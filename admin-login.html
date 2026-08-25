@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IELTSX — Admin Login</title>
-<link rel="stylesheet" href="index-BxgEAFAf.css">
-<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="/assets/index-BxgEAFAf.css">
+<link rel="stylesheet" href="/admin.css">
 </head>
 <body>
 <div style="min-height:100vh;display:grid;place-items:center;padding:20px">
@@ -23,7 +23,7 @@
       <div id="error" style="display:none;color:#b91c1c;font-size:12px;margin-top:10px">Invalid administrator credentials.</div>
       <button class="btn btn-primary" style="width:100%;margin-top:16px" type="submit">Sign in to Admin</button>
     </form>
-    <a href="index.html" style="display:block;text-align:center;margin-top:15px;color:#64748b;font-size:12px;text-decoration:none">← Back to IELTSX</a>
+    <a href="/index.html" style="display:block;text-align:center;margin-top:15px;color:#64748b;font-size:12px;text-decoration:none">← Back to IELTSX</a>
   </div>
 </div>
 <script>
@@ -32,8 +32,8 @@ form.addEventListener('submit',e=>{
  e.preventDefault();
  const u=document.getElementById('username').value.trim();
  const p=document.getElementById('password').value;
- if(u==='admin'&&p==='IELTSX@Admin2026!'){localStorage.setItem('ieltsx-admin-session-v1','1');location.href='admin.html'}
+ if(u==='admin'&&p==='IELTSX@Admin2026!'){localStorage.setItem('ieltsx-admin-session-v1','1');location.href='/admin.html'}
  else document.getElementById('error').style.display='block';
 });
 </script>
-<script src="admin-login.js"></script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body></html>
+<script src="/admin-login.js"></script><a href="/admin/admin.html" class="admin-panel-link">Admin Panel</a></body></html>

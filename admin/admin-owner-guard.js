@@ -7,7 +7,7 @@
   const allowed=currentEmail.toLowerCase()===ADMIN_OWNER_EMAIL.toLowerCase();
   if(!allowed || !adminSession){
     if(location.pathname.indexOf('/admin/')!==-1 || /admin(-login)?\.html$/i.test(location.pathname)){
-      location.href='../login.html?admin=denied';
+      location.href='/login.html?admin=denied';
     }
   }
   window.IELTSX_ADMIN_OWNER=ADMIN_OWNER_EMAIL;

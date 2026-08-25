@@ -2,7 +2,7 @@
  const OWNER='nomozovshoxnur@gmail.com';
  const email=(localStorage.getItem('ieltsx_logged_in_email')||localStorage.getItem('ieltsx_user_email')||localStorage.getItem('userEmail')||'').toLowerCase();
  if(email!==OWNER.toLowerCase()||!localStorage.getItem('ieltsx_admin_session')){
-   if(!location.pathname.endsWith('admin-login.html')) location.href='../login.html?admin=denied';
+   if(!location.pathname.endsWith('admin-login.html')) location.href='/login.html?admin=denied';
  }
  window.A={
    ownerEmail:OWNER,

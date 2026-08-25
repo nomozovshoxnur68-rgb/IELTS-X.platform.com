@@ -80,11 +80,11 @@ function staticFile(req,res,pathname,user){
       return res.end();
     }
     const legacyAssets={
-      'auth-bridge.js':'auth-bridge.js',
-      'site-access.js':'site-access.js',
-      'premium-access.js':'premium-access.js',
-      'ieltsx-data.js':'ieltsx-data.js',
-      'performance-dashboard.js':'performance-dashboard.js',
+      '/auth-bridge.js':'/auth-bridge.js',
+      '/site-access.js':'/site-access.js',
+      '/premium-access.js':'/premium-access.js',
+      '/ieltsx-data.js':'/ieltsx-data.js',
+      '/performance-dashboard.js':'/performance-dashboard.js',
       'filters.js':'assets/filters.js',
       'unlock-cards.js':'assets/unlock-cards.js',
       'unlock-cards.css':'assets/unlock-cards.css'

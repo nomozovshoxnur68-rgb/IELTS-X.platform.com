@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IELTS X — Welcome</title>
-<link rel="stylesheet" href="index-BxgEAFAf.css">
+<link rel="stylesheet" href="/assets/index-BxgEAFAf.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -22,7 +22,7 @@
 
         <!-- HOME -->
         <div class="absolute right-6 top-6 md:right-10 md:top-10">
-            <a href="index.html"
+            <a href="/index.html"
                class="inline-flex items-center justify-center rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                 Home
             </a>
@@ -100,7 +100,7 @@
 
             and
 
-            <a href="index.html" class="hover:text-black">
+            <a href="/index.html" class="hover:text-black">
                 Privacy Policy
             </a>
         </div>
@@ -108,7 +108,7 @@
     </div>
 
     <!-- SITE ACCESS -->
-    <script type="module" src="./site-access.js"></script>
+    <script type="module" src="/site-access.js"></script>
 
     <!-- SAVED ACCOUNTS HANDLER -->
     <script type="module">
@@ -198,7 +198,7 @@
                 list.appendChild(accountEl);
             });
 
-            // Emit event so site-access.js can attach login handlers
+            // Emit event so /site-access.js can attach login handlers
             document.dispatchEvent(new CustomEvent("saved-accounts-rendered"));
         }
 
@@ -217,6 +217,6 @@
             });
     </script>
 
-<script src="premium-access.js"></script><script>window.IELTSXPremium&&window.IELTSXPremium.protect();</script><script type="module">import {login,register} from './auth.js';const f=document.querySelector('#ieltsx-auth-form'),reg=document.querySelector('#ieltsx-register'),err=document.querySelector('#ieltsx-auth-error');f?.addEventListener('submit',async e=>{e.preventDefault();try{await login(document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='index.html'}catch(x){err.textContent=x.message}});reg?.addEventListener('click',async()=>{try{await register(document.querySelector('#ieltsx-name').value,document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='index.html'}catch(x){err.textContent=x.message}});</script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
+<script src="/premium-access.js"></script><script>window.IELTSXPremium&&window.IELTSXPremium.protect();</script><script type="module">import {login,register} from './auth.js';const f=document.querySelector('#ieltsx-auth-form'),reg=document.querySelector('#ieltsx-register'),err=document.querySelector('#ieltsx-auth-error');f?.addEventListener('submit',async e=>{e.preventDefault();try{await login(document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='/index.html'}catch(x){err.textContent=x.message}});reg?.addEventListener('click',async()=>{try{await register(document.querySelector('#ieltsx-name').value,document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='/index.html'}catch(x){err.textContent=x.message}});</script><a href="/admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
 
 </html>

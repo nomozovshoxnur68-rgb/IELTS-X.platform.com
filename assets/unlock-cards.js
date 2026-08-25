@@ -25,7 +25,7 @@ window.IELTSXUnlock={
     if(isPremium()){ location.href=target; return true; }
     const card=document.querySelector('.ieltsx-unlock-card');
     if(card) show(card,target);
-    else location.href='Price.html';
+    else location.href='/Price.html';
     return false;
   }
 };
@@ -39,7 +39,7 @@ function show(card,target){
     '<button class="unlock-close" aria-label="Close">×</button>'+
     '<h3>Premium Access Required</h3>'+
     '<p>This test is locked. Upgrade to Premium to unlock this content.</p>'+
-    '<a class="unlock-action" href="Price.html">Unlock Premium</a>'+
+    '<a class="unlock-action" href="/Price.html">Unlock Premium</a>'+
     '</div>';
   card.appendChild(overlay);
   overlay.querySelector('.unlock-close').onclick=function(){overlay.remove()};
