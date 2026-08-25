@@ -1,0 +1,57 @@
+
+.ieltsx-unlock-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(130,2,65,.14);
+  border-radius:18px;
+  background:var(--unlock-card-bg,#fff);
+  box-shadow:0 10px 28px rgba(0,0,0,.07);
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.ieltsx-unlock-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 34px rgba(0,0,0,.10);
+  border-color:rgba(130,2,65,.28);
+}
+.ieltsx-unlock-card.is-locked:after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(130,2,65,.035));
+  pointer-events:none;
+}
+.ieltsx-unlock-card .unlock-body{padding:20px}
+.ieltsx-unlock-card .unlock-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;border-radius:999px;
+  background:#f8eaf1;color:#820241;font-size:12px;font-weight:800;
+}
+.ieltsx-unlock-card .unlock-title{margin:12px 0 7px;font-size:18px;font-weight:800}
+.ieltsx-unlock-card .unlock-description{margin:0;color:#6b7070;line-height:1.5}
+.ieltsx-unlock-card .unlock-action{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:16px;padding:10px 14px;border:0;border-radius:10px;
+  background:#820241;color:#fff;font-weight:750;cursor:pointer;
+  text-decoration:none;
+}
+.ieltsx-unlock-card .unlock-action:hover{background:#a9045a}
+.ieltsx-unlock-card.is-unlocked .unlock-badge{background:#e8f7ef;color:#087443}
+.ieltsx-unlock-card.is-unlocked .unlock-action{background:#202222}
+.ieltsx-unlock-overlay{
+  position:absolute;z-index:4;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(255,255,255,.84);backdrop-filter:blur(3px);
+}
+.ieltsx-unlock-dialog{
+  width:min(390px,100%);background:#fff;border:1px solid #e4e7e7;
+  border-radius:16px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.18);
+}
+.ieltsx-unlock-dialog h3{margin:0 0 7px}
+.ieltsx-unlock-dialog p{margin:0;color:#6b7070;line-height:1.5}
+.ieltsx-unlock-dialog .unlock-close{
+  float:right;border:0;background:transparent;font-size:22px;cursor:pointer;color:#6b7070;
+}
+@media(prefers-color-scheme:dark){
+  .ieltsx-unlock-card{--unlock-card-bg:#202222;border-color:#343737}
+  .ieltsx-unlock-dialog{background:#202222;border-color:#343737;color:#fff}
+  .ieltsx-unlock-dialog p{color:#b8bebe}
+  .ieltsx-unlock-overlay{background:rgba(20,22,22,.82)}
+}

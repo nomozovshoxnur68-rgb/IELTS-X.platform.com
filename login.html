@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IELTS X — Welcome</title>
+<link rel="stylesheet" href="index-BxgEAFAf.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="antialiased bg-white">
+
+    <div class="relative flex min-h-screen flex-col">
+
+        <!-- LOGO -->
+        <div class="absolute left-6 top-6 md:left-10 md:top-10">
+            <img src="./assets/ieltsx-logo-transparent.png"
+                 class="h-8 w-auto"
+                 alt="IELTS X">
+        </div>
+
+        <!-- HOME -->
+        <div class="absolute right-6 top-6 md:right-10 md:top-10">
+            <a href="index.html"
+               class="inline-flex items-center justify-center rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Home
+            </a>
+        </div>
+
+        <!-- CENTER -->
+        <div class="flex flex-1 flex-col items-center justify-center gap-8 p-6">
+
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900">
+                    Welcome to IELTS X
+                </h1>
+
+                <p class="mt-2 text-gray-500">
+                    The new way of preparing for IELTS
+                </p>
+            </div>
+
+            <div class="w-full max-w-sm space-y-4">
+
+                <!-- SAVED ACCOUNTS -->
+                <div id="saved-accounts-container" class="hidden space-y-2">
+                    <p class="text-xs text-gray-500 uppercase font-semibold">Avval kirgan hisoblar</p>
+                    <div id="saved-accounts-list" class="space-y-2"></div>
+                    <hr class="my-3">
+                </div>
+
+                <!-- GOOGLE -->
+                <button
+                    id="google-login-btn"
+                    type="button"
+                    class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl px-4 py-3 bg-white hover:bg-gray-50 transition">
+
+                    <svg class="w-5 h-5" viewBox="0 0 533.5 544.3">
+                        <path fill="#4285f4"
+                            d="M533.5 278.4c0-18.5-1.5-37.2-4.7-55.3H272v104.8h147.1c-6.4 34.7-25.1 64-53.4 83.7l86.4 67c50.6-46.7 81.4-115.5 81.4-200.2z" />
+                        <path fill="#34a853"
+                            d="M272 544.3c72.7 0 133.8-24.1 178.4-65.3l-86.4-67c-24 16.1-54.9 25.3-92 25.3-70.7 0-130.7-47.8-152.2-112.2l-89.3 68.9C72.6 482.1 166.7 544.3 272 544.3z" />
+                        <path fill="#fbbc04"
+                            d="M119.8 325.1c-10.6-31.6-10.6-65.7 0-97.3l-89.3-69C-10.3 218.6-10.3 325.7 30.5 391l89.3-65.9z" />
+                        <path fill="#ea4335"
+                            d="M272 107.7c39.6-.6 77.8 14 107 40.9l80-77.9C410.1 24.6 343.5-.2 272 0 166.7 0 72.6 62.2 30.5 152.8l89.3 69C141.3 155.5 201.3 107.7 272 107.7z" />
+                    </svg>
+
+                    <span class="font-medium text-gray-700">
+                        Continue with Google
+                    </span>
+                </button>
+
+                <!-- TELEGRAM -->
+                <button
+                    id="telegram-btn"
+                    type="button"
+                    class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl px-4 py-3 bg-white hover:bg-gray-50 transition">
+
+                    <svg class="w-5 h-5" viewBox="0 0 240 240">
+                        <circle cx="120" cy="120" r="120" fill="#2AABEE" />
+                        <path fill="#fff"
+                            d="M54 120l120-52c6-3 12 1 10 8l-18 84c-2 8-7 10-13 6l-34-25-16 15c-2 2-4 4-8 4l2-28 52-47c2-2 0-3-3-2L72 129l-18-6z" />
+                    </svg>
+
+                    <span class="font-medium text-gray-700">
+                        Continue with Telegram
+                    </span>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="text-center text-xs text-gray-400 pb-6">
+            <a href="#" class="hover:text-black">
+                Terms
+            </a>
+
+            and
+
+            <a href="index.html" class="hover:text-black">
+                Privacy Policy
+            </a>
+        </div>
+<div id="ieltsx-email-login" class="w-full max-w-sm mt-4"><div class="text-xs text-gray-500 mb-2">Email account</div><form id="ieltsx-auth-form" class="space-y-2"><input id="ieltsx-name" class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Full name (for registration)"><input id="ieltsx-email" type="email" required class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Email"><input id="ieltsx-password" type="password" required minlength="8" class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Password (8+ characters)"><div class="flex gap-2"><button type="submit" data-mode="login" class="flex-1 border border-gray-300 rounded-xl px-4 py-3">Login</button><button type="button" id="ieltsx-register" class="flex-1 bg-black text-white rounded-xl px-4 py-3">Register</button></div><div id="ieltsx-auth-error" class="text-xs text-red-500"></div></form></div>
+    </div>
+
+    <!-- SITE ACCESS -->
+    <script type="module" src="./site-access.js"></script>
+
+    <!-- SAVED ACCOUNTS HANDLER -->
+    <script type="module">
+        import { getKnownAccounts, removeKnownAccount } from "./auth.js";
+
+        function renderSavedAccounts() {
+            const accounts = getKnownAccounts();
+            const container = document.getElementById("saved-accounts-container");
+            const list = document.getElementById("saved-accounts-list");
+
+            if (!accounts || accounts.length === 0) {
+                if (container) container.classList.add("hidden");
+                return;
+            }
+
+            // Show container
+            if (container) container.classList.remove("hidden");
+
+            // Clear list
+            list.innerHTML = "";
+
+            // Render each account
+            accounts.forEach((account) => {
+                const accountEl = document.createElement("div");
+                accountEl.className = "flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition";
+
+                const accountInfo = document.createElement("button");
+                accountInfo.type = "button";
+                accountInfo.className = "flex-1 flex items-center gap-3 text-left";
+                accountInfo.setAttribute("data-quick-login", "true");
+                accountInfo.setAttribute("data-account-uid", account.uid || "");
+                accountInfo.setAttribute("data-account-email", account.email || "");
+                accountInfo.setAttribute("data-account-name", account.displayName || "User");
+
+                // Photo
+                if (account.photoURL) {
+                    const photo = document.createElement("img");
+                    photo.src = account.photoURL;
+                    photo.className = "w-8 h-8 rounded-full object-cover";
+                    accountInfo.appendChild(photo);
+                } else {
+                    const avatar = document.createElement("div");
+                    avatar.className = "w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold";
+                    avatar.textContent = (account.displayName || "?").charAt(0).toUpperCase();
+                    accountInfo.appendChild(avatar);
+                }
+
+                // Info
+                const info = document.createElement("div");
+                info.className = "flex-1";
+
+                const name = document.createElement("div");
+                name.className = "text-sm font-medium text-gray-900";
+                name.textContent = account.displayName || "User";
+                info.appendChild(name);
+
+                const email = document.createElement("div");
+                email.className = "text-xs text-gray-500 truncate";
+                email.textContent = account.email;
+                info.appendChild(email);
+
+                if (account.premium) {
+                    const premium = document.createElement("div");
+                    premium.className = "mt-1 inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700";
+                    premium.innerHTML = "&#128081; Premium";
+                    info.appendChild(premium);
+                }
+
+                accountInfo.appendChild(info);
+
+                // Remove button
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "ml-2 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition";
+                removeBtn.title = "O'chirish";
+                removeBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm(`${account.displayName} hisobini o'chirasizmi?`)) {
+                        removeKnownAccount(account.uid);
+                        renderSavedAccounts();
+                    }
+                };
+
+                accountEl.appendChild(accountInfo);
+                accountEl.appendChild(removeBtn);
+                list.appendChild(accountEl);
+            });
+
+            // Emit event so site-access.js can attach login handlers
+            document.dispatchEvent(new CustomEvent("saved-accounts-rendered"));
+        }
+
+        // Initialize on page load
+        renderSavedAccounts();
+    </script>
+
+    <!-- TELEGRAM BUTTON -->
+    <script>
+        document
+            .getElementById("telegram-btn")
+            .addEventListener("click", () => {
+
+                alert("Telegram login coming soon.");
+
+            });
+    </script>
+
+<script src="premium-access.js"></script><script>window.IELTSXPremium&&window.IELTSXPremium.protect();</script><script type="module">import {login,register} from './auth.js';const f=document.querySelector('#ieltsx-auth-form'),reg=document.querySelector('#ieltsx-register'),err=document.querySelector('#ieltsx-auth-error');f?.addEventListener('submit',async e=>{e.preventDefault();try{await login(document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='index.html'}catch(x){err.textContent=x.message}});reg?.addEventListener('click',async()=>{try{await register(document.querySelector('#ieltsx-name').value,document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='index.html'}catch(x){err.textContent=x.message}});</script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
+
+</html>

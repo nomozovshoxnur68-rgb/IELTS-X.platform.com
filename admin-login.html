@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IELTSX — Admin Login</title>
+<link rel="stylesheet" href="index-BxgEAFAf.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div style="min-height:100vh;display:grid;place-items:center;padding:20px">
+  <div class="card" style="width:min(410px,100%);padding:28px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
+      <img src="./assets/ieltsx-logo-transparent.png" style="width:40px;height:40px;object-fit:contain;border-radius:9px;background:#f1f5f9" onerror="this.style.display='none'">
+      <div><strong style="font-size:18px">IELTSX Admin</strong><div class="muted" style="font-size:12px">Administration panel</div></div>
+    </div>
+    <h1 style="font-size:22px;margin:0 0 5px">Sign in</h1>
+    <p class="muted" style="font-size:13px;margin:0 0 20px">Use your administrator credentials.</p>
+    <form id="login-form">
+      <label style="display:block;font-size:12px;font-weight:650;margin-bottom:6px">Username</label>
+      <input id="username" class="field" style="width:100%;margin-bottom:13px" autocomplete="username" required>
+      <label style="display:block;font-size:12px;font-weight:650;margin-bottom:6px">Password</label>
+      <input id="password" type="password" class="field" style="width:100%" autocomplete="current-password" required>
+      <div id="error" style="display:none;color:#b91c1c;font-size:12px;margin-top:10px">Invalid administrator credentials.</div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" type="submit">Sign in to Admin</button>
+    </form>
+    <a href="index.html" style="display:block;text-align:center;margin-top:15px;color:#64748b;font-size:12px;text-decoration:none">← Back to IELTSX</a>
+  </div>
+</div>
+<script>
+const form=document.getElementById('login-form');
+form.addEventListener('submit',e=>{
+ e.preventDefault();
+ const u=document.getElementById('username').value.trim();
+ const p=document.getElementById('password').value;
+ if(u==='admin'&&p==='IELTSX@Admin2026!'){localStorage.setItem('ieltsx-admin-session-v1','1');location.href='admin.html'}
+ else document.getElementById('error').style.display='block';
+});
+</script>
+<script src="admin-login.js"></script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body></html>

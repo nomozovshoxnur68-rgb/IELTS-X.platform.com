@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IELTSX — Simple, Transparent Pricing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom additional styles for animations and transitions (unchanged) -->
+    <style>
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        :root {
+            --discount-banner-height: 0px;
+            --border: 214 32% 91%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted: 210 40% 96%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --ring: 215 20% 65%;
+        }
+
+        body {
+            background: hsl(var(--background));
+            font-feature-settings: "rlig" 1, "calt" 1;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* simple accordion animation (kept as original) */
+        [data-state="closed"] .lucide-chevron-down {
+            transform: rotate(0deg);
+        }
+
+        [data-state="open"] .lucide-chevron-down {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+
+<body class="antialiased bg-background text-foreground">
+
+    <!-- EXACT CONTENT PROVIDED BY USER (preserved verbatim) -->
+    <div id="root">
+        <div class="flex min-h-screen flex-col" style="padding-top: var(--discount-banner-height, 0px);">
+            <div id="discount-banner"
+                class="fixed top-0 left-0 right-0 z-[60] w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white shadow-md">
+                <div class="px-3 md:px-4">
+                    <div class="flex sm:hidden items-center justify-center gap-1.5 text-center py-2"><svg
+                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-gift h-3.5 w-3.5 flex-shrink-0">
+                            <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+                            <path d="M12 8v13"></path>
+                            <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path>
+                            <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5">
+                            </path>
+                        </svg><span class="font-bold text-[11px]">Use <span
+                                class="bg-white/20 rounded px-1">MAY10</span> for 10% OFF</span><a
+                            class="text-[11px] font-bold underline hover:text-white/90" href="/pricing"
+                            data-discover="true">Upgrade →</a></div>
+                    <div class="hidden sm:flex items-center justify-center gap-2 md:gap-3 text-center flex-wrap py-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-gift h-4 w-4 flex-shrink-0">
+                            <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+                            <path d="M12 8v13"></path>
+                            <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path>
+                            <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5">
+                            </path>
+                        </svg><span class="font-bold text-xs md:text-sm">Use promo code <span
+                                class="bg-white/20 rounded px-1.5 py-0.5 font-mono tracking-wider">MAY10</span> and get
+                            extra 10% discount</span>
+                        <div class="flex items-center gap-1">
+                            <div class="flex items-baseline gap-0.5"><span
+                                    class="font-bold text-xs md:text-sm tabular-nums min-w-[2ch] inline-block text-center">02</span><span
+                                    class="text-[10px] opacity-90">d</span></div><span
+                                class="font-bold text-xs">:</span>
+                            <div class="flex items-baseline gap-0.5"><span
+                                    class="font-bold text-xs md:text-sm tabular-nums min-w-[2ch] inline-block text-center">15</span><span
+                                    class="text-[10px] opacity-90">h</span></div><span
+                                class="font-bold text-xs">:</span>
+                            <div class="flex items-baseline gap-0.5"><span
+                                    class="font-bold text-xs md:text-sm tabular-nums min-w-[2ch] inline-block text-center">35</span><span
+                                    class="text-[10px] opacity-90">m</span></div><span
+                                class="font-bold text-xs">:</span>
+                            <div class="flex items-baseline gap-0.5"><span
+                                    class="font-bold text-xs md:text-sm tabular-nums min-w-[2ch] inline-block text-center">44</span><span
+                                    class="text-[10px] opacity-90">s</span></div>
+                        </div><a
+                            class="bg-white/15 hover:bg-white/25 text-white text-xs md:text-sm font-bold px-3 py-0.5 rounded-full transition-colors"
+                            href="/pricing" data-discover="true">Upgrade Now →</a>
+                    </div>
+                </div>
+            </div>
+            <nav class="fixed left-1/2 transform -translate-x-1/2 z-40 w-full max-w-7xl mx-auto px-4"
+                style="top: calc(var(--discount-banner-height, 0px) + 20px);">
+                <div class="bg-background/80 backdrop-blur-md border border-border rounded-2xl shadow-lg">
+                    <div class="flex h-14 items-center px-3 sm:px-6 gap-2"><a class="flex items-center shrink-0"
+                            href="/" data-discover="true"><img class="h-6 sm:h-8"
+                                src="/assets/ieltsx-logo-transparent-DmLSqOZo.png" alt="IELTS Logo"></a>
+                        <div class="hidden md:flex items-center justify-center space-x-1 flex-1"><a
+                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 py-2 text-sm px-3"
+                                href="/features" data-discover="true">Features</a><a
+                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 py-2 text-sm px-3"
+                                href="/pricing" data-discover="true">Pricing</a><a
+                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 py-2 text-sm px-3"
+                                href="/teachers" data-discover="true">Teachers</a><a href="https://mock.ieltsx.com"
+                                target="_blank" rel="noopener noreferrer"
+                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 py-2 text-sm px-3">For
+                                Business</a></div>
+                        <div class="flex-1 md:hidden"></div>
+                        <div class="flex items-center gap-2"><a
+                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 py-2 text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10"
+                                href="/home" data-discover="true">Home</a><button
+                                class="md:hidden p-1.5 rounded-lg hover:bg-muted transition-colors"
+                                aria-label="Toggle menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5">
+                                    <line x1="4" x2="20" y1="12" y2="12"></line>
+                                    <line x1="4" x2="20" y1="6" y2="6"></line>
+                                    <line x1="4" x2="20" y1="18" y2="18"></line>
+                                </svg></button></div>
+                    </div>
+                </div>
+            </nav>
+            <main class="flex-1">
+                <div class="min-h-screen bg-background">
+                    <section class="pt-24 pb-16 px-4 bg-gradient-to-b from-background to-background">
+                        <div class="container mx-auto">
+                            <div class="max-w-4xl mx-auto text-center">
+                                <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-foreground">Simple,
+                                    Transparent Pricing</h1>
+                                <p class="text-lg md:text-xl text-muted-foreground mt-4 max-w-2xl mx-auto">Choose your
+                                    plan and duration. Subscribe and cancel anytime.</p>
+                                <div class="flex items-center justify-center gap-4 md:gap-8 mt-8 flex-wrap">
+                                    <div class="flex items-center gap-2 text-sm"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-crown h-4 w-4 text-red-500">
+                                            <path
+                                                d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
+                                            </path>
+                                            <path d="M5 21h14"></path>
+                                        </svg><span>No hidden fees</span></div>
+                                    <div class="flex items-center gap-2 text-sm"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-clock h-4 w-4 text-blue-500">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg><span>Instant access</span></div>
+                                    <div class="flex items-center gap-2 text-sm"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-zap h-4 w-4 text-yellow-500">
+                                            <path
+                                                d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z">
+                                            </path>
+                                        </svg><span>Cancel anytime</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="pb-8 px-4">
+                        <div class="container mx-auto">
+                            <div class="max-w-4xl mx-auto mb-4">
+                                <p class="text-sm font-medium uppercase tracking-wide text-muted-foreground">Individual
+                                    Plans</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-center justify-between max-w-4xl mx-auto">
+                                <div
+                                    class="inline-flex w-full max-w-[200px] sm:max-w-none sm:w-auto items-center justify-center gap-0 p-1 bg-muted rounded-lg relative mx-auto sm:mx-0">
+                                    <div
+                                        class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-primary rounded-md transition-all duration-200 left-[calc(50%+3px)]">
+                                    </div><button
+                                        class="relative z-10 flex-1 min-w-0 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors sm:min-w-[88px] text-foreground/60 hover:text-foreground">🌍
+                                        USD</button><button
+                                        class="relative z-10 flex-1 min-w-0 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors sm:min-w-[88px] text-primary-foreground">🇺🇿
+                                        UZS</button>
+                                </div>
+                                <div class="inline-flex w-full items-center gap-1 p-1 bg-muted rounded-lg sm:w-auto">
+                                    <button
+                                        class="relative inline-flex h-9 flex-1 min-w-0 sm:flex-none sm:min-w-[108px] items-center justify-center gap-1.5 rounded-md px-2 sm:px-3 py-2 text-[13px] sm:text-sm font-medium whitespace-nowrap transition-colors text-foreground/60 hover:text-foreground hover:bg-muted-foreground/10"><span>Monthly</span><span
+                                            class="hidden sm:inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none border bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">-10%</span></button><button
+                                        class="relative inline-flex h-9 flex-1 min-w-0 sm:flex-none sm:min-w-[108px] items-center justify-center gap-1.5 rounded-md px-2 sm:px-3 py-2 text-[13px] sm:text-sm font-medium whitespace-nowrap transition-colors bg-primary text-primary-foreground shadow-sm"><span>3
+                                            Months</span><span
+                                            class="hidden sm:inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none border bg-primary-foreground/15 text-primary-foreground border-primary-foreground/20">-20%</span></button><button
+                                        class="relative inline-flex h-9 flex-1 min-w-0 sm:flex-none sm:min-w-[108px] items-center justify-center gap-1.5 rounded-md px-2 sm:px-3 py-2 text-[13px] sm:text-sm font-medium whitespace-nowrap transition-colors text-foreground/60 hover:text-foreground hover:bg-muted-foreground/10"><span>6
+                                            Months</span><span
+                                            class="hidden sm:inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none border bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800/60">-33%</span></button>
+                                </div>
+                                <div class="hidden sm:block w-[140px]"></div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="pb-16 px-4">
+                        <div class="container mx-auto">
+                            <div class="max-w-4xl mx-auto">
+                                <div class="grid gap-6 md:grid-cols-2">
+                                    <div class="order-last md:order-none">
+                                        <div
+                                            class="text-card-foreground shadow relative flex h-full flex-col rounded-2xl border-2 transition-all duration-200 bg-card border-border hover:border-muted-foreground/30">
+                                            <div class="px-6 pt-5">
+                                                <div class="flex items-center justify-between"><span
+                                                        class="hidden sm:inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">Tier
+                                                        3 Access</span><span
+                                                        class="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-red-500 to-red-700 px-2.5 py-1 text-xs font-bold text-white">🔥
+                                                        17% OFF</span></div>
+                                            </div>
+                                            <div class="space-y-1.5 p-6 flex flex-col gap-2 pt-4 pb-0">
+                                                <div class="tracking-tight flex items-center gap-2 text-2xl font-bold">
+                                                    Standard</div>
+                                                <div class="space-y-1 mt-2">
+                                                    <div class="flex items-baseline gap-1 justify-center"><span
+                                                            class="text-3xl font-bold text-foreground">55,000
+                                                            uzs</span><span class="text-sm text-muted-foreground">/
+                                                            month</span></div>
+                                                    <div class="flex items-center justify-center gap-2"><span>billed
+                                                            once</span><span class="font-semibold">165,000
+                                                            uzs</span><span
+                                                            class="line-through text-muted-foreground decoration-red-600 dark:decoration-red-400">198,000
+                                                            uzs</span></div>
+                                                </div>
+                                            </div>
+                                            <div class="px-6 py-4"><button
+                                                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border bg-background shadow-sm h-10 rounded-md px-8 w-full hover:text-white hover:bg-red-700 border-red-700">Lock
+                                                    in 17% Off</button></div>
+                                            <div class="mx-6 border-t border-border"></div>
+                                            <div class="p-6 flex flex-1 flex-col gap-3 py-5">
+                                                <p class="text-sm font-medium text-muted-foreground">Everything
+                                                    included:</p>
+                                                <ul class="space-y-2.5 text-sm">
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">60+ Full Listening, Reading
+                                                            Tests</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">60+ Full Writing, Speaking
+                                                            Tests</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">6+ Full Mock Tests</span>
+                                                    </li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">30+ AI essay check &amp;
+                                                            feedback</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">Answer Explanations,
+                                                            Transcripts, Vocabularies</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">Performance Dashboard</span>
+                                                    </li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">Weakness Analysis</span>
+                                                    </li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">Weekly Articles List</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="flex items-center p-6 pt-0 pb-5 px-6"><button
+                                                    class="w-full text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1">Compare
+                                                    Plans <span class="text-xs">↓</span></button></div>
+                                        </div>
+                                    </div>
+                                    <div class="md:order-none">
+                                        <div
+                                            class="text-card-foreground relative flex h-full flex-col rounded-2xl border-2 transition-all duration-200 bg-card border-red-500 dark:border-red-400 shadow-lg shadow-red-500/10">
+                                            <div class="px-6 pt-5">
+                                                <div class="flex items-center justify-between"><span
+                                                        class="hidden sm:inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">Tier
+                                                        3 Access</span><span
+                                                        class="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-red-500 to-red-700 px-2.5 py-1 text-xs font-bold text-white">🔥
+                                                        20% OFF</span></div>
+                                            </div>
+                                            <div class="space-y-1.5 p-6 flex flex-col gap-2 pt-4 pb-0">
+                                                <div class="tracking-tight flex items-center gap-2 text-2xl font-bold">
+                                                    Max<span
+                                                        class="text-base font-normal text-red-600 dark:text-red-400">Recommended</span>
+                                                </div>
+                                                <div class="space-y-1 mt-2">
+                                                    <div class="flex items-baseline gap-1 justify-center"><span
+                                                            class="text-3xl font-bold text-foreground">88,000
+                                                            uzs</span><span class="text-sm text-muted-foreground">/
+                                                            month</span></div>
+                                                    <div class="flex items-center justify-center gap-2"><span>billed
+                                                            once</span><span class="font-semibold">264,000
+                                                            uzs</span><span
+                                                            class="line-through text-muted-foreground decoration-red-600 dark:decoration-red-400">330,000
+                                                            uzs</span></div>
+                                                </div>
+                                            </div>
+                                            <div class="px-6 py-4"><button
+                                                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 shadow h-10 rounded-md px-8 w-full bg-red-600 text-white hover:bg-red-700">Lock
+                                                    in 20% Off</button></div>
+                                            <div class="mx-6 border-t border-border"></div>
+                                            <div class="p-6 flex flex-1 flex-col gap-3 py-5">
+                                                <p class="text-sm font-medium text-muted-foreground">Everything in
+                                                    STANDARD, plus:</p>
+                                                <ul class="space-y-2.5 text-sm">
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">60+ Full Listening, Reading
+                                                            Tests</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">60+ Full Writing, Speaking
+                                                            Tests</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">9+ Mock Tests</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">Exclusive practice
+                                                            materials</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">60+ AI essay evaluation
+                                                            &amp; feedback</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">100+ Reading
+                                                            Predictions</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">30+ Listening
+                                                            Predictions</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">100+ Writing
+                                                            Predictions</span></li>
+                                                    <li class="flex items-start gap-2.5"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg><span class="text-foreground">30+ Speaking
+                                                            Predictions</span></li>
+                                                </ul>
+                                            </div>
+                                            <div class="flex items-center p-6 pt-0 pb-5 px-6"><button
+                                                    class="w-full text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1">Compare
+                                                    Plans <span class="text-xs">↓</span></button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="mt-8 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200 dark:border-blue-800">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-message-circle h-5 w-5 text-blue-600 dark:text-blue-400">
+                                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                            </svg></div>
+                                        <p class="text-sm text-foreground"><strong>🇺🇿 Uzcard / Humo:</strong> <a
+                                                href="https://t.me/ieltsx_admin" target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="underline font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">@ieltsx_admin</a>
+                                            UZS Currency tanglang</p>
+                                    </div>
+                                </div>
+                                <div class="mt-14 mb-8">
+                                    <p
+                                        class="text-sm font-medium uppercase tracking-wide text-muted-foreground text-left">
+                                        Business Plans</p>
+                                </div>
+                                <div class="grid gap-6 md:grid-cols-2">
+                                    <div
+                                        class="text-card-foreground shadow relative flex h-full flex-col rounded-2xl border-2 border-border bg-card">
+                                        <div class="px-6 pt-5"><span
+                                                class="inline-flex items-center rounded-md bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide">For
+                                                Teachers</span></div>
+                                        <div class="space-y-1.5 p-6 flex flex-col gap-2 pt-4 pb-0">
+                                            <div class="tracking-tight flex items-center gap-2 text-2xl font-bold"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-graduation-cap h-6 w-6 text-red-600 dark:text-red-400">
+                                                    <path
+                                                        d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z">
+                                                    </path>
+                                                    <path d="M22 10v6"></path>
+                                                    <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                                                </svg>Teacher</div>
+                                            <div class="space-y-1 mt-2">
+                                                <div class="flex items-baseline gap-1 justify-center"><span
+                                                        class="text-3xl font-bold text-foreground">Custom</span><span
+                                                        class="text-sm font-medium text-muted-foreground">/user/month</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="px-6 py-4"><button
+                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border bg-background shadow-sm h-10 rounded-md px-8 w-full border-red-600 text-black hover:bg-red-600 hover:text-white dark:text-white">Contact
+                                                on Telegram</button></div>
+                                        <div class="mx-6 border-t border-border"></div>
+                                        <div class="p-6 flex flex-1 flex-col gap-3 py-5">
+                                            <p class="text-sm font-medium text-muted-foreground">Includes:</p>
+                                            <ul class="space-y-2.5 text-sm">
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Custom pricing</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Lower rates than current
+                                                        plans</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Manage subscriptions for
+                                                        students</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Direct setup support</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Zero setup fee</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="flex items-center p-6 pt-0 pb-5 px-6"><a
+                                                href="https://t.me/ieltsx_admin" target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="w-full text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">@ieltsx_admin</a>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="text-card-foreground shadow relative flex h-full flex-col rounded-2xl border-2 border-border bg-card">
+                                        <div class="px-6 pt-5"><span
+                                                class="inline-flex items-center rounded-md bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide">For
+                                                Mock Centers</span></div>
+                                        <div class="space-y-1.5 p-6 flex flex-col gap-2 pt-4 pb-0">
+                                            <div class="tracking-tight flex items-center gap-2 text-2xl font-bold">Mock
+                                                System</div>
+                                            <div class="space-y-1 mt-2">
+                                                <div class="flex items-baseline gap-1 justify-center"><span
+                                                        class="text-3xl font-bold text-foreground">Custom</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="px-6 py-4"><button
+                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border bg-background shadow-sm h-10 rounded-md px-8 w-full border-red-600 text-black hover:bg-red-600 hover:text-white dark:text-white">Contact
+                                                on Telegram</button></div>
+                                        <div class="mx-6 border-t border-border"></div>
+                                        <div class="p-6 flex flex-1 flex-col gap-3 py-5">
+                                            <p class="text-sm font-medium text-muted-foreground">Includes:</p>
+                                            <ul class="space-y-2.5 text-sm">
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Comes with a complete test
+                                                        bank</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Easy mock-exam management</span>
+                                                </li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Students can see their results
+                                                        on the website</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Custom pricing based on the
+                                                        number of exams</span></li>
+                                                <li class="flex items-start gap-2.5"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-check mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg><span class="text-foreground">Zero setup fee</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="flex items-center p-6 pt-0 pb-5 px-6"><a
+                                                href="https://t.me/ieltsx_admin" target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="w-full text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">@ieltsx_admin</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-12 p-6 rounded-xl bg-muted/50 border">
+                                    <p class="text-sm font-medium text-center text-muted-foreground mb-4">Accepted
+                                        Payment Methods</p>
+                                    <div class="flex items-center justify-center gap-12 flex-wrap">
+                                        <div class="flex flex-col items-center gap-2"><img
+                                                src="/assets/visa-mastercard-logo-C8wi7jRO.png" alt="Visa Mastercard"
+                                                class="h-14 w-auto object-contain"><span
+                                                class="text-xs text-muted-foreground">Visa, Mastercard</span></div>
+                                        <div class="flex flex-col items-center gap-2"><img
+                                                src="/assets/uzcard-humo-logo-7pOP3RAt.png" alt="Uzcard Humo"
+                                                class="h-14 w-auto object-contain"><span
+                                                class="text-xs text-muted-foreground">Uzcard, Humo</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="py-20 px-4">
+                        <div class="container mx-auto">
+                            <div id="compare-plans" class="max-w-5xl mx-auto">
+                                <div class="text-center mb-12">
+                                    <div
+                                        class="inline-flex items-center gap-2 px-3 py-1 mb-4 text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-900/40">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-target w-4 h-4">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <circle cx="12" cy="12" r="6"></circle>
+                                            <circle cx="12" cy="12" r="2"></circle>
+                                        </svg><span>Feature Comparison</span></div>
+                                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Compare Plans</h2>
+                                    <p class="text-lg text-muted-foreground max-w-2xl mx-auto">Choose the tier that fits
+                                        your preparation timeline</p>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <div class="min-w-[700px] border border-border rounded-xl overflow-hidden">
+                                        <div class="grid bg-muted/50 border-b border-border"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4 font-semibold text-sm">Features</div>
+                                            <div class="p-4 text-center border-l border-border ">
+                                                <div class="font-bold text-base flex items-center justify-center gap-1">
+                                                    Tier 1</div>
+                                                <div class="text-xs text-muted-foreground mt-1">STANDARD 1 Month</div>
+                                            </div>
+                                            <div class="p-4 text-center border-l border-border ">
+                                                <div class="font-bold text-base flex items-center justify-center gap-1">
+                                                    Tier 2</div>
+                                                <div class="text-xs text-muted-foreground mt-1">STANDARD 2 Months</div>
+                                            </div>
+                                            <div class="p-4 text-center border-l border-border ">
+                                                <div class="font-bold text-base flex items-center justify-center gap-1">
+                                                    Tier 3</div>
+                                                <div class="text-xs text-muted-foreground mt-1">MAX 1M or STANDARD 3M+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="bg-muted/30 px-4 py-3 border-b border-border"
+                                            style="grid-column: 1 / -1;">
+                                            <h4
+                                                class="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                                                Practice Tests</h4>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Full Listening Practice Tests</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">20+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">40+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">60+ tests</span></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Full Reading Practice Tests</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">20+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">40+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">60+ tests</span></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Full Writing Practice Tests</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">20+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">40+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">60+ tests</span></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Full Speaking Practice Tests</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">20+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">40+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">60+ tests</span></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Mock Tests</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">3+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">6+ tests</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">6+ tests</span></div>
+                                        </div>
+                                        <div class="bg-muted/30 px-4 py-3 border-b border-border"
+                                            style="grid-column: 1 / -1;">
+                                            <h4
+                                                class="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                                                Articles &amp; Courses</h4>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Weekly Article List (National
+                                                    Geographic, New Scientist, etc.)</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Listening Strategy Course</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="bg-muted/30 px-4 py-3 border-b border-border"
+                                            style="grid-column: 1 / -1;">
+                                            <h4
+                                                class="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                                                Interface &amp; Experience</h4>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">CD IELTS Interface</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Progress Dashboard</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Weakness analysis</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="bg-muted/30 px-4 py-3 border-b border-border"
+                                            style="grid-column: 1 / -1;">
+                                            <h4
+                                                class="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                                                Writing</h4>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">AI Writing Evaluations &amp; Feedback
+                                                </div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">40/mo</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">80/mo</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">80/mo</span></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">AI Writing Deep Check</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">10/mo</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">20/mo</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">20/mo</span></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">AI Speaking Check</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">10/mo</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">10/mo</span></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <span class="text-sm font-medium text-foreground">10/mo</span></div>
+                                        </div>
+                                        <div class="bg-muted/30 px-4 py-3 border-b border-border"
+                                            style="grid-column: 1 / -1;">
+                                            <h4
+                                                class="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                                                Study Tools</h4>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Answer Explanations</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Listening Transcripts</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                        <div class="grid border-b border-border last:border-b-0 hover:bg-muted/20 transition-colors"
+                                            style="grid-template-columns: minmax(200px, 1.5fr) repeat(3, 1fr);">
+                                            <div class="p-4">
+                                                <div class="text-sm font-medium">Review Mistakes</div>
+                                            </div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                            <div class="p-4 flex items-center justify-center border-l border-border ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check w-5 h-5 text-green-600 dark:text-green-400">
+                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                </svg></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-8 text-center">
+                                    <p class="text-sm text-muted-foreground mb-4">One-time payment, no auto-renewal.
+                                        Cancel anytime.</p>
+                                    <div class="flex gap-4 justify-center flex-wrap"><a href="https://t.me/ieltsx_admin"
+                                            target="_blank" rel="noopener noreferrer"
+                                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 shadow h-10 rounded-md px-8 bg-red-600 text-white hover:bg-red-700">Get
+                                            Tier 3 Access</a><a
+                                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-10 rounded-md px-8"
+                                            href="/login" data-discover="true">Try Demo Free</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="py-20 px-4 bg-muted/30">
+                        <div class="container mx-auto">
+                            <div class="text-center mb-12">
+                                <div
+                                    class="inline-flex items-center gap-2 px-3 py-1 mb-4 text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-900/40">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-sparkles w-4 h-4">
+                                        <path
+                                            d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z">
+                                        </path>
+                                        <path d="M20 3v4"></path>
+                                        <path d="M22 5h-4"></path>
+                                        <path d="M4 17v2"></path>
+                                        <path d="M5 18H3"></path>
+                                    </svg><span>FAQ</span></div>
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+                                <p class="text-lg text-muted-foreground max-w-2xl mx-auto">Find answers to common
+                                    questions about our IELTS preparation plans</p>
+                            </div>
+                            <div class="max-w-3xl mx-auto space-y-0">
+                                <div class="w-full" data-orientation="vertical">
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcb:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rca:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Is this a one-time payment or recurring
+                                                subscription?<svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcb:" hidden="" role="region"
+                                            aria-labelledby="radix-:rca:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcd:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rcc:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Can I upgrade next month without losing
+                                                progress?<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcd:" hidden="" role="region"
+                                            aria-labelledby="radix-:rcc:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcf:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rce:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Do you have the CD IELTS interface?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcf:" hidden="" role="region"
+                                            aria-labelledby="radix-:rce:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rch:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rcg:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">What does "Extended" and "All" mean in the
+                                                comparison table?<svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rch:" hidden="" role="region"
+                                            aria-labelledby="radix-:rcg:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcj:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rci:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">How does the tier system work?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcj:" hidden="" role="region"
+                                            aria-labelledby="radix-:rci:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcl:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rck:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">How do I pay?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcl:" hidden="" role="region"
+                                            aria-labelledby="radix-:rck:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcn:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rcm:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Do you use Cambridge materials?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcn:" hidden="" role="region"
+                                            aria-labelledby="radix-:rcm:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcp:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rco:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">If I pay for 3 months, do I need to pay
+                                                again for new updates?<svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcp:" hidden="" role="region"
+                                            aria-labelledby="radix-:rco:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcr:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rcq:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Can I try before buying?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcr:" hidden="" role="region"
+                                            aria-labelledby="radix-:rcq:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rct:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rcs:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Is this a course? Will there be a
+                                                teacher?<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rct:" hidden="" role="region"
+                                            aria-labelledby="radix-:rcs:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rcv:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rcu:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Is this a real IELTS exam? Will I get a
+                                                certificate?<svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rcv:" hidden="" role="region"
+                                            aria-labelledby="radix-:rcu:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rd1:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rd0:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Is IELTS X endorsed by IDP or British
+                                                Council?<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rd1:" hidden="" role="region"
+                                            aria-labelledby="radix-:rd0:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rd3:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rd2:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Is AI writing feedback accurate?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rd3:" hidden="" role="region"
+                                            aria-labelledby="radix-:rd2:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                    <div data-state="closed" data-orientation="vertical"
+                                        class="border-b border-blue-200 dark:border-blue-900/40">
+                                        <h3 data-orientation="vertical" data-state="closed" class="flex"><button
+                                                type="button" aria-controls="radix-:rd5:" aria-expanded="false"
+                                                data-state="closed" data-orientation="vertical" id="radix-:rd4:"
+                                                class="flex flex-1 items-center justify-between py-4 transition-all hover:underline text-left [&amp;[data-state=open]&gt;svg]:rotate-180 text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                                                data-radix-collection-item="">Will it guarantee I reach 7.0?<svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-chevron-down h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg></button></h3>
+                                        <div data-state="closed" id="radix-:rd5:" hidden="" role="region"
+                                            aria-labelledby="radix-:rd4:" data-orientation="vertical"
+                                            class="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+                                            style="--radix-accordion-content-height: var(--radix-collapsible-content-height); --radix-accordion-content-width: var(--radix-collapsible-content-width);">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="py-20 px-4">
+                        <div class="container mx-auto">
+                            <div class="max-w-3xl mx-auto text-center">
+                                <h2 class="text-2xl md:text-3xl font-bold text-foreground mb-4">Still have questions?
+                                </h2>
+                                <p class="text-muted-foreground mb-8">Our team is here to help you choose the right plan
+                                    for your IELTS preparation.</p>
+                                <div class="flex flex-col sm:flex-row gap-4 justify-center"><a
+                                        href="https://t.me/ieltsxuz" target="_blank" rel="noopener noreferrer"
+                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 rounded-md px-8">Contact
+                                        Support</a><a
+                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-10 rounded-md px-8"
+                                        href="/login" data-discover="true">Try Demo Free</a></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+            <footer class="bg-background border-t border-border">
+                <div class="container mx-auto px-6 py-12">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+                        <div class="col-span-2 md:col-span-1 flex flex-col gap-2"><a href="mailto:support@ieltsx.com"
+                                class="text-lg">support@ieltsx.com</a><a href="https://t.me/ieltsxuz" target="_blank"
+                                rel="noopener noreferrer"
+                                class="hover:text-foreground text-lg transition-colors">Telegram: @ieltsxuz</a>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex items-center gap-1 text-sm text-muted-foreground border border-border rounded-md p-1">
+                                    <button class="p-1 rounded-sm bg-muted text-foreground transition-colors"
+                                        aria-label="Switch to light theme"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-sun w-4 h-4">
+                                            <circle cx="12" cy="12" r="4"></circle>
+                                            <path d="M12 2v2"></path>
+                                            <path d="M12 20v2"></path>
+                                            <path d="m4.93 4.93 1.41 1.41"></path>
+                                            <path d="m17.66 17.66 1.41 1.41"></path>
+                                            <path d="M2 12h2"></path>
+                                            <path d="M20 12h2"></path>
+                                            <path d="m6.34 17.66-1.41 1.41"></path>
+                                            <path d="m19.07 4.93-1.41 1.41"></path>
+                                        </svg></button><button
+                                        class="p-1 rounded-sm hover:bg-muted text-muted-foreground transition-colors"
+                                        aria-label="Switch to dark theme"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-moon w-4 h-4">
+                                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                                        </svg></button><button
+                                        class="p-1 rounded-sm hover:bg-muted text-muted-foreground transition-colors"
+                                        aria-label="Switch to system theme"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="lucide lucide-monitor w-4 h-4">
+                                            <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+                                            <line x1="8" x2="16" y1="21" y2="21"></line>
+                                            <line x1="12" x2="12" y1="17" y2="21"></line>
+                                        </svg></button></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-foreground mb-4 text-sm">Product</h4>
+                            <ul class="space-y-3">
+                                <li><a class="text-muted-foreground transition-colors hover:text-foreground text-sm"
+                                        href="/pricing" data-discover="true">Pricing</a></li>
+                                <li><a class="text-muted-foreground transition-colors hover:text-foreground text-sm"
+                                        href="/features" data-discover="true">Features</a></li>
+                                <li><a class="text-muted-foreground transition-colors hover:text-foreground text-sm"
+                                        href="/teachers" data-discover="true">Teachers</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-foreground mb-4 text-sm">Privacy</h4>
+                            <ul class="space-y-3">
+                                <li><a class="text-muted-foreground transition-colors hover:text-foreground text-sm"
+                                        href="/privacy-policy" data-discover="true">Privacy Policy</a></li>
+                                <li><a class="text-muted-foreground transition-colors hover:text-foreground text-sm"
+                                        href="/terms-of-service" data-discover="true">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div
+                        class="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-6">
+                        <div>
+                            <p class="text-xs text-muted-foreground leading-relaxed my-2"><span
+                                    class="font-medium">Disclaimer:</span> IELTSX is an independent test preparation
+                                platform and is not affiliated with, endorsed by, or connected to IDP Education, British
+                                Council, Cambridge Assessment English, or any official IELTS organization. IELTS is a
+                                registered trademark of University of Cambridge ESOL, the British Council, and IDP
+                                Education Australia. All trademarks belong to their respective owners. This platform is
+                                designed solely to help students prepare for the IELTS examination.</p>
+                            <p class="text-sm text-muted-foreground">© 2026 IELTSX Inc. All rights reserved.</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        <div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;">
+            <ol tabindex="-1"
+                class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]">
+            </ol>
+        </div>
+    </div>
+
+<script src="premium-access.js"></script><script>window.IELTSXPremium&&window.IELTSXPremium.protect();</script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
+
+</html>

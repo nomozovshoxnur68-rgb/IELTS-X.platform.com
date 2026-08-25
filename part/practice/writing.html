@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>IELTSX — Writing Tasks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ─── base & sidebar ─── */
+        * { border-color: hsl(var(--border)); }
+        :root {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            /* light mode */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255,255,255,0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+        }
+        html.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32,34,34,0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --background: 32 34 34;
+            --foreground: 229 231 235;
+            --card: 42 44 44;
+            --card-foreground: 229 231 235;
+            --border: 58 60 60;
+            --secondary: 42 44 44;
+            --secondary-foreground: 229 231 235;
+            --muted-foreground: 156 163 175;
+            --accent: 42 44 44;
+            --accent-foreground: 229 231 235;
+            --ring: 58 60 60;
+            --sidebar: 36 38 38;
+            --sidebar-foreground: 229 231 235;
+            --sidebar-accent: 42 44 44;
+            --sidebar-accent-foreground: 229 231 235;
+            --sidebar-border: 58 60 60;
+            --sidebar-ring: 58 60 60;
+        }
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+        .bg-background { background-color: var(--bg-body) !important; }
+        .bg-card { background-color: var(--bg-card) !important; }
+        .border-border { border-color: var(--border-color) !important; }
+        .text-foreground { color: var(--text-primary) !important; }
+        .text-muted-foreground { color: var(--text-secondary) !important; }
+        .bg-sidebar { background-color: var(--sidebar-bg) !important; }
+        .bg-background\/95 { background-color: var(--header-bg) !important; }
+        .bg-muted\/40 { background-color: var(--badge-bg) !important; }
+        input, select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        input::placeholder { color: var(--text-secondary) !important; }
+
+        /* ─── sidebar core ─── */
+        /* ─── sidebar core / stable collapsed layout ─── */
+        #sidebarContainer,
+        #sidebarContainer .sidebar-desktop-root,
+        #sidebarContainer [data-sidebar="sidebar"],
+        #sidebarContainer > #main-sidebar-root > div:nth-child(2),
+        #sidebarContainer > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"],
+        #sidebarContainer > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"] > div {
+            box-sizing: border-box;
+        }
+
+        #sidebarContainer {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] {
+            width: var(--sidebar-width-icon);
+            min-width: var(--sidebar-width-icon);
+        }
+
+        #sidebarContainer [data-sidebar="sidebar"] {
+            width: var(--sidebar-width) !important;
+            min-width: var(--sidebar-width) !important;
+            transition: width 0.2s ease-in-out;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="sidebar"] {
+            width: var(--sidebar-width-icon) !important;
+            min-width: var(--sidebar-width-icon) !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] .sidebar-hidden-text,
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="group-label"] {
+            display: none !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="sidebar"] > div {
+            width: var(--sidebar-width-icon) !important;
+            min-width: var(--sidebar-width-icon) !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="menu-button"] {
+            justify-content: center !important;
+            padding: 0.5rem !important;
+            width: 2.5rem !important;
+            min-width: 2.5rem !important;
+            margin: 0 auto !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="menu-button"] svg {
+            display: inline-block !important;
+            flex: 0 0 auto !important;
+            flex-shrink: 0 !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="menu-button"] > svg:last-child {
+            display: none !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="group"] {
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="content"] {
+            overflow-x: hidden !important;
+        }
+
+        #sidebarContainer[data-collapsible="icon"] [data-sidebar="header"] {
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+
+        @media (min-width: 768px) {
+            #sidebarContainer[data-collapsible="icon"] {
+                width: var(--sidebar-width-icon);
+                min-width: var(--sidebar-width-icon);
+            }
+
+            #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:first-child {
+                width: var(--sidebar-width-icon) !important;
+            }
+
+            #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:nth-child(2) {
+                width: var(--sidebar-width-icon) !important;
+            }
+
+            #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"] {
+                width: var(--sidebar-width-icon) !important;
+            }
+
+            #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"] > div {
+                width: var(--sidebar-width-icon) !important;
+            }
+        }
+
+        /* ─── mobile sidebar ─── */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 35; display: none; }
+        .sidebar-overlay.active { display: block; }
+        #sidebarContainer { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 40; transition: left 0.2s ease; width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); overflow-y: auto; }
+        #sidebarContainer.mobile-open { left: 0; }
+        #sidebarContainer .sidebar-desktop-root { width: 100% !important; height: 100% !important; position: relative !important; inset: auto !important; display: block !important; border: none !important; }
+        #sidebarContainer .sidebar-desktop-root [data-sidebar="sidebar"] { width: 100% !important; height: 100% !important; }
+        @media (min-width: 768px) {
+            #sidebarContainer { position: relative; left: auto; top: auto; bottom: auto; width: auto; background: transparent; border: none; overflow: visible; z-index: auto; transition: none; }
+            #sidebarContainer.mobile-open { left: auto; }
+            .sidebar-overlay { display: none !important; }
+        }
+
+        /* theme toggle */
+        .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .theme-toggle-btn:hover { background: var(--badge-bg); }
+
+        /* pagination */
+        .pagination-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .pagination-btn:hover { background: var(--badge-bg); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* filter selects */
+        .filter-select {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .filter-select:focus { outline: none; ring: 2px solid var(--ring); }
+
+        /* card hover */
+        .rounded-xl { transition: all 0.2s ease; }
+        .hover\:shadow-lg:hover { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.02); }
+    </style>
+    <script src="auth-bridge.js"></script>
+    <link rel="stylesheet" href="assets/unlock-cards.css" />
+</head>
+<body class="antialiased">
+
+    <!-- OVERLAY for mobile sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <div id="root" class="flex min-h-screen">
+        <!-- SIDEBAR -->
+        <div id="sidebarContainer" class="group/sidebar-wrapper flex-shrink-0" style="--sidebar-width:16rem; --sidebar-width-icon:3rem;">
+            <div id="main-sidebar-root" class="sidebar-desktop-root group peer text-sidebar-foreground hidden md:block" data-state="expanded" data-collapsible="" data-variant="sidebar" data-side="left">
+                <!-- Sidebar content (unchanged from original, with sidebar-hidden-text added) -->
+                <div class="duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[--sidebar-width-icon]"></div>
+                <div class="duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l overflow-hidden [&>[data-sidebar=sidebar]]:flex-row">
+                    <div data-sidebar="sidebar" class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow">
+                        <div class="flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground border-r">
+                            <div data-sidebar="header" class="flex flex-col gap-2 p-2">
+                                <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                    <li data-sidebar="menu-item" class="group/menu-item relative"><a data-sidebar="menu-button" data-size="lg" data-active="false" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:!p-0 md:h-8 md:p-0" href="index.html" data-discover="true"><div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1"><img src="/assets/ieltsx-only-logo-BajnupZg.png" alt="IELTSX" class="size-6" /></div><div class="grid flex-1 text-left text-sm leading-tight sidebar-hidden-text"><span class="truncate font-semibold">IELTSX</span><span class="truncate text-xs capitalize">DEMO</span></div></a></li>
+                                </ul>
+                            </div>
+                            <div data-sidebar="content" class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden">
+                                <!-- Full Tests -->
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Full Tests</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="listening.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" /></svg><span class="flex-1 sidebar-hidden-text">Listening</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="reading.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg><span class="flex-1 sidebar-hidden-text">Reading</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="writing.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" /></svg><span class="flex-1 sidebar-hidden-text">Writing</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="speaking.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg><span class="flex-1 sidebar-hidden-text">Speaking</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Part Practice -->
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Part Practice</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/listening.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" /></svg><span class="flex-1 sidebar-hidden-text">Listening Sections</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/reading.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg><span class="flex-1 sidebar-hidden-text">Reading Passages</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/writing.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" /></svg><span class="flex-1 sidebar-hidden-text">Writing Tasks</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/speaking.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg><span class="flex-1 sidebar-hidden-text">Speaking Topics</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Collections -->
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Collections</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="Predictions.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" /><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" /><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" /></svg><span class="flex-1 sidebar-hidden-text">Predictions</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" /></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="Mock tests.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg><span class="flex-1 sidebar-hidden-text">Mock Tests</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Study Tools -->
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Study Tools</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Performance.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-line"><path d="M3 3v16a2 2 0 0 0 2 2h16" /><path d="m19 9-5 5-4-4-3 3" /></svg><span class="flex-1 sidebar-hidden-text">Performance</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" /></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Pdf materials.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" /></svg><span class="flex-1 sidebar-hidden-text">Pdf materials</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" /></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Articles.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg><span class="flex-1 sidebar-hidden-text">Articles</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" /></svg></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Bottom links -->
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false" href="Price.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /></svg><span class="flex-1 sidebar-hidden-text">Pricing</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a href="https://t.me/ieltsxuz" target="_blank" rel="noopener noreferrer" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /><path d="m21.854 2.147-10.94 10.939" /></svg><span class="flex-1 sidebar-hidden-text">Telegram Channel</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false" href="/support" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-life-buoy"><circle cx="12" cy="12" r="10" /><path d="m4.93 4.93 4.24 4.24" /><path d="m14.83 9.17 4.24-4.24" /><path d="m14.83 14.83 4.24 4.24" /><path d="m9.17 14.83-4.24 4.24" /><circle cx="12" cy="12" r="4" /></svg><span class="flex-1 sidebar-hidden-text">Support</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false" href="/feedback" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg><span class="flex-1 sidebar-hidden-text">Feedback</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <button data-sidebar="rail" aria-label="Toggle Sidebar" tabindex="-1" title="Toggle Sidebar" class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex [[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize [[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar [[data-side=left][data-collapsible=offcanvas]_&]:-right-2 [[data-side=right][data-collapsible=offcanvas]_&]:-left-2"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── MAIN CONTENT ─── -->
+        <main class="flex-1 flex flex-col min-h-screen bg-background">
+            <!-- Header -->
+            <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 backdrop-blur md:pr-10 lg:pr-20">
+                <div class="flex items-center gap-2 pl-2">
+                    <button id="sidebar-toggle-btn" class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent h-7 w-7" data-sidebar="trigger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+                        <span class="sr-only">Toggle Sidebar</span>
+                    </button>
+                    <div data-orientation="vertical" class="shrink-0 bg-border w-[1px] h-4 mr-2"></div>
+                    <h1 class="text-sm font-medium">Home</h1>
+                </div>
+                <div class="flex items-center gap-3 pr-4">
+                    <!-- Dark/Light Toggle -->
+                    <button id="themeToggleBtn" class="theme-toggle-btn flex h-8 w-8 items-center justify-center rounded-md border focus:outline-none" aria-label="Toggle theme">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m4.93 19.07 1.41-1.41"></path>
+                            <path d="m17.66 6.34 1.41-1.41"></path>
+                        </svg>
+                    </button>
+                    <!-- Avatar -->
+                    <button class="flex h-8 w-8 items-center justify-center rounded-md border bg-background">
+                        <span class="relative flex shrink-0 overflow-hidden h-7 w-7 rounded-md">
+                            <img class="aspect-square h-full w-full rounded-md object-cover" alt="shoxnur" src="https://lh3.googleusercontent.com/a/ACg8ocLeT0vaHevIPDPBpyR8hcxbYNSYH5dW7xpox4wkoTC7gQ7plw=s96-c" />
+                        </span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <section class="flex-1 overflow-auto p-6">
+                <div class="container max-w-7xl mx-auto space-y-6">
+                    <!-- Heading -->
+                    <div class="flex items-center gap-3">
+                        <span class="text-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil w-5 h-5">
+                                <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                <path d="m15 5 4 4" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h1 class="text-2xl font-bold text-foreground">Writing Tasks</h1>
+                            <p class="text-sm text-muted-foreground">Practice both Task 1 (graphs, charts, diagrams) and Task 2 (essays)</p>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="bg-card border rounded-lg p-4">
+                        <div class="flex flex-col gap-4">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <path d="m21 21-4.3-4.3" />
+                                    </svg>
+                                    <input id="searchInput" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-9 pr-8" placeholder="Search writing tasks..." value="" />
+                                </div>
+                                <button id="searchBtn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 py-2 px-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 mr-2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>Search
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <!-- Task filter -->
+                                <select id="taskFilter" class="filter-select flex h-9 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-auto min-w-[120px]">
+                                    <option value="all">All Tasks</option>
+                                    <option value="Task 1">Task 1</option>
+                                    <option value="Task 2">Task 2</option>
+                                </select>
+                                <!-- Status filter -->
+                                <select id="statusFilter" class="filter-select flex h-9 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-auto min-w-[120px]">
+                                    <option value="all">All Status</option>
+                                    <option value="Tier 1">Tier 1</option>
+                                    <option value="Tier 2">Tier 2</option>
+                                    <option value="Tier 3">Tier 3</option>
+                                </select>
+                                <!-- Type filter -->
+                                <select id="typeFilter" class="filter-select flex h-9 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-auto min-w-[120px]">
+                                    <option value="all">All Types</option>
+                                    <option value="Line Graph">Line Graph</option>
+                                    <option value="Bar Chart">Bar Chart</option>
+                                    <option value="Table">Table</option>
+                                    <option value="Pie Chart">Pie Chart</option>
+                                    <option value="Map">Map</option>
+                                    <option value="Agree Disagree">Agree Disagree</option>
+                                    <option value="Discussion">Discussion</option>
+                                    <option value="Two Part">Two Part</option>
+                                </select>
+                                <!-- Plan filter -->
+                                <select id="planFilter" class="filter-select flex h-9 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-auto min-w-[120px]">
+                                    <option value="all">All Plans</option>
+                                    <option value="Plan A">Plan A</option>
+                                    <option value="Plan B">Plan B</option>
+                                </select>
+                                <!-- Pack filter -->
+                                <select id="packFilter" class="filter-select flex h-9 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-auto min-w-[150px]">
+                                    <option value="all">All Packs</option>
+                                    <option value="09_02-16_02">09_02-16_02</option>
+                                    <option value="Jan-August">Jan-August</option>
+                                    <option value="Sep-Dec">Sep-Dec</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cards Grid -->
+                    <div>
+                        <p class="text-sm text-muted-foreground mb-4" id="resultCount">Showing 12 of 12 tests</p>
+                        <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch"></div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex items-center justify-between mt-6">
+                        <button id="prevPageBtn" class="pagination-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                            Previous
+                        </button>
+                        <span id="pageIndicator" class="text-sm text-muted-foreground">Page 1 of 1</span>
+                        <button id="nextPageBtn" class="pagination-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ─── Notifications ─── -->
+    <div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;">
+        <ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol>
+    </div>
+
+    <script>
+        // ─── Disable Context Menu ───
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+
+        // ─── Dark/Light Mode ───
+        const htmlEl = document.documentElement;
+        const themeBtn = document.getElementById('themeToggleBtn');
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') htmlEl.classList.add('dark-mode');
+        else htmlEl.classList.remove('dark-mode');
+        updateThemeIcon();
+
+        function updateThemeIcon() {
+            const isDark = htmlEl.classList.contains('dark-mode');
+            const svg = themeBtn.querySelector('svg');
+            if (isDark) {
+                svg.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 6 6 0 1 1-9-9Z"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>';
+            } else {
+                svg.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>';
+            }
+        }
+        themeBtn.addEventListener('click', function() {
+            htmlEl.classList.toggle('dark-mode');
+            localStorage.setItem('theme', htmlEl.classList.contains('dark-mode') ? 'dark' : 'light');
+            updateThemeIcon();
+            renderCards();
+        });
+
+        // ─── Data ───
+        const writingData = [
+            { id: 1, title: "Test 9 - T2: Extreme Sports Skydiving Skiing Dangerous Should Banned", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
+            { id: 2, title: "Test 9 - T1: Europeans Different Age Groups Gym Attendance 1990-2010 Chart", task: "Task 1", tier: "Tier 1", type: "Line Graph", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t9.png" },
+            { id: 3, title: "Test 8 - T2: Internet Most Important Invention Human History", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
+            { id: 4, title: "Test 8 - T1: Money Given Developing Countries Five Organisations 2008-2011 Chart", task: "Task 1", tier: "Tier 1", type: "Bar Chart", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t8.png" },
+            { id: 5, title: "Test 7 - T2: Working People Insufficient Free Time Family Friends Reasons", task: "Task 2", tier: "Tier 1", type: "Two Part", pack: "09_02-16_02", plan: "Plan A", img: null },
+            { id: 6, title: "Test 7 - T1: Household Composition North America 1970-2003 Table", task: "Task 1", tier: "Tier 1", type: "Table", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t7.png" },
+            { id: 7, title: "Test 6 - T2: Horizontal City vs Vertical City Living Preference", task: "Task 2", tier: "Tier 1", type: "Discussion", pack: "09_02-16_02", plan: "Plan A", img: null },
+            { id: 8, title: "Test 6 - T1: Males Watching vs Participating Sports Country Bar Chart", task: "Task 1", tier: "Tier 1", type: "Bar Chart", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t6.png" },
+            { id: 9, title: "Test 5 - T2: Historical Objects Museums Returned Countries of Origin", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
+            { id: 10, title: "Test 5 - T1: Male Female Workers Percentage Country A Country B Chart", task: "Task 1", tier: "Tier 1", type: "Pie Chart", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t5.png" },
+            { id: 11, title: "Test 4 - T2: Employers Dress Code Quality Work Matters", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
+            { id: 12, title: "Test 4 - Task 1: Task 1", task: "Task 1", tier: "Tier 1", type: "Map", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t4.png" }
+        ];
+
+        // ─── Render ───
+        let currentPage = 1;
+        const perPage = 6;
+
+        function getFilteredData() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const task = document.getElementById('taskFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const plan = document.getElementById('planFilter').value;
+            const pack = document.getElementById('packFilter').value;
+            return writingData.filter(item => {
+                return (search === '' || item.title.toLowerCase().includes(search)) &&
+                    (task === 'all' || item.task === task) &&
+                    (status === 'all' || item.tier === status) &&
+                    (type === 'all' || item.type === type) &&
+                    (plan === 'all' || item.plan === plan) &&
+                    (pack === 'all' || item.pack === pack);
+            });
+        }
+
+        function renderCards() {
+            const filtered = getFilteredData();
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / perPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            const start = (currentPage - 1) * perPage;
+            const pageItems = filtered.slice(start, start + perPage);
+
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = pageItems.map(item => `
+                <div class="h-full">
+                    <div class="rounded-xl bg-card text-card-foreground shadow group overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border h-full flex flex-col">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-muted">
+                            ${item.img ? `<img src="${item.img}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>` :
+                            `<div class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-500/80 via-indigo-500/70 to-violet-600/80 dark:from-blue-600/60 dark:via-indigo-600/50 dark:to-violet-700/60">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil w-8 h-8 text-white/90">
+                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                    <path d="m15 5 4 4" />
+                                </svg>
+                                <span class="mt-2 text-white/90 font-medium text-sm text-center px-4 line-clamp-2">${item.pack}</span>
+                            </div>`}
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="inline-flex items-center justify-center rounded-md font-medium border px-2.5 py-0.5 text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/50">${item.tier}</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 dark:border-white/30 text-xs font-medium shadow-md hover:bg-black/70 dark:hover:bg-black/90 transition-colors">${item.task}</div>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-1 gap-3">
+                            <div class="flex flex-col gap-3 flex-1">
+                                <h3 class="font-semibold text-base leading-6 break-words text-foreground group-hover:text-primary transition-colors">${item.title}</h3>
+                                <div class="text-xs text-muted-foreground">
+                                    <span class="flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-3.5 h-3.5 flex-shrink-0">
+                                            <path d="M12 7v14" />
+                                            <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+                                        </svg>
+                                        <span class="truncate">${item.pack}</span>
+                                    </span>
+                                </div>
+                                <div class="flex flex-wrap gap-1">
+                                    <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 text-xs">${item.type}</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
+                                        <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+                                        <path d="M5 21h14" />
+                                    </svg>Get Access
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('resultCount').textContent = `Showing ${pageItems.length} of ${total} tests`;
+            document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevPageBtn').disabled = (currentPage === 1);
+            document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
+        }
+
+        // ─── Pagination ───
+        document.getElementById('prevPageBtn').addEventListener('click', function() {
+            if (currentPage > 1) { currentPage--; renderCards(); }
+        });
+        document.getElementById('nextPageBtn').addEventListener('click', function() {
+            const filtered = getFilteredData();
+            const totalPages = Math.ceil(filtered.length / perPage);
+            if (currentPage < totalPages) { currentPage++; renderCards(); }
+        });
+
+        // ─── Filters ───
+        ['searchInput', 'searchBtn', 'taskFilter', 'statusFilter', 'typeFilter', 'planFilter', 'packFilter'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', function() { currentPage = 1; renderCards(); });
+            if (el && id !== 'searchInput') el.addEventListener('change', function() { currentPage = 1; renderCards(); });
+        });
+        document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
+
+        // ─── Sidebar Toggle ───
+        (function() {
+            const sidebarContainer = document.getElementById('sidebarContainer');
+            const sidebarRoot = document.getElementById('main-sidebar-root');
+            const toggleBtn = document.getElementById('sidebar-toggle-btn');
+            const overlay = document.getElementById('sidebarOverlay');
+            const railBtn = document.querySelector('[data-sidebar="rail"]');
+
+            function setDesktopSidebarState(collapsed) {
+                const state = collapsed ? 'icon' : '';
+                const dataState = collapsed ? 'collapsed' : 'expanded';
+
+                sidebarContainer.setAttribute('data-collapsible', state);
+                sidebarContainer.setAttribute('data-state', dataState);
+
+                if (sidebarRoot) {
+                    sidebarRoot.setAttribute('data-collapsible', state);
+                    sidebarRoot.setAttribute('data-state', dataState);
+                }
+
+                /* Keep the layout dimensions synchronized with the visual state. */
+                sidebarContainer.style.width = collapsed
+                    ? 'var(--sidebar-width-icon)'
+                    : 'var(--sidebar-width)';
+                sidebarContainer.style.minWidth = collapsed
+                    ? 'var(--sidebar-width-icon)'
+                    : 'var(--sidebar-width)';
+
+                /* Force a single clean reflow after changing the state. */
+                void sidebarContainer.offsetWidth;
+            }
+
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 768;
+
+                if (isMobile) {
+                    const open = !sidebarContainer.classList.contains('mobile-open');
+                    sidebarContainer.classList.toggle('mobile-open', open);
+                    overlay.classList.toggle('active', open);
+                    return;
+                }
+
+                const collapsed =
+                    sidebarContainer.getAttribute('data-collapsible') === 'icon';
+
+                setDesktopSidebarState(!collapsed);
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', function(e) { e.preventDefault(); toggleSidebar(); });
+            if (railBtn) railBtn.addEventListener('click', function(e) { e.preventDefault(); toggleSidebar(); });
+            if (overlay) overlay.addEventListener('click', function() {
+                sidebarContainer.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    sidebarContainer.classList.remove('mobile-open');
+                    if (overlay) overlay.classList.remove('active');
+                }
+            });
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebarContainer.classList.remove('mobile-open');
+                    if (overlay) overlay.classList.remove('active');
+
+                    const collapsed =
+                        sidebarContainer.getAttribute('data-collapsible') === 'icon';
+                    setDesktopSidebarState(collapsed);
+                }
+            });
+            if (sidebarRoot) {
+                const collapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
+                setDesktopSidebarState(collapsed);
+            }
+        })();
+
+        // ─── Init ───
+        renderCards();
+    </script>
+
+    <script type="module" src="site-access.js"></script>
+    <script src="assets/filters.js"></script>
+    <a href="admin/admin.html" class="admin-panel-link">Admin Panel</a>
+    <script src="assets/unlock-cards.js"></script>
+</body>
+</html>

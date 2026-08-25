@@ -1,0 +1,202 @@
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, Arial;
+    background: #f6f7f7;
+    color: #202222
+}
+
+.shell {
+    display: flex;
+    min-height: 100vh
+}
+
+.side {
+    width: 255px;
+    background: #202222;
+    color: #fff;
+    padding: 22px 14px;
+    position: fixed;
+    inset: 0 auto 0 0
+}
+
+.brand {
+    font-size: 22px;
+    font-weight: 800;
+    padding: 8px 12px 22px
+}
+
+.nav {
+    display: grid;
+    gap: 6px
+}
+
+.nav a {
+    padding: 11px 12px;
+    border-radius: 9px;
+    color: #d9dddd;
+    text-decoration: none
+}
+
+.nav a:hover,
+.nav a.active {
+    background: #303333;
+    color: #fff
+}
+
+.main {
+    margin-left: 255px;
+    width: calc(100% - 255px);
+    padding: 28px;
+    max-width: 1500px
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px
+}
+
+.title h1 {
+    margin: 0 0 5px;
+    font-size: 28px
+}
+
+.muted {
+    color: #6b7070
+}
+
+.btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
+    cursor: pointer;
+    background: #202222;
+    color: #fff;
+    font-weight: 600
+}
+
+.primary {
+    background: #820241
+}
+
+.danger {
+    background: #b42318
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #e4e7e7;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px
+}
+
+.stat {
+    font-size: 30px;
+    font-weight: 800;
+    margin-top: 7px
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px
+}
+
+.input,
+.select {
+    padding: 10px 12px;
+    border: 1px solid #e4e7e7;
+    border-radius: 9px;
+    background: #fff;
+    min-width: 180px
+}
+
+.tablewrap {
+    overflow: auto;
+    border: 1px solid #e4e7e7;
+    border-radius: 14px
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff
+}
+
+.table th,
+.table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #e4e7e7;
+    text-align: left
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700
+}
+
+.ok {
+    background: #e8f7ef;
+    color: #087443
+}
+
+.no {
+    background: #f2f3f3;
+    color: #666
+}
+
+.formgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px
+}
+
+.field {
+    display: grid;
+    gap: 7px
+}
+
+.field.full {
+    grid-column: 1/-1
+}
+
+.textarea {
+    min-height: 130px;
+    resize: vertical
+}
+
+@media(max-width:700px) {
+    .side {
+        position: static;
+        width: 100%
+    }
+
+    .shell {
+        display: block
+    }
+
+    .main {
+        margin: 0;
+        width: 100%
+    }
+
+    .grid,
+    .formgrid {
+        grid-template-columns: 1fr
+    }
+}

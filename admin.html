@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IELTSX — Admin Panel</title>
+<link rel="stylesheet" href="index-BxgEAFAf.css"><link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-shell">
+<aside class="admin-sidebar">
+  <div class="admin-brand">
+    <img src="./assets/ieltsx-logo-transparent.png" onerror="this.style.display='none'" alt="">
+    <div><strong>IELTSX</strong><small>Admin Panel</small></div>
+  </div>
+  <nav class="admin-nav">
+    <div class="nav-label">Management</div>
+    <a class="nav-item active" href="#dashboard"><span>▦</span><span class="grow">Dashboard</span></a>
+    <a class="nav-item" href="#users"><span>♙</span><span class="grow">Users</span></a>
+    <a class="nav-item" href="#premium"><span>★</span><span class="grow">Premium Access</span></a>
+    <a class="nav-item" href="#tests"><span>▤</span><span class="grow">Tests & Materials</span></a>
+    <div class="nav-label">Site</div>
+    <a class="nav-item" href="index.html"><span>⌂</span><span class="grow">Open Website</span></a>
+    <button class="nav-item" data-logout><span>↪</span><span class="grow">Sign out</span></button>
+  </nav>
+</aside>
+<main class="admin-main">
+  <header class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-right"><div class="admin-user"><div><strong style="font-size:13px">Administrator</strong><div class="muted" style="font-size:11px">Full access</div></div><div class="avatar">A</div></div></div>
+  </header>
+  <div class="container" id="dashboard">
+    <div class="grid stats">
+      <div class="card stat"><div><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">0</div></div><div class="stat-icon">♙</div></div>
+      <div class="card stat"><div><div class="stat-label">Premium Users</div><div class="stat-value" id="stat-premium">0</div></div><div class="stat-icon">★</div></div>
+      <div class="card stat"><div><div class="stat-label">Free Users</div><div class="stat-value" id="stat-free">0</div></div><div class="stat-icon">○</div></div>
+      <div class="card stat"><div><div class="stat-label">Available Tests</div><div class="stat-value" id="stat-tests">0</div></div><div class="stat-icon">▤</div></div>
+    </div>
+
+    <div id="users" class="card" style="margin-top:16px">
+      <div class="section-head"><div><div class="section-title">Users</div><div class="muted" style="font-size:12px">Manage accounts and premium access.</div></div></div>
+      <div class="search-row"><input id="user-search" class="field" placeholder="Search name, email or user ID"></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Email</th><th>Plan</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="users-body"></tbody></table></div>
+    </div>
+
+    <div class="grid two-col" style="margin-top:16px">
+      <div id="premium" class="card">
+        <div class="section-head"><div><div class="section-title">Premium Access</div><div class="muted" style="font-size:12px">Grant or revoke premium access from here.</div></div></div>
+        <div class="notice">Premium access is managed securely on the server. Admin changes are stored in the database and enforced by the server.</div>
+        <div id="premium-list" style="margin-top:12px"></div>
+      </div>
+      <div id="tests" class="card">
+        <div class="section-head"><div><div class="section-title">Tests & Materials</div><div class="muted" style="font-size:12px">Current site content overview.</div></div></div>
+        <div data-admin-test style="padding:11px 0;border-bottom:1px solid #e2e8f0"><strong>Reading</strong><div class="muted" style="font-size:12px">Practice passages and tests</div></div>
+        <div data-admin-test style="padding:11px 0;border-bottom:1px solid #e2e8f0"><strong>Listening</strong><div class="muted" style="font-size:12px">Listening practice</div></div>
+        <div data-admin-test style="padding:11px 0;border-bottom:1px solid #e2e8f0"><strong>Writing</strong><div class="muted" style="font-size:12px">Task 1 & Task 2 materials</div></div>
+        <div data-admin-test style="padding:11px 0"><strong>Speaking</strong><div class="muted" style="font-size:12px">Speaking practice</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+<div id="grant-modal" class="modal-backdrop"><div class="modal">
+  <h3>Give Premium Access</h3><p>Grant premium access to <strong id="grant-name"></strong>.</p>
+  <input type="hidden" id="grant-id">
+  <label style="display:block;font-size:12px;font-weight:650;margin-bottom:6px">Plan</label>
+  <select id="grant-plan" class="field" style="width:100%"><option>Premium</option><option>Premium Annual</option><option>Lifetime</option></select>
+  <div class="modal-actions"><button class="btn" data-close-modal>Cancel</button><button class="btn btn-primary" data-save-grant>Give Premium</button></div>
+</div></div>
+<div id="toast" class="toast"></div>
+<script src="premium-access.js"></script><script src="admin.js"></script>
+<a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body></html>

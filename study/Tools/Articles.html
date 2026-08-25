@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IELTSX — Articles & Reading Passages</title>
+    <link rel="stylesheet" href="index-BxgEAFAf.css">
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        /* reset & base */
+        * {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+        }
+
+        /* ─── dark mode ─── */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+            --badge-text: #1e293b;
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 4rem;
+        }
+
+        html.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32, 34, 34, 0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --badge-text: #d1d5db;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .bg-white {
+            background-color: var(--bg-card) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-body) !important;
+        }
+        .border-gray-200 {
+            border-color: var(--border-color) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-muted-foreground {
+            color: var(--text-secondary) !important;
+        }
+        .shadow-sm {
+            box-shadow: var(--shadow) !important;
+        }
+        .bg-sidebar {
+            background-color: var(--sidebar-bg) !important;
+        }
+        .bg-white\/95 {
+            background-color: var(--header-bg) !important;
+        }
+        .bg-muted\/40 {
+            background-color: var(--badge-bg) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .hover\:bg-gray-50:hover {
+            background-color: var(--badge-bg) !important;
+        }
+        input,
+        select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        /* ─── sidebar core ─── */
+        .sidebar-container {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 4rem;
+        }
+
+        /* desktop sidebar wrapper */
+        .sidebar-desktop-root {
+            transition: width 0.2s ease-in-out;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-text {
+            display: none !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-item {
+            justify-content: center !important;
+            padding: 0.5rem !important;
+            width: 2.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* ensure icons are always visible when collapsed */
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-item svg {
+            display: inline-block !important;
+            flex-shrink: 0;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-group-label {
+            display: none !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .logo-text {
+            display: none !important;
+        }
+        /* collapsed desktop: keep logo/icon visible and shrink every sidebar layer together */
+        .sidebar-desktop-root[data-collapsible="icon"] > div:first-child {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] > div:nth-child(2) {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-desktop-inner {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] {
+            width: 2.5rem !important;
+            min-width: 2.5rem !important;
+            height: 2.5rem !important;
+            justify-content: center !important;
+            gap: 0 !important;
+            padding: 0.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] > div:first-child {
+            flex-shrink: 0 !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] .sidebar-nav-text {
+            display: none !important;
+        }
+
+        /* FINAL SIDEBAR COLLAPSE FIX — keep logo/features intact */
+        @media (min-width: 769px) {
+            #main-sidebar-root[data-collapsible="icon"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] > div:first-child {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] > div:nth-child(2) {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                left: 0 !important;
+                right: auto !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] .sidebar-desktop-inner {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                flex: 0 0 var(--sidebar-width-icon) !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                box-sizing: border-box !important;
+                padding: 0.5rem !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu"] {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-item"] {
+                width: 100% !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] {
+                display: flex !important;
+                width: 2.5rem !important;
+                min-width: 2.5rem !important;
+                max-width: 2.5rem !important;
+                height: 2.5rem !important;
+                min-height: 2.5rem !important;
+                max-height: 2.5rem !important;
+                margin: 0 auto !important;
+                padding: 0.5rem !important;
+                gap: 0 !important;
+                overflow: visible !important;
+                justify-content: center !important;
+                align-items: center !important;
+                box-sizing: border-box !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] > div:first-child {
+                display: flex !important;
+                width: 2rem !important;
+                min-width: 2rem !important;
+                max-width: 2rem !important;
+                height: 2rem !important;
+                min-height: 2rem !important;
+                max-height: 2rem !important;
+                flex: 0 0 2rem !important;
+                align-items: center !important;
+                justify-content: center !important;
+                overflow: visible !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] img {
+                display: block !important;
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+                min-width: 1.5rem !important;
+                min-height: 1.5rem !important;
+                max-width: 1.5rem !important;
+                max-height: 1.5rem !important;
+                object-fit: cover !important;
+                flex-shrink: 0 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="content"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+        }
+
+        /* inner scroll */
+        .sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* mobile */
+        @media (max-width: 768px) {
+            .sidebar-container {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                transition: left 0.2s ease;
+                width: 280px;
+            }
+            .sidebar-container.mobile-open {
+                left: 0;
+            }
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 35;
+                display: none;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .sidebar-container .sidebar-desktop-root {
+                width: 100% !important;
+            }
+            .sidebar-container .sidebar-desktop-root[data-collapsible="icon"] {
+                width: 100% !important;
+            }
+        }
+
+        /* theme toggle */
+        .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .theme-toggle-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* tab active */
+        .tab-active {
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            color: #0f172a;
+        }
+        html.dark-mode .tab-active {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* rail button */
+        .sidebar-rail {
+            cursor: pointer;
+            position: absolute;
+            inset-y: 0;
+            z-index: 20;
+            width: 1rem;
+            transform: translateX(-50%);
+            transition: all 0.2s ease-linear;
+            display: none;
+        }
+        .sidebar-rail::after {
+            content: '';
+            position: absolute;
+            inset-y: 0;
+            left: 50%;
+            width: 2px;
+            transform: translateX(-50%);
+            background: transparent;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+        .sidebar-rail:hover::after {
+            background: var(--border-color);
+        }
+        @media (min-width: 768px) {
+            .sidebar-rail {
+                display: flex;
+            }
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-rail {
+            transform: translateX(-50%);
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-rail::after {
+            background: var(--border-color);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex min-h-screen w-full sidebar-container" id="mainSidebarContainer" data-state="expanded" data-collapsible="">
+
+        <!-- ─── SIDEBAR (desktop) ─── -->
+        <div class="group peer hidden md:block text-sidebar-foreground sidebar-desktop-root" id="main-sidebar-root" data-state="expanded" data-collapsible="" data-variant="sidebar" data-side="left">
+            <div class="duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[--sidebar-width-icon]"></div>
+            <div class="duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r overflow-hidden" style="border-color: var(--border-color);">
+                <div data-sidebar="sidebar" class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow">
+                    <div class="flex h-full w-[--sidebar-width] flex-col bg-white border-r shadow-sm transition-all sidebar-desktop-inner" style="background-color: var(--sidebar-bg); border-color: var(--border-color);">
+
+                        <!-- Sidebar Header -->
+                        <div data-sidebar="header" class="flex flex-col gap-2 p-2">
+                            <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                <li data-sidebar="menu-item" class="group/menu-item relative">
+                                    <a data-sidebar="menu-button" data-size="lg" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm md:h-8 md:p-0" href="index.html">
+                                        <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1"><img src="https://placehold.co/32x32?text=IELTSX" alt="IELTSX" class="size-6 rounded"></div>
+                                        <div class="grid flex-1 text-left text-sm leading-tight sidebar-nav-text"><span class="truncate font-semibold">IELTSX</span><span class="truncate text-xs capitalize">DEMO</span></div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Sidebar Content -->
+                        <div data-sidebar="content" class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden sidebar-scrollbar">
+                            <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 sidebar-group-label">
+                                    Full Tests
+                                </div>
+                                <div data-sidebar="group-content" class="w-full text-sm">
+                                    <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="listening.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones">
+                                                    <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Listening</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="reading.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open">
+                                                    <path d="M12 7v14"></path>
+                                                    <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Reading</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="writing.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+                                                    <path d="m15 5 4 4"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Writing</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="speaking.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic">
+                                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                                    <line x1="12" x2="12" y1="19" y2="22"></line>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Speaking</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 sidebar-group-label">
+                                    Part Practice
+                                </div>
+                                <div data-sidebar="group-content" class="w-full text-sm">
+                                    <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/listening.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones">
+                                                    <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Listening Sections</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/reading.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open">
+                                                    <path d="M12 7v14"></path>
+                                                    <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Reading Passages</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/writing.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+                                                    <path d="m15 5 4 4"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Writing Tasks</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/speaking.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square">
+                                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Speaking Topics</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 sidebar-group-label">
+                                    Collections
+                                </div>
+                                <div data-sidebar="group-content" class="w-full text-sm">
+                                    <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="Predictions.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers">
+                                                    <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path>
+                                                    <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path>
+                                                    <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Predictions</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4">
+                                                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                                                    <path d="M5 21h14"></path>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="Mock tests.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <circle cx="12" cy="12" r="6"></circle>
+                                                    <circle cx="12" cy="12" r="2"></circle>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Mock Tests</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 sidebar-group-label">
+                                    Study Tools
+                                </div>
+                                <div data-sidebar="group-content" class="w-full text-sm">
+                                    <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Performance.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-line">
+                                                    <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
+                                                    <path d="m19 9-5 5-4-4-3 3"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Performance</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4">
+                                                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                                                    <path d="M5 21h14"></path>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Pdf materials.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap">
+                                                    <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                                    <path d="M22 10v6"></path>
+                                                    <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Pdf materials</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4">
+                                                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                                                    <path d="M5 21h14"></path>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Articles.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot">
+                                                    <path d="M12 8V4H8"></path>
+                                                    <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                                                    <path d="M2 14h2"></path>
+                                                    <path d="M20 14h2"></path>
+                                                    <path d="M15 13v2"></path>
+                                                    <path d="M9 13v2"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Articles</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4">
+                                                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                                                    <path d="M5 21h14"></path>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
+                                <div data-sidebar="group-content" class="w-full text-sm">
+                                    <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="sm" data-active="false" href="Price.html" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card">
+                                                    <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                                                    <line x1="2" x2="22" y1="10" y2="10"></line>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Pricing</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a href="https://t.me/ieltsxuz" target="_blank" rel="noopener noreferrer" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="sm" data-active="false">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send">
+                                                    <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path>
+                                                    <path d="m21.854 2.147-10.94 10.939"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Telegram Channel</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="sm" data-active="false" href="/support" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-life-buoy">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <path d="m4.93 4.93 4.24 4.24"></path>
+                                                    <path d="m14.83 9.17 4.24-4.24"></path>
+                                                    <path d="m14.83 14.83 4.24 4.24"></path>
+                                                    <path d="m9.17 14.83-4.24 4.24"></path>
+                                                    <circle cx="12" cy="12" r="4"></circle>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Support</span>
+                                            </a>
+                                        </li>
+                                        <li data-sidebar="menu-item" class="group/menu-item relative">
+                                            <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2 sidebar-nav-item" data-sidebar="menu-button" data-size="sm" data-active="false" href="/feedback" data-discover="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle">
+                                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                                </svg>
+                                                <span class="flex-1 sidebar-nav-text">Feedback</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rail toggle button (desktop) -->
+                        <button data-sidebar="rail" aria-label="Toggle Sidebar" tabindex="-1" title="Toggle Sidebar" class="sidebar-rail group-data-[side=left]:-right-4 group-data-[side=right]:left-0 [[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize [[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar [[data-side=left][data-collapsible=offcanvas]_&]:-right-2 [[data-side=right][data-collapsible=offcanvas]_&]:-left-2">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── MAIN CONTENT ─── -->
+        <div class="flex-1 flex flex-col min-h-screen">
+            <!-- Header -->
+            <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 px-4 lg:pr-8" style="background-color: var(--header-bg); border-color: var(--border-color);">
+                <div class="flex items-center gap-2">
+                    <button id="sidebarToggleBtn" class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 bg-white hover:bg-gray-100" style="border-color: var(--border-color); background-color: var(--bg-card); color: var(--text-primary);">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+                    </button>
+                    <div class="h-4 w-px bg-gray-300 mx-1" style="background-color: var(--border-color);"></div>
+                    <nav class="flex items-center text-sm text-muted-foreground gap-1.5">
+                        <a href="index.html" class="hover:text-foreground text-sm font-medium" style="color: var(--text-primary);">Home</a>
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg>
+                        <span class="text-foreground text-sm font-medium" style="color: var(--text-primary);">Articles</span>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-3 relative" id="avatar-container">
+                    <button id="theme-toggle-btn" class="theme-toggle-btn flex h-8 w-8 items-center justify-center rounded-md border focus:outline-none" aria-label="Toggle theme" style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m4.93 19.07 1.41-1.41"></path>
+                            <path d="m17.66 6.34 1.41-1.41"></path>
+                        </svg>
+                    </button>
+                    <button id="avatar-dropdown-trigger" class="flex h-8 w-8 items-center justify-center rounded-md border bg-background focus:outline-none" style="border-color: var(--border-color); background: var(--bg-card);">
+                        <span class="relative flex shrink-0 overflow-hidden h-7 w-7 rounded-md"><img class="aspect-square h-full w-full rounded-md object-cover" alt="shoxnur" src="https://lh3.googleusercontent.com/a/ACg8ocLeT0vaHevIPDPBpyR8hcxbYNSYH5dW7xpox4wkoTC7gQ7plw=s96-c"></span>
+                    </button>
+                    <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 z-50 min-w-[12rem] w-56 rounded-lg border bg-popover shadow-md origin-top-right" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">
+                        <div class="px-2 py-1.5 text-sm">
+                            <div class="flex flex-col space-y-1">
+                                <p class="text-sm font-medium leading-none">shoxnur Nomozov</p>
+                                <p class="text-xs leading-none text-muted-foreground">nomozovshoxnur68@gmail.com</p>
+                            </div>
+                        </div>
+                        <div role="separator" class="-mx-1 my-1 h-px bg-muted"></div>
+                        <a href="account.html" role="menuitem" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent" id="dropdown-account" style="color: var(--text-primary);">
+                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                            <span>Account</span>
+                        </a>
+                        <div role="separator" class="-mx-1 my-1 h-px bg-muted"></div>
+                        <div role="menuitem" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent" id="dropdown-logout" style="color: var(--text-primary);">
+                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" x2="9" y1="12" y2="12" />
+                            </svg>
+                            <span>Log out</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 overflow-auto bg-gray-50 p-4 md:p-6" style="background: var(--bg-body);">
+                <div class="max-w-7xl mx-auto">
+                    <div class="w-full">
+                        <div class="flex items-center justify-start mb-5">
+                            <div class="grid w-full grid-cols-2 rounded-md border bg-muted/40 p-1 sm:w-[440px]" style="border-color: var(--border-color); background: var(--badge-bg);">
+                                <button id="tabPassages" class="tab-header flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all tab-active bg-white shadow text-gray-900" style="background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow);">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+                                    Passage Articles
+                                </button>
+                                <button id="tabFeed" class="tab-header flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50" style="color: var(--text-secondary);">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                                    Live Source Feed
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- PASSAGES PANEL -->
+                        <div id="passagesPanel" class="tab-pane">
+                            <div class="mb-5 rounded-lg border bg-white p-3 shadow-sm" style="background: var(--bg-card); border-color: var(--border-color); box-shadow: var(--shadow);">
+                                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                                    <div class="flex w-full gap-2 lg:max-w-xl">
+                                        <div class="relative flex-1">
+                                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                            <input id="searchInput" type="text" placeholder="Search passage articles" class="h-10 w-full rounded-md border border-gray-200 bg-white pl-9 pr-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-300" style="background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary);">
+                                        </div>
+                                        <button id="searchBtn" class="inline-flex h-10 items-center gap-2 rounded-md border border-gray-200 bg-white px-4 text-sm shadow-sm hover:bg-gray-50" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Search</button>
+                                    </div>
+                                    <div class="flex w-full flex-wrap gap-2 lg:w-auto lg:justify-end">
+                                        <select id="passageSelect" class="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm shadow-sm sm:w-[150px]" style="background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary);">
+                                            <option value="all">Any Passage</option><option value="Passage 1">Passage 1</option><option value="Passage 2">Passage 2</option><option value="Passage 3">Passage 3</option>
+                                        </select>
+                                        <select id="topicSelect" class="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm shadow-sm sm:w-[170px]" style="background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary);">
+                                            <option value="all">Any Topic</option><option value="History">History</option><option value="Technology">Technology</option><option value="Science">Science</option><option value="Environment">Environment</option>
+                                        </select>
+                                        <select id="sortSelect" class="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm shadow-sm sm:w-[155px]" style="background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary);">
+                                            <option value="recommended">Recommended</option><option value="newest">Newest</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="articlesGrid" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"></div>
+                        </div>
+
+                        <!-- LIVE FEED PANEL -->
+                        <div id="feedPanel" class="tab-pane hidden">
+                            <div class="rounded-lg border bg-white p-6 text-center text-gray-500" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-secondary);">📡 Live feed from external sources — latest IELTS readings and updates</div>
+                            <div id="liveFeedContent" class="grid grid-cols-1 gap-6 md:grid-cols-2 mt-5"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- overlay for mobile sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay hidden fixed inset-0 bg-black/40 z-30 md:hidden"></div>
+
+    <script>
+        // ----- DISABLE CONTEXT MENU -----
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // ----- DOM refs -----
+        const sidebarContainer = document.getElementById('mainSidebarContainer');
+        const sidebarRoot = document.getElementById('main-sidebar-root');
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const overlay = document.getElementById('sidebarOverlay');
+        const railBtn = document.querySelector('[data-sidebar="rail"]');
+
+        // ----- THEME TOGGLE -----
+        const themeBtn = document.getElementById('theme-toggle-btn');
+        const htmlEl = document.documentElement;
+
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'dark') {
+            htmlEl.classList.add('dark-mode');
+        } else if (storedTheme === 'light') {
+            htmlEl.classList.remove('dark-mode');
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                htmlEl.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlEl.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function updateThemeIcon() {
+            const isDark = htmlEl.classList.contains('dark-mode');
+            const icon = themeBtn.querySelector('svg');
+            if (isDark) {
+                icon.innerHTML =
+                    '<path d="M12 3a6 6 0 0 0 9 9 6 6 0 1 1-9-9Z"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>';
+            } else {
+                icon.innerHTML =
+                    '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>';
+            }
+        }
+        updateThemeIcon();
+
+        themeBtn.addEventListener('click', function() {
+            const isDark = htmlEl.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+            renderArticles();
+            renderLiveFeed();
+        });
+
+        // ----- SIDEBAR TOGGLE (core fix) -----
+        function toggleSidebar() {
+            const isMobile = window.innerWidth < 768;
+
+            if (isMobile) {
+                // Mobile: slide in/out
+                sidebarContainer.classList.toggle('mobile-open');
+                if (sidebarContainer.classList.contains('mobile-open')) {
+                    overlay.classList.add('active');
+                } else {
+                    overlay.classList.remove('active');
+                }
+            } else {
+                // Desktop: toggle icon mode
+                const currentState = sidebarContainer.getAttribute('data-collapsible');
+                const isIcon = currentState === 'icon';
+                const newState = isIcon ? '' : 'icon';
+                const newDataState = isIcon ? 'expanded' : 'collapsed';
+
+                // Update the outer container
+                sidebarContainer.setAttribute('data-collapsible', newState);
+                sidebarContainer.setAttribute('data-state', newDataState);
+
+                // Update the sidebar root (the element with the 'group' class)
+                if (sidebarRoot) {
+                    sidebarRoot.setAttribute('data-collapsible', newState);
+                    sidebarRoot.setAttribute('data-state', newDataState);
+                }
+
+                // Force reflow for smooth transition
+                void sidebarContainer.offsetWidth;
+            }
+        }
+
+        // Toggle button (hamburger)
+        toggleBtn?.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleSidebar();
+        });
+
+        // Rail button (the vertical bar on the sidebar edge)
+        railBtn?.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleSidebar();
+        });
+
+        // Overlay closes mobile sidebar
+        overlay?.addEventListener('click', function() {
+            sidebarContainer.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        });
+
+        // Escape key closes mobile sidebar
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                sidebarContainer.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            }
+        });
+
+        // Resize: reset mobile state on desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                sidebarContainer.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            }
+        });
+
+        // ----- ARTICLES DATA -----
+        const articlesData = [
+            { id: 1, title: "The Spinning Jenny", passage: "Passage 1", topic: "History", date: "2025-04-10",
+                image: "https://static-image.ieltsx.com/articles/spinning-jenny-original.avif",
+                description: "An account of how James Hargreaves' invention of the spinning jenny transformed the textile industry and catalyzed the shift from home-based cottage industries to factory-based production.",
+                href: "article1.html" },
+            { id: 2, title: "How to clean a beach", passage: "Passage 1", topic: "History",
+                date: "2025-04-01", image: "/article/images/how to clean a beach.jpg",
+                description: "As oil-spill specialists continue to tackle the Prestige slick, they are drawing on",
+                href: "/collections/article-1.html" },
+            { id: 3, title: "Great Apes and the Push for Legal Rights", passage: "Passage 1", topic: "History",
+                date: "2025-04-15", image: "/article/images/Great Apes and the Push for Legal Rights.jpg",
+                description: "Calls to grant basic legal rights to great apes have grown louder in recent decades.",
+                href: "/collections/article-2.html" },
+            { id: 4, title: "Climate Change and Rising Seas", passage: "Passage 3", topic: "Environment",
+                date: "2025-04-12", image: "article4.png",
+                description: "Analysis of melting ice caps and the potential impact on coastal megacities worldwide.",
+                href: "article4.html" },
+            { id: 5, title: "The Future of Renewable Energy", passage: "Passage 2", topic: "Science",
+                date: "2025-03-28", image: "article5.png",
+                description: "Solar, wind, and battery technologies driving the green transition.",
+                href: "article5.html" },
+            { id: 6, title: "Lake Bosumtwi – the secrets of a crater lake", passage: "Passage 3", topic: "History",
+                date: "2025-03-20", image: "article6.jpg",
+                description: "A major scientific project led by Earth Sciences professor Christopher Scholz represents the first large-scale investigation of Lake Bosumtwi in Ghana",
+                href: "article6.html" },
+            { id: 7, title: "Halley VI Research Station, Antarctica", passage: "Passage 2", topic: "Science", date: "2026-05-17",
+                image: "/article/images/Halley VI Research Station, Antarctica.jpg",
+                description: "The British Antarctic Survey’s new research station at Halley Bay is a portable pod structure that uses scent, colour and curves to take the edge off the world’s longest winter.",
+                href: "/collections/article-5.html" },
+            { id: 8, title: "Lever Brothers’ Sunlight Soap", passage: "Passage 1", topic: "History", date: "2026-05-17",
+                image: "/article/images/Lever Brothers’ Sunlight Soap.jpg",
+                description: "The history of Sunlight Soap and its influence on hygiene, industrial production, marketing, public health, social responsibility, and global consumer culture.",
+                href: "/collections/article-3.html" },
+            { id: 9, title: "Catch of the Day (GM Fish)", passage: "Passage 2", topic: "Technology",
+                date: "2026-05-17", image: "article9.jpg",
+                description: "As the global population grows, the amount of fish consumed by people worldwide has increased steadily.",
+                href: "article9.html" },
+            { id: 10, title: "Leo Burnett: Sultan Of Sell", passage: "Passage 1", topic: "History",
+                date: "2026-05-17", image: "/article/images/Leo Burnett Sultan Of Sell.jpg",
+                description: "How the Chicago adman who created the Marlboro Man, the Jolly Green Giant and Tony the Tiger reshaped modern advertising through the power of visual imagery.",
+                href: "/collections/article-6.html" },
+            { id: 11, title: "Strange symbols may rewrite history", passage: "Passage 2", topic: "Science",
+                date: "2026-05-17", image: "article11.png",
+                description: "STONE Age people 40,000 years ago used a simple form of writing comparable in complexity to the earliest stages of the world's",
+                href: "article11.html" },
+            { id: 12, title: "Brain Preservation & CryonicsHuge leap for brain preservation", passage: "Passage 3",
+                topic: "Science", date: "2026-05-17", image: "article12.png",
+                description: "AN ENTIRE mammalian brain has been successfully preserved using a technique that will now be offered",
+                href: "article12.html" },
+            { id: 13, title: " History of the SS Yongala", passage: "Passage 1", topic: "History",
+                date: "2026-05-17", image: "/article/images/History of the SS Yongala.jpg",
+                description: "The final voyage of the luxury steamliner SS Yongala, its mysterious disappearance, the long search for answers, and its transformation into one of Australia’s greatest dive sites.",
+                href: "/collections/article-4.html" },
+        ];
+
+        function renderArticles() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const passageVal = document.getElementById('passageSelect').value;
+            const topicVal = document.getElementById('topicSelect').value;
+            const sortVal = document.getElementById('sortSelect').value;
+            let filtered = articlesData.filter(art =>
+                (passageVal === 'all' || art.passage === passageVal) &&
+                (topicVal === 'all' || art.topic === topicVal) &&
+                (art.title.toLowerCase().includes(searchTerm) || art.description.toLowerCase().includes(
+                searchTerm))
+            );
+            if (sortVal === 'newest') filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            else filtered.sort((a, b) => b.id - a.id);
+            const container = document.getElementById('articlesGrid');
+            if (!container) return;
+            container.innerHTML = filtered.map(art =>
+                `
+                    <a href="${art.href || '#'}" class="group rounded-xl border text-card-foreground flex h-full min-h-[390px] cursor-pointer flex-col overflow-hidden border-border/70 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg" style="text-decoration: none; color: inherit; background: var(--bg-card); border-color: var(--border-color);">
+                        <div class="relative h-52 overflow-hidden">
+                            <img src="${art.image}" alt="${art.title}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"></div>
+                            <div class="flex flex-wrap gap-2 absolute left-4 top-4">
+                                <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold shadow border-white/30 bg-white/90 text-slate-900" style="background: var(--bg-card); color: var(--text-primary);">${art.passage}</span>
+                                <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold shadow border-white/20 bg-slate-950/55 text-white backdrop-blur">${art.topic}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col p-6 pb-3"><div class="font-semibold line-clamp-2 text-xl leading-snug" style="color: var(--text-primary);">${art.title}</div></div>
+                        <div class="p-6 pt-0 pb-4"><div class="text-muted-foreground line-clamp-3 text-base leading-7" style="color: var(--text-secondary);">${art.description}</div></div>
+                        <div class="flex items-center p-6 mt-auto px-6 pb-5 pt-0"><span class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 transition-colors group-hover:text-indigo-800">Read article<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
+                    </a>
+                `
+            ).join('');
+        }
+
+        function renderLiveFeed() {
+            const feedDiv = document.getElementById('liveFeedContent');
+            if (feedDiv) {
+                feedDiv.innerHTML = [
+                    { source: "BBC Future", title: "Why reading fiction boosts empathy", date: "2025-05-16" },
+                    { source: "The Guardian", title: "AI and language exams: new era", date: "2025-05-15" },
+                    { source: "IELTS Official", title: "Latest test updates 2025", date: "2025-05-14" }
+                ].map(f =>
+                    `
+                        <div class="rounded-xl border bg-white p-5 shadow-sm hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">
+                            <div class="text-xs" style="color: var(--text-secondary);">${f.source} · ${f.date}</div>
+                            <h4 class="font-semibold mt-1" style="color: var(--text-primary);">${f.title}</h4>
+                            <a href="#" class="text-indigo-600 text-sm mt-3 inline-block font-medium">Read full →</a>
+                        </div>
+                    `
+                ).join('');
+            }
+        }
+
+        // TABS
+        const passagesPanel = document.getElementById('passagesPanel');
+        const feedPanel = document.getElementById('feedPanel');
+        const tabPassages = document.getElementById('tabPassages');
+        const tabFeed = document.getElementById('tabFeed');
+
+        function activateTab(tabName) {
+            if (tabName === 'passages') {
+                passagesPanel.classList.remove('hidden');
+                feedPanel.classList.add('hidden');
+                tabPassages.classList.add('bg-white', 'shadow', 'text-gray-900');
+                tabFeed.classList.remove('bg-white', 'shadow', 'text-gray-900');
+                renderArticles();
+            } else {
+                passagesPanel.classList.add('hidden');
+                feedPanel.classList.remove('hidden');
+                tabFeed.classList.add('bg-white', 'shadow', 'text-gray-900');
+                tabPassages.classList.remove('bg-white', 'shadow', 'text-gray-900');
+                renderLiveFeed();
+            }
+        }
+        tabPassages.addEventListener('click', () => activateTab('passages'));
+        tabFeed.addEventListener('click', () => activateTab('feed'));
+
+        // Filter listeners
+        document.getElementById('searchInput').addEventListener('input', renderArticles);
+        document.getElementById('searchBtn').addEventListener('click', renderArticles);
+        document.getElementById('passageSelect').addEventListener('change', renderArticles);
+        document.getElementById('topicSelect').addEventListener('change', renderArticles);
+        document.getElementById('sortSelect').addEventListener('change', renderArticles);
+
+        // Initial renders
+        renderArticles();
+        renderLiveFeed();
+        activateTab('passages');
+
+        // Avatar dropdown
+        const avatarTrigger = document.getElementById('avatar-dropdown-trigger');
+        const userDropdown = document.getElementById('user-dropdown');
+        let isOpen = false;
+
+        function closeDropdown() { userDropdown?.classList.add('hidden');
+            isOpen = false; }
+
+        function openDropdown() { userDropdown?.classList.remove('hidden');
+            isOpen = true; }
+        if (avatarTrigger && userDropdown) {
+            avatarTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isOpen ? closeDropdown() : openDropdown();
+            });
+            document.addEventListener('click', (e) => {
+                if (!avatarTrigger.contains(e.target) && !userDropdown.contains(e.target)) closeDropdown();
+            });
+            document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
+            document.getElementById('dropdown-logout')?.addEventListener('click', () => {
+                alert('Logged out (demo)');
+                closeDropdown();
+            });
+        }
+
+        // Ensure sidebar root initial state matches container
+        if (sidebarRoot) {
+            const containerState = sidebarContainer.getAttribute('data-collapsible');
+            const containerDataState = sidebarContainer.getAttribute('data-state');
+            if (containerState !== sidebarRoot.getAttribute('data-collapsible')) {
+                sidebarRoot.setAttribute('data-collapsible', containerState);
+            }
+            if (containerDataState !== sidebarRoot.getAttribute('data-state')) {
+                sidebarRoot.setAttribute('data-state', containerDataState);
+            }
+        }
+    </script>
+    <script type="module" src="site-access.js"></script>
+    <script src="premium-access.js"></script>
+    <script>
+        window.IELTSXPremium && window.IELTSXPremium.protect();
+    </script>
+    <a href="admin/admin.html" class="admin-panel-link">Admin Panel</a>
+</body>
+</html>

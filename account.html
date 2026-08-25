@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IELTSX Dashboard | Account</title>
+    <!-- TailwindCSS v3 CDN -->
+     <link rel="stylesheet" href="index-BxgEAFAf.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* CSS Variables - white sidebar */
+        :root {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar-bg: #ffffff;
+            --sidebar-foreground: #0f172a;
+            --sidebar-accent: #f1f5f9;
+            --sidebar-accent-foreground: #0f172a;
+            --sidebar-border: #e2e8f0;
+            --background: #f8fafc;
+            --foreground: #0f172a;
+            --card: #ffffff;
+            --card-foreground: #0f172a;
+            --border: #e2e8f0;
+            --primary: #0f172a;
+            --primary-foreground: #f8fafc;
+            --muted: #f1f5f9;
+            --muted-foreground: #64748b;
+            --popover: #ffffff;
+            --popover-foreground: #0f172a;
+        }
+        * {
+            border-color: var(--border);
+        }
+        body {
+            background-color: #f8fafc;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* Sidebar collapse logic */
+        .sidebar-panel {
+            transition: width 0.2s ease;
+            width: var(--sidebar-width);
+        }
+        .sidebar-panel.sidebar-collapsed {
+            width: var(--sidebar-width-icon) !important;
+        }
+        /* Hide text labels when collapsed */
+        .sidebar-panel.sidebar-collapsed .menu-text,
+        .sidebar-panel.sidebar-collapsed .group-label span:not(.sr-only),
+        .sidebar-panel.sidebar-collapsed .menu-item span.flex-1,
+        .sidebar-panel.sidebar-collapsed .logo-text {
+            display: none !important;
+            opacity: 0;
+            visibility: hidden;
+        }
+        /* Center icons in collapsed state */
+        .sidebar-panel.sidebar-collapsed .peer\/menu-button,
+        .sidebar-panel.sidebar-collapsed [data-sidebar="menu-button"] {
+            justify-content: center !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        .sidebar-panel.sidebar-collapsed .peer\/menu-button svg,
+        .sidebar-panel.sidebar-collapsed [data-sidebar="menu-button"] svg {
+            margin-right: 0 !important;
+        }
+        /* Custom scrollbar */
+        .overflow-auto-custom::-webkit-scrollbar {
+            width: 4px;
+        }
+        .overflow-auto-custom::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        .overflow-auto-custom::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        /* Dropdown animation */
+        .dropdown-enter {
+            opacity: 0;
+            transform: scale(0.95) translateY(-8px);
+        }
+        /* Tab active state */
+        .tab-btn[data-active="true"] {
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 antialiased">
+    <div id="root" class="min-h-screen w-full">
+        <div class="group/sidebar-wrapper flex min-h-svh w-full">
+            <!-- SIDEBAR (desktop) - white background, collapsible -->
+            <div class="group peer hidden md:block relative">
+                <!-- Spacer for layout -->
+                <div class="duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear"></div>
+                <!-- Actual sidebar panel -->
+                <div id="sidebar-panel" class="sidebar-panel fixed inset-y-0 left-0 z-10 hidden h-svh transition-all duration-200 ease-linear md:flex border-r overflow-hidden" style="background-color: #ffffff; border-color: #e2e8f0;">
+                    <div class="flex h-full w-full flex-col" style="background-color: #ffffff; color: #0f172a;">
+                        <div class="flex h-full w-[--sidebar-width] flex-col border-r" style="background-color: #ffffff; color: #0f172a; border-color: #e2e8f0;">
+                            <!-- header / logo -->
+                            <div class="flex flex-col gap-2 p-2">
+                                <ul class="flex w-full min-w-0 flex-col gap-1">
+                                    <li class="group/menu-item relative">
+                                        <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none transition-all hover:bg-gray-100 hover:text-gray-900 h-12 text-sm md:h-8" href="index.html">
+                                            <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1 bg-gray-100">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="size-5 text-gray-800"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                            </div>
+                                            <div class="grid flex-1 text-left text-sm leading-tight logo-text">
+                                                <span class="truncate font-semibold">IELTSX</span>
+                                                <span class="truncate text-xs text-gray-500">DEMO</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Scrollable menu content -->
+                            <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+                                <!-- Full Tests Group -->
+                                <div class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div class="group-label duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-gray-500">Full Tests</div>
+                                    <div class="w-full text-sm">
+                                        <ul class="flex w-full min-w-0 flex-col gap-1">
+                                            <li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-gray-100 h-8 text-sm" href="listening.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg><span class="flex-1 menu-text">Listening</span></a></li>
+                                            <li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-gray-100 h-8 text-sm" href="reading.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg><span class="flex-1 menu-text">Reading</span></a></li>
+                                            <li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-gray-100 h-8 text-sm" href="writing.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg><span class="flex-1 menu-text">Writing</span></a></li>
+                                            <li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-gray-100 h-8 text-sm" href="speaking.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg><span class="flex-1 menu-text">Speaking</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Part Practice Group -->
+                                <div class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div class="group-label duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-gray-500">Part Practice</div>
+                                    <div class="w-full text-sm"><ul class="flex w-full min-w-0 flex-col gap-1"><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="listening.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg><span class="flex-1 menu-text">Listening Sections</span></a></li><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="reading.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg><span class="flex-1 menu-text">Reading Passages</span></a></li><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="writing.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg><span class="flex-1 menu-text">Writing Tasks</span></a></li><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="speaking.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="flex-1 menu-text">Speaking Topics</span></a></li></ul></div>
+                                </div>
+                                <!-- Collections Group -->
+                                <div class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div class="group-label duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-gray-500">Collections</div>
+                                    <div class="w-full text-sm"><ul class="flex w-full min-w-0 flex-col gap-1"><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="Predictions.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg><span class="flex-1 menu-text">Predictions</span><svg class="lucide lucide-crown size-3 ml-1 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></a></li><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="Mock tests.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="flex-1 menu-text">Mock Tests</span></a></li></ul></div>
+                                </div>
+                                <!-- Study Tools Group -->
+                                <div class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div class="group-label duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-gray-500">Study Tools</div>
+                                    <div class="w-full text-sm"><ul class="flex w-full min-w-0 flex-col gap-1"><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="Performance.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg><span class="flex-1 menu-text">Performance</span><svg class="lucide lucide-crown size-3 ml-1 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></a></li><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="Pdf materials.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg><span class="flex-1 menu-text">Pdf materials</span><svg class="lucide lucide-crown size-3 ml-1 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></a></li><li class="menu-item"><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-8 text-sm" href="Articles.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg><span class="flex-1 menu-text">Articles</span><svg class="lucide lucide-crown size-3 ml-1 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></a></li></ul></div>
+                                </div>
+                                <!-- Bottom menu -->
+                                <div class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
+                                    <div class="w-full text-sm"><ul class="flex w-full min-w-0 flex-col gap-1"><li><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="Price.html"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span class="flex-1 menu-text">Pricing</span></a></li><li><a href="https://t.me/ieltsxuz" target="_blank" class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg><span class="flex-1 menu-text">Telegram Channel</span></a></li><li><a href="admin-login.html" class="sidebar-link" data-admin-link><span aria-hidden="true">⚙</span><span class="flex-1">Admin Panel</span></a>
+<a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="/support"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg><span class="flex-1 menu-text">Support</span></a></li><li><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="/feedback"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span class="flex-1 menu-text">Feedback</span></a></li></ul></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <main class="relative flex min-h-svh flex-col bg-background flex-1">
+                <!-- Discount Banner -->
+                <div id="discount-banner" class="sticky top-0 z-[60] w-full shrink-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white shadow-md">
+                    <div class="px-3 md:px-4">
+                        <div class="flex sm:hidden items-center justify-center gap-1.5 text-center py-2"><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg><span class="font-bold text-[11px]">Use <span class="bg-white/20 rounded px-1">MAY10</span> for 10% OFF</span><a class="text-[11px] font-bold underline hover:text-white/90" href="/pricing">Upgrade →</a></div>
+                        <div class="hidden sm:flex items-center justify-center gap-2 md:gap-3 flex-wrap py-2"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg><span class="font-bold text-xs md:text-sm">Use promo code <span class="bg-white/20 rounded px-1.5 py-0.5 font-mono">MAY10</span> and get extra 10% discount</span><div class="flex items-center gap-1" id="countdown-timer"><div><span class="font-bold tabular-nums" id="days">02</span><span class="text-[10px]">d</span></div><span>:</span><div><span class="font-bold tabular-nums" id="hours">12</span><span class="text-[10px]">h</span></div><span>:</span><div><span class="font-bold tabular-nums" id="minutes">01</span><span class="text-[10px]">m</span></div><span>:</span><div><span class="font-bold tabular-nums" id="seconds">29</span><span class="text-[10px]">s</span></div></div><a class="bg-white/15 hover:bg-white/25 text-white text-xs md:text-sm font-bold px-3 py-0.5 rounded-full" href="/pricing">Upgrade Now →</a></div>
+                    </div>
+                </div>
+                <!-- Header -->
+                <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 backdrop-blur px-3 lg:pr-20 md:pr-10">
+                    <div class="flex items-center gap-2 pl-2">
+                        <button id="sidebar-toggle-btn" class="inline-flex items-center justify-center rounded-md text-sm hover:bg-accent h-7 w-7 transition">
+                            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+                            <span class="sr-only">Toggle Sidebar</span>
+                        </button>
+                        <div class="shrink-0 bg-border w-[1px] h-4 mx-2"></div>
+                        <nav class="flex items-center text-sm text-muted-foreground"><a class="hover:text-foreground hidden md:block" href="index.html">Home</a><svg class="size-3.5 hidden md:block mx-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><span class="text-foreground font-medium hidden md:block">Account</span></nav>
+                    </div>
+                    <div class="flex items-center gap-3 relative" id="avatar-container">
+                        <button id="avatar-dropdown-trigger" class="flex h-8 w-8 items-center justify-center rounded-md border bg-background focus:outline-none">
+                            <span class="relative flex shrink-0 overflow-hidden h-7 w-7 rounded-md"><img class="aspect-square h-full w-full rounded-md object-cover" alt="shoxnur" src="https://lh3.googleusercontent.com/a/ACg8ocLeT0vaHevIPDPBpyR8hcxbYNSYH5dW7xpox4wkoTC7gQ7plw=s96-c"></span>
+                        </button>
+                        <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 z-50 min-w-[12rem] w-56 rounded-lg border bg-popover shadow-md origin-top-right">
+                            <div class="px-2 py-1.5 text-sm"><div class="flex flex-col space-y-1"><p class="text-sm font-medium leading-none">shoxnur Nomozov</p><p class="text-xs leading-none text-muted-foreground">nomozovshoxnur68@gmail.com</p></div></div><div role="separator" class="-mx-1 my-1 h-px bg-muted"></div><div role="menuitem" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent" id="dropdown-account"><svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg><span>Account</span></div><div role="separator" class="-mx-1 my-1 h-px bg-muted"></div><div role="menuitem" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent" id="dropdown-logout"><svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg><span>Log out</span></div>
+                        </div>
+                    </div>
+                </header>
+                <!-- Account Main Content (Tabs fully functional) -->
+                <div class="flex-1 overflow-auto"><div class="container max-w-7xl mx-auto p-6"><div class="max-w-6xl mx-auto"><div class="flex flex-col md:flex-row gap-6 mb-6"><div class="flex-1"><div class="w-full"><div class="h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground grid grid-cols-4 mb-8"><button data-tab="profile" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Profile</button><button data-tab="appearance" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Appearance</button><button data-tab="subscription" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Subscription</button><button data-tab="invites" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Invites</button></div>
+                    <div data-tab-panel="profile" class="space-y-6"><div class="rounded-xl border bg-card shadow"><div class="p-6 pb-2"><div class="font-semibold">Profile Information</div><div class="text-sm text-muted-foreground">Update your personal details</div></div><div class="p-6 pt-0"><form id="profileForm"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-sm font-medium">First Name</label><input class="flex h-9 w-full rounded-md border px-3 py-1 text-sm" value="shoxnur"></div><div><label class="text-sm font-medium">Last Name</label><input class="flex h-9 w-full rounded-md border px-3 py-1 text-sm" value="Nomozov"></div><div><label class="text-sm font-medium">Email Address</label><input type="email" disabled value="nomozovshoxnur68@gmail.com" class="flex h-9 w-full rounded-md border bg-muted px-3 py-1 text-sm"></div></div><div class="flex justify-end mt-4"><button type="submit" class="bg-primary text-white px-4 py-2 rounded-md text-sm">Save Changes</button></div></form></div></div><div class="rounded-xl border bg-card shadow"><div class="p-6 pb-2"><div class="font-semibold">Active Sessions</div><div class="text-sm text-muted-foreground">Manage your active login sessions</div></div><div class="p-6 pt-0 space-y-3"><div class="flex gap-3 p-3 rounded-lg border"><span class="text-xl">📱</span><div><p class="font-medium text-sm">Chrome on Android</p><p class="text-xs text-muted-foreground">21 days ago</p></div></div><div class="flex gap-3 p-3 rounded-lg border bg-accent/20"><span class="text-xl">🖥️</span><div><p class="font-medium text-sm">Chrome - Windows 10 <span class="ml-2 text-xs bg-primary/10 px-1.5 rounded">Current</span></p><p class="text-xs text-muted-foreground">4 minutes ago</p></div></div></div></div></div>
+                    <div data-tab-panel="appearance" class="hidden space-y-6"><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Interface Settings</div><div class="text-sm text-muted-foreground">Customize your application appearance</div></div><div class="p-6 pt-0 space-y-6"><div class="space-y-3"><div class="grid grid-cols-1 gap-4"><div class="flex items-center justify-between"><div><p class="font-medium">Theme</p><p class="text-sm text-muted-foreground">Switch between light and dark themes</p></div><div class="flex items-center gap-1 text-sm text-muted-foreground border border-border rounded-md p-1" id="theme-selector"><button data-theme="light" class="theme-opt p-1 rounded-sm hover:bg-muted transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button><button data-theme="dark" class="theme-opt p-1 rounded-sm hover:bg-muted transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button><button data-theme="system" class="theme-opt p-1 rounded-sm hover:bg-muted transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></button></div></div><div class="flex items-center justify-between"><div><p class="font-medium">Exam Interface Style</p><p class="text-sm text-muted-foreground">Choose your CD IELTS interface style</p></div><button id="exam-style-btn" class="flex h-9 items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-32"><span>IDP</span><svg class="h-4 w-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div></div></div></div></div></div>
+                    <div data-tab-panel="subscription" class="hidden space-y-6"><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">AI Usage</div><div class="text-sm text-muted-foreground">Your monthly AI feature usage</div></div><div class="p-6 pt-0 space-y-6"><div class="space-y-6"><div class="space-y-3"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18"/><path d="m2.3 2.3 7.286 7.286"/><circle cx="11" cy="11" r="2"/></svg><h3 class="font-medium">Writing Check</h3></div><div><div class="flex justify-between text-sm"><span>Used: 0 / 2</span><span class="text-green-600">2 remaining</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-2"><div class="h-full w-0 bg-primary transition-all"></div></div></div></div><div class="space-y-3"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg><h3 class="font-medium">Mock Writing Check</h3></div><div><div class="flex justify-between text-sm"><span>Used: 0 / 2</span><span class="text-green-600">2 remaining</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-2"><div class="h-full w-0 bg-primary transition-all"></div></div></div></div><div class="space-y-3"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg><h3 class="font-medium">Speaking Check</h3></div><div><div class="flex justify-between text-sm"><span>Used: 0 / 0</span><span class="text-red-600">0 remaining</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-2"><div class="h-full w-0 bg-primary"></div></div><div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md"><p class="text-sm text-amber-800 mb-2">You've reached your monthly speaking check limit.</p><button class="h-8 rounded-md px-3 text-xs border bg-background hover:bg-accent">Upgrade to Continue</button></div></div></div></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Subscription & Billing</div><div class="text-sm text-muted-foreground">Manage your subscription plan and payment methods.</div></div><div class="p-6 pt-0 space-y-6"><div class="space-y-3"><h3 class="text-lg font-medium">Current Plan</h3><div class="bg-primary/5 border border-primary/20 rounded-md p-4"><div class="flex justify-between items-start mb-3"><div><h4 class="font-semibold text-lg">DEMO</h4></div><div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold bg-primary text-primary-foreground">ACTIVE</div></div><div class="flex justify-between items-center"><div></div><button class="h-8 rounded-md px-3 text-xs border bg-background hover:bg-accent">Manage Subscription</button></div></div></div><div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4"><div class="flex items-center justify-between gap-4 flex-wrap"><div class="flex items-center gap-3"><div class="bg-blue-100 p-2 rounded-lg"><svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294zM5 21h14"/></svg></div><div><h3 class="text-sm font-medium text-blue-900">Demo Plan - Limited Access</h3><p class="text-xs text-blue-700">Upgrade to Standard for unlimited practice tests and AI feedback</p></div></div><div class="flex gap-2"><button class="h-8 rounded-md px-3 text-xs border border-blue-300 bg-background text-blue-600 hover:bg-blue-50">View Plans</button><button class="h-8 rounded-md px-3 text-xs bg-blue-600 text-white hover:bg-blue-700">Upgrade Now</button></div></div></div></div></div></div>
+                    <div data-tab-panel="invites" class="hidden space-y-6"><div><h2 class="text-2xl font-bold mb-4">Invite Your Friends</h2><div class="space-y-4"><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Your Progress</div><div class="text-sm text-muted-foreground">Track your invite progress and claim your reward</div><div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4"><div class="flex items-start gap-3"><div class="bg-blue-100 p-2 rounded-lg"><svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></div><div><h3 class="text-sm font-medium text-blue-900 mb-1">How It Works</h3><ul class="text-xs text-blue-700 space-y-1"><li>• Share your invite link with 10 friends</li><li>• They sign up and get 1 invite credit to start</li><li>• Join @ieltsxuz telegram channel</li><li>• You earn 1 month of STANDARD subscription (one-time reward)</li></ul></div></div></div></div><div class="p-6 pt-0 space-y-4"><div class="space-y-3"><div class="flex justify-between items-center"><span class="text-sm font-medium">Signups</span><span class="text-xl font-bold text-primary">0 / 10</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-3"><div class="h-full w-0 bg-primary transition-all"></div></div><p class="text-xs text-muted-foreground text-center">10 more signups needed</p></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Your Invite Link</div><div class="text-sm text-muted-foreground">Share this with your friends to get started</div></div><div class="p-6 pt-0 space-y-4"><div class="space-y-2"><label class="text-sm font-medium">Invite Link</label><div class="flex gap-2"><input id="invite-link-input" class="flex h-9 w-full rounded-md border px-3 py-1 text-sm" readonly value="https://ieltsx.com/login?invite=KDAQ3TFG"><button id="copyInviteLink" class="h-9 w-9 shrink-0 border rounded-md hover:bg-accent"><svg class="h-4 w-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button></div></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Share via Social Media</div><div class="text-sm text-muted-foreground">Quick share to your favorite platforms</div></div><div class="p-6 pt-0"><div class="grid grid-cols-2 gap-3"><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="Telegram"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Telegram</button><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="Instagram"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Instagram</button><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="WhatsApp"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>WhatsApp</button><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="Facebook"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Facebook</button></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><div class="font-semibold leading-none tracking-tight">Your Statistics</div></div></div><div class="p-6 pt-0"><div class="grid grid-cols-2 gap-4"><div class="text-center p-4 bg-muted rounded-lg"><p class="text-3xl font-bold text-primary">0</p><p class="text-sm text-muted-foreground mt-1">Successful Invites</p></div><div class="text-center p-4 bg-muted rounded-lg"><p class="text-3xl font-bold text-primary">10</p><p class="text-sm text-muted-foreground mt-1">Remaining</p></div></div></div></div></div></div></div>
+                </div></div><div class="rounded-xl border bg-card shadow w-full md:w-80 h-fit"><div class="p-6 text-center"><div class="flex justify-center mb-4"><span class="relative flex h-24 w-24 items-center justify-center rounded-full bg-slate-800 text-white text-4xl font-medium">N</span></div><div class="font-semibold text-lg">shoxnur Nomozov</div><div class="text-sm text-muted-foreground">nomozovshoxnur68@gmail.com</div><div class="mt-3"><span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs bg-slate-100">DEMO</span></div></div><div class="p-6 pt-0"><button id="learning-stats-btn" class="w-full border rounded-md py-2 text-sm flex items-center justify-center gap-2 hover:bg-accent"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294zM5 21h14"/></svg> View Learning Statistics</button></div></div></div></div></div></div>
+            </main>
+        </div>
+    </div>
+    <script>
+        // ======================== SIDEBAR TOGGLE (FIXED) ========================
+        const sidebarPanel = document.getElementById('sidebar-panel');
+        const toggleBtn = document.getElementById('sidebar-toggle-btn');
+        if (toggleBtn && sidebarPanel) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                sidebarPanel.classList.toggle('sidebar-collapsed');
+            });
+        }
+
+        // ======================== TAB SWITCHING ========================
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const panelsMap = {
+            profile: document.querySelector('[data-tab-panel="profile"]'),
+            appearance: document.querySelector('[data-tab-panel="appearance"]'),
+            subscription: document.querySelector('[data-tab-panel="subscription"]'),
+            invites: document.querySelector('[data-tab-panel="invites"]')
+        };
+        function activateTab(tabId) {
+            Object.values(panelsMap).forEach(panel => { if (panel) panel.classList.add('hidden'); });
+            if (panelsMap[tabId]) panelsMap[tabId].classList.remove('hidden');
+            tabBtns.forEach(btn => {
+                const val = btn.getAttribute('data-tab');
+                if (val === tabId) btn.setAttribute('data-active', 'true');
+                else btn.setAttribute('data-active', 'false');
+            });
+        }
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                if (tabId && panelsMap[tabId]) activateTab(tabId);
+            });
+        });
+        activateTab('profile');
+
+        // ======================== COUNTDOWN TIMER ========================
+        function startCountdown() {
+            const endTime = new Date();
+            endTime.setDate(endTime.getDate() + 2);
+            endTime.setHours(endTime.getHours() + 12);
+            function update() {
+                const now = new Date();
+                const diff = endTime - now;
+                if (diff <= 0) {
+                    document.getElementById('days').innerText = '00';
+                    document.getElementById('hours').innerText = '00';
+                    document.getElementById('minutes').innerText = '00';
+                    document.getElementById('seconds').innerText = '00';
+                    return;
+                }
+                const days = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                document.getElementById('days').innerText = String(days).padStart(2, '0');
+                document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+            }
+            update();
+            setInterval(update, 1000);
+        }
+        startCountdown();
+
+        // ======================== PROFILE FORM ========================
+        document.getElementById('profileForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Profile updated (demo)');
+        });
+
+        // ======================== AVATAR DROPDOWN ========================
+        const trigger = document.getElementById('avatar-dropdown-trigger');
+        const dropdown = document.getElementById('user-dropdown');
+        let isOpen = false;
+        function closeDropdown() { dropdown?.classList.add('hidden'); isOpen = false; }
+        function openDropdown() { dropdown?.classList.remove('hidden'); isOpen = true; }
+        if (trigger && dropdown) {
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isOpen ? closeDropdown() : openDropdown();
+            });
+            document.addEventListener('click', (e) => {
+                if (!trigger.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+            });
+            document.getElementById('dropdown-account')?.addEventListener('click', () => { alert('Account settings (demo)'); closeDropdown(); });
+            document.getElementById('dropdown-logout')?.addEventListener('click', () => { alert('Logged out (demo)'); closeDropdown(); });
+        }
+
+        // ======================== COPY INVITE LINK ========================
+        const copyBtn = document.getElementById('copyInviteLink');
+        const inviteInput = document.getElementById('invite-link-input');
+        if (copyBtn && inviteInput) {
+            copyBtn.addEventListener('click', () => {
+                inviteInput.select();
+                navigator.clipboard.writeText(inviteInput.value);
+                alert('Invite link copied!');
+            });
+        }
+
+        // ======================== SOCIAL SHARE BUTTONS ========================
+        document.querySelectorAll('.share-social').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert(`Share via ${btn.getAttribute('data-platform')} (demo)`);
+            });
+        });
+
+        // ======================== THEME TOGGLER ========================
+        const themeOpts = document.querySelectorAll('.theme-opt');
+        function setTheme(theme) {
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            if (theme === 'system') {
+                const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+                if (darkModeMedia.matches) document.documentElement.classList.add('dark');
+                else document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('theme', theme);
+            themeOpts.forEach(opt => {
+                if (opt.getAttribute('data-theme') === theme) opt.classList.add('bg-muted', 'text-foreground');
+                else opt.classList.remove('bg-muted', 'text-foreground');
+            });
+        }
+        const savedTheme = localStorage.getItem('theme') || 'system';
+        setTheme(savedTheme);
+        themeOpts.forEach(opt => opt.addEventListener('click', () => setTheme(opt.getAttribute('data-theme'))));
+
+        // ======================== EXAM STYLE BUTTON ========================
+        document.getElementById('exam-style-btn')?.addEventListener('click', () => {
+            alert('Interface style toggled (IDP/BC) - demo');
+        });
+
+        // ======================== DEMO LINKS (prevent actual navigation) ========================
+        document.querySelectorAll('a[href^="/"]:not([href="https://t.me/ieltsxuz"])').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Demo navigation: ' + link.getAttribute('href'));
+            });
+        });
+
+        // ======================== UPGRADE / PLAN BUTTONS ========================
+        document.querySelectorAll('.bg-blue-600, .border-blue-300, .bg-primary\\/5 button, .bg-gradient-to-r button').forEach(btn => {
+            if (btn.tagName === 'BUTTON') {
+                btn.addEventListener('click', () => alert('Upgrade plan (demo)'));
+            }
+        });
+        document.getElementById('learning-stats-btn')?.addEventListener('click', () => alert('Learning statistics (demo)'));
+    </script>
+<script src="premium-access.js"></script><script>window.IELTSXPremium&&window.IELTSXPremium.protect();</script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
+</html>

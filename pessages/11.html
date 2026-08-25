@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en" class="light text-default-size">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="cid:css-e22d668e-9863-4473-bdd0-fb267ff0aee6@mhtml.blink" />
+
+
+    <!--
+      Page-level tags (title, description, keywords, canonical, og:*, twitter:*) are deliberately
+      NOT declared here. react-helmet-async cannot remove static tags it did not author, so any tag
+      left in this file would coexist with the per-page tag - and two conflicting rel=canonical
+      values make Google ignore both. SEOHead owns them at runtime; scripts/generate-seo-static-pages.mjs
+      owns them in prerendered HTML.
+    -->
+
+    <!-- Basic Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="IELTSX Platform">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="en">
+
+    <!-- LLM-specific meta tags -->
+    <meta name="classification" content="Education, IELTS Test Preparation">
+    <meta name="category" content="Educational Technology">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="General">
+    <meta name="disclaimer"
+        content="IELTSX is an independent platform not affiliated with British Council, IDP, or Cambridge Assessment">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="96x96" href="https://ieltsx.com/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://ieltsx.com/favicon-192.png">
+    <link rel="apple-touch-icon" href="https://ieltsx.com/ieltsx-only-logo.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-navbutton-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link rel="preconnect" href="https://accounts.google.com/">
+    <link rel="preconnect" href="https://pub-b4cdf9cea3c1412d9af58d86ce04ab1e.r2.dev/">
+    <link rel="preconnect" href="https://static.cloudflareinsights.com/">
+
+    <!-- DNS Prefetch for external domains -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com/">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com/">
+    <link rel="dns-prefetch" href="https://accounts.google.com/">
+
+    <!--
+      Matches SEO_CONFIG.pages.home.title in src/config/seo.ts. This is what a crawler reads before
+      any JavaScript runs, and it is also the title served on every unmatched path via the
+      `_redirects` catch-all, so it has to name the product rather than abbreviate it.
+    -->
+
+
+    <!-- Structured Data -->
+
+
+    <!-- FAQ Structured Data -->
+
+
+    <!-- About/Disambiguation for LLMs -->
+
+
+    <!-- Google tag (gtag.js) -->
+
+
+    <!-- Cloudflare Web Analytics -->
+
+    <!-- End Cloudflare Web Analytics -->
+
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/router-oTa00OWi.js">
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/query-BoogBOpP.js">
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/ui-DQFvSc6P.js">
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/icons-BdBw2AFm.js">
+    <link rel="stylesheet" crossorigin="" href="https://ieltsx.com/assets/index-BcLsOYU1.css">
+    <!--seo-static-->
+    <title>IELTS X - The CDI Platform</title>
+    <meta name="description"
+        content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <link rel="canonical" href="https://ieltsx.com/">
+    <meta property="og:title" content="IELTS X - The CDI Platform">
+    <meta property="og:description"
+        content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ieltsx.com/">
+    <meta property="og:site_name" content="IELTSX">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="IELTS X - The CDI Platform">
+    <meta name="twitter:description"
+        content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <meta property="og:image" content="https://ieltsx.com/ieltsx-logo-round-filled.png">
+    <meta name="twitter:image" content="https://ieltsx.com/ieltsx-logo-round-filled.png">
+    <meta property="og:image:alt" content="IELTSX">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ExamRoutes-Dnd_BOow.js">
+    <link rel="modulepreload" as="script" crossorigin=""
+        href="https://ieltsx.com/assets/SpeakingTestReview-BtH5Wbms.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useSpeakingTests-DSb5aB35.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/exam.utils-BYryEXJB.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/usePracticeTests-f_9qh6Ol.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useTestSolution-abWxKq4F.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/fuzzyTextMatching-BDgWYSW1.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/examIntegrityApi-D5UUzxFG.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/MarkdownRenderer-U4BWY1ld.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/writingCriteria-D1T4UITt.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useIssueReports-DTnhoLia.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/formatters-D_CuouuD.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/index-B2_gy1AM.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ReadingTestMain-Bc04PRcs.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/index-CDMGd2R9.js">
+    <link rel="modulepreload" as="script" crossorigin=""
+        href="https://ieltsx.com/assets/ReadingPassageRenderer-CdqlGp4A.js">
+    <link rel="modulepreload" as="script" crossorigin=""
+        href="https://ieltsx.com/assets/FlowChartCompletionTest-sUYohljN.js">
+    <link rel="modulepreload" as="script" crossorigin=""
+        href="https://ieltsx.com/assets/QuestionFlagButton-BH8loblm.js">
+    <link rel="modulepreload" as="script" crossorigin=""
+        href="https://ieltsx.com/assets/ExamReadingDivider-AnOozx87.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ReportIssueDialog-CTIeepen.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/examDuration-D3ywLXF9.js">
+    <link rel="modulepreload" as="script" crossorigin=""
+        href="https://ieltsx.com/assets/examResultCalculations-BaIfGSqA.js">
+</head>
+
+<body style="">
+    <div id="root">
+        <div class="flex h-[100dvh] flex-col overflow-hidden bg-white">
+            <header
+                class="grid shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(2.5rem,1fr)] items-center gap-2 border-b border-b-gray-300 px-2 py-1 sm:px-4 min-h-10 ">
+                <div class="flex min-w-0 items-center gap-2">
+                    <div class="shrink-0 "><img class="h-8 sm:h-9 aspect-square w-auto"
+                            src="https://ieltsx.com/assets/ieltsx-only-logo-BajnupZg.png" alt="IELTS X"></div>
+                    <div class="min-w-0 overflow-hidden">
+                        <div class="ml-1 min-w-0 text-xs sm:ml-3 sm:text-sm text-primary"><span
+                                class="font-semibold truncate block">[Demo] Test 3 - P3: Improving Patient Safety</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex min-w-0 items-center justify-center gap-2 whitespace-nowrap">
+                    <div class="flex items-center gap-4"></div>
+                </div>
+                <div class="flex min-w-0 items-center justify-end gap-2">
+                    <div class="flex items-center gap-2 py-0.5"><button type="button"
+                            class="px-2 py-0.5 bg-secondary border border-gray-400 hover:bg-gray-200 text-primary rounded text-xs sm:px-4 sm:text-sm flex items-center gap-1"
+                            title="Enter fullscreen"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize2">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" x2="14" y1="3" y2="10"></line>
+                                <line x1="3" x2="10" y1="21" y2="14"></line>
+                            </svg></button><button type="button"
+                            class="px-2 py-0.5 bg-secondary border border-gray-400 hover:bg-gray-200 text-primary rounded text-xs sm:px-4 sm:text-sm flex items-center gap-1"
+                            aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:rf:"
+                            data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                                <line x1="4" x2="20" y1="12" y2="12"></line>
+                                <line x1="4" x2="20" y1="6" y2="6"></line>
+                                <line x1="4" x2="20" y1="18" y2="18"></line>
+                            </svg></button><button type="button"
+                            class="px-2 py-0.5 bg-secondary border border-gray-400 hover:bg-gray-200 text-primary rounded text-xs sm:px-4 sm:text-sm">Finish</button>
+                    </div>
+                </div>
+            </header>
+            <main class="flex min-h-0 flex-1 flex-col overflow-hidden bg-white px-1">
+                <div class="shrink-0 border-gray-200">
+                    <div class="p-2 sm:p-3">
+                        <div class="rounded border border-gray-300 bg-[#F1F2EC] p-2 dark:bg-secondary sm:p-3">
+                            <div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:gap-4">
+                                <div class="min-w-0 flex-[0.8] text-sm sm:text-base">
+                                    <p class="font-bold">Reading Passage 3 Review</p>
+                                    <p class="">Review your answers for questions 27–40.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <section class="min-h-0 flex-1 text-content">
+                    <div id="exam-content" class="test-content h-full overflow-y-auto bg-white">
+                        <div id="reading-container" class="flex h-full ative">
+                            <div class="overflow-y-auto p-4" data-exam-integrity-reading-passage="true"
+                                style="width: 50%;">
+                                <div class="max-w-none space-y-6">
+                                    <h2 class="text-2xl font-semibold text-foreground text-center">Improving Patient
+                                        Safety</h2>
+                                    <p class="text-lg italic text-gray-800 dark:text-gray-200 mb-8 text-center">How
+                                        improved drug packaging could provide some answers to patient safety issues</p>
+                                    <div class="whitespace-pre-wrap">
+                                        <div class="space-y-8">
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7">One of the most prominent
+                                                        design issues in pharmacy is that of drug packages and the
+                                                        patient information leaflets (PILs) included in them. Many
+                                                        pharmacists are concerned that current designs are 'accidents
+                                                        waiting to happen'. The UK government shares this concern and,
+                                                        in 2003, the National Patient Safety Agency created a new role,
+                                                        appointing Colum Lowe, who has 14 years' experience as a
+                                                        designer in the private sector, as head of design and human
+                                                        factors.</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7">Packaging design in the
+                                                        pharmaceutical industry is handled by either in-house teams or
+                                                        external design agencies. For packaging design of
+                                                        over-the-counter medicines, which do not have to be dispensed by
+                                                        a pharmacist but can be bought directly from a sales assistant,
+                                                        <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 34"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q34</span>characteristics
+                                                            such as attractiveness and distinguishability are important
+                                                            and so these are usually commissioned from an external
+                                                            design team.</span> <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 33"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q33</span>The
+                                                            marketing team prepares the initial brief and the designers
+                                                            come up with six or seven designs.</span> <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 35"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q35</span>Two
+                                                            or three of these are then tested on a consumer
+                                                            group.</span> <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 36"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q36</span>In
+                                                            contrast, most designs for prescription-only products are
+                                                            created in-house. In some cases, this may simply involve the
+                                                            company's design team</span> <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 37"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q37</span>applying
+                                                            the house design and then handing it over to design
+                                                            engineers rather than testing the design on a consumer
+                                                            group.</span> Clearly this process cannot adequately address
+                                                        the needs of the wide variety of patients using medication.</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7">In her book Information Design
+                                                        for Patient Safety, Thea Swayne highlighted a multitude of
+                                                        design problems. For example, drugs that look or sound alike can
+                                                        lead to confusion; small type sizes and even the glare on
+                                                        silver-foil packaging can lead to names or instructions being
+                                                        misread. <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 38"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q38</span>One
+                                                            such example is a drug that was accidentally injected into a
+                                                            patient through the spine (intrathecally) rather than
+                                                            through the veins (intravenously). Investigations following
+                                                            this tragedy attributed some blame to the poor choice of
+                                                            typescript used on the drug container.</span> Furthermore,
+                                                        <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 30"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q30</span>according
+                                                            to Swayne, real situations in which medicines are used
+                                                            include a parent giving a cough medicine to a child in the
+                                                            middle of the night; packaging should be designed for
+                                                            moments such as these</span> rather than for the ideal world
+                                                        of a hospital.</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7">Child protection is another
+                                                        area that gives designers opportunities to improve safety. <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 29"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q29</span>According
+                                                            to the Child Accident Prevention Trust, 70% of children
+                                                            admitted to hospital with suspected poisoning have swallowed
+                                                            medicines, and although child-resistant lids have helped,
+                                                            they are not yet fully effective.</span> There is scope for
+                                                        improving what is currently available, <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 27"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q27</span>according
+                                                            to Richard Mawle, a freelance product designer who feels it
+                                                            is not just children who are blocked by child-proof
+                                                            closures. 'Many child-resistant packs are based on strength
+                                                            but older people may have the same level of strength as a
+                                                            child,'</span> he explained, and suggested that better
+                                                        designs could rely on cognitive skills (e.g. removing the lid
+                                                        using a three-step process).</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7"><span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 32"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q32</span>Mawle
+                                                            also worked on a project which involved applying his skills
+                                                            to packaging and PILs. Commenting on the information
+                                                            presented, he said: 'There can be an awful lot of junk at
+                                                            the beginning of PILs.</span> For example, why are company
+                                                        details towards the beginning of a leaflet when what might be
+                                                        more vital for the patient is that the medicine should not be
+                                                        taken with alcohol?'</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7">Most designers work according
+                                                        to basic principles; for example, certain print styles are known
+                                                        to be more difficult to read than others. Look-alike boxes
+                                                        present the potential for errors and an obvious solution would
+                                                        be to use colours to highlight a larger dosage of a drug.
+                                                        However, according to Thea Swayne, designating a colour to a
+                                                        particular dosage is not recommended because this could lead to
+                                                        the user not reading the text on a box.</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7">Design features can provide the
+                                                        basis for lengthy debates. <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 39"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q39</span>One
+                                                            argument is that if all packaging was white with black
+                                                            lettering, people would have no choice but to read every box
+                                                            carefully.</span> The problem is that trials of drug
+                                                        packaging are few common signage studies concern road-traffic
+                                                        signs and visual-display units. Although some designers take
+                                                        results from such studies into account, proving that a
+                                                        particular feature is beneficial can be difficult. For example,
+                                                        current UK legislation requires packaging to include the name of
+                                                        the medicine in Braille, but, <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 28"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q28</span>according
+                                                            to Karel van der Waarde, a design consultant to the
+                                                            pharmaceutical industry, 'it is not known how much visually
+                                                            impaired patients will benefit nor how much the reading of
+                                                            visually able patients will be impaired'.</span> <span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 31"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q31</span>Van
+                                                            der Waarde is sceptical about current legislation and says
+                                                            that many regulatory authorities do not have the resources
+                                                            to handle packaging information properly. 'They do not look
+                                                            at the use of packaging in a practical context - they only
+                                                            see one box at a time and not several together</span> as
+                                                        pharmacists would do,' he said.</p>
+                                                </div>
+                                            </div>
+                                            <div class="block">
+                                                <div class="block">
+                                                    <p class="text-foreground leading-7"><span
+                                                            class="bg-yellow-100 dark:bg-yellow-900/50 border-b-2 border-yellow-400 dark:border-yellow-500 pr-1 py-0.5 transition-colors duration-200"
+                                                            title="Answer for Question 40"><span
+                                                                class="font-bold bg-yellow-400 dark:bg-yellow-500 text-black px-1 py-0.5 rounded text-xs mr-1">Q40</span>On
+                                                            a positive note, a recent innovation exhibition revealed
+                                                            several new designs. 'The popper' aims to help arthritis
+                                                            sufferers remove tablets from blister packs, and 'Pluspoint'
+                                                            is an adrenaline auto-injector</span> (a device that allows
+                                                        diabetics to inject themselves) aimed at overcoming the fact
+                                                        that many patients do not carry their medication due to its
+                                                        prohibitive size. The aim of good design is to try to make
+                                                        things more user-friendly as well as safer. The guidelines in
+                                                        Information Design for Patient Safety are not intended to be
+                                                        legally binding. Rather, the book's purpose is to create a basic
+                                                        design standard and to stimulate innovation. The challenge for
+                                                        the pharmaceutical industry is to adopt such a standard.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-1 bg-gray-200 cursor-col-resize relative">
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                    <button
+                                        class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md hover:bg-blue-600 transition-colors">⋮</button>
+                                </div>
+                            </div>
+                            <div class="overflow-y-auto p-4" style="width: 50%;">
+                                <div dir="ltr" data-orientation="horizontal" class="w-full">
+                                    <div role="tablist" aria-orientation="horizontal"
+                                        class="h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground grid w-full grid-cols-2 mb-4"
+                                        tabindex="0" data-orientation="horizontal" style="outline: none;"><button
+                                            type="button" role="tab" aria-selected="true"
+                                            aria-controls="radix-:ri:-content-questions" data-state="active"
+                                            id="radix-:ri:-trigger-questions"
+                                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow"
+                                            tabindex="-1" data-orientation="horizontal"
+                                            data-radix-collection-item="">Questions Review</button><button type="button"
+                                            role="tab" aria-selected="false"
+                                            aria-controls="radix-:ri:-content-vocabulary" data-state="inactive"
+                                            id="radix-:ri:-trigger-vocabulary"
+                                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow"
+                                            tabindex="-1" data-orientation="horizontal"
+                                            data-radix-collection-item="">Vocabulary (10)</button></div>
+                                    <div data-state="active" data-orientation="horizontal" role="tabpanel"
+                                        aria-labelledby="radix-:ri:-trigger-questions" id="radix-:ri:-content-questions"
+                                        tabindex="0"
+                                        class="ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-0"
+                                        style="animation-duration: 0s;">
+                                        <div class="space-y-20 pb-20">
+                                            <div data-exam-integrity-question-group="true"
+                                                data-exam-integrity-question-type="MATCHING_FEATURES">
+                                                <div class="space-y-6">
+                                                    <div class="space-y-2">
+                                                        <h5 class="font-semibold">Questions 27–32</h5>
+                                                        <p>Choose the correct person or group, <strong>A, B, C or
+                                                                D</strong>, for each statement.</p>
+                                                    </div>
+                                                    <div class="overflow-x-auto">
+                                                        <div
+                                                            class="w-full max-w-4xl p-4 border border-gray-500 h-fit flex-1">
+                                                            <table class="h-full w-full border-collapse">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th
+                                                                            class="whitespace-nowrap border-black dark:border-gray-300 px-3 py-2 min-w-[300px]">
+                                                                            Statements</th>
+                                                                        <th
+                                                                            class="whitespace-nowrap border-black dark:border-gray-300 p-3 text-center border-l-2">
+                                                                            A</th>
+                                                                        <th
+                                                                            class="whitespace-nowrap border-black dark:border-gray-300 p-3 text-center border-l">
+                                                                            B</th>
+                                                                        <th
+                                                                            class="whitespace-nowrap border-black dark:border-gray-300 p-3 text-center border-l">
+                                                                            C</th>
+                                                                        <th
+                                                                            class="whitespace-nowrap border-black dark:border-gray-300 p-3 text-center border-l">
+                                                                            D</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr
+                                                                        class="border-black dark:border-gray-300 h-full border-t-2">
+                                                                        <td class="flex gap-2 p-3 md:mr-5 items-center">
+                                                                            <span role="button" tabindex="0"
+                                                                                aria-label="Question 27, incorrect"
+                                                                                class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">27</span><span>The
+                                                                                elderly would benefit from drug
+                                                                                containers that do not require force to
+                                                                                open them.</span><button
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                                More<svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="24" height="24"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="2"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                    <path d="m9 18 6-6-6-6"></path>
+                                                                                </svg></button></td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l-2">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 bg-blue-100 dark:bg-blue-900/60">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="25" height="25"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="3"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-check text-green-700 opacity-60">
+                                                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                                                </svg></div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr
+                                                                        class="border-black dark:border-gray-300 h-full border-t">
+                                                                        <td class="flex gap-2 p-3 md:mr-5 items-center">
+                                                                            <span role="button" tabindex="0"
+                                                                                aria-label="Question 28, incorrect"
+                                                                                class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">28</span><span>Adapting
+                                                                                packaging for the blind may disadvantage
+                                                                                people who can see.</span><button
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                                More<svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="24" height="24"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="2"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                    <path d="m9 18 6-6-6-6"></path>
+                                                                                </svg></button></td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l-2">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 bg-blue-100 dark:bg-blue-900/60">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="25" height="25"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="3"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-check text-green-700 opacity-60">
+                                                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                                                </svg></div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr
+                                                                        class="border-black dark:border-gray-300 h-full border-t">
+                                                                        <td class="flex gap-2 p-3 md:mr-5 items-center">
+                                                                            <span role="button" tabindex="0"
+                                                                                aria-label="Question 29, incorrect"
+                                                                                class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">29</span><span>Specially
+                                                                                designed containers have not been able
+                                                                                to eliminate drugs being swallowed
+                                                                                accidentally.</span><button
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                                More<svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="24" height="24"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="2"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                    <path d="m9 18 6-6-6-6"></path>
+                                                                                </svg></button></td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l-2">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 bg-blue-100 dark:bg-blue-900/60">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="25" height="25"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="3"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-check text-green-700 opacity-60">
+                                                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                                                </svg></div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr
+                                                                        class="border-black dark:border-gray-300 h-full border-t">
+                                                                        <td class="flex gap-2 p-3 md:mr-5 items-center">
+                                                                            <span role="button" tabindex="0"
+                                                                                aria-label="Question 30, incorrect"
+                                                                                class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">30</span><span>Designers
+                                                                                have to consider how drugs are used in
+                                                                                the home.</span><button
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                                More<svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="24" height="24"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="2"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                    <path d="m9 18 6-6-6-6"></path>
+                                                                                </svg></button></td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l-2">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 bg-blue-100 dark:bg-blue-900/60">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="25" height="25"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="3"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-check text-green-700 opacity-60">
+                                                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                                                </svg></div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr
+                                                                        class="border-black dark:border-gray-300 h-full border-t">
+                                                                        <td class="flex gap-2 p-3 md:mr-5 items-center">
+                                                                            <span role="button" tabindex="0"
+                                                                                aria-label="Question 31, incorrect"
+                                                                                class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">31</span><span>Governing
+                                                                                bodies need to compare different drug
+                                                                                containers rather than studying
+                                                                                individual ones.</span><button
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                                More<svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="24" height="24"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="2"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                    <path d="m9 18 6-6-6-6"></path>
+                                                                                </svg></button></td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l-2">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 bg-blue-100 dark:bg-blue-900/60">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="25" height="25"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="3"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-check text-green-700 opacity-60">
+                                                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                                                </svg></div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr
+                                                                        class="border-black dark:border-gray-300 h-full border-t">
+                                                                        <td class="flex gap-2 p-3 md:mr-5 items-center">
+                                                                            <span role="button" tabindex="0"
+                                                                                aria-label="Question 32, incorrect"
+                                                                                class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">32</span><span>Information
+                                                                                provided with medicine is not listed in
+                                                                                the right order.</span><button
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                                More<svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="24" height="24"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="2"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                    <path d="m9 18 6-6-6-6"></path>
+                                                                                </svg></button></td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l-2">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 bg-blue-100 dark:bg-blue-900/60">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    width="25" height="25"
+                                                                                    viewBox="0 0 24 24" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="3"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    class="lucide lucide-check text-green-700 opacity-60">
+                                                                                    <path d="M20 6 9 17l-5-5"></path>
+                                                                                </svg></div>
+                                                                        </td>
+                                                                        <td
+                                                                            class="border-0 border-black dark:border-gray-300 h-full p-0 border-l">
+                                                                            <div
+                                                                                class="w-full min-h-full flex items-center justify-center p-2.5 min-w-12 h-full flex-1 ">
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="w-fit border border-gray-300 dark:border-gray-600 p-4 bg-gray-50 dark:bg-gray-800">
+                                                        <h4 class="mb-3 font-medium text-gray-900 dark:text-gray-100">
+                                                            List of People or Groups</h4>
+                                                        <div class="space-y-1.5">
+                                                            <div class="flex gap-3"><span
+                                                                    class="font-medium text-gray-900 dark:text-gray-100">A</span><span>Thea
+                                                                    Swayne</span></div>
+                                                            <div class="flex gap-3"><span
+                                                                    class="font-medium text-gray-900 dark:text-gray-100">B</span><span>The
+                                                                    Child Accident Prevention Trust</span></div>
+                                                            <div class="flex gap-3"><span
+                                                                    class="font-medium text-gray-900 dark:text-gray-100">C</span><span>Richard
+                                                                    Mawle</span></div>
+                                                            <div class="flex gap-3"><span
+                                                                    class="font-medium text-gray-900 dark:text-gray-100">D</span><span>Karel
+                                                                    van der Waarde</span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-exam-integrity-question-group="true"
+                                                data-exam-integrity-question-type="SUMMARY_COMPLETION_OPTIONS">
+                                                <div class="space-y-8">
+                                                    <div class="space-y-2">
+                                                        <h5 class="font-semibold">Questions 33–37</h5>
+                                                        <p>Complete the summary using the list of words. Choose the
+                                                            correct answer and move it into the gap.</p>
+                                                    </div>
+                                                    <div class="flex flex-col gap-5">
+                                                        <div class="flex-1">
+                                                            <div class="mb-6 text-center">
+                                                                <h4 class="font-bold">Packaging design in the
+                                                                    pharmaceutical industry</h4>
+                                                            </div>
+                                                            <div class="text-base leading-relaxed">
+                                                                <span>Over-the-counter drugs
+                                                                    First, a proposal is written by the </span><span
+                                                                    role="button" tabindex="0"
+                                                                    aria-label="Question 33, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer mx-1">33</span><span
+                                                                    class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 mx-1"><span
+                                                                        class="font-semibold text-red-500 ">✗</span><span
+                                                                        class="font-semibold text-green-600">→ marketing
+                                                                        team</span><button
+                                                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                        More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2" stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                            <path d="m9 18 6-6-6-6"></path>
+                                                                        </svg></button></span><span>. Then several
+                                                                    designs are produced by the </span><span
+                                                                    role="button" tabindex="0"
+                                                                    aria-label="Question 34, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer mx-1">34</span><span
+                                                                    class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 mx-1"><span
+                                                                        class="font-semibold text-red-500 ">✗</span><span
+                                                                        class="font-semibold text-green-600">→ external
+                                                                        design team</span><button
+                                                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                        More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2" stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                            <path d="m9 18 6-6-6-6"></path>
+                                                                        </svg></button></span><span>. Finally, selected
+                                                                    designs are shown to </span><span role="button"
+                                                                    tabindex="0" aria-label="Question 35, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer mx-1">35</span><span
+                                                                    class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 mx-1"><span
+                                                                        class="font-semibold text-red-500 ">✗</span><span
+                                                                        class="font-semibold text-green-600">→
+                                                                        consumers</span><button
+                                                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                        More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2" stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                            <path d="m9 18 6-6-6-6"></path>
+                                                                        </svg></button></span><span>.
+                                                                    Prescription-only drugs
+                                                                    The </span><span role="button" tabindex="0"
+                                                                    aria-label="Question 36, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer mx-1">36</span><span
+                                                                    class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 mx-1"><span
+                                                                        class="font-semibold text-red-500 ">✗</span><span
+                                                                        class="font-semibold text-green-600">→ in-house
+                                                                        design team</span><button
+                                                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                        More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2" stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                            <path d="m9 18 6-6-6-6"></path>
+                                                                        </svg></button></span><span> create the design.
+                                                                    The design is then passed to </span><span
+                                                                    role="button" tabindex="0"
+                                                                    aria-label="Question 37, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer mx-1">37</span><span
+                                                                    class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 mx-1"><span
+                                                                        class="font-semibold text-red-500 ">✗</span><span
+                                                                        class="font-semibold text-green-600">→ design
+                                                                        engineers</span><button
+                                                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                        More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2" stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                            <path d="m9 18 6-6-6-6"></path>
+                                                                        </svg></button></span><span>.</span></div>
+                                                        </div>
+                                                        <div class="w-full">
+                                                            <div class="">
+                                                                <h3 class="mb-3 font-bold">Options</h3>
+                                                                <ul
+                                                                    class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">A</span>: consumers
+                                                                    </li>
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">B</span>: design
+                                                                        engineers</li>
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">C</span>: external
+                                                                        design team</li>
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">D</span>: in-house
+                                                                        design team</li>
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">E</span>: marketing
+                                                                        team</li>
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">F</span>:
+                                                                        pharmaceutical industry</li>
+                                                                    <li class="rounded border p-2 text-sm"><span
+                                                                            class="font-semibold">G</span>: pharmacists
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-exam-integrity-question-group="true"
+                                                data-exam-integrity-question-type="MULTIPLE_CHOICE">
+                                                <div class="space-y-4">
+                                                    <div class="space-y-2">
+                                                        <h5 class="font-semibold">Questions 38–40</h5>
+                                                        <p>Choose the correct answer.</p>
+                                                    </div>
+                                                    <div class="space-y-6">
+                                                        <div class="flex flex-col gap-4">
+                                                            <div id="question-38" class="flex items-start gap-2 "><span
+                                                                    role="button" tabindex="0"
+                                                                    aria-label="Question 38, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">38</span>
+                                                                <div class="min-w-0 flex-1">
+                                                                    <p>In the accident mentioned in the passage, what
+                                                                        was the 'design consideration' that caused a
+                                                                        drug to be given incorrectly?</p>
+                                                                    <div class="flex flex-col space-y-1 py-2"><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-38"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="A"><span class="">a printing
+                                                                                error</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-38"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="B"><span
+                                                                                class="text-green-700">the style of
+                                                                                print</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-38"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="C"><span class="">an incorrect
+                                                                                label</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-38"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="D"><span class="">the shape of
+                                                                                the bottle</span></label></div><span
+                                                                        class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 "><span
+                                                                            class="font-semibold text-red-500 ">✗</span><span
+                                                                            class="font-semibold text-green-600">→
+                                                                            B</span><button
+                                                                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                            More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                                width="24" height="24"
+                                                                                viewBox="0 0 24 24" fill="none"
+                                                                                stroke="currentColor" stroke-width="2"
+                                                                                stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                                class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                <path d="m9 18 6-6-6-6"></path>
+                                                                            </svg></button></span>
+                                                                </div>
+                                                            </div>
+                                                            <div id="question-39" class="flex items-start gap-2 "><span
+                                                                    role="button" tabindex="0"
+                                                                    aria-label="Question 39, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">39</span>
+                                                                <div class="min-w-0 flex-1">
+                                                                    <p>What do some people say about the use of only
+                                                                        black and white as a design feature?</p>
+                                                                    <div class="flex flex-col space-y-1 py-2"><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-39"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="A"><span class="">Consumers would
+                                                                                dislike this
+                                                                                option.</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-39"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="B"><span class="">Drug containers
+                                                                                would all look too
+                                                                                similar.</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-39"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="C"><span
+                                                                                class="text-green-700">People would pay
+                                                                                more attention to label
+                                                                                information.</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-39"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="D"><span class="">Partially
+                                                                                sighted people would find these colours
+                                                                                more helpful.</span></label></div><span
+                                                                        class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 "><span
+                                                                            class="font-semibold text-red-500 ">✗</span><span
+                                                                            class="font-semibold text-green-600">→
+                                                                            C</span><button
+                                                                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                            More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                                width="24" height="24"
+                                                                                viewBox="0 0 24 24" fill="none"
+                                                                                stroke="currentColor" stroke-width="2"
+                                                                                stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                                class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                <path d="m9 18 6-6-6-6"></path>
+                                                                            </svg></button></span>
+                                                                </div>
+                                                            </div>
+                                                            <div id="question-40" class="flex items-start gap-2 "><span
+                                                                    role="button" tabindex="0"
+                                                                    aria-label="Question 40, incorrect"
+                                                                    class="inline-flex h-fit shrink-0 self-start items-center justify-center rounded-sm border-2 px-1 font-semibold text-white border-red-600 bg-red-600 cursor-pointer ">40</span>
+                                                                <div class="min-w-0 flex-1">
+                                                                    <p>Why does the writer refer to 'the popper' and
+                                                                        'Pluspoint'?</p>
+                                                                    <div class="flex flex-col space-y-1 py-2"><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-40"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="A"><span
+                                                                                class="text-green-700">to show that
+                                                                                progress is being made in pharmaceutical
+                                                                                packaging design</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-40"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="B"><span class="">to give an
+                                                                                example of pharmaceutical design
+                                                                                problems that can cause
+                                                                                accidents</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-40"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="C"><span class="">to prove that a
+                                                                                lot of work still needs to be done to
+                                                                                improve pharmaceutical packaging
+                                                                                design</span></label><label
+                                                                            class="flex items-center p-2 rounded-sm"><input
+                                                                                type="radio" name="question-40"
+                                                                                class="w-4 h-4 mr-2" disabled=""
+                                                                                value="D"><span class="">to point out
+                                                                                that patients need to be more informed
+                                                                                about pharmaceutical
+                                                                                products</span></label></div><span
+                                                                        class="inline-flex flex-wrap items-center gap-x-2 gap-y-1 "><span
+                                                                            class="font-semibold text-red-500 ">✗</span><span
+                                                                            class="font-semibold text-green-600">→
+                                                                            A</span><button
+                                                                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-8 rounded-md px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">Explain
+                                                                            More<svg xmlns="http://www.w3.org/2000/svg"
+                                                                                width="24" height="24"
+                                                                                viewBox="0 0 24 24" fill="none"
+                                                                                stroke="currentColor" stroke-width="2"
+                                                                                stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                                class="lucide lucide-chevron-right w-4 h-4 ml-1">
+                                                                                <path d="m9 18 6-6-6-6"></path>
+                                                                            </svg></button></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <div class="shrink-0 border-t border-gray-200 bg-white">
+                <footer
+                    class="flex min-w-0 items-center justify-between overflow-hidden border-t border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+                    aria-label="Exam navigation">
+                    <div class="flex h-[53px] min-w-0 flex-1 items-center gap-1 overflow-x-auto bg-white">
+                        <div class="flex h-full min-w-max flex-shrink-0 items-center"><button type="button" class="h-full text-base text-foreground font-semibold justify-center border-t-[3px]
+            rounded-none shadow-none px-2 sm:px-4 flex items-center transition-colors border-gray-400"
+                                aria-label="Part 3">Part 3</button>
+                            <div
+                                class="flex h-full max-w-[calc(100vw-9rem)] flex-row items-center space-x-1 overflow-x-auto sm:ml-2 sm:max-w-none sm:pr-2">
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 27">27</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 28">28</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 29">29</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 30">30</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 31">31</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 32">32</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 33">33</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 34">34</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 35">35</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 36">36</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 37">37</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 38">38</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 39">39</button></div>
+                                <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                        aria-label="Question 40">40</button></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:flex items-center space-x-2 mx-2 flex-shrink-0"><button
+                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md text-xs h-10 w-10 p-0 border border-gray-500"
+                            aria-label="Previous question"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left">
+                                <path d="m12 19-7-7 7-7"></path>
+                                <path d="M19 12H5"></path>
+                            </svg></button><button
+                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md text-xs h-10 w-10 p-0 border border-gray-500"
+                            aria-label="Next question"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg></button></div>
+                </footer>
+            </div>
+        </div>
+        <div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;">
+            <ol tabindex="-1"
+                class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]">
+            </ol>
+        </div>
+    </div>
+    <!-- Cloudflare Pages Analytics --><!-- Cloudflare Pages Analytics -->
+
+</body>
+
+</html>

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en" class="text-default-size light">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="IELTSX Platform">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="en">
+    <meta name="classification" content="Education, IELTS Test Preparation">
+    <meta name="category" content="Educational Technology">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="General">
+    <meta name="disclaimer" content="IELTSX is an independent platform not affiliated with British Council, IDP, or Cambridge Assessment">
+    <link rel="icon" type="image/png" sizes="96x96" href="https://ieltsx.uz/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://ieltsx.uz/favicon-192.png">
+    <link rel="apple-touch-icon" href="https://ieltsx.uz/ieltsx-only-logo.png">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-navbutton-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link rel="preconnect" href="https://accounts.google.com/">
+    <link rel="preconnect" href="https://pub-b4cdf9cea3c1412d9af58d86ce04ab1e.r2.dev/">
+    <link rel="preconnect" href="https://static.cloudflareinsights.com/">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com/">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com/">
+    <link rel="dns-prefetch" href="https://accounts.google.com/">
+
+    <link rel="stylesheet" crossorigin href="/assets/index-DNLr8-et.css">
+
+    <title>IELTS X - The CDI Platform</title>
+    <meta name="description" content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <link rel="canonical" href="https://ieltsx.com/">
+    <meta property="og:title" content="IELTS X - The CDI Platform">
+    <meta property="og:description" content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ieltsx.com/">
+    <meta property="og:site_name" content="IELTSX">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="IELTS X - The CDI Platform">
+    <meta name="twitter:description" content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <meta property="og:image" content="https://ieltsx.com/ieltsx-logo-round-filled.png">
+    <meta name="twitter:image" content="https://ieltsx.com/ieltsx-logo-round-filled.png">
+    <meta property="og:image:alt" content="IELTSX">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+
+    <style>
+        /* ---- Base reset & defaults ---- */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* ---- Article size helpers ---- */
+        .article-size-comfortable p {
+            font-size: 17px !important;
+            line-height: 30px !important;
+        }
+        .article-size-large p {
+            font-size: 18px !important;
+            line-height: 32px !important;
+        }
+        .article-size-extra p {
+            font-size: 19px !important;
+            line-height: 34px !important;
+        }
+        .article-style-sans {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+        }
+        .article-style-serif {
+            font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif !important;
+        }
+        .article-style-serif p {
+            font-weight: 400 !important;
+        }
+        .article-style-sans p {
+            font-weight: 500 !important;
+        }
+
+        /* ---- Modal ---- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 1rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.75rem 2rem 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        /* ---- Sidebar collapse / expand (robust fix) ---- */
+        .sidebar-inner {
+            width: var(--sidebar-width);
+            transition: width 0.2s ease;
+        }
+        [data-collapsible="icon"] .sidebar-inner {
+            width: var(--sidebar-width-icon);
+        }
+        [data-collapsible="icon"] .sidebar-text-hidden {
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            display: none;
+        }
+
+        #main-sidebar-root {
+            transition: width 0.25s ease, min-width 0.25s ease, max-width 0.25s ease;
+        }
+        #main-sidebar-root[data-state="collapsed"] .sidebar-inner {
+            width: var(--sidebar-width-icon, 3rem) !important;
+            min-width: var(--sidebar-width-icon, 3rem) !important;
+            max-width: var(--sidebar-width-icon, 3rem) !important;
+            overflow: hidden !important;
+        }
+
+        /* ---- Collapsed holatda faqat matn yashiriladi, tugma o'lchamlari o'zgarmaydi ---- */
+        #main-sidebar-root[data-state="collapsed"] .sidebar-inner [data-sidebar="menu-item"] a span:not(:has(svg)),
+        #main-sidebar-root[data-state="collapsed"] .sidebar-inner [data-sidebar="menu-item"] button span:not(:has(svg)) {
+            display: none !important;
+        }
+
+        /* Ixtiyoriy: guruh sarlavhalari va footer matnlarini yashirish */
+        #main-sidebar-root[data-state="collapsed"] .sidebar-inner [data-sidebar="group-label"],
+        #main-sidebar-root[data-state="collapsed"] .sidebar-inner [data-sidebar="footer"] .grid .truncate,
+        #main-sidebar-root[data-state="collapsed"] .sidebar-inner [data-sidebar="footer"] .grid .text-xs {
+            display: none !important;
+        }
+
+        #main-sidebar-root[data-state="collapsed"] .sidebar-outer {
+            width: var(--sidebar-width-icon, 3rem) !important;
+        }
+        #main-sidebar-root[data-state="expanded"] .sidebar-outer {
+            width: var(--sidebar-width, 16rem) !important;
+        }
+
+        .sidebar-outer {
+            transition: width 0.2s ease !important;
+            will-change: width;
+        }
+
+        /* Mobile backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-backdrop.open {
+            display: block;
+        }
+        @media (min-width: 768px) {
+            .sidebar-backdrop {
+                display: none !important;
+            }
+        }
+
+        /* ---- DARK MODE overrides ---- */
+        html.dark {
+            color-scheme: dark;
+        }
+        html.dark body {
+            background-color: #1e2020;
+            color: #e8edf5;
+        }
+        html.dark .bg-background,
+        html.dark .bg-white,
+        html.dark .bg-sidebar,
+        html.dark #root>div,
+        html.dark .group\/sidebar-wrapper {
+            background-color: #1e2020 !important;
+        }
+        html.dark .bg-muted {
+            background-color: #2a2d2d !important;
+        }
+        html.dark .bg-muted\/60 {
+            background-color: rgba(42, 45, 45, 0.6) !important;
+        }
+        html.dark .bg-secondary {
+            background-color: #2a2d2d !important;
+        }
+        html.dark .bg-card,
+        html.dark .bg-popover {
+            background-color: #262929 !important;
+        }
+        html.dark .bg-border {
+            background-color: #334155 !important;
+        }
+        html.dark .bg-sidebar {
+            background-color: #1e2020 !important;
+        }
+        html.dark .border-r,
+        html.dark .border-border,
+        html.dark .border,
+        html.dark .border-b,
+        html.dark .border-t {
+            border-color: #2d3235 !important;
+        }
+        html.dark .shadow-sm,
+        html.dark .shadow,
+        html.dark .shadow-md {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        }
+        html.dark .text-neutral-950,
+        html.dark .text-foreground,
+        html.dark .text-sidebar-foreground,
+        html.dark .text-neutral-800,
+        html.dark .text-card-foreground,
+        html.dark .text-popover-foreground {
+            color: #e8edf5 !important;
+        }
+        html.dark .text-muted-foreground,
+        html.dark .text-sidebar-foreground\/70 {
+            color: #94a3b8 !important;
+        }
+        html.dark .text-secondary-foreground {
+            color: #e8edf5 !important;
+        }
+        html.dark .hover\:bg-sidebar-accent:hover,
+        html.dark .hover\:bg-accent:hover {
+            background-color: #2d3235 !important;
+        }
+        html.dark .hover\:text-sidebar-accent-foreground:hover,
+        html.dark .hover\:text-accent-foreground:hover {
+            color: #e8edf5 !important;
+        }
+        html.dark .hover\:bg-secondary\/80:hover {
+            background-color: rgba(42, 45, 45, 0.8) !important;
+        }
+        html.dark .prose p,
+        html.dark .prose-p\:text-neutral-950 p,
+        html.dark .prose-p\:text-neutral-950 {
+            color: #e8edf5 !important;
+        }
+        html.dark .dark\:prose-p\:text-foreground p {
+            color: #e8edf5 !important;
+        }
+        html.dark .dark\:prose-invert {
+            color: #e8edf5 !important;
+        }
+        html.dark .decoration-yellow-400 {
+            text-decoration-color: #facc15 !important;
+        }
+        html.dark .decoration-yellow-300 {
+            text-decoration-color: #fde047 !important;
+        }
+        html.dark .decoration-blue-500 {
+            text-decoration-color: #3b82f6 !important;
+        }
+        html.dark .decoration-blue-300 {
+            text-decoration-color: #93c5fd !important;
+        }
+        html.dark .decoration-purple-400 {
+            text-decoration-color: #c084fc !important;
+        }
+        html.dark .decoration-purple-300 {
+            text-decoration-color: #d8b4fe !important;
+        }
+        html.dark .modal-content {
+            background: #262929 !important;
+            color: #e8edf5 !important;
+            border: 1px solid #2d3235 !important;
+        }
+        html.dark .modal-content .text-muted-foreground {
+            color: #94a3b8 !important;
+        }
+        html.dark .modal-content .border-muted {
+            border-color: #2d3235 !important;
+        }
+        html.dark .modal-content .bg-muted\/60 {
+            background-color: rgba(42, 45, 45, 0.6) !important;
+        }
+        html.dark .modal-content .bg-yellow-100 {
+            background-color: rgba(250, 204, 21, 0.2) !important;
+            color: #facc15 !important;
+            border-color: rgba(250, 204, 21, 0.3) !important;
+        }
+        html.dark .modal-content .bg-blue-100 {
+            background-color: rgba(59, 130, 246, 0.2) !important;
+            color: #93c5fd !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+        html.dark .modal-content .bg-secondary {
+            background-color: #2a2d2d !important;
+            color: #e8edf5 !important;
+        }
+        html.dark [role="tablist"] {
+            background-color: #2a2d2d !important;
+            border-color: #2d3235 !important;
+        }
+        html.dark [role="tab"] {
+            color: #94a3b8 !important;
+        }
+        html.dark [role="tab"][data-state="active"] {
+            background-color: #1e2020 !important;
+            color: #e8edf5 !important;
+        }
+        html.dark .theme-btn,
+        html.dark .size-btn,
+        html.dark .style-btn {
+            background-color: transparent !important;
+            color: #e8edf5 !important;
+        }
+        html.dark .theme-btn.bg-secondary,
+        html.dark .size-btn.bg-secondary,
+        html.dark .style-btn.bg-secondary {
+            background-color: #2a2d2d !important;
+            color: #e8edf5 !important;
+        }
+        html.dark .theme-btn:hover,
+        html.dark .size-btn:hover,
+        html.dark .style-btn:hover {
+            background-color: #2d3235 !important;
+            color: #e8edf5 !important;
+        }
+        html.dark header {
+            background-color: rgba(30, 32, 32, 0.95) !important;
+            border-color: #2d3235 !important;
+        }
+        html.dark header .bg-background\/95 {
+            background-color: rgba(30, 32, 32, 0.95) !important;
+        }
+        html.dark header .border-b {
+            border-color: #2d3235 !important;
+        }
+        html.dark footer {
+            border-color: #2d3235 !important;
+            color: #94a3b8 !important;
+        }
+        html.dark footer .text-foreground {
+            color: #e8edf5 !important;
+        }
+        html.dark .review-item {
+            background-color: #1e2020 !important;
+            border-color: #2d3235 !important;
+            color: #e8edf5 !important;
+        }
+        html.dark .review-item:hover {
+            background-color: #2a2d2d !important;
+            border-color: #3b82f6 !important;
+        }
+        html.dark .review-item .bg-yellow-300 {
+            background-color: rgba(250, 204, 21, 0.25) !important;
+            color: #facc15 !important;
+        }
+        html.dark .review-item .bg-blue-300 {
+            background-color: rgba(59, 130, 246, 0.25) !important;
+            color: #93c5fd !important;
+        }
+        html.dark figure img {
+            filter: brightness(0.9);
+        }
+        html.dark .border-transparent {
+            border-color: transparent !important;
+        }
+        html.dark .container,
+        html.dark .mx-auto,
+        html.dark .bg-background {
+            background-color: #1e2020 !important;
+        }
+        html.dark section.border-b {
+            border-color: #2d3235 !important;
+        }
+        html.dark .sticky {
+            background-color: rgba(30, 32, 32, 0.95) !important;
+        }
+        html.dark blockquote {
+            border-left-color: #3b82f6 !important;
+            color: #cbd5e1 !important;
+        }
+        html.dark .rounded-md.border.bg-muted\/60 {
+            background-color: rgba(42, 45, 45, 0.6) !important;
+            border-color: #2d3235 !important;
+            color: #e8edf5 !important;
+        }
+        html.dark .sidebar-inner .font-semibold,
+        html.dark .sidebar-inner .text-xs {
+            color: #e8edf5 !important;
+        }
+        html.dark .sidebar-inner .text-sidebar-foreground\/70 {
+            color: #94a3b8 !important;
+        }
+        html.dark #modal-close-btn {
+            background-color: #2a2d2d !important;
+            color: #e8edf5 !important;
+        }
+        html.dark #modal-close-btn:hover {
+            background-color: #3a3d3d !important;
+        }
+        html.dark [data-item-id] {
+            color: #e8edf5 !important;
+        }
+        html.dark [data-item-id].decoration-yellow-400 {
+            text-decoration-color: #facc15 !important;
+        }
+        html.dark [data-item-id].decoration-blue-500 {
+            text-decoration-color: #3b82f6 !important;
+        }
+        html.dark [data-item-id].decoration-purple-400 {
+            text-decoration-color: #c084fc !important;
+        }
+
+        [data-sidebar="rail"] {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar" style="--sidebar-width: 16rem; --sidebar-width-icon: 3rem;">
+
+            <!-- SIDEBAR (new version) -->
+            <div class="group peer hidden md:block text-sidebar-foreground" data-state="expanded" data-collapsible="" data-variant="sidebar" data-side="left" id="main-sidebar-root">
+                <div class="duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[--sidebar-width-icon] sidebar-outer"></div>
+                <div class="duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l overflow-hidden [&amp;&gt;[data-sidebar=sidebar]]:flex-row sidebar-outer">
+                    <div data-sidebar="sidebar" class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow">
+                        <div class="flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground border-r sidebar-inner">
+                            <div data-sidebar="header" class="flex flex-col gap-2 p-2">
+                                <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                    <li data-sidebar="menu-item" class="group/menu-item relative">
+                                        <a data-sidebar="menu-button" data-size="lg" data-active="false" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:!p-0 md:h-8 md:p-0" href="/index.html" data-discover="true">
+                                            <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E" alt="IELTSX" class="size-6"></div>
+                                            <div class="grid flex-1 text-left text-sm leading-tight sidebar-text-hidden"><span class="truncate font-semibold">IELTSX</span><span class="truncate text-xs capitalize">DEMO</span></div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div data-sidebar="content" class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden">
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Full Tests</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/full-tests/listening.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg><span class="flex-1">Listening</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/full-tests/reading.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg><span class="flex-1">Reading</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/full-tests/writing.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg><span class="flex-1">Writing</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/full-tests/speaking.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg><span class="flex-1">Speaking</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Part Practice</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/listening.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg><span class="flex-1">Listening Sections</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/reading.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg><span class="flex-1">Reading Passages</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/writing.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg><span class="flex-1">Writing Tasks</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/part/practice/speaking.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span class="flex-1">Speaking Topics</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Collections</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href=/test-collections" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg><span class="flex-1">Predictions</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/practice/mock" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg><span class="flex-1">Mock Tests</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+                                    <div data-sidebar="group-label" class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">Study Tools</div>
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Performance.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-line"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="m19 9-5 5-4-4-3 3"></path></svg><span class="flex-1">Performance</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Pdf materials.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg><span class="flex-1">Pdf materials</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/vocabulary" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-a"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path><path d="m8 13 4-7 4 7"></path><path d="M9.1 11h5.7"></path></svg><span class="flex-1">Vocabularies</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown size-4"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path></svg></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2" data-sidebar="menu-button" data-size="default" data-active="false" href="/study/Tools/Articles.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg><span class="flex-1">Articles</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
+                                    <div data-sidebar="group-content" class="w-full text-sm">
+                                        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false" href="/pricing" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg><span class="flex-1">Pricing</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a href="#" target="_blank" rel="noopener noreferrer" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg><span class="flex-1">Telegram Channel</span></a></li>
+                                            <li data-sidebar="menu-item" class="group/menu-item relative"><a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2" data-sidebar="menu-button" data-size="sm" data-active="false" href="/support" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-life-buoy"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></svg><span class="flex-1">Support</span></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-sidebar="footer" class="flex flex-col gap-2 p-2">
+                                <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                                    <li data-sidebar="menu-item" class="group/menu-item relative">
+                                        <button data-sidebar="menu-button" data-size="lg" data-active="false" class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:!p-0 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground" type="button" id="radix-:rd8:" aria-haspopup="menu" aria-expanded="false" data-state="closed">
+                                            <span class="relative flex shrink-0 overflow-hidden h-8 w-8 rounded-lg"><span class="flex h-full w-full items-center justify-center rounded-lg bg-background"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-4 w-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span></span>
+                                            <div class="grid flex-1 text-left text-sm leading-tight"><span class="truncate font-semibold">user </span><span class="truncate text-xs"></span></div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down ml-auto size-4"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button data-sidebar="rail" aria-label="Toggle Sidebar" tabindex="-1" title="Toggle Sidebar" class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex [[data-side=left]_&amp;]:cursor-w-resize [[data-side=right]_&amp;]:cursor-e-resize [[data-side=left][data-state=collapsed]_&amp;]:cursor-e-resize [[data-side=right][data-state=collapsed]_&amp;]:cursor-w-resize group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar [[data-side=left][data-collapsible=offcanvas]_&amp;]:-right-2 [[data-side=right][data-collapsible=offcanvas]_&amp;]:-left-2"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT (unchanged) -->
+            <main class="relative flex min-h-svh flex-col peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow min-w-0 flex-1 bg-background">
+                <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:pr-20 md:pr-10">
+                    <div class="flex items-center gap-2 pl-2">
+                        <button id="sidebar-trigger" data-sidebar="trigger" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-7 w-7">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+                            <span class="sr-only">Toggle Sidebar</span>
+                        </button>
+                        <div data-orientation="vertical" role="none" class="shrink-0 bg-border w-[1px] h-4 mr-2"></div>
+                        <nav aria-label="breadcrumb">
+                            <ol class="flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5">
+                                <li class="items-center gap-1.5 hidden md:inline-flex"><a class="transition-colors hover:text-foreground text-sm font-medium" href="https://ieltsx.uz/home">Home</a></li>
+                                <li role="presentation" aria-hidden="true" class="[&>svg]:w-3.5 [&>svg]:h-3.5 hidden md:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg></li>
+                                <li class="items-center gap-1.5 hidden md:inline-flex"><span role="link" aria-disabled="true" aria-current="page" class="text-foreground text-sm font-medium">Articles</span></li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="flex items-center gap-1 pr-3">
+                        <button id="theme-light" class="theme-btn inline-flex items-center justify-center gap-1 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-md h-7 px-2 text-xs bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg> Light
+                        </button>
+                        <button id="theme-dark" class="theme-btn inline-flex items-center justify-center gap-1 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-md h-7 px-2 text-xs hover:bg-accent hover:text-accent-foreground">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg> Dark
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Rest of the content (article, tabs, review panel, modal, scripts) remains exactly as before -->
+                <main class="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
+                    <main class="container mx-auto w-full min-w-0 max-w-7xl p-6">
+                        <div class="bg-background">
+                            <!-- Article Header -->
+                            <section class="border-b bg-background">
+                                <div class="mx-auto max-w-6xl px-4 py-5 md:py-8">
+                                    <a href="/study/Tools/articles.html">
+                                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs mb-6 -ml-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left mr-1 h-4 w-4"><path d="m15 18-6-6 6-6"></path></svg>
+                                            Articles
+                                        </button>
+                                    </a>
+                                    <div class="mx-auto max-w-5xl">
+                                        <div class="mx-auto max-w-[720px]">
+                                            <div class="mb-4 flex flex-wrap justify-center gap-2 md:justify-start">
+                                                <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">environment</div>
+                                                <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">Passage 3</div>
+                                                <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">Academic Reading</div>
+                                            </div>
+                                            <h1 class="max-w-[720px] font-sans text-3xl font-bold leading-tight tracking-normal text-neutral-950 dark:text-foreground md:text-[2.5rem] md:leading-[1.08]">How to clean a beach</h1>
+                                            <p class="mt-4 max-w-[680px] text-lg leading-7 text-muted-foreground">As oil-spill specialists continue to tackle the Prestige slick, they are drawing on knowledge from decades of clean-up operations. John Whitfield reports from Spain's Galician coast.</p>
+                                            <div class="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border pb-7 text-sm text-muted-foreground">
+                                                <span class="font-medium text-foreground">IELTSX Reading Team</span>
+                                                <span>03.06.2026</span>
+                                                <span class="inline-flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar mr-1 h-4 w-4"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Test date: 03.06.2026</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Tabs and Controls (unchanged) -->
+                            <div dir="ltr" data-orientation="horizontal" class="mx-auto max-w-6xl px-4 py-5 md:py-6">
+                                <div class="sticky top-16 z-20 mx-auto mb-8 flex w-full max-w-[720px] flex-col items-center gap-3 bg-background/95 backdrop-blur sm:flex-row sm:justify-center">
+                                    <div role="tablist" aria-orientation="horizontal" class="h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground grid w-full max-w-sm grid-cols-2 border shadow-sm" tabindex="0" data-orientation="horizontal" style="outline: none;">
+                                        <button type="button" role="tab" aria-selected="true" aria-controls="tab-panel-read" data-state="active" id="tab-trigger-read" class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow" tabindex="-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open mr-2 h-4 w-4"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>Read
+                                        </button>
+                                        <button type="button" role="tab" aria-selected="false" aria-controls="tab-panel-review" data-state="inactive" id="tab-trigger-review" class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow" tabindex="-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2 h-4 w-4"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>Review highlights
+                                        </button>
+                                    </div>
+                                    <div class="flex flex-wrap justify-center gap-2">
+                                        <div class="flex items-center rounded-md border bg-background p-1 shadow-sm">
+                                            <button class="size-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 rounded-md h-8 min-w-9 px-2 text-sm" data-size="comfortable" aria-label="comfortable">A-</button>
+                                            <button class="size-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground rounded-md h-8 min-w-9 px-2 text-sm" data-size="large" aria-label="large">A</button>
+                                            <button class="size-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground rounded-md h-8 min-w-9 px-2 text-sm" data-size="extra" aria-label="extra">A+</button>
+                                        </div>
+                                        <div class="flex items-center rounded-md border bg-background p-1 shadow-sm">
+                                            <button class="style-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 rounded-md h-8 px-3 text-sm" data-style="sans" aria-label="sans">Clean</button>
+                                            <button class="style-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground rounded-md h-8 px-3 text-sm" data-style="serif" aria-label="serif">Classic</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Read Panel -->
+                                <div data-state="active" data-orientation="horizontal" role="tabpanel" aria-labelledby="tab-trigger-read" id="tab-panel-read" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                    <article class="mx-auto max-w-[720px] space-y-8 pb-12" id="article-content">
+                                        <div class="flow-root">
+                                            <div class="prose max-w-none dark:prose-invert prose-p:my-0 prose-p:text-neutral-950 prose-p:tracking-normal prose-p:[font-synthesis:none] prose-strong:font-semibold dark:prose-p:text-foreground prose-p:text-[17px] prose-p:leading-[30px] md:prose-p:text-[18px] md:prose-p:leading-[32px] prose-p:font-medium prose-p:[font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">
+                                                <figure class="mb-5 w-full md:mb-4 md:w-[52%] md:max-w-[460px] md:float-right md:ml-8 lg:-mr-28">
+                                                    <img src="/article/images/how to clean beach.jpg" alt="How to clean a beach" class="w-full border object-cover">
+                                                </figure>
+                                                <div class="space-y-8">
+                                                    <div class="space-y-1">
+                                                        <p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">From the coast road, the beaches of Lira seem as they should be: yellow sand and blue sea. But walk down to the tide's edge and things change. A whiff of petrol taints the sea spray. Water in rock pools has an oily sheen and boulders that should be wet and slippery have a tacky, tarry coating. After the oil-tanker Prestige spilt her cargo last November, these coves in Galicia, in northwest Spain, were a metre deep in a mixture of oil and sea water known to pollution specialists as 'chocolate mousse'. "There was no ocean, only oil," says Pablo Garcia, manager of the Stolt Sea Farm, an aquaculture company in Lira, the area that became known as Ground Zero of the spill.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">The Prestige is the latest exhibit in the tanker hall of infamy. But while each new incident brings environmental destruction and financial loss, it also improves our understanding of how to deal with oil spills. This knowledge is hard-won - aggressive clean-ups have sometimes caused more damage than the oil. Government priorities can also clash with those of scientists. But such difficulties apart, a <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V2 rough consensus" data-item-id="v2">rough consensus</span> on how to juggle the political, economic and ecological issues involved in clearing up oil spills has begun to emerge.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Oil is much less damaging at sea than on shore, so the best option is to suck and skim a <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V11 slick" data-item-id="v11">slick</span> off the water using specially equipped ships, or break it up with chemical dispersants. <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V12 booms" data-item-id="v12">Booms</span> can also be used to protect the coastline. But the sea around the Prestige was too rough and much of the coast too exposed for booms to work, so there was little that could be done except watch the oil wash up.</p></div>
+                                        <div class="space-y-1"><h3 class="text-lg font-semibold">The human touch</h3><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">When oil arrives onshore, the question becomes how best to save affected plants and animals while minimizing damage to the surrounding ecosystem, and without running up a huge bill. In large spills, leaving nature to do the job is a bad idea. <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-blue-500 dark:decoration-blue-300" title="G2 even the oiliest" data-item-id="g2">Even the oiliest shore</span> will return to normal, but without <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V1 human intervention" data-item-id="v1">human intervention</span> this can take a long time. In 1974, the Metula spilled 50,000 tonnes of oil into the Strait of Magellan at the southern tip of South America. Because of the remoteness of the region and the rough seas, no clean-up was mounted, and patches of asphalt-like residue stain the rocks to this day. "It looks like a cheap driveway," says David Page, a chemist at Bowdoin College in Brunswick, Maine.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">In the case of the Prestige, the volume of oil spilt and the wildlife, fishing and tourist value of the Galician coast demanded action. The first priority in a clean-up is to remove oil from the beaches as quickly as possible. If washed back out to sea, or buried in the beach, oil can do more damage some other time or place. Cleaning beaches is ideally done manually. People with shovels are the only tools sensitive enough to remove the oil while protecting the ground beneath. Only the human eye can distinguish patches of oil from the clean areas in between: on some of the Galician beaches, oil-coated rocks and apparently unaffected rocks sit side by side. And people can work on isolated rocky shores where heavy machinery cannot go.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">But at Lira in early December, manual labour was having no effect. "We got the full load of a couple of tanks of the Prestige - 15,000 tonnes on two kilometres of coast," says Garcia. "You'd see guys working manually, and at the end of the day, the area occupied by the slick was the same." To decide what to do next, specialists combined their experience with local knowledge in an assessment process known as net environmental benefit analysis. Factors taken into account include environmental considerations, such as whether an oiled beach is home to a breeding colony of seals or seabirds. <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V4 socioeconomic considerations" data-item-id="v4">Socioeconomic considerations</span> also come into play: local people may rely on nearby shellfish beds, for example, or an affected beach could be a tourist destination. And practical realities, such as how much a particular clean-up option will cost, and how easy it will be to implement, are also assessed.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Every intensive clean-up option has its drawbacks. When high-pressure hot water was used to scrub the Alaskan shoreline oiled by the Exxon Valdez spill in 1989, beaches that got this treatment recovered more slowly than those that did not, although conditions seemed about equal after three years. This technique is now used less often, says Alan Mearns, a marine ecologist with the Hazardous Materials Response Division of the US National Oceanic and Atmospheric Administration (NOAA) in Seattle, Washington. "We have a go-easy policy on using rigorous methods," he says. "The coastguard understands that you don't have to go in with all guns blazing." In Spain, high-pressure water has so far been used only on man-made structures such as jetties and harbour walls.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Chemical cleaners also do damage. When the Torrey Canyon ran aground off the south coast of Cornwall, UK, in March 1967, oiled beaches were sprayed with 10,000 tonnes of powerful solvents and detergents, including industrial degreasers. The chemicals were more toxic than the oil: many seashore <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V13 invertebrates" data-item-id="v13">invertebrates</span> died, and the nutrients in the <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V14 dispersants" data-item-id="v14">dispersants</span> caused an explosion of seaweed growth. Dispersants are much milder now, but they can still be used inappropriately. Peter Dyrynda, a marine biologist at the University of Wales Swansea, UK, says that after the Sea Empress ran aground off the southwest coast of Wales in 1996, dispersants were used on some patches of oil but were not washed off. The resulting mix was more toxic than either oil or dispersant alone, and killed animals that had survived until then. Such problems, as well as the fact that dispersants are ineffective against thick oil, have prevented their use in Galicia.</p></div>
+                                        <div class="space-y-1"><h3 class="text-lg font-semibold">Softly, softly</h3><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">A gentler option is <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V3 bioremediation" data-item-id="v3">bioremediation</span>, which involves using fertilizer to speed the growth of naturally occurring oil-digesting bacteria. But this won't work on every spill, says Richard Swannell, a <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V3 bioremediation" data-item-id="v3">bioremediation</span> specialist with Momenta, a consultancy company near Oxford, UK, that works with the British government. The oily shore must be sheltered, otherwise the sea will wash the oil and bacteria away. Oil buried in sediments can't be digested. And if the natural bacterial growth is limited by temperature rather than by nutrients, the treatment will have no effect. The oil must also be biodegradable: light crude oils of the type spilt by the Exxon Valdez are broken down easily, but heavier types contain compounds that microbes find indigestible. Finally, sites must be secluded, so that they do not offend the senses of local people and tourists during the several months the bacteria need to work. The remote Alaskan shores polluted by the Exxon Valdez fitted the bill, but many others do not. "For marine spills, <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V3 bioremediation" data-item-id="v3">bioremediation</span> is a niche market," Swannell concludes. Spanish researchers began <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V3 bioremediation" data-item-id="v3">bioremediation</span> experiments on oiled beaches late last month, although the Prestige's thick, poorly biodegradable oil might not respond well to the treatment.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">In Galicia, local people wanted heavy machinery to come in and remove large quantities of oil quickly. But this has its own environmental costs. There were no tracks to the worst-affected beaches and building them would have harmed the surrounding landscape. "If you've got a site that no one visits, then it's ideal to leave for natural clean-up. If it's an area that people go to all the time you can't do that, because people will be getting oil on them," says Rob Self of Oil Spill Response, a company in Southampton that worked out of the command centre in La Coruña to advise the Spanish authorities on the clean-up operation. But at Lira, oil on the surface of the beaches was likely to be washed into the pipe that supplied water to Garcia's fish farm. In the end, the desire to protect the farm tipped the balance in favour of building tracks for bulldozers and earthmovers, which scooped up the chocolate mousse from the beach.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Heavy machinery has not been used in all areas affected by the Prestige spill. Saltmarshes and estuaries are <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-purple-400 dark:decoration-purple-300" title="G3 such delicate terrain that" data-item-id="g3">such delicate terrain</span> that almost any activity does more damage than the oil. After the Amoco Cadiz disaster in 1978, when nearly a quarter of a million tonnes of oil were spilt off the coast of Brittany, in northwest France, heavy equipment was sent into some polluted salt-marshes, where it scraped up the top half-metre of sediment. Twelve years later, these areas had still not recovered, whereas the oiled marshes that went uncleaned seemed in good shape. In Galicia, some marshy areas were placed completely off-limits, even to people, when it became clear that volunteers were cleaning with excessive gusto. "People were pushing the oil into the <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V15 substrate" data-item-id="v15">substrate</span>, and that has more of an effect than if you just left it," says Self. "In the end we had to close the site."</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Using a combination of manual labour and heavy machinery, the Prestige spill has now moved from what Self calls the emergency phase - high-profile, high-pressure - to a long-term, <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V6 painstaking" data-item-id="v6">painstaking</span> project. Cleaning beaches, for example, is a <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V16 Sisyphean" data-item-id="v16">Sisyphean</span> task. At Carnota, one of the most heavily affected areas of Galicia, the high-water mark on the beach in February continues to be marked by a chain of thumbnail-sized oily <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V17 gobbets" data-item-id="v17">gobbets</span>. Dozens of volunteers and soldiers work their way along six kilometres of sand on hands and knees, picking up the small lumps with what look like wallpaper scrapers. At other beaches nearby, people sift the sand and comb seaside plants by hand to remove the oil and stop it becoming buried.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Perhaps the most difficult decision, and one usually taken by local politicians, is when to stop. As the coastline becomes cleaner, the clean-up starts to cost more for progressively less reward and more environmental damage. On rocky shores, once the bulk of the oil is recovered, the decision often comes down to whether the beach is an <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V18 eyesore" data-item-id="v18">eyesore</span>. Once workers have done all they can with shovels and pompoms balls of plastic strips that soak up oil - stubborn patches still remain under rocks and in crevices. Moving oily boulders down the beach into the surf can accelerate the natural cleaning process, as can flushing - pumping sea water over the shore and sifting the oil out of the <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V19 run-off" data-item-id="v19">run-off</span>.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">As the Prestige clean-up continues into spring and summer, researchers are starting to try to assess the spill's effects. Marine <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V20 toxicologist" data-item-id="v20">toxicologist</span> Ricardo Beiras of the University of Vigo in Galicia hopes to produce data on damage to local fisheries on which <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V21 compensation" data-item-id="v21">compensation</span> claims can be based. Researchers will also be called on to pronounce when the coast has recovered. This doesn't necessarily mean that no trace of oil remains - old, weathered oil is not very toxic, and oil locked in sediments may not harm organisms. But the definition of recovery is disputed. The owners of the Exxon Valdez are still fighting with Alaskans over whether the area hit by the spill is still suffering. Page, whose funding comes partly from Exxon, thinks it isn't. "With all spills there are places you can go back to and dig and find a deposit," he says. "The question is whether those isolated <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V22 remnants" data-item-id="v22">remnants</span> are <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V7 biologically relevant" data-item-id="v7">biologically relevant</span>. And the answer is no, they're not."</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Others disagree. Stanley Rice of NOAA's Alaska Fisheries Science Center in Auke Bay says the oil is still damaging animals that live and feed on the seashore, such as <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V23 otters" data-item-id="v23">otters</span> and salmon. "These damages are new and continuing from the remaining oil, and <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-blue-500 dark:decoration-blue-300" title="G4 not just a slow recovery" data-item-id="g4">not just a slow recovery</span> from the original hit," says Rice. To try to minimize such <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V8 chronic effects" data-item-id="v8">chronic effects</span>, he advocates a swing towards more intensive cleaning. "I would push for a more aggressive clean-up, realizing that for the short term you are going to suffer more damage."</p></div>
+                                        <div class="space-y-1"><h3 class="text-lg font-semibold">Political science</h3><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Resolving issues such as these will require more research, but studies of spills are often only carried out in the <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V9 fraught" data-item-id="v9">fraught</span> atmosphere after a disaster. As a result, clean-up efforts are not as well informed or coordinated as they could be. "We don't clean up spills as well as we should be able to," says Ian White, managing director of the London-based International Tanker Owners Pollution Federation, which responds to spills around the world. "Spills take on a political significance that's hard to control." Research tends to be improvised and opportunist, as local scientists drop what they were doing and start studying the pollution. "In the early days of a major spill, things are terribly chaotic," says Dyrynda. "Scientific study is not a top priority." Like many others, Dyrynda had oil-pollution research thrust upon him when the Sea Empress ran aground close to where he works. Scientists in northwest Spain are having the same experience, and once again the research is not running smoothly. "There are different individual studies, but they're not coordinated. People are diverting resources from other projects," says Beiras.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">But despite the gaps in our knowledge, scientists say that the major threat to the coast, <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-blue-500 dark:decoration-blue-300" title="G1 Conditional (should another spill occur)" data-item-id="g1">should another spill occur</span>, is not lack of research but of government <span role="button" tabindex="0" class="inline cursor-pointer bg-transparent p-0 text-inherit underline underline-offset-[6px] [font:inherit] [letter-spacing:inherit] [line-height:inherit] [text-decoration-skip-ink:auto] transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:bg-muted/60 decoration-[2px] decoration-yellow-400 dark:decoration-yellow-300" title="V10 preparedness" data-item-id="v10">preparedness</span>. There have been six major oil spills in Galicia. The region is also a hotbed of marine science, with four institutes in Vigo alone. But such experience doesn't guarantee that government officials will talk to local experts. "There's not a lack of knowledge, there's a lack of communication," says plankton ecologist Pablo Serret, of the University of Vigo.</p></div>
+                                        <div class="space-y-1"><p class="m-0 tracking-normal text-neutral-950 dark:text-foreground [font-synthesis:none] [-webkit-font-smoothing:antialiased] text-[17px] leading-[30px] md:text-[18px] md:leading-[32px] font-medium [font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe_UI,sans-serif]">Many Spanish researchers accuse their government of ignoring scientific advice in their handling of the spill - particularly in its decision to tow the Prestige out to sea rather than into port - and of seeking to play down the incident's severity. At the end of January, the scientific community rejected the original plan for studying the clean-up and recovery, put together behind closed doors by the government's National Research Council; the replacement was published only last week, four months after the spill. Just before Christmas, Galician researchers, worried that the government was giving Spanish researchers a bad name, put together a letter of protest. They circulated it around the research community, and got 385 signatures in 24 hours. Research into clean-up methods may be coming together. But as the strength of feeling among Spanish researchers attests, good science is of limited use unless scientists have the backing of politicians. Without that, the damage from oil spills risks going unchecked. "We haven't learnt from the past," says Beiras.</p></div>
+                                    </article>
+                                    <footer class="mx-auto max-w-[720px] border-t border-border pt-6 pb-20 text-sm leading-6 text-neutral-800 dark:text-muted-foreground">
+                                        <h2 class="mb-3 text-base font-semibold text-foreground">References</h2>
+                                        <div class="mb-5 space-y-4"><div><p>How to clean a beach. Nature 422, 464-466 (2003). (accessed 3 июня 2026 г.):</p></div></div>
+                                        <p>Compiled, rewritten, formatted, and lightly proofread by IELTS X for educational IELTS preparation.</p>
+                                        <p>All copyright remains with the original authors. For educational purposes only.</p>
+                                    </footer>
+                                </div>
+
+                                <!-- Review Panel -->
+                                <div data-state="inactive" data-orientation="horizontal" role="tabpanel" aria-labelledby="tab-trigger-review" hidden="" id="tab-panel-review" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,860px)_320px] lg:items-start lg:justify-center">
+                                        <div class="max-w-[720px]">
+                                            <article class="mx-auto max-w-[720px] space-y-8 pb-12" id="article-content-review"></article>
+                                            <footer class="mx-auto max-w-[720px] border-t border-border pt-6 pb-20 text-sm leading-6 text-neutral-800 dark:text-muted-foreground">
+                                                <h2 class="mb-3 text-base font-semibold text-foreground">References</h2>
+                                                <div class="mb-5 space-y-4"><div><p>How to clean a beach. Nature 422, 464-466 (2003). (accessed 3 июня 2026 г.):</p></div></div>
+                                                <p>Compiled, rewritten, formatted, and lightly proofread by IELTS X for educational IELTS preparation.</p>
+                                                <p>All copyright remains with the original authors. For educational purposes only.</p>
+                                            </footer>
+                                        </div>
+                                        <aside class="lg:sticky lg:top-32">
+                                            <div class="rounded-md border bg-background p-4 shadow-sm">
+                                                <div class="mb-4 flex items-center gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-primary"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>
+                                                    <h2 class="text-base font-semibold">Review Guide</h2>
+                                                </div>
+                                                <div id="review-sidebar-content"></div>
+                                            </div>
+                                        </aside>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </main>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal (unchanged) -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content" id="modal-content">
+            <div id="modal-header" class="mb-2 flex flex-wrap gap-2"></div>
+            <h2 id="modal-title" class="text-2xl font-bold"></h2>
+            <div id="modal-body" class="space-y-5 mt-4"></div>
+            <button id="modal-close-btn" class="mt-6 float-right rounded-md bg-muted px-4 py-2 text-sm font-medium hover:bg-muted/80">Close</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const reviewItems = [
+                { id: 'v1', type: 'vocabulary', marker: 'V1', title: 'human intervention', definition: 'action taken by people to change or affect a situation, rather than letting it happen naturally', example: 'Without human intervention, this can take a long time.', sourceContext: 'Even the oiliest shore will return to normal, but without human intervention this can take a long time.' },
+                { id: 'v2', type: 'vocabulary', marker: 'V2', title: 'rough consensus', definition: 'a general agreement that is not perfectly detailed but is sufficient for practical purposes', example: 'A rough consensus on how to juggle the political, economic and ecological issues involved in clearing up oil spills has begun to emerge.', sourceContext: 'But such difficulties apart, a rough consensus on how to juggle the political, economic and ecological issues involved in clearing up oil spills has begun to emerge.' },
+                { id: 'v3', type: 'vocabulary', marker: 'V3', title: 'bioremediation', definition: 'the use of living organisms (especially bacteria) to remove or neutralize contaminants from a polluted area', example: 'A gentler option is bioremediation, which involves using fertilizer to speed the growth of naturally occurring oil-digesting bacteria.', sourceContext: 'A gentler option is bioremediation, which involves using fertilizer to speed the growth of naturally occurring oil-digesting bacteria.' },
+                { id: 'v4', type: 'vocabulary', marker: 'V4', title: 'socioeconomic considerations', definition: 'factors relating to social and economic conditions that influence decisions or policies', example: 'Socioeconomic considerations also come into play: local people may rely on nearby shellfish beds.', sourceContext: 'Socioeconomic considerations also come into play: local people may rely on nearby shellfish beds, for example, or an affected beach could be a tourist destination.' },
+                { id: 'v5', type: 'vocabulary', marker: 'V5', title: 'delicate terrain', definition: 'a landscape or area that is easily damaged or vulnerable to disturbance', example: 'Saltmarshes and estuaries are such delicate terrain that almost any activity does more damage than the oil.', sourceContext: 'Saltmarshes and estuaries are such delicate terrain that almost any activity does more damage than the oil.' },
+                { id: 'v6', type: 'vocabulary', marker: 'V6', title: 'painstaking', definition: 'done with great care and thoroughness, requiring a lot of effort', example: 'Using a combination of manual labour and heavy machinery, the Prestige spill has now moved from what Self calls the emergency phase to a long-term, painstaking project.', sourceContext: 'Using a combination of manual labour and heavy machinery, the Prestige spill has now moved from what Self calls the emergency phase to a long-term, painstaking project.' },
+                { id: 'v7', type: 'vocabulary', marker: 'V7', title: 'biologically relevant', definition: 'having significance or importance to living organisms in a meaningful ecological context', example: 'The question is whether those isolated remnants are biologically relevant. And the answer is no, they\'re not.', sourceContext: '"The question is whether those isolated remnants are biologically relevant. And the answer is no, they\'re not."' },
+                { id: 'v8', type: 'vocabulary', marker: 'V8', title: 'chronic effects', definition: 'long-lasting or persistent impacts that develop gradually over time', example: 'To try to minimize such chronic effects, he advocates a swing towards more intensive cleaning.', sourceContext: 'To try to minimize such chronic effects, he advocates a swing towards more intensive cleaning.' },
+                { id: 'v9', type: 'vocabulary', marker: 'V9', title: 'fraught', definition: 'filled with or likely to result in something undesirable; anxious or tense', example: 'Studies of spills are often only carried out in the fraught atmosphere after a disaster.', sourceContext: 'Studies of spills are often only carried out in the fraught atmosphere after a disaster.' },
+                { id: 'v10', type: 'vocabulary', marker: 'V10', title: 'preparedness', definition: 'the state of being ready and able to deal with a situation, especially an emergency', example: 'Scientists say that the major threat to the coast, should another spill occur, is not lack of research but of government preparedness.', sourceContext: 'But despite the gaps in our knowledge, scientists say that the major threat to the coast, should another spill occur, is not lack of research but of government preparedness.' },
+                { id: 'v11', type: 'vocabulary', marker: 'V11', title: 'slick', definition: 'a thin layer of oil floating on the surface of water', example: 'The best option is to suck and skim a slick off the water using specially equipped ships.', sourceContext: 'Oil is much less damaging at sea than on shore, so the best option is to suck and skim a slick off the water.' },
+                { id: 'v12', type: 'vocabulary', marker: 'V12', title: 'booms', definition: 'floating barriers used to contain an oil spill or protect a particular area', example: 'Booms can also be used to protect the coastline.', sourceContext: 'Booms can also be used to protect the coastline.' },
+                { id: 'v13', type: 'vocabulary', marker: 'V13', title: 'invertebrates', definition: 'animals without a backbone, such as worms, shellfish, and insects', example: 'Many seashore invertebrates died, and the nutrients in the dispersants caused an explosion of seaweed growth.', sourceContext: 'The chemicals were more toxic than the oil: many seashore invertebrates died, and the nutrients in the dispersants caused an explosion of seaweed growth.' },
+                { id: 'v14', type: 'vocabulary', marker: 'V14', title: 'dispersants', definition: 'chemicals that break up oil into smaller droplets, allowing it to mix with water', example: 'The nutrients in the dispersants caused an explosion of seaweed growth.', sourceContext: 'Dispersants are much milder now, but they can still be used inappropriately.' },
+                { id: 'v15', type: 'vocabulary', marker: 'V15', title: 'substrate', definition: 'the surface or material on which an organism lives or grows; here the beach sediment', example: 'People were pushing the oil into the substrate, and that has more of an effect than if you just left it.', sourceContext: '"People were pushing the oil into the substrate, and that has more of an effect than if you just left it," says Self.' },
+                { id: 'v16', type: 'vocabulary', marker: 'V16', title: 'Sisyphean', definition: 'used to describe a task that is endless and ineffective, from the myth of Sisyphus', example: 'Cleaning beaches, for example, is a Sisyphean task.', sourceContext: 'Cleaning beaches, for example, is a Sisyphean task.' },
+                { id: 'v17', type: 'vocabulary', marker: 'V17', title: 'gobbets', definition: 'small lumps or pieces of a substance', example: 'The high-water mark on the beach continues to be marked by a chain of thumbnail-sized oily gobbets.', sourceContext: 'At Carnota, the high-water mark on the beach in February continues to be marked by a chain of thumbnail-sized oily gobbets.' },
+                { id: 'v18', type: 'vocabulary', marker: 'V18', title: 'eyesore', definition: 'something that is very ugly, especially a building or view that offends the senses', example: 'The decision often comes down to whether the beach is an eyesore.', sourceContext: 'On rocky shores, once the bulk of the oil is recovered, the decision often comes down to whether the beach is an eyesore.' },
+                { id: 'v19', type: 'vocabulary', marker: 'V19', title: 'run-off', definition: 'water that flows over the ground surface and is not absorbed, here carrying oil', example: 'Sifting the oil out of the run-off.', sourceContext: 'As can flushing - pumping sea water over the shore and sifting the oil out of the run-off.' },
+                { id: 'v20', type: 'vocabulary', marker: 'V20', title: 'toxicologist', definition: 'a scientist who studies the harmful effects of chemicals, toxins, or pollutants on living organisms', example: 'Marine toxicologist Ricardo Beiras hopes to produce data on damage to local fisheries.', sourceContext: 'Marine toxicologist Ricardo Beiras of the University of Vigo in Galicia hopes to produce data on damage to local fisheries.' },
+                { id: 'v21', type: 'vocabulary', marker: 'V21', title: 'compensation', definition: 'something, typically money, awarded to someone as a recompense for loss, injury, or suffering', example: 'Data on damage to local fisheries on which compensation claims can be based.', sourceContext: 'Marine toxicologist Ricardo Beiras hopes to produce data on damage to local fisheries on which compensation claims can be based.' },
+                { id: 'v22', type: 'vocabulary', marker: 'V22', title: 'remnants', definition: 'a part or quantity that is left after the greater part has been used, removed, or destroyed', example: 'Isolated remnants of oil are not biologically relevant.', sourceContext: '"The question is whether those isolated remnants are biologically relevant."' },
+                { id: 'v23', type: 'vocabulary', marker: 'V23', title: 'otters', definition: 'a semi-aquatic fish-eating mammal with thick fur and webbed feet, vulnerable to oil pollution', example: 'The oil is still damaging animals that live and feed on the seashore, such as otters and salmon.', sourceContext: 'Stanley Rice says the oil is still damaging animals that live and feed on the seashore, such as otters and salmon.' },
+                { id: 'g1', type: 'grammar', marker: 'G1', title: 'Conditional inversion (should another spill occur)', pattern: 'Should + subject + verb (inversion for conditional)', explanation: 'Formal conditional structure equivalent to "if another spill should occur". Often used in academic writing.', example: 'Should another spill occur, the damage risks going unchecked.', sourceContext: 'Scientists say that the major threat to the coast, should another spill occur, is not lack of research but of government preparedness.' },
+                { id: 'g2', type: 'grammar', marker: 'G2', title: 'Adverb "Even" for emphasis', pattern: 'Even + noun phrase + verb', explanation: '"Even" emphasizes an extreme or surprising example. It highlights that something is true despite expectations.', example: 'Even the oiliest shore will return to normal, but without human intervention this can take a long time.', sourceContext: 'Even the oiliest shore will return to normal, but without human intervention this can take a long time.' },
+                { id: 'g3', type: 'grammar', marker: 'G3', title: 'Result clause "such ... that"', pattern: 'such + adjective + noun + that + clause', explanation: 'Used to show the result of something being extreme. Similar to "so ... that".', example: 'Saltmarshes and estuaries are such delicate terrain that almost any activity does more damage than the oil.', sourceContext: 'Saltmarshes and estuaries are such delicate terrain that almost any activity does more damage than the oil.' },
+                { id: 'g4', type: 'grammar', marker: 'G4', title: '"not just ... but also" (correlative conjunction)', pattern: 'not just + noun phrase + but also + noun phrase', explanation: 'Used to emphasize that something includes more than one element, often contrasting with expectations.', example: 'These damages are new and continuing from the remaining oil, and not just a slow recovery from the original hit.', sourceContext: '"These damages are new and continuing from the remaining oil, and not just a slow recovery from the original hit," says Rice.' }
+            ];
+
+            function getItem(id) { return reviewItems.find(i => i.id === id) || null; }
+
+            const readPanel = document.getElementById('tab-panel-read');
+            const reviewPanel = document.getElementById('tab-panel-review');
+            const triggerRead = document.getElementById('tab-trigger-read');
+            const triggerReview = document.getElementById('tab-trigger-review');
+            const sizeBtns = document.querySelectorAll('.size-btn');
+            const styleBtns = document.querySelectorAll('.style-btn');
+            const articleEl = document.getElementById('article-content');
+            const reviewArticleEl = document.getElementById('article-content-review');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalTitle = document.getElementById('modal-title');
+            const modalHeader = document.getElementById('modal-header');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close-btn');
+            const sidebarContent = document.getElementById('review-sidebar-content');
+            const themeLight = document.getElementById('theme-light');
+            const themeDark = document.getElementById('theme-dark');
+            const htmlEl = document.documentElement;
+            const sidebarContainer = document.querySelector('#main-sidebar-root');
+
+            let currentTab = 'read';
+            let currentSize = 'comfortable';
+            let currentStyle = 'sans';
+
+            function toggleSidebar() {
+                if (!sidebarContainer) return;
+                const isCollapsed = sidebarContainer.getAttribute('data-state') === 'collapsed';
+                if (isCollapsed) {
+                    sidebarContainer.setAttribute('data-state', 'expanded');
+                    sidebarContainer.setAttribute('data-collapsible', '');
+                } else {
+                    sidebarContainer.setAttribute('data-state', 'collapsed');
+                    sidebarContainer.setAttribute('data-collapsible', 'icon');
+                }
+            }
+
+            document.getElementById('sidebar-trigger').addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebar();
+            });
+
+            document.querySelectorAll('[data-sidebar="rail"]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            });
+
+            function setActiveTab(tab) {
+                currentTab = tab;
+                if (tab === 'read') {
+                    readPanel.removeAttribute('hidden');
+                    readPanel.setAttribute('data-state', 'active');
+                    reviewPanel.setAttribute('hidden', '');
+                    reviewPanel.setAttribute('data-state', 'inactive');
+                    triggerRead.setAttribute('aria-selected', 'true');
+                    triggerRead.setAttribute('data-state', 'active');
+                    triggerReview.setAttribute('aria-selected', 'false');
+                    triggerReview.setAttribute('data-state', 'inactive');
+                } else {
+                    reviewPanel.removeAttribute('hidden');
+                    reviewPanel.setAttribute('data-state', 'active');
+                    readPanel.setAttribute('hidden', '');
+                    readPanel.setAttribute('data-state', 'inactive');
+                    triggerReview.setAttribute('aria-selected', 'true');
+                    triggerReview.setAttribute('data-state', 'active');
+                    triggerRead.setAttribute('aria-selected', 'false');
+                    triggerRead.setAttribute('data-state', 'inactive');
+                    if (reviewArticleEl && !reviewArticleEl.innerHTML.trim()) {
+                        const readContent = articleEl.cloneNode(true);
+                        reviewArticleEl.innerHTML = readContent.innerHTML;
+                        attachHighlightEvents(reviewArticleEl);
+                        applySizeAndStyle(reviewArticleEl);
+                    }
+                    renderSidebar();
+                }
+            }
+
+            triggerRead.addEventListener('click', () => setActiveTab('read'));
+            triggerReview.addEventListener('click', () => setActiveTab('review'));
+
+            function setSize(size) {
+                currentSize = size;
+                sizeBtns.forEach(b => {
+                    const isActive = b.dataset.size === size;
+                    b.classList.toggle('bg-secondary', isActive);
+                    b.classList.toggle('text-secondary-foreground', isActive);
+                    b.classList.toggle('shadow-sm', isActive);
+                    b.classList.toggle('hover:bg-secondary/80', isActive);
+                });
+                [articleEl, reviewArticleEl].forEach(el => {
+                    if (el) {
+                        el.classList.remove('article-size-comfortable', 'article-size-large', 'article-size-extra');
+                        el.classList.add('article-size-' + size);
+                    }
+                });
+            }
+
+            function setStyle(style) {
+                currentStyle = style;
+                styleBtns.forEach(b => {
+                    const isActive = b.dataset.style === style;
+                    b.classList.toggle('bg-secondary', isActive);
+                    b.classList.toggle('text-secondary-foreground', isActive);
+                    b.classList.toggle('shadow-sm', isActive);
+                    b.classList.toggle('hover:bg-secondary/80', isActive);
+                });
+                [articleEl, reviewArticleEl].forEach(el => {
+                    if (el) {
+                        el.classList.remove('article-style-sans', 'article-style-serif');
+                        el.classList.add('article-style-' + style);
+                    }
+                });
+            }
+
+            function applySizeAndStyle(el) {
+                if (!el) return;
+                el.classList.remove('article-size-comfortable', 'article-size-large', 'article-size-extra');
+                el.classList.add('article-size-' + currentSize);
+                el.classList.remove('article-style-sans', 'article-style-serif');
+                el.classList.add('article-style-' + currentStyle);
+            }
+
+            sizeBtns.forEach(btn => btn.addEventListener('click', function() { setSize(this.dataset.size); }));
+            styleBtns.forEach(btn => btn.addEventListener('click', function() { setStyle(this.dataset.style); }));
+
+            function openModal(itemId) {
+                const item = getItem(itemId);
+                if (!item) return;
+                const isVocab = item.type === 'vocabulary';
+                modalHeader.innerHTML = `<span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold ${isVocab ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-blue-100 text-blue-800 border-blue-300'}">${isVocab ? 'Vocabulary' : 'Grammar'}</span>
+                    <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-secondary text-secondary-foreground">${item.marker}</span>`;
+                modalTitle.textContent = item.title;
+                let bodyHTML = '';
+                if (item.definition) bodyHTML += `<p class="text-base leading-7 text-muted-foreground">${item.definition}</p>`;
+                if (item.pattern) bodyHTML += `<div class="rounded-md border bg-muted/60 px-4 py-3 font-mono text-sm">${item.pattern}</div>`;
+                if (item.explanation) bodyHTML += `<p class="text-sm leading-6 text-muted-foreground">${item.explanation}</p>`;
+                if (item.example) bodyHTML += `<blockquote class="border-l-4 border-primary pl-4 text-sm leading-6">${item.example}</blockquote>`;
+                if (item.sourceContext) bodyHTML += `<div class="rounded-md bg-muted/60 p-4 text-sm leading-6 text-muted-foreground">${item.sourceContext}</div>`;
+                modalBody.innerHTML = bodyHTML;
+                modalOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+            function attachHighlightEvents(container) {
+                container.querySelectorAll('[data-item-id]').forEach(el => {
+                    el.addEventListener('click', function(e) { e.stopPropagation(); const id = this.dataset.itemId; if (id) openModal(id); });
+                    el.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const id = this.dataset.itemId; if (id) openModal(id); } });
+                });
+            }
+
+            function renderSidebar() {
+                if (!sidebarContent) return;
+                const vocabItems = reviewItems.filter(i => i.type === 'vocabulary');
+                const grammarItems = reviewItems.filter(i => i.type === 'grammar');
+                let html = '';
+                if (vocabItems.length) {
+                    html += `<div class="sidebar-section mb-4"><div class="section-title flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>Vocabulary</div>`;
+                    vocabItems.forEach(item => {
+                        html += `<button class="review-item flex w-full items-center gap-3 rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 hover:bg-muted/60" data-item-id="${item.id}"><span class="inline-flex h-6 min-w-8 items-center justify-center rounded px-1.5 text-xs font-bold bg-yellow-300 text-yellow-950">${item.marker}</span><span class="min-w-0 flex-1 truncate font-medium">${item.title}</span></button>`;
+                    });
+                    html += `</div>`;
+                }
+                if (grammarItems.length) {
+                    html += `<div class="sidebar-section mb-4"><div class="section-title flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>Grammar</div>`;
+                    grammarItems.forEach(item => {
+                        html += `<button class="review-item flex w-full items-center gap-3 rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 hover:bg-muted/60" data-item-id="${item.id}"><span class="inline-flex h-6 min-w-8 items-center justify-center rounded px-1.5 text-xs font-bold bg-blue-300 text-blue-950">${item.marker}</span><span class="min-w-0 flex-1 truncate font-medium">${item.title}</span></button>`;
+                    });
+                    html += `</div>`;
+                }
+                if (!html) html = '<p class="text-sm text-muted-foreground">No review highlights available.</p>';
+                sidebarContent.innerHTML = html;
+                sidebarContent.querySelectorAll('.review-item').forEach(btn => {
+                    btn.addEventListener('click', function() { const id = this.dataset.itemId; if (id) openModal(id); });
+                });
+            }
+
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    htmlEl.classList.add('dark');
+                    themeDark.classList.add('bg-secondary', 'text-secondary-foreground', 'shadow-sm', 'hover:bg-secondary/80');
+                    themeDark.classList.remove('hover:bg-accent', 'hover:text-accent-foreground');
+                    themeLight.classList.remove('bg-secondary', 'text-secondary-foreground', 'shadow-sm', 'hover:bg-secondary/80');
+                    themeLight.classList.add('hover:bg-accent', 'hover:text-accent-foreground');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    themeLight.classList.add('bg-secondary', 'text-secondary-foreground', 'shadow-sm', 'hover:bg-secondary/80');
+                    themeLight.classList.remove('hover:bg-accent', 'hover:text-accent-foreground');
+                    themeDark.classList.remove('bg-secondary', 'text-secondary-foreground', 'shadow-sm', 'hover:bg-secondary/80');
+                    themeDark.classList.add('hover:bg-accent', 'hover:text-accent-foreground');
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            themeLight.addEventListener('click', () => setTheme('light'));
+            themeDark.addEventListener('click', () => setTheme('dark'));
+
+            setSize('comfortable');
+            setStyle('sans');
+            setActiveTab('read');
+            attachHighlightEvents(articleEl);
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+
+            if (sidebarContainer) {
+                sidebarContainer.setAttribute('data-state', 'expanded');
+                sidebarContainer.setAttribute('data-collapsible', '');
+            }
+
+            console.log('✅ Sidebar toggling fixed: menu items now show icons when collapsed.');
+        })();
+    </script>
+</body>
+</html>
