@@ -1,45 +1,39 @@
 {
-  "version": 2,
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/home",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/pricing",
-      "destination": "/Price.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/support",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/feedback",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/features",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/teachers",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/privacy-policy",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/terms-of-service",
-      "destination": "/index.html"
-    }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "redirects": [
+    {"source":"/home","destination":"/index.html","permanent":false},
+    {"source":"/login","destination":"/login.html","permanent":false},
+    {"source":"/privacy-policy","destination":"/index.html","permanent":false},
+    {"source":"/terms-of-service","destination":"/index.html","permanent":false},
+    {"source":"/feedback","destination":"/index.html","permanent":false},
+    {"source":"/practice/mock","destination":"/Mock%20tests.html","permanent":false},
+    {"source":"/study/Tools/articles.html","destination":"/study/Tools/Articles.html","permanent":false},
+    {"source":"/study/tools/Articles.html","destination":"/study/Tools/Articles.html","permanent":false},
+    {"source":"/study/tools/Performance.html","destination":"/study/Tools/Performance.html","permanent":false},
+    {"source":"/study/tools/Pdf materials.html","destination":"/study/Tools/Pdf%20materials.html","permanent":false},
+    {"source":"/features","destination":"/index.html","permanent":false},
+    {"source":"/teachers","destination":"/index.html","permanent":false},
+    {"source":"/pricing","destination":"/Price.html","permanent":false},
+    {"source":"/support","destination":"/index.html","permanent":false},
+    {"source":"/vocabulary","destination":"/index.html","permanent":false},
+    {"source":"/full-tests/listening.html","destination":"/part/practice/listening.html","permanent":false},
+    {"source":"/full-tests/reading.html","destination":"/part/practice/reading.html","permanent":false},
+    {"source":"/full-tests/writing.html","destination":"/part/practice/writing.html","permanent":false},
+    {"source":"/full-tests/speaking.html","destination":"/part/practice/speaking.html","permanent":false},
+    {"source":"/listening.html","destination":"/part/practice/listening.html","permanent":false},
+    {"source":"/reading.html","destination":"/part/practice/reading.html","permanent":false},
+    {"source":"/writing.html","destination":"/part/practice/writing.html","permanent":false},
+    {"source":"/speaking.html","destination":"/part/practice/speaking.html","permanent":false},
+    {"source":"/Performance.html","destination":"/study/Tools/Performance.html","permanent":false},
+    {"source":"/Pdf materials.html","destination":"/study/Tools/Pdf materials.html","permanent":false},
+    {"source":"/materials.html","destination":"/study/Tools/Pdf materials.html","permanent":false},
+    {"source":"/full listening.html","destination":"/part/practice/listening.html","permanent":false},
+    {"source":"/full reading.html","destination":"/part/practice/reading.html","permanent":false},
+    {"source":"/full writing.html","destination":"/part/practice/writing.html","permanent":false},
+    {"source":"/full speaking.html","destination":"/part/practice/speaking.html","permanent":false}
+  ],
+  "headers": [
+    {"source":"/(.*)","headers":[{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"strict-origin-when-cross-origin"}]}
   ]
 }

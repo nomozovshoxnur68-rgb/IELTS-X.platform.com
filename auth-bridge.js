@@ -34,7 +34,7 @@
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem('userEmail');
       localStorage.removeItem('ieltsx_admin_session');
-      location.href = '/login.html';
+      location.href = 'login.html';
     }
   };
 

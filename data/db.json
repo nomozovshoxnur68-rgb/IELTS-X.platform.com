@@ -1,4 +1,29 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": "434a5b77-29ce-4cc1-b517-f0c2e9e33de4",
+      "name": "Administrator",
+      "email": "admin",
+      "role": "admin",
+      "plan": "Admin",
+      "premiumActive": true,
+      "premiumExpiresAt": null,
+      "passwordHash": "9ac1abe60ca33b075787f10cca347f8ef3f7a17752eaa28715045cbe20456840ab3c2830f475ee913bbeb86542beb7118ffe354917b931d7877e2f61cf2f518b",
+      "passwordSalt": "6183d68ba70ed765eb638473ff0691a1",
+      "createdAt": "2026-08-26T13:59:53.500Z"
+    },
+    {
+      "id": "49f1ae0e-86a8-4604-96bb-26b18cb4e4f9",
+      "name": "Test User",
+      "email": "test@example.com",
+      "role": "user",
+      "plan": "Free",
+      "premiumActive": false,
+      "premiumExpiresAt": null,
+      "passwordHash": "584a38a5b794aa5b9a13cb217f74b7abba7d1d1610934409d4e3d1ac3d5258acdc1727899fe569ddecf2e2e3eb3ba512fb14b68394c744e6cce8a527b0768afd",
+      "passwordSalt": "ef1b58d95c704a9c02d0d83c5640d7c4",
+      "createdAt": "2026-08-26T14:00:18.966Z"
+    }
+  ],
   "sessions": []
 }
