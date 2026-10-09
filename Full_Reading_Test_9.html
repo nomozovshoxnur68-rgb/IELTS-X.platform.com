@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Academic Reading — Full Reading Test 9</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<!-- ============================================================
+     STAGE 1: REGISTRATION
+     ============================================================ -->
+<!-- COSMOS: the restart sheet is removed. A reload restarts the paper
+     silently — restartSheet() falls through to startFresh() with no
+     #resume-sheet in the document. -->
+
+<!-- The boot class is set here, before the registration markup is parsed, so
+     the card is never painted for a frame ahead of the prelude. If scripting
+     is off the class is never added and the card simply renders. -->
+<!-- The login / registration card and the instructions screen have been removed: the paper opens straight on Passage 1. -->
+
+
+<!-- ============================================================
+     STAGE 2: READING INSTRUCTIONS
+     ============================================================ -->
+
+<!-- ============================================================
+     STAGE 3: READING TEST  (real-exam chrome)
+     ============================================================ -->
+<!-- The CDI mark used to live on the registration card. That card is gone, so the
+     one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
+     and paints the completion screen and the certificate from it. -->
+<img class="brand-logo" alt="READING CDI" hidden style="display:none" src="data:image/png;base64,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">
+
+<!-- ============================================================
+     STAGE 1: LOGIN / REGISTRATION
+     ============================================================ -->
+<div class="stage active" id="stage-registration">
+  <div class="rcx-card">
+    <span class="rcx-wordmark">READING_CDI</span>
+    <h1>Full Reading Test 9</h1>
+    <p class="rcx-lead">Academic Reading &middot; Passages 1&ndash;3 &middot; Questions 1&ndash;40 &middot; 60 minutes</p>
+    <div class="rcx-field" id="start-field">
+      <label for="start-name">Candidate full name</label>
+      <input id="start-name" autocomplete="off" spellcheck="false" placeholder="Type your full name"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();ExamApp.validateStart();}">
+      <div id="start-hint-text" class="rcx-err"></div>
+    </div>
+    <div class="rcx-note"><b>How this test runs.</b> You have <b>60 minutes</b> for Questions 1&ndash;40.
+      Select text in the passage to highlight it or add a note. The tick at the bottom right submits the
+      test and shows your answers with a full explanation for every question.</div>
+    <button class="rcx-btn" type="button" onclick="ExamApp.validateStart()">Start &rarr;</button>
+  </div>
+</div>
+
+<div class="stage" id="stage-reading">
+  <div id="hdr">
+    <div id="hdr-left">
+      <div class="ex-logo"><!-- PLACEHOLDER LOGO: replace this <svg> with your own <img src="your-logo.png" alt="logo"> --><svg viewBox="0 0 32 32" role="img" aria-label="Logo" focusable="false"><rect width="32" height="32" fill="#b3121f"/><rect x="5.5" y="5.5" width="21" height="21" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 23L23 9" stroke="#fff" stroke-width="2"/></svg></div>
+      <div class="ex-status">
+        <div class="ex-name ex-title" id="hdr-title">[Demo] Test 9 - P1</div>
+        <div class="timer" id="timer-reading" title="Time remaining">
+          <span id="timer-text" class="timer-text">60 minutes remaining</span>
+        </div>
+        <div class="ex-name ttid-name" id="ttid-name">&nbsp;</div>
+      </div>
+    </div>
+    <!-- Right-hand icons: wifi, full screen, options (menu), notes. -->
+    <div id="hdr-right">
+      <div class="ex-icbtn" id="wifi-btn" title="Connected"><svg width="27.4" height="25" viewBox="0 0 2048 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121 q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75z M1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z"/></svg></div>
+      <button class="ex-icbtn" id="fs-btn" type="button" title="Full screen" aria-label="Toggle full screen" onclick="ExamApp.toggleFullscreen()"><svg class="fs-glyph" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="fs-in" d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/><path class="fs-out" d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" style="display:none"/></svg></button>
+      <button class="ex-icbtn" id="menu-btn" type="button" title="Options" aria-label="Options" onclick="toggleMenu()"><svg width="20.58" height="25" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45 t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z"/></svg></button>
+      <button class="ex-icbtn" id="notes-btn" type="button" title="Notes" aria-label="Show notes" onclick="ExamApp.toggleNotesDrawer()"><svg width="24" height="25" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M888 352l116 116l-152 152l-116 -116v-56h96v-96h56zM1328 1072q-16 16 -33 -1l-350 -350q-17 -17 -1 -33t33 1l350 350q17 17 1 33zM1408 478v-190q0 -119 -84.5 -203.5t-203.5 -84.5h-832q-119 0 -203.5 84.5t-84.5 203.5v832q0 119 84.5 203.5t203.5 84.5h832 q63 0 117 -25q15 -7 18 -23q3 -17 -9 -29l-49 -49q-14 -14 -32 -8q-23 6 -45 6h-832q-66 0 -113 -47t-47 -113v-832q0 -66 47 -113t113 -47h832q66 0 113 47t47 113v126q0 13 9 22l64 64q15 15 35 7t20 -29zM1312 1216l288 -288l-672 -672h-288v288zM1756 1084l-92 -92 l-288 288l92 92q28 28 68 28t68 -28l152 -152q28 -28 28 -68t-28 -68z"/></svg><span class="nd-count" id="notes-count" hidden>0</span></button>
+    </div>
+  </div>
+
+  <div id="pbar">
+    <div id="pbar-inner">
+      <span id="pbar-title">Part 1</span>
+      <span id="pbar-desc">Read the text and answer questions 1–13.</span>
+    </div>
+  </div>
+
+  <div class="exam-main" id="main">
+    <section id="passage-pane" class="split-pane"></section>
+    <div class="split-divider" id="resizer"><div class="resizeBar" id="resize-bar"><button type="button" id="div-btn" aria-label="Resize the panes" title="Resize the panes"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1792 896q0 26 -19 45l-256 256q-19 19 -45 19t-45 -19t-19 -45v-128h-1024v128q0 26 -19 45t-45 19t-45 -19l-256 -256q-19 -19 -19 -45t19 -45l256 -256q19 -19 45 -19t45 19t19 45v128h1024v-128q0 -26 19 -45t45 -19t45 19l256 256q19 19 19 45z"/></svg></button></div></div>
+    <section id="questions-pane" class="split-pane"></section>
+  </div>
+
+  <div id="bnav">
+    <div id="reading-nav"></div>
+  </div>
+
+  <div id="qnav-arrows">
+    <button class="qnav-btn prev" onclick="ExamApp.prevPart()" title="Previous part" aria-label="Previous part"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1600 960v-128q0 -53 -32.5 -90.5t-84.5 -37.5h-704l293 -294q38 -36 38 -90t-38 -90l-75 -76q-37 -37 -90 -37q-52 0 -91 37l-651 652q-37 37 -37 90q0 52 37 91l651 650q38 38 91 38q52 0 90 -38l75 -74q38 -38 38 -91t-38 -91l-293 -293h704q52 0 84.5 -37.5t32.5 -90.5z"/></svg></button>
+    <button class="qnav-btn next" onclick="ExamApp.nextPart()" title="Next part" aria-label="Next part"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1600 896q0 -53 -37 -90l-651 -652q-39 -37 -91 -37q-51 0 -90 37l-75 75q-38 38 -38 91t38 91l293 293h-704q-52 0 -84.5 37.5t-32.5 90.5v128q0 53 32.5 90.5t84.5 37.5h704l-293 294q-38 36 -38 90t38 90l75 75q38 38 90 38q53 0 91 -38l651 -651q37 -35 37 -90z"/></svg></button>
+  </div>
+
+  <!-- The official player replaces the small dropdown with a full-screen white
+       Options page: three 698 x 75.8 rows in a 700px column at x=370, the first
+       one #e31837, and Contrast / Text size opening as sub-pages. -->
+  <div class="ex-sheet ex-options" id="ex-options" role="dialog" aria-modal="true" aria-label="Options">
+   <div class="ex-sheet-top">
+    <button type="button" class="ex-sheet-back" onclick="exOptionsPage('root')"><svg class="ex-ic" width="19.43" height="27.2" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1171 1235l-531 -531l531 -531q19 -19 19 -45t-19 -45l-166 -166q-19 -19 -45 -19t-45 19l-742 742q-19 19 -19 45t19 45l742 742q19 19 45 19t45 -19l166 -166q19 -19 19 -45t-19 -45z"/></svg><span>Options</span></button>
+    <h1 class="ex-sheet-title">Options</h1>
+    <button type="button" class="ex-sheet-close" aria-label="Close" onclick="exCloseSheet()"><svg class="ex-ic" width="21.21" height="27" viewBox="0 0 1408 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z"/></svg></button>
+   </div>
+   <div class="ex-sheet-body">
+    <div class="ex-opt-page is-on" data-page="root">
+   <div class="ex-opt-group is-red">
+    <button type="button" class="ex-opt-item is-red" onclick="exGoSubmission()"><span class="ex-opt-ic"><svg class="ex-ic" width="20.9" height="20.9" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1764 1525q33 -24 27 -64l-256 -1536q-5 -29 -32 -45q-14 -8 -31 -8q-11 0 -24 5l-527 215l-298 -327q-18 -21 -47 -21q-14 0 -23 4q-19 7 -30 23.5t-11 36.5v452l-472 193q-37 14 -40 55q-3 39 32 59l1664 960q35 21 68 -2zM1422 26l221 1323l-1434 -827l336 -137 l863 639l-478 -797z"/></svg></span><span class="ex-opt-label">Go to submission page</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+   </div>
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item" onclick="exOptionsPage('contrast')"><span class="ex-opt-ic is-grey"><svg class="ex-ic" style="margin-left:2px" width="18" height="21" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M768 96v1088q-148 0 -273 -73t-198 -198t-73 -273t73 -273t198 -198t273 -73zM1536 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z"/></svg></span><span class="ex-opt-label">Contrast</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+    <button type="button" class="ex-opt-item" onclick="exOptionsPage('text')"><span class="ex-opt-ic is-grey"><svg class="ex-ic" width="19.7" height="21.2" viewBox="0 0 1664 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 736v-64q0 -13 -9.5 -22.5t-22.5 -9.5h-224v-224q0 -13 -9.5 -22.5t-22.5 -9.5h-64q-13 0 -22.5 9.5t-9.5 22.5v224h-224q-13 0 -22.5 9.5t-9.5 22.5v64q0 13 9.5 22.5t22.5 9.5h224v224q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5 -9.5t9.5 -22.5v-224h224 q13 0 22.5 -9.5t9.5 -22.5zM1152 704q0 185 -131.5 316.5t-316.5 131.5t-316.5 -131.5t-131.5 -316.5t131.5 -316.5t316.5 -131.5t316.5 131.5t131.5 316.5zM1664 -128q0 -53 -37.5 -90.5t-90.5 -37.5q-54 0 -90 38l-343 342q-179 -124 -399 -124q-143 0 -273.5 55.5 t-225 150t-150 225t-55.5 273.5t55.5 273.5t150 225t225 150t273.5 55.5t273.5 -55.5t225 -150t150 -225t55.5 -273.5q0 -220 -124 -399l343 -343q37 -37 37 -90z"/></svg></span><span class="ex-opt-label">Text size</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+   </div>
+    </div>
+    <div class="ex-opt-page" data-page="contrast">
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item ex-contrast-opt is-on" data-val="bw" onclick="setContrast('bw')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Black on white</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#ffffff" stroke="#c9c9c9"/><rect x="6" y="9" width="26" height="2.5" fill="#111111"/><rect x="6" y="16" width="44" height="2.5" fill="#111111"/><rect x="6" y="22" width="44" height="2.5" fill="#111111"/><rect x="6" y="28" width="44" height="2.5" fill="#111111"/></svg></span></button>
+    <button type="button" class="ex-opt-item ex-contrast-opt" data-val="wb" onclick="setContrast('wb')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">White on black</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#000000" stroke="#000000"/><rect x="6" y="9" width="26" height="2.5" fill="#ffffff"/><rect x="6" y="16" width="44" height="2.5" fill="#ffffff"/><rect x="6" y="22" width="44" height="2.5" fill="#ffffff"/><rect x="6" y="28" width="44" height="2.5" fill="#ffffff"/></svg></span></button>
+    <button type="button" class="ex-opt-item ex-contrast-opt" data-val="yb" onclick="setContrast('yb')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Yellow on black</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#000000" stroke="#000000"/><rect x="6" y="9" width="26" height="2.5" fill="#ffe200"/><rect x="6" y="16" width="44" height="2.5" fill="#ffe200"/><rect x="6" y="22" width="44" height="2.5" fill="#ffe200"/><rect x="6" y="28" width="44" height="2.5" fill="#ffe200"/></svg></span></button>
+   </div>
+    </div>
+    <div class="ex-opt-page" data-page="text">
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item ex-text-opt is-on" data-val="regular" onclick="setTextSize('regular')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Regular</span></button>
+    <button type="button" class="ex-opt-item ex-text-opt" data-val="large" onclick="setTextSize('large')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Large</span></button>
+    <button type="button" class="ex-opt-item ex-text-opt" data-val="xlarge" onclick="setTextSize('xlarge')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Extra large</span></button>
+   </div>
+    </div>
+   </div>
+   <div class="ex-sheet-empty"></div>
+  </div>
+  <div class="ex-sheet ex-messages" id="ex-messages" role="dialog" aria-modal="true" aria-label="Messages">
+   <div class="ex-sheet-top">
+    <h1 class="ex-sheet-title">Messages</h1>
+    <button type="button" class="ex-sheet-close" aria-label="Close" onclick="exCloseSheet()"><svg class="ex-ic" width="21.21" height="27" viewBox="0 0 1408 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z"/></svg></button>
+   </div>
+   <div class="ex-sheet-empty"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 4: COMPLETION
+     ============================================================ -->
+<div class="stage" id="stage-completion">
+  <div class="complete-card">
+    <div class="ch-comp-body">
+
+      <div class="ch-comp-head">
+        <div class="ch-seal" id="ch-seal">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs><linearGradient id="chSealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f3f46"/><stop offset=".55" stop-color="#71717a"/><stop offset="1" stop-color="#111111"/></linearGradient><linearGradient id="chSealDone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111111"/><stop offset="1" stop-color="#52525b"/></linearGradient></defs>
+            <circle class="ch-seal-track" cx="32" cy="32" r="28"/>
+            <circle class="ch-seal-arc" id="ch-seal-arc" cx="32" cy="32" r="28"/>
+          </svg>
+          <div class="ch-seal-core"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4.6 10.4l3.5 3.5 7.3-7.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="ch-seal-pct" id="ch-seal-pct">0%</div>
+        </div>
+        <div>
+          <div class="trans-eyebrow">Reading test complete</div>
+          <h1 class="complete-title">Your answer sheet is in.</h1>
+          <p class="complete-sub" id="ch-status">Sealing your answer sheet&hellip;</p>
+        </div>
+      </div>
+
+      <ol class="ch-steps" id="ch-steps">
+        <li><span class="ch-step-dot"></span>Answers locked and time&#8209;stamped</li>
+        <li><span class="ch-step-dot"></span>Every response checked against the answer key</li>
+        <li><span class="ch-step-dot"></span>Official IELTS Academic Reading band table applied</li>
+      </ol>
+
+      <div class="ch-note">
+        <p>Sitting a full paper under real conditions is much harder than most people think &mdash; and analysing it afterwards is what separates the high scorers. You just did the hard half. Now go and read your mistakes.</p>
+        <!-- ===== EDIT PER TEST · AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
+        <p class="ch-sign">Built from scratch by <strong>Islom Kenjayev</strong> &middot; IELTS 8.5 (L&nbsp;9.0 &middot; R&nbsp;9.0)</p>
+      </div>
+
+      <div class="ch-cta-slot">
+        <p class="ch-wait" id="ch-wait" aria-live="polite">Marking takes a couple of seconds &mdash; nothing you answered can be lost.</p>
+        <div class="ch-cta" id="ch-cta">
+          <button class="btn btn-primary btn-lg" onclick="ExamApp.unlockResults()">
+            <span>See my band score</span>
+            <svg class="ch-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.6 8h10.8m0 0L9.6 4.2M13.4 8l-3.8 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <a class="channel-promo" href="https://t.me/reading_cdi" target="_blank" rel="noopener">
+      <div class="tg-icon">&#9992;</div>
+      <div class="channel-text">
+        <div class="channel-name">@READING_CDI</div>
+        <div class="channel-desc">New authentic practice tests every week</div>
+      </div>
+      <div class="channel-cta">Join</div>
+    </a>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 5: RESULTS
+     ============================================================ -->
+<div class="stage" id="stage-results">
+  <div class="results-modal-box">
+    <button type="button" class="results-modal-close" aria-label="Close" onclick="ExamApp.closeResultsModal()">&times;</button>
+    <div class="rcx-hdr">
+      <div class="rcx-hdr-left">
+        <div class="rcx-mark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+        <div class="rcx-ttblock"><div class="rcx-ttid" id="res-taker">Test taker ID</div></div>
+      </div>
+      <div class="rcx-hdr-right">
+        <a class="rcx-tglink" href="https://t.me/reading_cdi" target="_blank" rel="noopener" title="Join @reading_cdi on Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23l7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3L3.64 12c-.88-.25-.89-1.37.2-1.64l16.56-6.4c.75-.29 1.4.22 1.2.94l-2.67 12.61c-.22.95-1.13 1.18-1.78.73l-4.5-3.32l-2.23 2.15c-.47.44-1.29.21-1.48-.37z"/></svg>READING_CDI</a>
+      </div>
+    </div>
+    <div class="results-content" id="results-content"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     OVERLAYS
+     ============================================================ -->
+<div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
+  <div class="warning-card">
+    <div class="wc-body">
+      <div class="wc-top">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6 2.6 20h18.8L12 3.6Z"/><path d="M12 9.6v4.6"/><path d="M12 17.3h.01"/></svg>
+        </div>
+        <div class="wc-heads">
+          <div class="wc-eyebrow">Exam integrity</div>
+          <h2 id="warning-title">This session is being monitored</h2>
+        </div>
+      </div>
+      <div class="wc-reason">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        <p id="warning-body"></p>
+      </div>
+      <div class="wc-meter">
+        <div class="wc-meter-head"><span>Violations recorded</span></div>
+        <div class="strike-counter" id="strike-counter" role="img" aria-label="Violation counter">
+          <div class="strike"></div><div class="strike"></div><div class="strike"></div>
+        </div>
+        <p id="warning-strikes-text">Warning <strong>1 of 3</strong> &mdash; the test will be terminated on the third violation.</p>
+      </div>
+    </div>
+    <div class="wc-foot">
+      <div class="wc-note">Real IELTS test centres apply the same rule. Stay in full-screen until you submit.</div>
+      <button class="wc-btn" onclick="ExamApp.dismissWarning()">Return to the test</button>
+    </div>
+  </div>
+</div>
+
+<!-- Matches the real player's adder: a small white card with exactly two
+     icon-above-label buttons, Note and Highlight. Erase stays as a third,
+     revealed only when the selection already sits on a highlight. -->
+<div id="hl-popup" class="hl-popup">
+  <button class="tool-btn note" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Add a note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    <span>Note</span>
+  </button>
+  <button class="tool-btn hilite" onmousedown="event.preventDefault(); ExamApp.applyHighlight('hl-y')" title="Highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+    <span>Highlight</span>
+  </button>
+  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Remove highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+    <span>Clear</span>
+  </button>
+</div>
+
+<!-- V3: note composer (V2 called getElementById('note-modal') but never shipped one) -->
+<div id="note-modal" class="note-modal">
+  <div class="nm-head">
+    <span class="nm-title">Note</span>
+    <button class="nm-x" onclick="ExamApp.closeNote()" title="Close">&times;</button>
+  </div>
+  <textarea id="note-textarea" class="nm-text" rows="4" placeholder="Write your note&hellip;"
+            onkeydown="if(event.key==='Escape'){ExamApp.closeNote();}
+                       if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){ExamApp.saveNote();}"></textarea>
+  <div class="nm-foot">
+    <span class="nm-hint">&#8984;/Ctrl + Enter to save</span>
+    <div class="nm-actions">
+      <button class="nm-btn ghost" onclick="ExamApp.deleteNote()">Delete</button>
+      <button class="nm-btn solid" onclick="ExamApp.saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- V3: notes drawer — mirrors the real player's right-hand Notes panel -->
+<aside id="notes-drawer" class="notes-drawer" aria-label="Notes" aria-hidden="true">
+  <div class="nd-head">
+    <span class="nd-title">Notes</span>
+    <button class="nd-x" onclick="ExamApp.toggleNotesDrawer(false)" aria-label="Close notes">&times;</button>
+  </div>
+  <div class="nd-body" id="notes-drawer-body"></div>
+</aside>
+
+<!-- V3: pacing marker -->
+<div id="pace-note" class="pace-note">
+  <div class="pn-bar"></div>
+  <div class="pn-body"><strong id="pace-title"></strong><span id="pace-sub"></span></div>
+  <button class="pn-x" onclick="document.getElementById('pace-note').classList.remove('show')">&times;</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="vocab-print"></div>
+<!-- The printable report. Off-screen and empty until buildPrintReport() fills
+     it (on the Download Report button, and on any browser-initiated print):
+     page 1 is the Test Report Form, page 2 the Schedule of Answers. -->
+<div id="print-report"></div>
+
+<script>
+/* ============================================================
+   TEST DATA — Full Reading Test 9
+   Passages, questions, answers and explanations for this test only.
+   The functions live in reading.js (shared by every test).
+   ============================================================ */
+window.READING_TEST = (function () {
+const STORAGE_KEY = "cdi_reading_v3_full_reading_test_9";   // trailing digits also set CERT_TEST_NO
+
+const SECTIONS = {
+ "1": [
+  {
+   "type": "tfng",
+   "num": "",
+   "title": "True / False / Not Given",
+   "instruction": "Do the following statements agree with the information given in Reading Passage 1? In boxes 1&ndash;7 on your answer sheet, write",
+   "items": [
+    {
+     "id": 1,
+     "answer": "FALSE",
+     "label": "The majority of ancient Greeks followed the advice of Hippocrates about cold foods."
+    },
+    {
+     "id": 2,
+     "answer": "TRUE",
+     "label": "Seneca had different reactions to Nero&rsquo;s various uses of snow."
+    },
+    {
+     "id": 3,
+     "answer": "NOT GIVEN",
+     "label": "Many ancient Romans went to the mountains in the summer to eat ice cream."
+    },
+    {
+     "id": 4,
+     "answer": "FALSE",
+     "label": "The cold storage houses in Rome were generally built of frozen blocks of ice."
+    },
+    {
+     "id": 5,
+     "answer": "TRUE",
+     "label": "The buying and selling of snow and ice became a common international activity during Roman times."
+    },
+    {
+     "id": 6,
+     "answer": "NOT GIVEN",
+     "label": "Tang Dynasty Chinese preferred chilled desserts made from milk to those made only of snow and ice."
+    },
+    {
+     "id": 7,
+     "answer": "FALSE",
+     "label": "The freezing temperature of most types of milk made it easy to create frozen dairy desserts."
+    }
+   ]
+  },
+  {
+   "type": "notes",
+   "num": "",
+   "title": "Completion",
+   "wordLimit": 1,
+   "noteTitle": "The development of modern ice cream",
+   "instruction": "Complete the notes below. Choose <b>ONE WORD ONLY</b> from the passage for each answer. Write your answers in boxes 8&ndash;13 on your answer sheet.",
+   "items": [
+    {
+     "id": 8,
+     "answer": "recipes",
+     "label": "&bull; First book in English with",
+     "after": "for ice cream was published in 1718"
+    },
+    {
+     "id": 9,
+     "answer": "ingredients",
+     "label": "&bull; Many different",
+     "after": "were added to ice cream desserts"
+    },
+    {
+     "id": 10,
+     "answer": "aristocracy",
+     "label": "&bull; It was once widely thought that ice cream was mostly eaten by the",
+     "after": ""
+    },
+    {
+     "id": 11,
+     "answer": "ball",
+     "label": "&bull; Ice cream was served at an important",
+     "after": "for an American president"
+    },
+    {
+     "id": 12,
+     "answer": "texture",
+     "label": "&bull; Before 1843, ice cream had an unpleasant",
+     "after": "because it was not stirred"
+    },
+    {
+     "id": 13,
+     "answer": "price",
+     "label": "&bull; 20th-century production methods allowed a reduction in the",
+     "after": "of commercially sold ice cream"
+    }
+   ]
+  }
+ ],
+ "2": [
+  {
+   "type": "matching-headings",
+   "num": "",
+   "title": "Matching Headings",
+   "instruction": "Reading Passage 2 has five sections, <b>A&ndash;E</b>. Choose the correct heading for each section from the list of headings below. Write the correct number, <b>i&ndash;viii</b>, in boxes 14&ndash;18 on your answer sheet.",
+   "items": [
+    {
+     "id": 14,
+     "answer": "v"
+    },
+    {
+     "id": 15,
+     "answer": "viii"
+    },
+    {
+     "id": 16,
+     "answer": "i"
+    },
+    {
+     "id": 17,
+     "answer": "vii"
+    },
+    {
+     "id": 18,
+     "answer": "iv"
+    }
+   ]
+  },
+  {
+   "type": "matching-features",
+   "num": "",
+   "title": "Matching Features",
+   "bankLabel": "List of Statements",
+   "instruction": "Look at the following experts (Questions 19&ndash;22) and the list of statements below. Match each expert with the correct statement, <b>A&ndash;G</b>. Write the correct letter, <b>A&ndash;G</b>, in boxes 19&ndash;22 on your answer sheet.",
+   "people": [
+    {
+     "l": "A",
+     "name": "A mistake could have serious consequences for Earth."
+    },
+    {
+     "l": "B",
+     "name": "It might be difficult to arouse interest in an asteroid of limited size."
+    },
+    {
+     "l": "C",
+     "name": "The project could be an early step in space exploration."
+    },
+    {
+     "l": "D",
+     "name": "An asteroid&rsquo;s weight makes the project extremely challenging."
+    },
+    {
+     "l": "E",
+     "name": "The skill gained could save Earth from future danger."
+    },
+    {
+     "l": "F",
+     "name": "An asteroid could be a useful landing place for a spaceship."
+    },
+    {
+     "l": "G",
+     "name": "Capturing an asteroid would not be an efficient method of research."
+    }
+   ],
+   "items": [
+    {
+     "id": 19,
+     "answer": "E",
+     "label": "Louis Friedman"
+    },
+    {
+     "id": 20,
+     "answer": "D",
+     "label": "Rusty Schweickart"
+    },
+    {
+     "id": 21,
+     "answer": "B",
+     "label": "Dan Mazanek"
+    },
+    {
+     "id": 22,
+     "answer": "G",
+     "label": "Joseph A Nuth"
+    }
+   ]
+  },
+  {
+   "type": "summary",
+   "num": "",
+   "title": "Completion",
+   "wordLimit": 1,
+   "noteTitle": "The merits of the US mission",
+   "instruction": "Complete the summary below. Choose <b>ONE WORD ONLY</b> from the passage for each answer. Write your answers in boxes 23&ndash;26 on your answer sheet.",
+   "items": [
+    {
+     "id": 23,
+     "answer": "base",
+     "label": "Capture of an asteroid would reduce the time that astronauts travelling to it needed to spend in space. An asteroid could also act as a",
+     "after": "for further space travel and exploration."
+    },
+    {
+     "id": 24,
+     "answer": "gravity",
+     "label": "The fact that an asteroid would have weaker",
+     "after": "would allow easier movement of resources."
+    },
+    {
+     "id": 25,
+     "answer": "metals",
+     "label": "These resources include",
+     "after": "which could be used in space or on Earth and"
+    },
+    {
+     "id": 26,
+     "answer": "water",
+     "label": "",
+     "after": "which could be consumed or used as a source of power."
+    }
+   ]
+  }
+ ],
+ "3": [
+  {
+   "type": "matching-info",
+   "num": "",
+   "title": "Matching Information",
+   "instruction": "Reading Passage 3 has eight paragraphs, <b>A&ndash;H</b>. Which paragraph contains the following information? Write the correct letter, <b>A&ndash;H</b>, in boxes 27&ndash;31 on your answer sheet.",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "items": [
+    {
+     "id": 27,
+     "answer": "F",
+     "label": "the fact that there may be too much information to cope with"
+    },
+    {
+     "id": 28,
+     "answer": "A",
+     "label": "the relevance of generating repeat business"
+    },
+    {
+     "id": 29,
+     "answer": "B",
+     "label": "an example of personalised marketing"
+    },
+    {
+     "id": 30,
+     "answer": "H",
+     "label": "an illustration of a situation where commissioning new information research might not be advisable"
+    },
+    {
+     "id": 31,
+     "answer": "D",
+     "label": "how the greater wealth of customers enables them to select from a broader range of products"
+    }
+   ]
+  },
+  {
+   "type": "ynng",
+   "num": "",
+   "title": "Yes / No / Not Given",
+   "instruction": "Do the following statements agree with the views of the writer in Reading Passage 3? In boxes 32&ndash;36 on your answer sheet, write",
+   "items": [
+    {
+     "id": 32,
+     "answer": "NO",
+     "label": "The majority of marketing statistics are gathered by government agencies."
+    },
+    {
+     "id": 33,
+     "answer": "NOT GIVEN",
+     "label": "The move from an industrial to an information-based economy has happened more quickly in New Zealand than in Australia."
+    },
+    {
+     "id": 34,
+     "answer": "YES",
+     "label": "Employees sometimes hide information that gives a poor impression of them."
+    },
+    {
+     "id": 35,
+     "answer": "YES",
+     "label": "Managers frequently fail to make good use of the information they receive."
+    },
+    {
+     "id": 36,
+     "answer": "YES",
+     "label": "Marketing information has to be used to be valuable."
+    }
+   ]
+  },
+  {
+   "type": "notes",
+   "num": "",
+   "title": "Completion",
+   "wordLimit": 2,
+   "noteTitle": "The Marketing Information System (MIS)",
+   "instruction": "Complete the flow-chart below. Choose <b>NO MORE THAN TWO WORDS</b> from the passage for each answer. Write your answers in boxes 37&ndash;40 on your answer sheet.",
+   "items": [
+    {
+     "id": 37,
+     "answer": "marketing managers|managers",
+     "label": "The MIS starts and finishes with the",
+     "after": "."
+    },
+    {
+     "id": 38,
+     "answer": "information needs|needs",
+     "label": "&darr;<br>Find out their",
+     "after": "."
+    },
+    {
+     "id": 39,
+     "answer": "internal records|records",
+     "label": "&darr;<br>Information developed through:",
+     "after": "&bull; marketing intelligence activities &bull; the research process"
+    },
+    {
+     "id": 40,
+     "answer": "analysis unit",
+     "label": "&darr;<br>Processed by the",
+     "after": ". &darr;<br>Timely and accurate data distributed to decision-makers"
+    }
+   ]
+  }
+ ]
+};
+
+
+const PASSAGES = {
+ "1": {
+  "title": "The History of Ice Cream",
+  "content": "<div><p><em>From the snow pits of ancient Rome to the factories of the 20th century</em></p><p>People the world over love ice cream. But they seldom consider how the frozen dessert came into being. Ice cold desserts, called 'ices', were around as far back as the 5th century BC, when the ancient Greeks refreshed themselves with snow, flavoured with honey or fruits. Although the Greek physician Hippocrates warned his patients to avoid unhealthy chilled drinks, these icy treats nonetheless enjoyed tremendous popularity.</p><p>The ancient Romans were also familiar with ices. While the philosopher Seneca criticised the emperor Nero in the 1st century AD for the extravagance of having ice and snow brought from the mountains to cool his swimming pool, he seemed to have seen nothing wrong with the emperor's fondness for chilled drinks and snow flavoured with honey.</p><p>But at that time, unless Romans wanted to eat their ices only in winter or high in the mountains, they needed not only to bring snow or ice to where they consumed it, but also to find some way of storing it in warm weather. This required a special sort of building now known as an ice house. Usually constructed of stone, underground and insulated with straw, these were sufficiently cold to preserve ice cut from frozen lakes and rivers in winter, or snow carried down from the mountains. Ice houses were in regular use in ancient Rome, and their growing use soon led to the development of a busy trade in snow and ice crisscrossing Europe, the Mediterranean and parts of western Asia.</p><p>Yet desserts made with cold dairy products were not invented until much later. During the Tang Dynasty (AD 616-907), the Chinese made a cold, creamy concoction of buffalo milk, flour, camphor and snow. But while it was easy enough to cool milk down, this mixture proved difficult to freeze. This was simply a matter of physics. Most milk freezes at between -0.535 degrees C and -0.565 degrees C, which is below the freezing point of water; so packing it in frozen water or snow doesn't get milk cold enough to become solid. Surprisingly, the solution to this problem was salt. When salt is added to snow or ice, energy is absorbed from a container of milk, for example, set within the snow or ice, reducing the milk's temperature and creating a basic form of refrigeration or freezing.</p><p>No one knows precisely when a mixture of salt and snow or ice was first used to produce ice cream. The earliest recorded references to what we know as ice cream occurred in Europe around 1530. However, it was not until the publication of a cookbook by Mrs Mary Eales in 1718 that recipes showing how to make it appeared in English. At that time, there was considerable variation in the ingredients. Milk, cream and custard were used almost interchangeably; and books of the period recommended including, for example, rose petals, caramel, ginger, lemon, chocolate, parsley and even asparagus.</p><p>For many years, historians assumed that it was the aristocracy that were the main consumers of these early ice creams. During the 18th century, for example, a range of beautiful ice cream dishes were created for French King Louis XV and his court. In 1813, US President James Madison's wife arranged for ice creams to be given to guests at her husband's inaugural ball; two years later, the French writer Balzac described the lavish ice cream desserts consumed in the great houses of Paris in his novel Splendeurs et misères des courtisanes. But, especially in 18th-century Naples in Italy, in part because of the relatively easy access to snow, it was also possible for people much lower down the social scale to make, sell and enjoy ice cream. Not only were there shops and cafés selling ice creams, but there were also vendors who sold it along the public roads, and there is evidence to suggest that some families may have made it at home.</p><p>However, early ice creams were still quite different from the iced treats we enjoy today. Since the milk, cream or custard was not stirred as it was frozen, it formed icy chunks, resulting in a lumpy, disagreeable texture. In 1843, however, an American called Nancy Johnson designed a hand-turned freezer, which allowed her to make silky smooth ice cream. Her invention consisted of a large container filled with ice and salt, a tightly closed cylinder for the milk or cream and a removable handle, which was rotated to stir the ice cream until properly frozen.</p><p>Even with Nancy Johnson's freezer, however, it was only possible to make small batches of ice cream at a time. But in 1926 another American, Clarence Vogt, improved on Johnson's idea with his continuous freezer, which made it possible to produce ice cream on an industrial scale. The inventions of Johnson and Vogt resulted in an explosion in the output of ice cream, which pushed the price down, making ice cream available to everyone everywhere. As more companies started manufacturing their own brands, increased competition led to the standardisation of the commercial product and to more inventive varieties.</p></div>"
+ },
+ "2": {
+  "title": "The plan to bring an asteroid to Earth",
+  "content": "<div><p><em>Moving in orbit around our sun are millions of rocks known as asteroids. Now scientists have plans to capture one.</em></p><p><strong class=\"para-letter\">A</strong> Send a robot into space, catch an asteroid and bring it back to Earth's orbit. This may sound like science fiction, but it is being taken seriously by scientists and engineers at the California Institute of Technology (Caltech). A four-day workshop was dedicated to investigating the feasibility of capturing a near-Earth asteroid, bringing it closer to our planet and using it as a base for future manned spaceflight missions.<br><br>This is not something the scientists are imagining could be done some day off in the future. It is possible with the technology we have today and could be accomplished within a decade. A robotic probe could anchor to an asteroid with simple magnets, or with a specialized spacecraft with claws. Alternatively, a large spacecraft could use its gravitational field to shift the orbit of a larger asteroid, sending it towards Earth.<br><br>'Once you get over the initial reaction – You want to go what?! – it actually starts to seem like a reasonable idea,' said project leader John Brophy, who helped organize the workshop. In fact, many of these ideas have been on the drawing board for years as part of the NASA planetary defense program, which is aimed at large space-based objects that might threaten Earth. There's no shortage of potential targets. NASA estimates there are 19,500 asteroids at least 100 meters wide within 45 million kilometers of Earth.</p><p><strong class=\"para-letter\">B</strong> Though rearranging the heavens may seem an excessive undertaking, the US mission has its merits. The US already has plans to send astronauts to a near-Earth asteroid, a mission that would mean confining them in a tiny capsule for three to six months and involve all the risks of deep-space voyage. Instead, robots could bring an asteroid close enough for them to get there in just a month.<br><br>An asteroid would provide a stationary base from which to launch missions farther into space. There are several advantages to this. For one, launching missions carrying materials from Earth requires a lot of power, fuel, and consequently money, because of our planet's strong force of gravity. Since this would be far weaker on an asteroid, materials mined there could be more easily taken off the asteroid and shuttled around the solar system.<br><br>And many asteroids have a lot to offer. Some are full of metals, which can be mined and used to build space-based habitats, or brought back to Earth. Others are up to one-quarter water, which would either be used for life-support or broken down into hydrogen and oxygen to make fuel. And astronomers would have the chance to get a close-up look at one of the solar system's earliest relics, generating important scientific data.<br><br>'Executing the asteroid retrieval plan would help demonstrate and greatly expand mankind's space-based engineering capabilities,' says engineer Louis Friedman, another co-organizer of the Caltech workshop. 'For instance, the mission would teach engineers how to capture an uncooperative target, which could be useful practice for planetary defense missions in the event of a threat from a meteoroid or comet from space approaching our planet,' he adds.</p><p><strong class=\"para-letter\">C</strong> Former astronaut Rusty Schweickart, cofounder of the B612 Foundation, an organization dedicated to protecting Earth from asteroid strikes, points out that though it would be technically feasible, shifting such a hefty and substantial target would not be easy: \"You're moving the largest mother lode imaginable,\" he says.<br><br>Engineers would need to be absolutely certain they could control such a potentially dangerous object. \"It's the opposite of planetary defense, if you do something wrong you have a Tunguska event,\" says engineer Marco Tantardini from the Planetary Society, referring to the powerful 1908 explosion above a remote Russian region thought to have been caused by a meteoroid or comet.</p><p><strong class=\"para-letter\">D</strong> Still, these obstacles only add to the appeal of the project for engineers, who love to go over every potential difficulty in order to solve it. And if the challenges for a large asteroid seem too daunting, researchers could always start with a smaller asteroid perhaps 2 to 10 meters across. Last year, Brophy helped conduct a study to look at the feasibility of bringing a two-meter, 1,000 kilogram asteroid – of which there might conceivably be millions – to the International Space Station. The study suggested the asteroid could be captured robotically in something as simple as a large bag. Of course, such a small object might not have the same emotional impact as a larger target. 'NASA isn't going to want to go to something that is smaller than our spaceships,' says engineer Dan Mazanek from NASA Langley Research Center.</p><p><strong class=\"para-letter\">E</strong> No matter the size of the asteroid, these plans would require hefty investments. Even capturing a small asteroid would consume at least a billion dollars. Convincing taxpayers to foot such a bill could be difficult. However, private industry might be interested in getting involved. One possibility would be to push the asteroid to near Earth orbit and then invite anyone who wants to develop the capabilities to reach and mine the object.<br><br>However, though the undertaking might be scientifically exciting, and provide great insight into the solar system formation, this is not enough on its own to justify the expense of bringing an asteroid to Earth. Investigations of asteroids can be done much more cheaply with an unmanned spacecraft, says chemist Joseph A Nuth from NASA's Goddard Space Flight Center. According to Brophy, ultimately, we would be working towards bringing an asteroid closer to Earth in order to help move out into the solar system.</p></div>",
+  "headings": [
+   {
+    "id": "i",
+    "text": "The need for skill and care"
+   },
+   {
+    "id": "ii",
+    "text": "Choosing the richest asteroid"
+   },
+   {
+    "id": "iii",
+    "text": "The safest way to protect an asteroid"
+   },
+   {
+    "id": "iv",
+    "text": "Obtaining support for the project"
+   },
+   {
+    "id": "v",
+    "text": "An achievable goal, not an impossible dream"
+   },
+   {
+    "id": "vi",
+    "text": "The need for global cooperation"
+   },
+   {
+    "id": "vii",
+    "text": "Beginning with a less challenging task"
+   },
+   {
+    "id": "viii",
+    "text": "Practical, economic and research justifications"
+   }
+  ],
+  "headingSlots": [
+   {
+    "letter": "A",
+    "qNum": 14
+   },
+   {
+    "letter": "B",
+    "qNum": 15
+   },
+   {
+    "letter": "C",
+    "qNum": 16
+   },
+   {
+    "letter": "D",
+    "qNum": 17
+   },
+   {
+    "letter": "E",
+    "qNum": 18
+   }
+  ]
+ },
+ "3": {
+  "title": "Marketing and the information age",
+  "content": "<div><p><em>Why gathering, storing and using information has become the marketer&rsquo;s most valuable tool</em></p><p><strong class=\"para-letter\">A</strong> For the early practitioners of marketing in the late 19th and early 20th centuries, the business of selling was simply a matter of continually finding new customers. By contrast, marketing managers in the current era recognise the importance of gathering information about the market and potential customers. They recognise that if companies are to be profitable, customers must gain and retain their perceptions of value from the brands they buy over a long time frame, rather than from a single transaction. This also means that customers must see value in returning continually to the stores where they shop, as well as to the service providers they deal with.</p><p><strong class=\"para-letter\">B</strong> Marketing practitioners and marketing scientists have never worked more closely than they currently do. There are many reasons for this, including the fact that this is the information age where the convergence in telecommunications, media and technology is causing old ways to be challenged, and new methods and tools to be tested. Customer expectations have risen as new technologies allow for new approaches. For instance, the subscriber-TV music channel Channel [V] encourages its viewers to sign up for text messages and email alerts that tell them when their favourite artists and songs are about to be broadcast. Competitive advantage lies in being able to recognise which customers can be given greater attention, not just because they demand it but because it makes commercial sense to provide high levels of product quality and service.</p><p><strong class=\"para-letter\">C</strong> Modern marketing information systems rely on information technology to enable marketing intelligence to be gathered and to store and analyse marketing research information. While some of the information used is gathered by government bodies such as the Australian Bureau of Statistics and Statistics New Zealand, most of it is purposefully gathered by marketing organisations for client companies. In the process, computer technology is used to manipulate the data and then to present the information in such a way that allows executives to readily identify any problems or issues, and quickly arrive at solutions.</p><p><strong class=\"para-letter\">D</strong> In order to produce superior value and satisfaction for customers, marketing managers need information at almost every turn. They need information about customers both end-users and resellers – as well as competitors and other forces in the marketplace. One marketing executive put it this way: “To manage a business well is to manage its future; and to manage the future is to manage information.” Increasingly, marketers are viewing information not just as an input for making better decisions but also as an important strategic asset and marketing tool. As household incomes increase, choice widens and buyers become better discriminating, so sellers need information about how buyers respond to different products and advertising campaigns.</p><p><strong class=\"para-letter\">E</strong> The supply of information has also increased greatly. It has been suggested by the futurist and best-selling author John Naisbitt that the United States and, by observation, developed countries such as Australia, New Zealand and Singapore are moving from industrial to information-based economies. These post-industrial economies earn 70-80% of their Gross Domestic Product from services, and have entered what some commentators have termed the ‘Information Age’ or the ‘Information Technology Era’.</p><p><strong class=\"para-letter\">F</strong> One study found that with all the information now available through supermarket scanners, a packaged goods product controller is bombarded with one million to one billion new numbers each week. As Naisbitt points out: “Running out of information is not a problem, but drowning in it is.” Yet marketers frequently complain that they lack information of the right kind but have plenty of the wrong kind, or they claim that marketing information is so widely spread throughout the organisation that it takes great effort to locate even simple facts. In addition, subordinates may withhold information they believe will reflect badly on their performance and important information often arrives too late to be useful, or on-time information is not accurate. So marketing managers need better information. Although marketing organisations have greater capacity to provide managers with information, they often do not use it well. As a result, many marketing organisations are now studying their managers’ information needs and designing information systems specifically to meet those needs.</p><p><strong class=\"para-letter\">G</strong> One solution is to use a Marketing Information System (MIS). This consists of people, equipment and procedures which, when put together, are able to gather, analyse, evaluate and distribute needed, timely and accurate information to marketing decision-makers. The MIS begins and ends with marketing managers. First, it interacts with these managers to assess the information needs they have. Next, it develops the needed information from internal records, marketing intelligence activities and the research process. The analysis unit processes the data to make it more useful and, finally, the MIS distributes it to managers in the right form and at the right time to help them make better marketing decisions.</p><p><strong class=\"para-letter\">H</strong> However, the costs of obtaining, processing, storing and delivering information can mount quickly. In some cases, additional information will do little to change or improve a manager’s decision, or the costs of acquiring the information will exceed the returns from the improved decision. For example, if an organisation estimates that launching a new product without any further information will yield a profit of $500,000, then it would be foolish to spend $30,000 for additional information that would increase the profit to only $525,000. By itself information is valueless – its value comes from its use.</p></div>"
+ }
+};
+
+const VOCABULARY_DATA = {
+ "1": {
+  "passageTitle": "The History of Ice Cream",
+  "words": []
+ },
+ "2": {
+  "passageTitle": "The plan to bring an asteroid to Earth",
+  "words": []
+ },
+ "3": {
+  "passageTitle": "Marketing and the information age",
+  "words": []
+ }
+};
+
+const READING_EXPLANATIONS = {
+ "1": {
+  "explanation": "FALSE — The passage says the opposite: 'Although the Greek physician Hippocrates warned his patients to avoid unhealthy chilled drinks, these icy treats nonetheless enjoyed tremendous popularity.' So most Greeks did not follow his advice.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE — Matnda aksi aytilgan: Gippokrat sovuq ichimliklardan saqlanishni maslahat bergan bo'lsa-da, bu muzdek shirinliklar baribir juda ommabop bo'lgan. Demak, ko'pchilik uning maslahatiga amal qilmagan.</div>",
+  "highlights": [
+   "warned his patients to avoid unhealthy chilled drinks, these icy treats nonetheless enjoyed tremendous popularity"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — The passage says the opposite: 'Although the Greek physician Hippocrates warned his patients to avoid unhealthy chilled drinks, these icy treats nonetheless enjoyed tremendous popularity.' So most Greeks did not follow his advice.",
+  "uz": "FALSE — Matnda aksi aytilgan: Gippokrat sovuq ichimliklardan saqlanishni maslahat bergan bo'lsa-da, bu muzdek shirinliklar baribir juda ommabop bo'lgan. Demak, ko'pchilik uning maslahatiga amal qilmagan."
+ },
+ "2": {
+  "explanation": "TRUE — Seneca 'criticised the emperor Nero… for the extravagance of having ice and snow brought from the mountains to cool his swimming pool', but 'he seemed to have seen nothing wrong with the emperor's fondness for chilled drinks'. Two different reactions to two uses of snow.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE — Seneka Neronning basseynni sovutish uchun tog'dan qor keltirishini isrofgarchilik deb tanqid qilgan, ammo sovuq ichimliklarni yoqtirishida hech qanday yomonlik ko'rmagan. Ya'ni qorning turli ishlatilishiga munosabati har xil bo'lgan.</div>",
+  "highlights": [
+   "he seemed to have seen nothing wrong with the emperor's fondness for chilled drinks"
+  ],
+  "paraphraseMap": [],
+  "en": "TRUE — Seneca 'criticised the emperor Nero… for the extravagance of having ice and snow brought from the mountains to cool his swimming pool', but 'he seemed to have seen nothing wrong with the emperor's fondness for chilled drinks'. Two different reactions to two uses of snow.",
+  "uz": "TRUE — Seneka Neronning basseynni sovutish uchun tog'dan qor keltirishini isrofgarchilik deb tanqid qilgan, ammo sovuq ichimliklarni yoqtirishida hech qanday yomonlik ko'rmagan. Ya'ni qorning turli ishlatilishiga munosabati har xil bo'lgan."
+ },
+ "3": {
+  "explanation": "NOT GIVEN — The passage only mentions the option of eating ices 'only in winter or high in the mountains' as a limitation. It never says that many Romans actually travelled to the mountains in summer to do so.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN — Matnda faqat muzli shirinliklarni 'qishda yoki tog'da' iste'mol qilish cheklovi tilga olinadi. Ko'plab rimliklar yozda tog'ga borgani haqida hech qanday ma'lumot yo'q.</div>",
+  "highlights": [
+   "unless Romans wanted to eat their ices only in winter or high in the mountains"
+  ],
+  "paraphraseMap": [],
+  "en": "NOT GIVEN — The passage only mentions the option of eating ices 'only in winter or high in the mountains' as a limitation. It never says that many Romans actually travelled to the mountains in summer to do so.",
+  "uz": "NOT GIVEN — Matnda faqat muzli shirinliklarni 'qishda yoki tog'da' iste'mol qilish cheklovi tilga olinadi. Ko'plab rimliklar yozda tog'ga borgani haqida hech qanday ma'lumot yo'q."
+ },
+ "4": {
+  "explanation": "FALSE — Ice houses were 'Usually constructed of stone, underground and insulated with straw'. The ice was stored inside them, not used as the building material.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE — Muzxonalar 'odatda toshdan qurilgan, yer ostida va somon bilan izolyatsiyalangan' edi. Muz ular ichida saqlangan, binoning qurilish materiali bo'lmagan.</div>",
+  "highlights": [
+   "Usually constructed of stone, underground and insulated with straw"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — Ice houses were 'Usually constructed of stone, underground and insulated with straw'. The ice was stored inside them, not used as the building material.",
+  "uz": "FALSE — Muzxonalar 'odatda toshdan qurilgan, yer ostida va somon bilan izolyatsiyalangan' edi. Muz ular ichida saqlangan, binoning qurilish materiali bo'lmagan."
+ },
+ "5": {
+  "explanation": "TRUE — 'their growing use soon led to the development of a busy trade in snow and ice crisscrossing Europe, the Mediterranean and parts of western Asia.' A trade across regions is international activity.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE — Muzxonalardan foydalanish ortishi Yevropa, O'rta yer dengizi va G'arbiy Osiyoni kesib o'tuvchi jonli qor va muz savdosini keltirib chiqargan — bu xalqaro faoliyat.</div>",
+  "highlights": [
+   "a busy trade in snow and ice crisscrossing Europe, the Mediterranean and parts of western Asia"
+  ],
+  "paraphraseMap": [],
+  "en": "TRUE — 'their growing use soon led to the development of a busy trade in snow and ice crisscrossing Europe, the Mediterranean and parts of western Asia.' A trade across regions is international activity.",
+  "uz": "TRUE — Muzxonalardan foydalanish ortishi Yevropa, O'rta yer dengizi va G'arbiy Osiyoni kesib o'tuvchi jonli qor va muz savdosini keltirib chiqargan — bu xalqaro faoliyat."
+ },
+ "6": {
+  "explanation": "NOT GIVEN — The passage says the Chinese made 'a cold, creamy concoction of buffalo milk, flour, camphor and snow', but it never compares how much they preferred it to plain snow and ice desserts.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN — Matnda xitoyliklar sut asosidagi sovuq aralashma tayyorlagani aytiladi, lekin uni oddiy qor-muz shirinliklaridan ko'proq yoqtirgani haqida hech narsa yozilmagan.</div>",
+  "highlights": [
+   "the Chinese made a cold, creamy concoction of buffalo milk, flour, camphor and snow"
+  ],
+  "paraphraseMap": [],
+  "en": "NOT GIVEN — The passage says the Chinese made 'a cold, creamy concoction of buffalo milk, flour, camphor and snow', but it never compares how much they preferred it to plain snow and ice desserts.",
+  "uz": "NOT GIVEN — Matnda xitoyliklar sut asosidagi sovuq aralashma tayyorlagani aytiladi, lekin uni oddiy qor-muz shirinliklaridan ko'proq yoqtirgani haqida hech narsa yozilmagan."
+ },
+ "7": {
+  "explanation": "FALSE — The freezing point of milk made it hard, not easy: 'this mixture proved difficult to freeze… Most milk freezes at between -0.535 degrees C and -0.565 degrees C, which is below the freezing point of water; so packing it in frozen water or snow doesn't get milk cold enough to become solid.'<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE — Aksincha, sutning muzlash harorati ishni qiyinlashtirgan: sut suvdan pastroq haroratda muzlagani uchun uni qor yoki muz ichiga qo'yish qattiq holatga keltirish uchun yetarli bo'lmagan.</div>",
+  "highlights": [
+   "so packing it in frozen water or snow doesn't get milk cold enough to become solid"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — The freezing point of milk made it hard, not easy: 'this mixture proved difficult to freeze… Most milk freezes at between -0.535 degrees C and -0.565 degrees C, which is below the freezing point of water; so packing it in frozen water or snow doesn't get milk cold enough to become solid.'",
+  "uz": "FALSE — Aksincha, sutning muzlash harorati ishni qiyinlashtirgan: sut suvdan pastroq haroratda muzlagani uchun uni qor yoki muz ichiga qo'yish qattiq holatga keltirish uchun yetarli bo'lmagan."
+ },
+ "8": {
+  "explanation": "recipes — 'it was not until the publication of a cookbook by Mrs Mary Eales in 1718 that recipes showing how to make it appeared in English.'<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> recipes — 1718-yilda Meri Eales oshpazlik kitobi chiqqandan keyingina ingliz tilida muzqaymoq tayyorlash retseptlari (recipes) paydo bo'lgan.</div>",
+  "highlights": [
+   "in 1718 that recipes showing how to make it appeared in English"
+  ],
+  "paraphraseMap": [],
+  "en": "recipes — 'it was not until the publication of a cookbook by Mrs Mary Eales in 1718 that recipes showing how to make it appeared in English.'",
+  "uz": "recipes — 1718-yilda Meri Eales oshpazlik kitobi chiqqandan keyingina ingliz tilida muzqaymoq tayyorlash retseptlari (recipes) paydo bo'lgan."
+ },
+ "9": {
+  "explanation": "ingredients — 'At that time, there was considerable variation in the ingredients', followed by the list of rose petals, caramel, ginger and so on.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> ingredients — 'O'sha paytda ingredientlarda katta xilma-xillik bor edi' deyilib, atirgul bargi, karamel, zanjabil kabilar sanab o'tiladi.</div>",
+  "highlights": [
+   "there was considerable variation in the ingredients"
+  ],
+  "paraphraseMap": [],
+  "en": "ingredients — 'At that time, there was considerable variation in the ingredients', followed by the list of rose petals, caramel, ginger and so on.",
+  "uz": "ingredients — 'O'sha paytda ingredientlarda katta xilma-xillik bor edi' deyilib, atirgul bargi, karamel, zanjabil kabilar sanab o'tiladi."
+ },
+ "10": {
+  "explanation": "aristocracy — 'For many years, historians assumed that it was the aristocracy that were the main consumers of these early ice creams.'<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> aristocracy — 'Ko'p yillar davomida tarixchilar bu dastlabki muzqaymoqlarning asosiy iste'molchilari aristokratiya (aristocracy) deb hisoblashgan.'</div>",
+  "highlights": [
+   "it was the aristocracy that were the main consumers of these early ice creams"
+  ],
+  "paraphraseMap": [],
+  "en": "aristocracy — 'For many years, historians assumed that it was the aristocracy that were the main consumers of these early ice creams.'",
+  "uz": "aristocracy — 'Ko'p yillar davomida tarixchilar bu dastlabki muzqaymoqlarning asosiy iste'molchilari aristokratiya (aristocracy) deb hisoblashgan.'"
+ },
+ "11": {
+  "explanation": "ball — 'In 1813, US President James Madison's wife arranged for ice creams to be given to guests at her husband's inaugural ball.'<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> ball — 1813-yilda AQSh prezidenti Jeyms Medisonning rafiqasi erining inauguratsiya balida (ball) mehmonlarga muzqaymoq berilishini tashkil qilgan.</div>",
+  "highlights": [
+   "to be given to guests at her husband's inaugural ball"
+  ],
+  "paraphraseMap": [],
+  "en": "ball — 'In 1813, US President James Madison's wife arranged for ice creams to be given to guests at her husband's inaugural ball.'",
+  "uz": "ball — 1813-yilda AQSh prezidenti Jeyms Medisonning rafiqasi erining inauguratsiya balida (ball) mehmonlarga muzqaymoq berilishini tashkil qilgan."
+ },
+ "12": {
+  "explanation": "texture — 'Since the milk, cream or custard was not stirred as it was frozen, it formed icy chunks, resulting in a lumpy, disagreeable texture.'<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> texture — Muzlash paytida aralashtirilmagani uchun massa muz bo'laklariga aylanib, yoqimsiz konsistensiya (texture) hosil qilgan.</div>",
+  "highlights": [
+   "resulting in a lumpy, disagreeable texture"
+  ],
+  "paraphraseMap": [],
+  "en": "texture — 'Since the milk, cream or custard was not stirred as it was frozen, it formed icy chunks, resulting in a lumpy, disagreeable texture.'",
+  "uz": "texture — Muzlash paytida aralashtirilmagani uchun massa muz bo'laklariga aylanib, yoqimsiz konsistensiya (texture) hosil qilgan."
+ },
+ "13": {
+  "explanation": "price — Vogt's 1926 continuous freezer led to 'an explosion in the output of ice cream, which pushed the price down, making ice cream available to everyone everywhere.'<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> price — 1926-yilgi uzluksiz muzlatgich ishlab chiqarishni keskin oshirgan va bu narxni (price) tushirib, muzqaymoqni hamma uchun ochiq qilgan.</div>",
+  "highlights": [
+   "which pushed the price down"
+  ],
+  "paraphraseMap": [],
+  "en": "price — Vogt's 1926 continuous freezer led to 'an explosion in the output of ice cream, which pushed the price down, making ice cream available to everyone everywhere.'",
+  "uz": "price — 1926-yilgi uzluksiz muzlatgich ishlab chiqarishni keskin oshirgan va bu narxni (price) tushirib, muzqaymoqni hamma uchun ochiq qilgan."
+ },
+ "14": {
+  "explanation": "<b>v.</b> Section A answers the &ldquo;science fiction&rdquo; reaction head on: &ldquo;It is possible with the technology we have today and could be accomplished within a decade.&rdquo; The idea is achievable, not a fantasy.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> v &mdash; A bo&rsquo;limi g&rsquo;oyani &laquo;ilmiy fantastika&raquo; deb hisoblashga javob beradi: &laquo;Buni bugungi texnologiya bilan amalga oshirish mumkin va o&rsquo;n yil ichida bajarish mumkin.&raquo;</div>",
+  "highlights": [
+   "It is possible with the technology we have today and could be accomplished within a decade"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>v.</b> Section A answers the &ldquo;science fiction&rdquo; reaction head on: &ldquo;It is possible with the technology we have today and could be accomplished within a decade.&rdquo; The idea is achievable, not a fantasy.",
+  "uz": "v &mdash; A bo&rsquo;limi g&rsquo;oyani &laquo;ilmiy fantastika&raquo; deb hisoblashga javob beradi: &laquo;Buni bugungi texnologiya bilan amalga oshirish mumkin va o&rsquo;n yil ichida bajarish mumkin.&raquo;"
+ },
+ "15": {
+  "explanation": "<b>viii.</b> Section B lists the reasons for the mission: a shorter, safer trip for astronauts, a base for launches, metals and water to mine, and &ldquo;the chance to get a close-up look at one of the solar system&rsquo;s earliest relics&rdquo; &ndash; practical, economic and research justifications together.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> viii &mdash; B bo&rsquo;limida sabablar sanaladi: kosmonavtlar uchun qisqaroq safar, uchirish bazasi, qazib olinadigan metall va suv, hamda ilmiy ma&rsquo;lumot &ndash; amaliy, iqtisodiy va ilmiy asoslar.</div>",
+  "highlights": [
+   "Though rearranging the heavens may seem an excessive undertaking, the US mission has its merits"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>viii.</b> Section B lists the reasons for the mission: a shorter, safer trip for astronauts, a base for launches, metals and water to mine, and &ldquo;the chance to get a close-up look at one of the solar system&rsquo;s earliest relics&rdquo; &ndash; practical, economic and research justifications together.",
+  "uz": "viii &mdash; B bo&rsquo;limida sabablar sanaladi: kosmonavtlar uchun qisqaroq safar, uchirish bazasi, qazib olinadigan metall va suv, hamda ilmiy ma&rsquo;lumot &ndash; amaliy, iqtisodiy va ilmiy asoslar."
+ },
+ "16": {
+  "explanation": "<b>i.</b> Section C is about the danger of getting it wrong: shifting such a target &ldquo;would not be easy&rdquo; and &ldquo;engineers would need to be absolutely certain they could control such a potentially dangerous object&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> i &mdash; C bo&rsquo;limi xatoning xavfi haqida: bunday nishonni siljitish oson emas va muhandislar bu xavfli obyektni nazorat qila olishlariga to&rsquo;liq ishonch hosil qilishlari kerak.</div>",
+  "highlights": [
+   "Engineers would need to be absolutely certain they could control such a potentially dangerous object"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>i.</b> Section C is about the danger of getting it wrong: shifting such a target &ldquo;would not be easy&rdquo; and &ldquo;engineers would need to be absolutely certain they could control such a potentially dangerous object&rdquo;.",
+  "uz": "i &mdash; C bo&rsquo;limi xatoning xavfi haqida: bunday nishonni siljitish oson emas va muhandislar bu xavfli obyektni nazorat qila olishlariga to&rsquo;liq ishonch hosil qilishlari kerak."
+ },
+ "17": {
+  "explanation": "<b>vii.</b> Section D suggests scaling down: &ldquo;if the challenges for a large asteroid seem too daunting, researchers could always start with a smaller asteroid perhaps 2 to 10 meters across&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> vii &mdash; D bo&rsquo;limida kichikroq boshlash taklif qilinadi: &laquo;agar katta asteroid juda qiyin tuyulsa, tadqiqotchilar 2&ndash;10 metrlik kichik asteroiddan boshlashlari mumkin&raquo;.</div>",
+  "highlights": [
+   "researchers could always start with a smaller asteroid"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>vii.</b> Section D suggests scaling down: &ldquo;if the challenges for a large asteroid seem too daunting, researchers could always start with a smaller asteroid perhaps 2 to 10 meters across&rdquo;.",
+  "uz": "vii &mdash; D bo&rsquo;limida kichikroq boshlash taklif qilinadi: &laquo;agar katta asteroid juda qiyin tuyulsa, tadqiqotchilar 2&ndash;10 metrlik kichik asteroiddan boshlashlari mumkin&raquo;."
+ },
+ "18": {
+  "explanation": "<b>iv.</b> Section E is about money and backing: capturing even a small asteroid &ldquo;would consume at least a billion dollars&rdquo;, &ldquo;convincing taxpayers to foot such a bill could be difficult&rdquo;, and &ldquo;private industry might be interested&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> iv &mdash; E bo&rsquo;limi mablag&rsquo; va qo&rsquo;llab-quvvatlash haqida: kichik asteroid ham kamida bir milliard dollar turadi, soliq to&rsquo;lovchilarni ishontirish qiyin, xususiy sektor esa qiziqishi mumkin.</div>",
+  "highlights": [
+   "Convincing taxpayers to foot such a bill could be difficult"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>iv.</b> Section E is about money and backing: capturing even a small asteroid &ldquo;would consume at least a billion dollars&rdquo;, &ldquo;convincing taxpayers to foot such a bill could be difficult&rdquo;, and &ldquo;private industry might be interested&rdquo;.",
+  "uz": "iv &mdash; E bo&rsquo;limi mablag&rsquo; va qo&rsquo;llab-quvvatlash haqida: kichik asteroid ham kamida bir milliard dollar turadi, soliq to&rsquo;lovchilarni ishontirish qiyin, xususiy sektor esa qiziqishi mumkin."
+ },
+ "19": {
+  "explanation": "<b>E.</b> Friedman says the mission &ldquo;would teach engineers how to capture an uncooperative target, which could be useful practice for planetary defense missions in the event of a threat from a meteoroid or comet&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> E &mdash; Fridman: missiya muhandislarni &laquo;itoatsiz nishonni ushlashga o&rsquo;rgatadi&raquo; va bu meteorit yoki kometa xavfi bo&rsquo;lganda sayyorani himoya qilish uchun foydali mashq bo&rsquo;ladi.</div>",
+  "highlights": [
+   "the mission would teach engineers how to capture an uncooperative target"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>E.</b> Friedman says the mission &ldquo;would teach engineers how to capture an uncooperative target, which could be useful practice for planetary defense missions in the event of a threat from a meteoroid or comet&rdquo;.",
+  "uz": "E &mdash; Fridman: missiya muhandislarni &laquo;itoatsiz nishonni ushlashga o&rsquo;rgatadi&raquo; va bu meteorit yoki kometa xavfi bo&rsquo;lganda sayyorani himoya qilish uchun foydali mashq bo&rsquo;ladi."
+ },
+ "20": {
+  "explanation": "<b>D.</b> Schweickart points out that &ldquo;shifting such a hefty and substantial target would not be easy: &lsquo;You&rsquo;re moving the largest mother lode imaginable.&rsquo;&rdquo; It is the weight that makes it hard.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> D &mdash; Shveykart: &laquo;shunday og&rsquo;ir va ulkan nishonni siljitish oson emas&raquo; &ndash; qiyinchilik aynan og&rsquo;irlikda.</div>",
+  "highlights": [
+   "shifting such a hefty and substantial target would not be easy"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>D.</b> Schweickart points out that &ldquo;shifting such a hefty and substantial target would not be easy: &lsquo;You&rsquo;re moving the largest mother lode imaginable.&rsquo;&rdquo; It is the weight that makes it hard.",
+  "uz": "D &mdash; Shveykart: &laquo;shunday og&rsquo;ir va ulkan nishonni siljitish oson emas&raquo; &ndash; qiyinchilik aynan og&rsquo;irlikda."
+ },
+ "21": {
+  "explanation": "<b>B.</b> Mazanek is quoted after the remark that &ldquo;such a small object might not have the same emotional impact as a larger target&rdquo;: &ldquo;NASA isn&rsquo;t going to want to go to something that is smaller than our spaceships.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> B &mdash; Mazanek: &laquo;NASA kemalarimizdan kichikroq narsaga borishni xohlamaydi&raquo; &ndash; kichik asteroid qiziqish uyg&rsquo;otmaydi.</div>",
+  "highlights": [
+   "such a small object might not have the same emotional impact as a larger target"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>B.</b> Mazanek is quoted after the remark that &ldquo;such a small object might not have the same emotional impact as a larger target&rdquo;: &ldquo;NASA isn&rsquo;t going to want to go to something that is smaller than our spaceships.&rdquo;",
+  "uz": "B &mdash; Mazanek: &laquo;NASA kemalarimizdan kichikroq narsaga borishni xohlamaydi&raquo; &ndash; kichik asteroid qiziqish uyg&rsquo;otmaydi."
+ },
+ "22": {
+  "explanation": "<b>G.</b> Nuth says that although the science would be exciting, &ldquo;investigations of asteroids can be done much more cheaply with an unmanned spacecraft&rdquo; &ndash; capture is not an efficient way to do research.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> G &mdash; Nut: asteroidlarni o&rsquo;rganish &laquo;uchuvchisiz kema bilan ancha arzonroq amalga oshirilishi mumkin&raquo; &ndash; ushlab kelish tadqiqot uchun samarali usul emas.</div>",
+  "highlights": [
+   "Investigations of asteroids can be done much more cheaply with an unmanned spacecraft"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>G.</b> Nuth says that although the science would be exciting, &ldquo;investigations of asteroids can be done much more cheaply with an unmanned spacecraft&rdquo; &ndash; capture is not an efficient way to do research.",
+  "uz": "G &mdash; Nut: asteroidlarni o&rsquo;rganish &laquo;uchuvchisiz kema bilan ancha arzonroq amalga oshirilishi mumkin&raquo; &ndash; ushlab kelish tadqiqot uchun samarali usul emas."
+ },
+ "23": {
+  "explanation": "<b>base.</b> &ldquo;An asteroid would provide a stationary <i>base</i> from which to launch missions farther into space.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> base &mdash; &laquo;Asteroid kosmosga uzoqroq missiyalarni uchirish uchun qo&rsquo;zg&rsquo;almas baza bo&rsquo;lib xizmat qiladi.&raquo;</div>",
+  "highlights": [
+   "An asteroid would provide a stationary base from which to launch missions farther into space"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>base.</b> &ldquo;An asteroid would provide a stationary <i>base</i> from which to launch missions farther into space.&rdquo;",
+  "uz": "base &mdash; &laquo;Asteroid kosmosga uzoqroq missiyalarni uchirish uchun qo&rsquo;zg&rsquo;almas baza bo&rsquo;lib xizmat qiladi.&raquo;"
+ },
+ "24": {
+  "explanation": "<b>gravity.</b> Launching from Earth needs great power &ldquo;because of our planet&rsquo;s strong force of <i>gravity</i>. Since this would be far weaker on an asteroid, materials mined there could be more easily taken off&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> gravity &mdash; Yerdan uchirish katta quvvat talab qiladi, chunki tortishish kuchi kuchli; asteroidda esa u ancha zaif, shuning uchun materiallarni olib chiqish osonroq.</div>",
+  "highlights": [
+   "Since this would be far weaker on an asteroid"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>gravity.</b> Launching from Earth needs great power &ldquo;because of our planet&rsquo;s strong force of <i>gravity</i>. Since this would be far weaker on an asteroid, materials mined there could be more easily taken off&rdquo;.",
+  "uz": "gravity &mdash; Yerdan uchirish katta quvvat talab qiladi, chunki tortishish kuchi kuchli; asteroidda esa u ancha zaif, shuning uchun materiallarni olib chiqish osonroq."
+ },
+ "25": {
+  "explanation": "<b>metals.</b> &ldquo;Some are full of <i>metals</i>, which can be mined and used to build space-based habitats, or brought back to Earth.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> metals &mdash; &laquo;Ba&rsquo;zilari metallarga to&rsquo;la &ndash; ularni qazib olib, kosmik turar joylar qurishda yoki Yerga qaytarishda ishlatish mumkin.&raquo;</div>",
+  "highlights": [
+   "Some are full of metals, which can be mined and used to build space-based habitats"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>metals.</b> &ldquo;Some are full of <i>metals</i>, which can be mined and used to build space-based habitats, or brought back to Earth.&rdquo;",
+  "uz": "metals &mdash; &laquo;Ba&rsquo;zilari metallarga to&rsquo;la &ndash; ularni qazib olib, kosmik turar joylar qurishda yoki Yerga qaytarishda ishlatish mumkin.&raquo;"
+ },
+ "26": {
+  "explanation": "<b>water.</b> &ldquo;Others are up to one-quarter <i>water</i>, which would either be used for life-support or broken down into hydrogen and oxygen to make fuel.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> water &mdash; &laquo;Boshqalari to&rsquo;rtdan bir qismigacha suvdan iborat &ndash; u hayotni ta&rsquo;minlash uchun yoki yoqilg&rsquo;i olish uchun ishlatiladi.&raquo;</div>",
+  "highlights": [
+   "Others are up to one-quarter water"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>water.</b> &ldquo;Others are up to one-quarter <i>water</i>, which would either be used for life-support or broken down into hydrogen and oxygen to make fuel.&rdquo;",
+  "uz": "water &mdash; &laquo;Boshqalari to&rsquo;rtdan bir qismigacha suvdan iborat &ndash; u hayotni ta&rsquo;minlash uchun yoki yoqilg&rsquo;i olish uchun ishlatiladi.&raquo;"
+ },
+ "27": {
+  "explanation": "<b>F.</b> Paragraph F reports that a product controller faces &ldquo;one million to one billion new numbers each week&rdquo; and quotes Naisbitt: &ldquo;Running out of information is not a problem, but drowning in it is.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> F &mdash; F xatboshida mahsulot nazoratchisi har hafta millionlab yangi raqamga duch kelishi va Naysbitning &laquo;Ma&rsquo;lumot yetishmasligi emas, unda cho&rsquo;kib ketish muammo&raquo; degan gapi keltiriladi.</div>",
+  "highlights": [
+   "Running out of information is not a problem, but drowning in it is"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>F.</b> Paragraph F reports that a product controller faces &ldquo;one million to one billion new numbers each week&rdquo; and quotes Naisbitt: &ldquo;Running out of information is not a problem, but drowning in it is.&rdquo;",
+  "uz": "F &mdash; F xatboshida mahsulot nazoratchisi har hafta millionlab yangi raqamga duch kelishi va Naysbitning &laquo;Ma&rsquo;lumot yetishmasligi emas, unda cho&rsquo;kib ketish muammo&raquo; degan gapi keltiriladi."
+ },
+ "28": {
+  "explanation": "<b>A.</b> Paragraph A says customers must gain value &ldquo;over a long time frame, rather than from a single transaction&rdquo; and &ldquo;must see value in returning continually to the stores where they shop&rdquo; &ndash; repeat business.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> A &mdash; A xatboshi: mijoz qiymatni bitta xariddan emas, uzoq muddat davomida ko&rsquo;rishi va do&rsquo;konga qayta-qayta qaytishi kerak &ndash; ya&rsquo;ni takroriy savdo.</div>",
+  "highlights": [
+   "customers must see value in returning continually to the stores where they shop"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>A.</b> Paragraph A says customers must gain value &ldquo;over a long time frame, rather than from a single transaction&rdquo; and &ldquo;must see value in returning continually to the stores where they shop&rdquo; &ndash; repeat business.",
+  "uz": "A &mdash; A xatboshi: mijoz qiymatni bitta xariddan emas, uzoq muddat davomida ko&rsquo;rishi va do&rsquo;konga qayta-qayta qaytishi kerak &ndash; ya&rsquo;ni takroriy savdo."
+ },
+ "29": {
+  "explanation": "<b>B.</b> Paragraph B gives the Channel [V] example: it &ldquo;encourages its viewers to sign up for text messages and email alerts that tell them when their favourite artists and songs are about to be broadcast&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> B &mdash; B xatboshida Channel [V] misoli: tomoshabinlar sevimli qo&rsquo;shiqchilari efirga chiqishidan oldin SMS va email xabar olish uchun ro&rsquo;yxatdan o&rsquo;tadi &ndash; shaxsiylashtirilgan marketing.</div>",
+  "highlights": [
+   "encourages its viewers to sign up for text messages and email alerts"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>B.</b> Paragraph B gives the Channel [V] example: it &ldquo;encourages its viewers to sign up for text messages and email alerts that tell them when their favourite artists and songs are about to be broadcast&rdquo;.",
+  "uz": "B &mdash; B xatboshida Channel [V] misoli: tomoshabinlar sevimli qo&rsquo;shiqchilari efirga chiqishidan oldin SMS va email xabar olish uchun ro&rsquo;yxatdan o&rsquo;tadi &ndash; shaxsiylashtirilgan marketing."
+ },
+ "30": {
+  "explanation": "<b>H.</b> Paragraph H gives the figures: if a launch will yield $500,000 without further information, &ldquo;it would be foolish to spend $30,000 for additional information that would increase the profit to only $525,000&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> H &mdash; H xatboshida raqamlar bilan misol: 500 000 dollar foyda kutilayotganda, foydani 525 000 gacha oshiradigan ma&rsquo;lumot uchun 30 000 dollar sarflash ahmoqlik bo&rsquo;lardi.</div>",
+  "highlights": [
+   "it would be foolish to spend $30,000 for additional information"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>H.</b> Paragraph H gives the figures: if a launch will yield $500,000 without further information, &ldquo;it would be foolish to spend $30,000 for additional information that would increase the profit to only $525,000&rdquo;.",
+  "uz": "H &mdash; H xatboshida raqamlar bilan misol: 500 000 dollar foyda kutilayotganda, foydani 525 000 gacha oshiradigan ma&rsquo;lumot uchun 30 000 dollar sarflash ahmoqlik bo&rsquo;lardi."
+ },
+ "31": {
+  "explanation": "<b>D.</b> Paragraph D: &ldquo;As household incomes increase, choice widens and buyers become better discriminating, so sellers need information about how buyers respond&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> D &mdash; D xatboshi: &laquo;Oila daromadlari o&rsquo;sgani sayin tanlov kengayadi va xaridorlar talabchanroq bo&rsquo;ladi&raquo;.</div>",
+  "highlights": [
+   "As household incomes increase, choice widens and buyers become better discriminating"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>D.</b> Paragraph D: &ldquo;As household incomes increase, choice widens and buyers become better discriminating, so sellers need information about how buyers respond&rdquo;.",
+  "uz": "D &mdash; D xatboshi: &laquo;Oila daromadlari o&rsquo;sgani sayin tanlov kengayadi va xaridorlar talabchanroq bo&rsquo;ladi&raquo;."
+ },
+ "32": {
+  "explanation": "<b>NO.</b> Some information comes from government bodies, but the passage says &ldquo;most of it is purposefully gathered by marketing organisations for client companies&rdquo; &ndash; the opposite of the statement.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NO &mdash; Ba&rsquo;zi ma&rsquo;lumot davlat organlaridan olinadi, lekin matnda &laquo;aksariyati marketing tashkilotlari tomonidan mijoz kompaniyalar uchun to&rsquo;planadi&raquo; deyilgan.</div>",
+  "highlights": [
+   "most of it is purposefully gathered by marketing organisations for client companies"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>NO.</b> Some information comes from government bodies, but the passage says &ldquo;most of it is purposefully gathered by marketing organisations for client companies&rdquo; &ndash; the opposite of the statement.",
+  "uz": "NO &mdash; Ba&rsquo;zi ma&rsquo;lumot davlat organlaridan olinadi, lekin matnda &laquo;aksariyati marketing tashkilotlari tomonidan mijoz kompaniyalar uchun to&rsquo;planadi&raquo; deyilgan."
+ },
+ "33": {
+  "explanation": "<b>NOT GIVEN.</b> Australia, New Zealand and Singapore are named together as developed countries making the same move. The writer never compares the speed of the change in one country with another.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; Avstraliya, Yangi Zelandiya va Singapur birga tilga olinadi; bu o&rsquo;zgarish qaysi mamlakatda tezroq kechgani haqida taqqoslash yo&rsquo;q.</div>",
+  "highlights": [
+   "developed countries such as Australia, New Zealand and Singapore"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>NOT GIVEN.</b> Australia, New Zealand and Singapore are named together as developed countries making the same move. The writer never compares the speed of the change in one country with another.",
+  "uz": "NOT GIVEN &mdash; Avstraliya, Yangi Zelandiya va Singapur birga tilga olinadi; bu o&rsquo;zgarish qaysi mamlakatda tezroq kechgani haqida taqqoslash yo&rsquo;q."
+ },
+ "34": {
+  "explanation": "<b>YES.</b> &ldquo;Subordinates may withhold information they believe will reflect badly on their performance.&rdquo; <i>Subordinates</i> = employees; <i>withhold</i> = hide.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; &laquo;Qo&rsquo;l ostidagi xodimlar o&rsquo;z ishlariga soya soladigan ma&rsquo;lumotni yashirishi mumkin.&raquo; <i>withhold</i> = yashirmoq.</div>",
+  "highlights": [
+   "subordinates may withhold information they believe will reflect badly on their performance"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>YES.</b> &ldquo;Subordinates may withhold information they believe will reflect badly on their performance.&rdquo; <i>Subordinates</i> = employees; <i>withhold</i> = hide.",
+  "uz": "YES &mdash; &laquo;Qo&rsquo;l ostidagi xodimlar o&rsquo;z ishlariga soya soladigan ma&rsquo;lumotni yashirishi mumkin.&raquo; <i>withhold</i> = yashirmoq."
+ },
+ "35": {
+  "explanation": "<b>YES.</b> &ldquo;Although marketing organisations have greater capacity to provide managers with information, they often do not use it well.&rdquo; Marketers also complain they have plenty of the wrong kind of information.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; &laquo;Marketing tashkilotlari menejerlarni ma&rsquo;lumot bilan ta&rsquo;minlash imkoniga ega bo&rsquo;lsa-da, ko&rsquo;pincha undan yaxshi foydalanmaydi.&raquo;</div>",
+  "highlights": [
+   "they often do not use it well"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>YES.</b> &ldquo;Although marketing organisations have greater capacity to provide managers with information, they often do not use it well.&rdquo; Marketers also complain they have plenty of the wrong kind of information.",
+  "uz": "YES &mdash; &laquo;Marketing tashkilotlari menejerlarni ma&rsquo;lumot bilan ta&rsquo;minlash imkoniga ega bo&rsquo;lsa-da, ko&rsquo;pincha undan yaxshi foydalanmaydi.&raquo;"
+ },
+ "36": {
+  "explanation": "<b>YES.</b> The passage ends: &ldquo;By itself information is valueless &ndash; its value comes from its use.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; Matn shunday tugaydi: &laquo;O&rsquo;z-o&rsquo;zidan ma&rsquo;lumotning qiymati yo&rsquo;q &ndash; qiymat undan foydalanishdan keladi.&raquo;</div>",
+  "highlights": [
+   "By itself information is valueless"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>YES.</b> The passage ends: &ldquo;By itself information is valueless &ndash; its value comes from its use.&rdquo;",
+  "uz": "YES &mdash; Matn shunday tugaydi: &laquo;O&rsquo;z-o&rsquo;zidan ma&rsquo;lumotning qiymati yo&rsquo;q &ndash; qiymat undan foydalanishdan keladi.&raquo;"
+ },
+ "37": {
+  "explanation": "<b>marketing managers.</b> &ldquo;The MIS begins and ends with <i>marketing managers</i>.&rdquo; <i>Begins and ends</i> = <i>starts and finishes</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> marketing managers &mdash; &laquo;MIS marketing menejerlaridan boshlanadi va ular bilan tugaydi.&raquo;</div>",
+  "highlights": [
+   "The MIS begins and ends with marketing managers"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>marketing managers.</b> &ldquo;The MIS begins and ends with <i>marketing managers</i>.&rdquo; <i>Begins and ends</i> = <i>starts and finishes</i>.",
+  "uz": "marketing managers &mdash; &laquo;MIS marketing menejerlaridan boshlanadi va ular bilan tugaydi.&raquo;"
+ },
+ "38": {
+  "explanation": "<b>information needs.</b> &ldquo;First, it interacts with these managers to assess the <i>information needs</i> they have.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> information needs &mdash; &laquo;Avvalo u menejerlar bilan muloqot qilib, ularning axborotga bo&rsquo;lgan ehtiyojini baholaydi.&raquo;</div>",
+  "highlights": [
+   "it interacts with these managers to assess the information needs they have"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>information needs.</b> &ldquo;First, it interacts with these managers to assess the <i>information needs</i> they have.&rdquo;",
+  "uz": "information needs &mdash; &laquo;Avvalo u menejerlar bilan muloqot qilib, ularning axborotga bo&rsquo;lgan ehtiyojini baholaydi.&raquo;"
+ },
+ "39": {
+  "explanation": "<b>internal records.</b> &ldquo;Next, it develops the needed information from <i>internal records</i>, marketing intelligence activities and the research process.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> internal records &mdash; &laquo;So&rsquo;ng u kerakli ma&rsquo;lumotni ichki yozuvlar, marketing razvedkasi va tadqiqot jarayonidan shakllantiradi.&raquo;</div>",
+  "highlights": [
+   "it develops the needed information from internal records"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>internal records.</b> &ldquo;Next, it develops the needed information from <i>internal records</i>, marketing intelligence activities and the research process.&rdquo;",
+  "uz": "internal records &mdash; &laquo;So&rsquo;ng u kerakli ma&rsquo;lumotni ichki yozuvlar, marketing razvedkasi va tadqiqot jarayonidan shakllantiradi.&raquo;"
+ },
+ "40": {
+  "explanation": "<b>analysis unit.</b> &ldquo;The <i>analysis unit</i> processes the data to make it more useful and, finally, the MIS distributes it to managers &hellip; at the right time.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> analysis unit &mdash; &laquo;Tahlil bo&rsquo;limi ma&rsquo;lumotni foydaliroq qilish uchun qayta ishlaydi&raquo;, keyin MIS uni menejerlarga tarqatadi.</div>",
+  "highlights": [
+   "The analysis unit processes the data to make it more useful"
+  ],
+  "paraphraseMap": [],
+  "en": "<b>analysis unit.</b> &ldquo;The <i>analysis unit</i> processes the data to make it more useful and, finally, the MIS distributes it to managers &hellip; at the right time.&rdquo;",
+  "uz": "analysis unit &mdash; &laquo;Tahlil bo&rsquo;limi ma&rsquo;lumotni foydaliroq qilish uchun qayta ishlaydi&raquo;, keyin MIS uni menejerlarga tarqatadi."
+ }
+};
+
+return { STORAGE_KEY: STORAGE_KEY, SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCABULARY_DATA: VOCABULARY_DATA,
+         READING_EXPLANATIONS: READING_EXPLANATIONS };
+})();
+</script>
+<script src="reading.js"></script>
+
+<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+     Listening and Reading tests. Inlined, so it works from a memory stick
+     with the network off. See the header comment inside for what it does and
+     why it is not jsPDF + html2canvas. ══ -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     MONOCHROME SKIN — grey / black / white only.
+     Appended last on purpose: it re-tokenises the login card, the completion
+     screen and the certificate without touching #stage-reading, which is the
+     Arial exam screen and already neutral. Nothing here introduces a hue.
+     ════════════════════════════════════════════════════════════════════════ -->
+
+
+</body>
+</html>

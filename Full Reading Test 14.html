@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+
+<html data-test-no="14" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IELTS Academic Reading — Full Reading Test 14</title>
+
+<link href="reading-common.css" rel="stylesheet"/></head>
+<body>
+<!-- ============================================================
+     STAGE 1: REGISTRATION
+     ============================================================ -->
+<!-- COSMOS: the restart sheet is removed. A reload restarts the paper
+     silently — restartSheet() falls through to startFresh() with no
+     #resume-sheet in the document. -->
+<!-- The boot class is set here, before the registration markup is parsed, so
+     the card is never painted for a frame ahead of the prelude. If scripting
+     is off the class is never added and the card simply renders. -->
+<!-- The login / registration card and the instructions screen have been removed: the paper opens straight on Passage 1. -->
+<!-- ============================================================
+     STAGE 2: READING INSTRUCTIONS
+     ============================================================ -->
+<!-- ============================================================
+     STAGE 3: READING TEST  (real-exam chrome)
+     ============================================================ -->
+<!-- The CDI mark used to live on the registration card. That card is gone, so the
+     one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
+     and paints the completion screen and the certificate from it. -->
+<img alt="READING CDI" class="brand-logo" hidden="" src="data:image/png;base64,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" style="display:none"/>
+<!-- ============================================================
+     STAGE 1: LOGIN / REGISTRATION
+     ============================================================ -->
+<div class="stage active" id="stage-registration">
+<div class="rcx-card">
+<span class="rcx-wordmark">READING_CDI</span>
+<h1>Full Reading Test 14</h1>
+<p class="rcx-lead">Academic Reading · Passages 1–3 · Questions 1–40 · 60 minutes</p>
+<div class="rcx-field" id="start-field">
+<label for="start-name">Candidate full name</label>
+<input autocomplete="off" id="start-name" onkeydown="if(event.key==='Enter'){event.preventDefault();ExamApp.validateStart();}" placeholder="Type your full name" spellcheck="false"/>
+<div class="rcx-err" id="start-hint-text"></div>
+</div>
+<div class="rcx-note"><b>How this test runs.</b> You have <b>60 minutes</b> for Questions 1–40.
+      Select text in the passage to highlight it or add a note. The tick at the bottom right submits the
+      test and shows your answers with a full explanation for every question.</div>
+<button class="rcx-btn" onclick="ExamApp.validateStart()" type="button">Start →</button>
+</div>
+</div>
+<div class="stage" id="stage-reading">
+<div id="hdr">
+<div id="hdr-left">
+<!-- the real ielts-logo.svg asset the player loads (viewBox 0 0 777.8 228.6),
+           rendered 92.5 x 27.19 at x=16 y=14.39 inside a 14.4px/16px padded box -->
+<div class="ex-logo"><svg aria-label="IELTS" focusable="false" role="img" viewbox="0 0 777.8 228.6"><g fill="#E31837" transform="translate(107.14286,-229.37293)"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"></path><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"></path><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"></path><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"></path><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"></path><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"></path><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"></path></g></svg></div>
+<div class="ex-status">
+<div class="ex-name">Test taker ID</div>
+<div class="ex-name ttid-name" id="ttid-name"> </div>
+</div>
+<!-- styled exactly like .header__name: 600 16px Arial, #000, no eye button -->
+<div class="timer" id="timer-reading" title="Time remaining">
+<span class="timer-text" id="timer-text">60 minutes left</span>
+</div>
+</div>
+<!-- Icon order and metrics match the real player exactly: wifi (a div, not a
+         button) 27.4 wide, bell-o 24, bars 20.58, pencil-square-o 24; every icon
+         has margin 0 16px inside a 56px-tall flex button, colour #333, and the
+         notes icon's right edge lands at x=1408. -->
+<div id="hdr-right">
+<button aria-label="Toggle full screen" class="ex-icbtn" id="fs-btn" onclick="ExamApp.toggleFullscreen()" title="Full screen" type="button"><svg aria-hidden="true" class="fs-glyph" fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="22"><path class="fs-in" d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"></path><path class="fs-out" d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" style="display:none"></path></svg></button>
+<div class="ex-icbtn" id="wifi-btn" title="Connected"><svg aria-hidden="true" fill="currentColor" focusable="false" height="25" viewbox="0 0 2048 1792" width="27.4"><path d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121 q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75z M1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z" transform="translate(0,1536) scale(1,-1)"></path></svg></div>
+<button aria-label="Messages" class="ex-icbtn" id="bell-btn" onclick="exOpenSheet('messages')" title="Messages" type="button"><svg aria-hidden="true" fill="currentColor" focusable="false" height="25" viewbox="0 0 1792 1792" width="24"><path d="M912 -160q0 16 -16 16q-59 0 -101.5 42.5t-42.5 101.5q0 16 -16 16t-16 -16q0 -73 51.5 -124.5t124.5 -51.5q16 0 16 16zM246 128h1300q-266 300 -266 832q0 51 -24 105t-69 103t-121.5 80.5t-169.5 31.5t-169.5 -31.5t-121.5 -80.5t-69 -103t-24 -105q0 -532 -266 -832z M1728 128q0 -52 -38 -90t-90 -38h-448q0 -106 -75 -181t-181 -75t-181 75t-75 181h-448q-52 0 -90 38t-38 90q50 42 91 88t85 119.5t74.5 158.5t50 206t19.5 260q0 152 117 282.5t307 158.5q-8 19 -8 39q0 40 28 68t68 28t68 -28t28 -68q0 -20 -8 -39q190 -28 307 -158.5 t117 -282.5q0 -139 19.5 -260t50 -206t74.5 -158.5t85 -119.5t91 -88z" transform="translate(0,1536) scale(1,-1)"></path></svg></button>
+<button aria-label="Options" class="ex-icbtn" id="menu-btn" onclick="toggleMenu()" title="Options" type="button"><svg aria-hidden="true" fill="currentColor" focusable="false" height="25" viewbox="0 0 1536 1792" width="20.58"><path d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45 t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z" transform="translate(0,1536) scale(1,-1)"></path></svg></button>
+<button aria-label="Show notes" class="ex-icbtn" id="notes-btn" onclick="ExamApp.toggleNotesDrawer()" title="Notes" type="button"><svg aria-hidden="true" fill="currentColor" focusable="false" height="25" viewbox="0 0 1792 1792" width="24"><path d="M888 352l116 116l-152 152l-116 -116v-56h96v-96h56zM1328 1072q-16 16 -33 -1l-350 -350q-17 -17 -1 -33t33 1l350 350q17 17 1 33zM1408 478v-190q0 -119 -84.5 -203.5t-203.5 -84.5h-832q-119 0 -203.5 84.5t-84.5 203.5v832q0 119 84.5 203.5t203.5 84.5h832 q63 0 117 -25q15 -7 18 -23q3 -17 -9 -29l-49 -49q-14 -14 -32 -8q-23 6 -45 6h-832q-66 0 -113 -47t-47 -113v-832q0 -66 47 -113t113 -47h832q66 0 113 47t47 113v126q0 13 9 22l64 64q15 15 35 7t20 -29zM1312 1216l288 -288l-672 -672h-288v288zM1756 1084l-92 -92 l-288 288l92 92q28 28 68 28t68 -28l152 -152q28 -28 28 -68t-28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg><span class="nd-count" hidden="" id="notes-count">0</span></button>
+</div>
+</div>
+<div id="pbar">
+<div id="pbar-inner">
+<span id="pbar-title">Part 1</span>
+<span id="pbar-desc">Read the text and answer questions 1–13.</span>
+</div>
+</div>
+<div class="exam-main" id="main">
+<section class="split-pane" id="passage-pane"></section>
+<div class="split-divider" id="resizer"><div class="resizeBar" id="resize-bar"><button aria-label="Resize the panes" id="div-btn" title="Resize the panes" type="button"><svg aria-hidden="true" fill="currentColor" focusable="false" viewbox="0 0 1792 1792"><path d="M1792 896q0 26 -19 45l-256 256q-19 19 -45 19t-45 -19t-19 -45v-128h-1024v128q0 26 -19 45t-45 19t-45 -19l-256 -256q-19 -19 -19 -45t19 -45l256 -256q19 -19 45 -19t45 19t19 45v128h1024v-128q0 -26 19 -45t45 -19t45 19l256 256q19 19 19 45z" transform="translate(0,1536) scale(1,-1)"></path></svg></button></div></div>
+<section class="split-pane" id="questions-pane"></section>
+</div>
+<div id="bnav">
+<div id="reading-nav"></div>
+</div>
+<div id="qnav-arrows">
+<button aria-label="Previous part" class="qnav-btn prev" onclick="ExamApp.prevPart()" title="Previous part"><svg aria-hidden="true" fill="currentColor" focusable="false" viewbox="0 0 1792 1792"><path d="M1600 960v-128q0 -53 -32.5 -90.5t-84.5 -37.5h-704l293 -294q38 -36 38 -90t-38 -90l-75 -76q-37 -37 -90 -37q-52 0 -91 37l-651 652q-37 37 -37 90q0 52 37 91l651 650q38 38 91 38q52 0 90 -38l75 -74q38 -38 38 -91t-38 -91l-293 -293h704q52 0 84.5 -37.5t32.5 -90.5z" transform="translate(0,1536) scale(1,-1)"></path></svg></button>
+<button aria-label="Next part" class="qnav-btn next" onclick="ExamApp.nextPart()" title="Next part"><svg aria-hidden="true" fill="currentColor" focusable="false" viewbox="0 0 1792 1792"><path d="M1600 896q0 -53 -37 -90l-651 -652q-39 -37 -91 -37q-51 0 -90 37l-75 75q-38 38 -38 91t38 91l293 293h-704q-52 0 -84.5 37.5t-32.5 90.5v128q0 53 32.5 90.5t84.5 37.5h704l-293 294q-38 36 -38 90t38 90l75 75q38 38 90 38q53 0 91 -38l651 -651q37 -35 37 -90z" transform="translate(0,1536) scale(1,-1)"></path></svg></button>
+</div>
+<!-- The official player replaces the small dropdown with a full-screen white
+       Options page: three 698 x 75.8 rows in a 700px column at x=370, the first
+       one #e31837, and Contrast / Text size opening as sub-pages. -->
+<div aria-label="Options" aria-modal="true" class="ex-sheet ex-options" id="ex-options" role="dialog">
+<div class="ex-sheet-top">
+<button class="ex-sheet-back" onclick="exOptionsPage('root')" type="button"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="27.2" viewbox="0 0 1280 1792" width="19.43"><path d="M1171 1235l-531 -531l531 -531q19 -19 19 -45t-19 -45l-166 -166q-19 -19 -45 -19t-45 19l-742 742q-19 19 -19 45t19 45l742 742q19 19 45 19t45 -19l166 -166q19 -19 19 -45t-19 -45z" transform="translate(0,1536) scale(1,-1)"></path></svg><span>Options</span></button>
+<h1 class="ex-sheet-title">Options</h1>
+<button aria-label="Close" class="ex-sheet-close" onclick="exCloseSheet()" type="button"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="27" viewbox="0 0 1408 1792" width="21.21"><path d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></button>
+</div>
+<div class="ex-sheet-body">
+<div class="ex-opt-page is-on" data-page="root">
+<div class="ex-opt-group is-red">
+<button class="ex-opt-item is-red" onclick="exGoSubmission()" type="button"><span class="ex-opt-ic"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="20.9" viewbox="0 0 1792 1792" width="20.9"><path d="M1764 1525q33 -24 27 -64l-256 -1536q-5 -29 -32 -45q-14 -8 -31 -8q-11 0 -24 5l-527 215l-298 -327q-18 -21 -47 -21q-14 0 -23 4q-19 7 -30 23.5t-11 36.5v452l-472 193q-37 14 -40 55q-3 39 32 59l1664 960q35 21 68 -2zM1422 26l221 1323l-1434 -827l336 -137 l863 639l-478 -797z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Go to submission page</span><span class="ex-opt-chev"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="17.7" viewbox="0 0 1280 1792" width="12.65"><path d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z" transform="translate(0,1536) scale(1,-1)"></path></svg></span></button>
+</div>
+<div class="ex-opt-group">
+<button class="ex-opt-item" onclick="exOptionsPage('contrast')" type="button"><span class="ex-opt-ic is-grey"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21" style="margin-left:2px" viewbox="0 0 1536 1792" width="18"><path d="M768 96v1088q-148 0 -273 -73t-198 -198t-73 -273t73 -273t198 -198t273 -73zM1536 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Contrast</span><span class="ex-opt-chev"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="17.7" viewbox="0 0 1280 1792" width="12.65"><path d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z" transform="translate(0,1536) scale(1,-1)"></path></svg></span></button>
+<button class="ex-opt-item" onclick="exOptionsPage('text')" type="button"><span class="ex-opt-ic is-grey"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.2" viewbox="0 0 1664 1792" width="19.7"><path d="M1024 736v-64q0 -13 -9.5 -22.5t-22.5 -9.5h-224v-224q0 -13 -9.5 -22.5t-22.5 -9.5h-64q-13 0 -22.5 9.5t-9.5 22.5v224h-224q-13 0 -22.5 9.5t-9.5 22.5v64q0 13 9.5 22.5t22.5 9.5h224v224q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5 -9.5t9.5 -22.5v-224h224 q13 0 22.5 -9.5t9.5 -22.5zM1152 704q0 185 -131.5 316.5t-316.5 131.5t-316.5 -131.5t-131.5 -316.5t131.5 -316.5t316.5 -131.5t316.5 131.5t131.5 316.5zM1664 -128q0 -53 -37.5 -90.5t-90.5 -37.5q-54 0 -90 38l-343 342q-179 -124 -399 -124q-143 0 -273.5 55.5 t-225 150t-150 225t-55.5 273.5t55.5 273.5t150 225t225 150t273.5 55.5t273.5 -55.5t225 -150t150 -225t55.5 -273.5q0 -220 -124 -399l343 -343q37 -37 37 -90z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Text size</span><span class="ex-opt-chev"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="17.7" viewbox="0 0 1280 1792" width="12.65"><path d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z" transform="translate(0,1536) scale(1,-1)"></path></svg></span></button>
+</div>
+</div>
+<div class="ex-opt-page" data-page="contrast">
+<div class="ex-opt-group">
+<button class="ex-opt-item ex-contrast-opt is-on" data-val="bw" onclick="setContrast('bw')" type="button"><span class="ex-opt-ic is-tick"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.5" viewbox="0 0 1792 1792" width="21.5"><path d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Black on white</span><span class="ex-opt-sw"><svg aria-hidden="true" focusable="false" height="37.5" preserveaspectratio="none" viewbox="0 0 56 40" width="56"><rect fill="#ffffff" height="39" stroke="#c9c9c9" width="55" x="0.5" y="0.5"></rect><rect fill="#111111" height="2.5" width="26" x="6" y="9"></rect><rect fill="#111111" height="2.5" width="44" x="6" y="16"></rect><rect fill="#111111" height="2.5" width="44" x="6" y="22"></rect><rect fill="#111111" height="2.5" width="44" x="6" y="28"></rect></svg></span></button>
+<button class="ex-opt-item ex-contrast-opt" data-val="wb" onclick="setContrast('wb')" type="button"><span class="ex-opt-ic is-tick"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.5" viewbox="0 0 1792 1792" width="21.5"><path d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">White on black</span><span class="ex-opt-sw"><svg aria-hidden="true" focusable="false" height="37.5" preserveaspectratio="none" viewbox="0 0 56 40" width="56"><rect fill="#000000" height="39" stroke="#000000" width="55" x="0.5" y="0.5"></rect><rect fill="#ffffff" height="2.5" width="26" x="6" y="9"></rect><rect fill="#ffffff" height="2.5" width="44" x="6" y="16"></rect><rect fill="#ffffff" height="2.5" width="44" x="6" y="22"></rect><rect fill="#ffffff" height="2.5" width="44" x="6" y="28"></rect></svg></span></button>
+<button class="ex-opt-item ex-contrast-opt" data-val="yb" onclick="setContrast('yb')" type="button"><span class="ex-opt-ic is-tick"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.5" viewbox="0 0 1792 1792" width="21.5"><path d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Yellow on black</span><span class="ex-opt-sw"><svg aria-hidden="true" focusable="false" height="37.5" preserveaspectratio="none" viewbox="0 0 56 40" width="56"><rect fill="#000000" height="39" stroke="#000000" width="55" x="0.5" y="0.5"></rect><rect fill="#ffe200" height="2.5" width="26" x="6" y="9"></rect><rect fill="#ffe200" height="2.5" width="44" x="6" y="16"></rect><rect fill="#ffe200" height="2.5" width="44" x="6" y="22"></rect><rect fill="#ffe200" height="2.5" width="44" x="6" y="28"></rect></svg></span></button>
+</div>
+</div>
+<div class="ex-opt-page" data-page="text">
+<div class="ex-opt-group">
+<button class="ex-opt-item ex-text-opt is-on" data-val="regular" onclick="setTextSize('regular')" type="button"><span class="ex-opt-ic is-tick"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.5" viewbox="0 0 1792 1792" width="21.5"><path d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Regular</span></button>
+<button class="ex-opt-item ex-text-opt" data-val="large" onclick="setTextSize('large')" type="button"><span class="ex-opt-ic is-tick"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.5" viewbox="0 0 1792 1792" width="21.5"><path d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Large</span></button>
+<button class="ex-opt-item ex-text-opt" data-val="xlarge" onclick="setTextSize('xlarge')" type="button"><span class="ex-opt-ic is-tick"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="21.5" viewbox="0 0 1792 1792" width="21.5"><path d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></span><span class="ex-opt-label">Extra large</span></button>
+</div>
+</div>
+</div>
+<div class="ex-sheet-empty"></div>
+</div>
+<div aria-label="Messages" aria-modal="true" class="ex-sheet ex-messages" id="ex-messages" role="dialog">
+<div class="ex-sheet-top">
+<h1 class="ex-sheet-title">Messages</h1>
+<button aria-label="Close" class="ex-sheet-close" onclick="exCloseSheet()" type="button"><svg aria-hidden="true" class="ex-ic" fill="currentColor" focusable="false" height="27" viewbox="0 0 1408 1792" width="21.21"><path d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z" transform="translate(0,1536) scale(1,-1)"></path></svg></button>
+</div>
+<div class="ex-sheet-empty"></div>
+</div>
+</div>
+<!-- ============================================================
+     STAGE 4: COMPLETION
+     ============================================================ -->
+<div class="stage" id="stage-completion">
+<div class="complete-card">
+<div class="ch-comp-body">
+<div class="ch-comp-head">
+<div class="ch-seal" id="ch-seal">
+<svg aria-hidden="true" viewbox="0 0 64 64">
+<defs><lineargradient id="chSealGrad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#3f3f46"></stop><stop offset=".55" stop-color="#71717a"></stop><stop offset="1" stop-color="#111111"></stop></lineargradient><lineargradient id="chSealDone" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#111111"></stop><stop offset="1" stop-color="#52525b"></stop></lineargradient></defs>
+<circle class="ch-seal-track" cx="32" cy="32" r="28"></circle>
+<circle class="ch-seal-arc" cx="32" cy="32" id="ch-seal-arc" r="28"></circle>
+</svg>
+<div class="ch-seal-core"><svg aria-hidden="true" fill="none" viewbox="0 0 20 20"><path d="M4.6 10.4l3.5 3.5 7.3-7.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg></div>
+<div class="ch-seal-pct" id="ch-seal-pct">0%</div>
+</div>
+<div>
+<div class="trans-eyebrow">Reading test complete</div>
+<h1 class="complete-title">Your answer sheet is in.</h1>
+<p class="complete-sub" id="ch-status">Sealing your answer sheet…</p>
+</div>
+</div>
+<ol class="ch-steps" id="ch-steps">
+<li><span class="ch-step-dot"></span>Answers locked and time‑stamped</li>
+<li><span class="ch-step-dot"></span>Every response checked against the answer key</li>
+<li><span class="ch-step-dot"></span>Official IELTS Academic Reading band table applied</li>
+</ol>
+<div class="ch-note">
+<p>Sitting a full paper under real conditions is much harder than most people think — and analysing it afterwards is what separates the high scorers. You just did the hard half. Now go and read your mistakes.</p>
+<!-- ===== EDIT PER TEST · AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
+<p class="ch-sign">Built from scratch by <strong>Islom Kenjayev</strong> · IELTS 8.5 (L 9.0 · R 9.0)</p>
+</div>
+<div class="ch-cta-slot">
+<p aria-live="polite" class="ch-wait" id="ch-wait">Marking takes a couple of seconds — nothing you answered can be lost.</p>
+<div class="ch-cta" id="ch-cta">
+<button class="btn btn-primary btn-lg" onclick="ExamApp.unlockResults()">
+<span>See my band score</span>
+<svg aria-hidden="true" class="ch-arrow" fill="none" viewbox="0 0 16 16"><path d="M2.6 8h10.8m0 0L9.6 4.2M13.4 8l-3.8 3.8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<a class="channel-promo" href="https://t.me/reading_cdi" rel="noopener" target="_blank">
+<div class="tg-icon">✈</div>
+<div class="channel-text">
+<div class="channel-name">@READING_CDI</div>
+<div class="channel-desc">New authentic practice tests every week</div>
+</div>
+<div class="channel-cta">Join</div>
+</a>
+</div>
+</div>
+<!-- ============================================================
+     STAGE 5: RESULTS
+     ============================================================ -->
+<div class="stage" id="stage-results">
+<div class="results-modal-box">
+<button aria-label="Close" class="results-modal-close" onclick="ExamApp.closeResultsModal()" type="button">×</button>
+<div class="rcx-hdr">
+<div class="rcx-hdr-left">
+<div class="rcx-mark"><svg aria-label="IELTS" focusable="false" role="img" viewbox="0 0 777.8 228.6"><g fill="#E31837" transform="translate(107.14286,-229.37293)"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"></path><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"></path><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"></path><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"></path><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"></path><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"></path><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"></path></g></svg></div>
+<div class="rcx-ttblock"><div class="rcx-ttid" id="res-taker">Test taker ID</div></div>
+</div>
+<div class="rcx-hdr-right">
+<a class="rcx-tglink" href="https://t.me/reading_cdi" rel="noopener" target="_blank" title="Join @reading_cdi on Telegram"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9.78 18.65l.28-4.23l7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3L3.64 12c-.88-.25-.89-1.37.2-1.64l16.56-6.4c.75-.29 1.4.22 1.2.94l-2.67 12.61c-.22.95-1.13 1.18-1.78.73l-4.5-3.32l-2.23 2.15c-.47.44-1.29.21-1.48-.37z"></path></svg>READING_CDI</a>
+</div>
+</div>
+<div class="results-content" id="results-content"></div>
+</div>
+</div>
+<!-- ============================================================
+     OVERLAYS
+     ============================================================ -->
+<div aria-labelledby="warning-title" aria-modal="true" class="warning-overlay" id="warning-overlay" role="alertdialog">
+<div class="warning-card">
+<div class="wc-body">
+<div class="wc-top">
+<div aria-hidden="true" class="ic">
+<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewbox="0 0 24 24"><path d="M12 3.6 2.6 20h18.8L12 3.6Z"></path><path d="M12 9.6v4.6"></path><path d="M12 17.3h.01"></path></svg>
+</div>
+<div class="wc-heads">
+<div class="wc-eyebrow">Exam integrity</div>
+<h2 id="warning-title">This session is being monitored</h2>
+</div>
+</div>
+<div class="wc-reason">
+<svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
+<p id="warning-body"></p>
+</div>
+<div class="wc-meter">
+<div class="wc-meter-head"><span>Violations recorded</span></div>
+<div aria-label="Violation counter" class="strike-counter" id="strike-counter" role="img">
+<div class="strike"></div><div class="strike"></div><div class="strike"></div>
+</div>
+<p id="warning-strikes-text">Warning <strong>1 of 3</strong> — the test will be terminated on the third violation.</p>
+</div>
+</div>
+<div class="wc-foot">
+<div class="wc-note">Real IELTS test centres apply the same rule. Stay in full-screen until you submit.</div>
+<button class="wc-btn" onclick="ExamApp.dismissWarning()">Return to the test</button>
+</div>
+</div>
+</div>
+<!-- Matches the real player's adder: a small white card with exactly two
+     icon-above-label buttons, Note and Highlight. Erase stays as a third,
+     revealed only when the selection already sits on a highlight. -->
+<div class="hl-popup" id="hl-popup">
+<button class="tool-btn note" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Add a note">
+<svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+<span>Note</span>
+</button>
+<button class="tool-btn hilite" onmousedown="event.preventDefault(); ExamApp.applyHighlight('hl-y')" title="Highlight">
+<svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3"></path><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"></path></svg>
+<span>Highlight</span>
+</button>
+<button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Remove highlight">
+<svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M10 11v6M14 11v6"></path></svg>
+<span>Clear</span>
+</button>
+</div>
+<!-- V3: note composer (V2 called getElementById('note-modal') but never shipped one) -->
+<div class="note-modal" id="note-modal">
+<div class="nm-head">
+<span class="nm-title">Note</span>
+<button class="nm-x" onclick="ExamApp.closeNote()" title="Close">×</button>
+</div>
+<textarea class="nm-text" id="note-textarea" onkeydown="if(event.key==='Escape'){ExamApp.closeNote();}
+                       if(event.key==='Enter'&amp;&amp;(event.metaKey||event.ctrlKey)){ExamApp.saveNote();}" placeholder="Write your note…" rows="4"></textarea>
+<div class="nm-foot">
+<span class="nm-hint">⌘/Ctrl + Enter to save</span>
+<div class="nm-actions">
+<button class="nm-btn ghost" onclick="ExamApp.deleteNote()">Delete</button>
+<button class="nm-btn solid" onclick="ExamApp.saveNote()">Save</button>
+</div>
+</div>
+</div>
+<!-- V3: notes drawer — mirrors the real player's right-hand Notes panel -->
+<aside aria-hidden="true" aria-label="Notes" class="notes-drawer" id="notes-drawer">
+<div class="nd-head">
+<span class="nd-title">Notes</span>
+<button aria-label="Close notes" class="nd-x" onclick="ExamApp.toggleNotesDrawer(false)">×</button>
+</div>
+<div class="nd-body" id="notes-drawer-body"></div>
+</aside>
+<!-- V3: pacing marker -->
+<div class="pace-note" id="pace-note">
+<div class="pn-bar"></div>
+<div class="pn-body"><strong id="pace-title"></strong><span id="pace-sub"></span></div>
+<button class="pn-x" onclick="document.getElementById('pace-note').classList.remove('show')">×</button>
+</div>
+<div class="toast" id="toast"></div>
+<div id="vocab-print"></div>
+<!-- The printable report. Off-screen and empty until buildPrintReport() fills
+     it (on the Download Report button, and on any browser-initiated print):
+     page 1 is the Test Report Form, page 2 the Schedule of Answers. -->
+<div id="print-report"></div>
+
+<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+     Listening and Reading tests. Inlined, so it works from a memory stick
+     with the network off. See the header comment inside for what it does and
+     why it is not jsPDF + html2canvas. ══ -->
+
+
+
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     MONOCHROME SKIN — grey / black / white only.
+     Appended last on purpose: it re-tokenises the login card, the completion
+     screen and the certificate without touching #stage-reading, which is the
+     Arial exam screen and already neutral. Nothing here introduces a hue.
+     ════════════════════════════════════════════════════════════════════════ -->
+
+
+<script src="reading-common.js"></script></body>
+</html>

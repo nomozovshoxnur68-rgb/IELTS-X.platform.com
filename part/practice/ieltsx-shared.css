@@ -1,0 +1,263 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   IELTSX — shared page styles
+   One source of truth for every app-shell page (Listening, Reading,
+   Writing, Speaking, Articles, PDF materials, Performance).
+
+   Load order on every page:
+     1. /assets/index-BxgEAFAf.css   (compiled site CSS)
+     2. /assets/index-DNLr8-et.css   (compiled site CSS)
+     3. /assets/ieltsx-shared.css    (this file)
+
+   Everything is expressed with the site's shadcn-style HSL tokens, so
+   light/dark mode and every colour come from the same place.
+   Page-specific rules stay in each page's own <style> block.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── base ── */
+* {
+    border-color: hsl(var(--border));
+}
+
+/* ── tokens: light ── */
+:root {
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
+    --sidebar: 0 0% 98%;
+    --sidebar-background: 0 0% 98%; /* name the compiled CSS actually reads for .bg-sidebar */
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 240 6% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --ring: 215 20% 65%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* legacy names some pages still use — now just aliases of the tokens above */
+    --bg-body: hsl(var(--background));
+    --bg-card: hsl(var(--card));
+    --text-primary: hsl(var(--foreground));
+    --text-secondary: hsl(var(--muted-foreground));
+    --border-color: hsl(var(--border));
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --sidebar-bg: hsl(var(--sidebar));
+    --header-bg: hsl(var(--background) / 0.95);
+    --input-bg: hsl(var(--background));
+    --badge-bg: hsl(var(--secondary));
+}
+
+/* ── tokens: dark ── */
+html.dark-mode {
+    --background: 0 0% 13%; /* #212121 */
+    --foreground: 210 20% 90%;
+    --card: 0 0% 15%;
+    --card-foreground: 210 20% 90%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --primary: 221 83% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 210 10% 60%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 210 20% 90%;
+    --ring: 215 20% 40%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 210 20% 90%;
+    --sidebar: 0 0% 12%;
+    --sidebar-background: 0 0% 12%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 210 20% 90%;
+    --sidebar-primary-foreground: 0 0% 12%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 0 0% 22%;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body {
+    background: hsl(var(--background));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    color: hsl(var(--foreground));
+    transition: background 0.2s, color 0.2s;
+}
+
+/* ── form controls follow the theme ── */
+input::placeholder {
+    color: hsl(var(--muted-foreground));
+}
+
+/* ── sidebar ── */
+[data-sidebar="sidebar"] {
+    transition: width 0.2s ease-in-out;
+}
+
+.group[data-collapsible="icon"] [data-sidebar="sidebar"] {
+    width: var(--sidebar-width-icon);
+}
+
+.group[data-collapsible="icon"] .sidebar-hidden-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* ── small helpers ── */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+.rounded-xl {
+    transition: all 0.2s ease;
+}
+
+.hover\:shadow-lg:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+}
+
+.card-hidden {
+    display: none !important;
+}
+
+/* ── header: theme toggle ── */
+.theme-toggle-btn {
+    background: hsl(var(--background));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+}
+
+.theme-toggle-btn:hover {
+    background: hsl(var(--accent));
+}
+
+/* ── pagination + native filter selects ── */
+.pagination-btn {
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+}
+
+.pagination-btn:hover {
+    background: hsl(var(--accent));
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.filter-select {
+    background: hsl(var(--background));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+}
+
+.filter-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+/* ── filter dropdowns (button-style filters) ── */
+.filter-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 50;
+    min-width: 180px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: hsl(var(--popover));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    padding: 0.25rem;
+    display: none;
+}
+
+.filter-dropdown.open {
+    display: block;
+}
+
+.filter-dropdown .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: hsl(var(--popover-foreground));
+    transition: background 0.15s;
+}
+
+.filter-dropdown .filter-option:hover {
+    background: hsl(var(--accent));
+}
+
+.filter-dropdown .filter-option.active {
+    background: hsl(var(--accent));
+    font-weight: 600;
+}
+
+.filter-dropdown .filter-option .check {
+    margin-left: auto;
+    opacity: 0;
+}
+
+.filter-dropdown .filter-option.active .check {
+    opacity: 1;
+}
+
+.filter-btn-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.filter-btn-wrap .filter-trigger {
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-btn-wrap .filter-trigger .trigger-label {
+    pointer-events: none;
+}
+
+.filter-badge-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: hsl(var(--accent));
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: hsl(var(--accent-foreground));
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-badge-clear:hover {
+    background: hsl(var(--border));
+}
+
+.filter-badge-clear svg {
+    width: 12px;
+    height: 12px;
+}

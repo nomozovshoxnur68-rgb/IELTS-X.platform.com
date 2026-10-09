@@ -6,223 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>IELTSX — Performance Dashboard</title>
     <!-- Tailwind CSS CDN -->
-     <link rel="stylesheet" href="index-BxgEAFAf.css">
+    <link rel="stylesheet" href="/assets/index-BxgEAFAf.css">
+    <link rel="stylesheet" href="/assets/index-DNLr8-et.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Custom styles for sidebar animations, countdown, etc. -->
-    <style>
-        * {
-            border-color: hsl(var(--border));
-        }
-
-        :root {
-            --sidebar-width: 16rem;
-            --sidebar-width-icon: 3rem;
-            --sidebar: 0 0% 98%;
-            --sidebar-foreground: 240 5% 26%;
-            --sidebar-accent: 240 5% 96%;
-            --sidebar-accent-foreground: 240 6% 10%;
-            --sidebar-border: 220 13% 91%;
-            --sidebar-ring: 217 91% 60%;
-            --background: 0 0% 100%;
-            --foreground: 222 47% 11%;
-            --card: 0 0% 100%;
-            --card-foreground: 222 47% 11%;
-            --border: 214 32% 91%;
-            --primary: 221 83% 53%;
-            --primary-foreground: 210 40% 98%;
-            --secondary: 210 40% 96%;
-            --secondary-foreground: 222 47% 11%;
-            --muted-foreground: 215 16% 47%;
-            --accent: 210 40% 96%;
-            --accent-foreground: 222 47% 11%;
-            --ring: 215 20% 65%;
-            /* light mode */
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06);
-            --sidebar-bg: #ffffff;
-            --header-bg: rgba(255,255,255,0.95);
-            --input-bg: #ffffff;
-            --badge-bg: #f1f5f9;
-        }
-
-        html.dark-mode {
-            --bg-body: #202222;
-            --bg-card: #2a2c2c;
-            --text-primary: #e5e7eb;
-            --text-secondary: #9ca3af;
-            --border-color: #3a3c3c;
-            --shadow: 0 1px 3px rgba(0,0,0,0.3);
-            --sidebar-bg: #242626;
-            --header-bg: rgba(32,34,34,0.95);
-            --input-bg: #2a2c2c;
-            --badge-bg: #333636;
-            --background: 32 34 34;
-            --foreground: 229 231 235;
-            --card: 42 44 44;
-            --card-foreground: 229 231 235;
-            --border: 58 60 60;
-            --secondary: 42 44 44;
-            --secondary-foreground: 229 231 235;
-            --muted-foreground: 156 163 175;
-            --accent: 42 44 44;
-            --accent-foreground: 229 231 235;
-            --ring: 58 60 60;
-            --sidebar: 36 38 38;
-            --sidebar-foreground: 229 231 235;
-            --sidebar-accent: 42 44 44;
-            --sidebar-accent-foreground: 229 231 235;
-            --sidebar-border: 58 60 60;
-            --sidebar-ring: 58 60 60;
-        }
-
-        body {
-            background: var(--bg-body);
-            color: var(--text-primary);
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .bg-background { background-color: var(--bg-body) !important; }
-        .bg-card { background-color: var(--bg-card) !important; }
-        .border-border { border-color: var(--border-color) !important; }
-        .text-foreground { color: var(--text-primary) !important; }
-        .text-muted-foreground { color: var(--text-secondary) !important; }
-        .bg-sidebar { background-color: var(--sidebar-bg) !important; }
-        .bg-background\/95 { background-color: var(--header-bg) !important; }
-        .bg-muted\/40 { background-color: var(--badge-bg) !important; }
-        input, select {
-            background-color: var(--input-bg) !important;
-            color: var(--text-primary) !important;
-            border-color: var(--border-color) !important;
-        }
-        input::placeholder { color: var(--text-secondary) !important; }
-
-        [data-sidebar="sidebar"] {
-            transition: width 0.2s ease-in-out;
-        }
-
-        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"]>div {
-            width: var(--sidebar-width-icon) !important;
-        }
-
-        #main-sidebar-root[data-collapsible="icon"] .sidebar-hidden-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-        }
-
-        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] ul li a span.flex-1 {
-            display: none;
-        }
-
-        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] .menu-label {
-            display: none;
-        }
-
-        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] [data-sidebar="group-label"] {
-            opacity: 0;
-            margin-top: -2rem;
-            height: 0;
-            overflow: hidden;
-        }
-
-        .tabular-nums {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .rounded-xl {
-            transition: all 0.2s ease;
-        }
-
-        .hover\:shadow-lg:hover {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-        }
-
-        .animation-delay-1000 {
-            animation-delay: 1000ms;
-        }
-
-        /* theme toggle button */
-        .theme-toggle-btn {
-            background: var(--bg-card);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-        .theme-toggle-btn:hover {
-            background: var(--badge-bg);
-        }
-
-        /* ─── SIDEBAR OVERFLOW FIX ─── */
-        #main-sidebar-root .sidebar-inner-scroll {
-            overflow-y: auto !important;
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-            max-height: 100% !important;
-        }
-        #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar-thumb {
-            background: hsl(var(--sidebar-border));
-            border-radius: 4px;
-        }
-        /* Ensure sidebar container takes full height */
-        #main-sidebar-root .sidebar-outer-container {
-            height: 100vh;
-            max-height: 100vh;
-            overflow: hidden;
-        }
-        #main-sidebar-root .sidebar-flex-col {
-            height: 100%;
-            max-height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        /* Fix for the content area inside sidebar */
-        #main-sidebar-root [data-sidebar="content"] {
-            overflow-y: auto !important;
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-            max-height: 100% !important;
-        }
-        /* Hide scrollbar when collapsed */
-        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="content"] {
-            overflow: hidden !important;
-        }
-
-        /* ─── MAIN CONTENT OVERFLOW FIX ─── */
-        .main-content-scroll {
-            overflow-y: auto !important;
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-            max-height: 100% !important;
-        }
-        .main-content-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-        .main-content-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .main-content-scroll::-webkit-scrollbar-thumb {
-            background: hsl(var(--border));
-            border-radius: 4px;
-        }
-        /* Ensure the main container takes full height */
-        .main-flex-container {
-            height: 100vh;
-            max-height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/performance.css">
+    <link rel="stylesheet" href="/part/practice/assets/css/ui.css">
 </head>
 
 <body class="antialiased">
@@ -586,19 +375,11 @@
             </div>
             <div class="flex items-center gap-3 pr-4">
                 <!-- Dark/Light Toggle -->
-                <button id="themeToggleBtn" class="theme-toggle-btn flex h-8 w-8 items-center justify-center rounded-md border focus:outline-none" aria-label="Toggle theme">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="4"></circle>
-                        <path d="M12 2v2"></path>
-                        <path d="M12 20v2"></path>
-                        <path d="m4.93 4.93 1.41 1.41"></path>
-                        <path d="m17.66 17.66 1.41 1.41"></path>
-                        <path d="M2 12h2"></path>
-                        <path d="M20 12h2"></path>
-                        <path d="m4.93 19.07 1.41-1.41"></path>
-                        <path d="m17.66 6.34 1.41-1.41"></path>
-                    </svg>
-                </button>
+                <div class="theme-switch" role="radiogroup" aria-label="Theme">
+                        <button type="button" role="radio" aria-checked="false" data-theme-mode="light" aria-label="Light" title="Light"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg></button>
+                        <button type="button" role="radio" aria-checked="false" data-theme-mode="dark" aria-label="Dark" title="Dark"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+                        <button type="button" role="radio" aria-checked="false" data-theme-mode="system" aria-label="System" title="System"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></button>
+                    </div>
                 <button class="flex h-8 w-8 items-center justify-center rounded-md border bg-background">
                     <span class="relative flex shrink-0 overflow-hidden h-7 w-7 rounded-md">
                         <img class="aspect-square h-full w-full rounded-md object-cover" alt="shoxnur" src="https://lh3.googleusercontent.com/a/ACg8ocLeT0vaHevIPDPBpyR8hcxbYNSYH5dW7xpox4wkoTC7gQ7plw=s96-c">
@@ -800,13 +581,7 @@
                                                             Attempts</h4>
                                                         <div data-chart="chart-rbp"
                                                             class="flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none aspect-[3/1]">
-                                                            <style>
-                                                                [data-chart=chart-rbp] {
-                                                                    --color-listening: #0ea5e9;
-                                                                    --color-reading: #84cc16;
-                                                                    --color-writing: #a855f7;
-                                                                }
-                                                            </style>
+                                                            <link rel="stylesheet" href="assets/css/performance-2.css">
                                                             <!-- Listening chart SVG (original) -->
                                                             <div class="recharts-responsive-container"
                                                                 style="width: 100%; height: 100%; min-width: 0px;">
@@ -866,87 +641,13 @@
     <script src="performance-dashboard.js"></script>
 
     <!-- JavaScript for sidebar toggle, dark/light mode, and countdown -->
-    <script>
-        (function () {
-            // ─── Dark/Light Mode ───
-            const htmlEl = document.documentElement;
-            const themeBtn = document.getElementById('themeToggleBtn');
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            if (savedTheme === 'dark') htmlEl.classList.add('dark-mode');
-            else htmlEl.classList.remove('dark-mode');
-            updateThemeIcon();
-
-            function updateThemeIcon() {
-                const isDark = htmlEl.classList.contains('dark-mode');
-                const svg = themeBtn.querySelector('svg');
-                if (isDark) {
-                    svg.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 6 6 0 1 1-9-9Z"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>';
-                } else {
-                    svg.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>';
-                }
-            }
-
-            themeBtn.addEventListener('click', function () {
-                htmlEl.classList.toggle('dark-mode');
-                localStorage.setItem('theme', htmlEl.classList.contains('dark-mode') ? 'dark' : 'light');
-                updateThemeIcon();
-            });
-
-            // ─── Sidebar Toggle ───
-            const sidebarContainer = document.getElementById('main-sidebar-root');
-            const toggleButtons = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
-
-            function updateSidebarState() {
-                if (!sidebarContainer) return;
-                const isCollapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-                if (isCollapsed) {
-                    sidebarContainer.setAttribute('data-collapsible', '');
-                    sidebarContainer.setAttribute('data-state', 'expanded');
-                } else {
-                    sidebarContainer.setAttribute('data-collapsible', 'icon');
-                    sidebarContainer.setAttribute('data-state', 'collapsed');
-                }
-            }
-
-            toggleButtons.forEach(function (btn) {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    updateSidebarState();
-                });
-            });
-
-            // ─── Countdown Timer ───
-            let totalSeconds = (2 * 86400) + (23 * 3600) + (24 * 60) + 53;
-            const daysSpan = document.getElementById('daysLeft');
-            const hoursSpan = document.getElementById('hoursLeft');
-            const minutesSpan = document.getElementById('minutesLeft');
-            const secondsSpan = document.getElementById('secondsLeft');
-
-            function updateCountdown() {
-                if (!daysSpan) return;
-                let remaining = totalSeconds;
-                if (remaining < 0) remaining = 0;
-                const days = Math.floor(remaining / 86400);
-                const hours = Math.floor((remaining % 86400) / 3600);
-                const mins = Math.floor((remaining % 3600) / 60);
-                const secs = remaining % 60;
-                daysSpan.innerText = String(days).padStart(2, '0');
-                hoursSpan.innerText = String(hours).padStart(2, '0');
-                minutesSpan.innerText = String(mins).padStart(2, '0');
-                secondsSpan.innerText = String(secs).padStart(2, '0');
-                if (remaining > 0) totalSeconds--;
-            }
-
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-        })();
-    </script>
-    <script type="module" src="site-access.js"></script>
-    <script src="assets/filters.js"></script>
-    <script src=performance-dashboard.js"></script>
-    <script src="premium-access.js"></script>
-    <script>window.IELTSXPremium && window.IELTSXPremium.protect();</script>
-    <a href="admin/admin.html" class="admin-panel-link">Admin Panel</a>
+<script src="/part/practice/assets/js/app.js" data-page-script></script>
+    <script src="/ieltsx-data.js"></script>
+    <script src="/performance-dashboard.js"></script>
+    <script type="module" src="/site-access.js"></script>
+    <script src="/assets/filters.js"></script>
+    <script src="/premium-access.js"></script>
+    <script src="assets/js/premium-protect.js"></script>
 
 </body>
 

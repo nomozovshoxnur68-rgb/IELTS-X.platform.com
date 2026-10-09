@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="en" class="light text-default-size">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="cid:css-7627ec46-9351-47d8-8856-939e1ef5870a@mhtml.blink" />
+
+    <!--
+          Page-level tags (title, description, keywords, canonical, og:*, twitter:*) are deliberately
+          NOT declared here. react-helmet-async cannot remove static tags it did not author, so any tag
+          left in this file would coexist with the per-page tag - and two conflicting rel=canonical
+          values make Google ignore both. SEOHead owns them at runtime; scripts/generate-seo-static-pages.mjs
+          owns them in prerendered HTML.
+        -->
+
+    <!-- Basic Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="IELTSX Platform">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="en">
+
+    <!-- LLM-specific meta tags -->
+    <meta name="classification" content="Education, IELTS Test Preparation">
+    <meta name="category" content="Educational Technology">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="General">
+    <meta name="disclaimer"
+    content="IELTSX is an independent platform not affiliated with British Council, IDP, or Cambridge Assessment">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="96x96" href="https://ieltsx.com/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://ieltsx.com/favicon-192.png">
+    <link rel="apple-touch-icon" href="https://ieltsx.com/ieltsx-only-logo.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-navbutton-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link rel="preconnect" href="https://accounts.google.com/">
+    <link rel="preconnect" href="https://pub-b4cdf9cea3c1412d9af58d86ce04ab1e.r2.dev/">
+    <link rel="preconnect" href="https://static.cloudflareinsights.com/">
+
+    <!-- DNS Prefetch for external domains -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com/">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com/">
+    <link rel="dns-prefetch" href="https://accounts.google.com/">
+
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/router-oTa00OWi.js">
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/query-BoogBOpP.js">
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/ui-DQFvSc6P.js">
+    <link rel="modulepreload" crossorigin="" href="https://ieltsx.com/assets/icons-BdBw2AFm.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-DNLr8-et.css">
+    <!--seo-static-->
+    <title>IELTS X - The CDI Platform</title>
+    <meta name="description"
+    content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <link rel="canonical" href="https://ieltsx.com/">
+    <meta property="og:title" content="IELTS X - The CDI Platform">
+    <meta property="og:description"
+    content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ieltsx.com/">
+    <meta property="og:site_name" content="IELTSX">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="IELTS X - The CDI Platform">
+    <meta name="twitter:description"
+    content="Practice with the CD IELTS interface. Access practice materials with AI-powered writing feedback and detailed performance analysis. Improve your band score faster.">
+    <meta property="og:image" content="https://ieltsx.com/ieltsx-logo-round-filled.png">
+    <meta name="twitter:image" content="https://ieltsx.com/ieltsx-logo-round-filled.png">
+    <meta property="og:image:alt" content="IELTSX">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ExamRoutes-DVqMZkuP.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/SpeakingTestReview-ConwSZp9.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useSpeakingTests-t9LV0JBa.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/exam.utils-BYryEXJB.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/usePracticeTests-QDIxgyuS.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useTestSolution-CUMKs-rF.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/fuzzyTextMatching-BDgWYSW1.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/examIntegrityApi-lSWMP7Ui.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/MarkdownRenderer-CZGl_LGD.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/writingCriteria-D1T4UITt.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useIssueReports-DTApMgnZ.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/formatters-D_CuouuD.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/index-B2_gy1AM.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ListeningTestMain-DlAwVUnw.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ReportIssueDialog-DWAVDaJR.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/index-DTlslB7f.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/examDuration-D3ywLXF9.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/ListeningQuestionRenderer-DepXNqlV.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/FlowChartCompletionTest-sD537-1W.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/QuestionFlagButton-BH8loblm.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/useListeningTests-DebV3VzW.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://ieltsx.com/assets/examResultCalculations-BaIfGSqA.js">
+
+    <!-- ===== FIX: ALL MISSING CUSTOM STYLES + FULLSCREEN RESULTS + DARK MODE FIXES ===== -->
+    <style>
+        /* --- Hidden Modal --- */
+        .hidden-modal {
+            display: none !important;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* --- Results Section (FULL SCREEN) --- */
+        #resultsSection {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 0;
+            animation: fadeIn 0.3s ease;
+        }
+        #resultsSection.visible {
+            display: flex !important;
+        }
+        #resultsSection .results-inner {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            background: #ffffff;
+            border-radius: 0;
+            padding: 2rem 2.5rem 1.5rem;
+            box-shadow: none;
+            animation: zoomIn 0.25s ease;
+            overflow-y: auto;
+        }
+        .dark #resultsSection .results-inner {
+            background: #111827;
+        }
+        #resultsSection .results-inner::-webkit-scrollbar {
+            width: 6px;
+        }
+        #resultsSection .results-inner::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        #resultsSection .results-inner::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .dark #resultsSection .results-inner::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        .dark #resultsSection .results-inner::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+
+        #closeResultsBtn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: rgba(0, 0, 0, 0.05);
+            font-size: 1.5rem;
+            line-height: 1;
+            color: #6b7280;
+            cursor: pointer;
+            border-radius: 9999px;
+            transition: background 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #closeResultsBtn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #111827;
+        }
+        .dark #closeResultsBtn {
+            color: #e5e7eb;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .dark #closeResultsBtn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .results-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem 1.25rem;
+            transition: box-shadow 0.2s;
+        }
+        .results-card.bg-secondary {
+            background: #f1f5f9;
+        }
+        .results-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .results-stat-row:last-child {
+            border-bottom: none;
+        }
+        .results-stat-row .label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .results-stat-row .value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .results-stat-row .value.text-red-600 {
+            color: #dc2626;
+        }
+
+        /* --- Detailed Review --- */
+        .review-section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .count-badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #e5e7eb;
+            padding: 0.2rem 0.75rem;
+            border-radius: 9999px;
+            color: #4b5563;
+        }
+
+        .review-filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .review-filter-tabs button {
+            padding: 0.25rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .review-filter-tabs button:hover {
+            background: #f3f4f6;
+        }
+        .review-filter-tabs button.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+
+        .review-question-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            background: #fafafa;
+            transition: background 0.2s;
+        }
+        .review-question-item.correct {
+            border-left: 4px solid #22c55e;
+        }
+        .review-question-item.incorrect {
+            border-left: 4px solid #ef4444;
+        }
+        .review-question-item .q-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .review-question-item .q-text {
+            font-weight: 500;
+            margin: 0.25rem 0 0.5rem;
+            color: #1f2937;
+        }
+        .review-question-item .q-answer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+        }
+        .review-question-item .q-answer .status-icon {
+            font-size: 1rem;
+        }
+        .review-question-item .user-ans {
+            font-weight: 600;
+            padding: 0.1rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .review-question-item .user-ans.wrong {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .review-question-item .user-ans.correct-ans {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .review-question-item .correct-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #16a34a;
+            background: #dcfce7;
+            padding: 0.1rem 0.5rem;
+            border-radius: 9999px;
+        }
+        .review-question-item .wrong-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 0.1rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .review-explain-btn {
+            margin-top: 0.5rem;
+            background: transparent;
+            border: none;
+            color: #3b82f6;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: background 0.2s;
+        }
+        .review-explain-btn:hover {
+            background: #eff6ff;
+        }
+        .review-explain-btn .arrow {
+            display: inline-block;
+            transition: transform 0.2s;
+            font-size: 0.6rem;
+        }
+        .review-explain-btn .arrow.open {
+            transform: rotate(90deg);
+        }
+
+        .review-explain-content {
+            display: none;
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #f1f5f9;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            color: #1f2937;
+            border-left: 3px solid #3b82f6;
+        }
+        .review-explain-content.open {
+            display: block;
+        }
+
+        /* --- Results Buttons --- */
+        .results-btn {
+            padding: 0.5rem 1.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: #fff;
+            color: #1f2937;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .results-btn:hover {
+            background: #f3f4f6;
+        }
+        .results-btn-primary {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+        .results-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        /* --- Settings Modal --- */
+        #settingsModal .modal-content .theme-option,
+        #settingsModal .modal-content .size-option,
+        #settingsModal .modal-content .speed-option {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #settingsModal .modal-content .theme-option.active-theme,
+        #settingsModal .modal-content .size-option.active-size,
+        #settingsModal .modal-content .speed-option.active-speed {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+            font-weight: 500;
+        }
+
+        /* --- Notes Drawer --- */
+        .notes-drawer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 360px;
+            max-width: 90vw;
+            height: 60vh;
+            max-height: 500px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem 0.75rem 0 0;
+            box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1);
+            z-index: 80;
+            display: none;
+            flex-direction: column;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .notes-drawer.open {
+            display: flex !important;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .notes-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .notes-drawer-header .font-semibold {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        #closeNotesBtn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0 0.25rem;
+        }
+        #closeNotesBtn:hover {
+            color: #111827;
+        }
+        .notes-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem 1rem;
+        }
+        .notes-drawer-body .note-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: #1f2937;
+            word-break: break-word;
+        }
+        .notes-drawer-footer {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+            background: #fafafa;
+            border-radius: 0 0 0.75rem 0.75rem;
+        }
+        .notes-drawer-footer input {
+            flex: 1;
+            padding: 0.4rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            outline: none;
+            background: #ffffff;
+        }
+        .notes-drawer-footer input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .notes-drawer-footer button {
+            padding: 0.4rem 1rem;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .notes-drawer-footer button:hover {
+            background: #2563eb;
+        }
+
+        /* --- Selection Toolbar --- */
+        .selection-toolbar {
+            position: fixed;
+            display: none;
+            background: #1f2937;
+            color: #fff;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            gap: 0.25rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            z-index: 70;
+            align-items: center;
+            font-size: 0.75rem;
+            pointer-events: auto;
+        }
+        .selection-toolbar button {
+            background: none;
+            border: none;
+            color: #fff;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.15s;
+        }
+        .selection-toolbar button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .selection-toolbar .divider {
+            width: 1px;
+            height: 1.25rem;
+            background: rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        /* --- Highlight Menu --- */
+        .highlight-menu {
+            position: fixed;
+            display: none;
+            background: #1f2937;
+            color: #fff;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            gap: 0.25rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            z-index: 75;
+            align-items: center;
+            font-size: 0.75rem;
+            pointer-events: auto;
+        }
+        .highlight-menu button {
+            background: none;
+            border: none;
+            color: #fff;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.15s;
+        }
+        .highlight-menu button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .highlight-menu .divider {
+            width: 1px;
+            height: 1.25rem;
+            background: rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        /* --- Note Popup --- */
+        .note-popup {
+            position: fixed;
+            display: none;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+            z-index: 85;
+            width: 280px;
+            max-width: 90vw;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .note-popup textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            resize: vertical;
+            outline: none;
+            font-family: inherit;
+        }
+        .note-popup textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .note-popup .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .note-popup .actions button {
+            padding: 0.3rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        .note-popup .actions .cancel {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        .note-popup .actions .cancel:hover {
+            background: #e5e7eb;
+        }
+        .note-popup .actions .save {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .note-popup .actions .save:hover {
+            background: #2563eb;
+        }
+
+        /* --- Text Size --- */
+        body.text-large .test-content {
+            font-size: 1.1rem;
+        }
+        body.text-large .test-content input,
+        body.text-large .test-content label,
+        body.text-large .test-content p,
+        body.text-large .test-content span {
+            font-size: 1.1rem;
+        }
+        body.text-extra-large .test-content {
+            font-size: 1.3rem;
+        }
+        body.text-extra-large .test-content input,
+        body.text-extra-large .test-content label,
+        body.text-extra-large .test-content p,
+        body.text-extra-large .test-content span {
+            font-size: 1.3rem;
+        }
+
+        /* --- Submit Modal --- */
+        #submitModal .modal-content {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 61;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 28rem;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: zoomIn 0.2s ease;
+        }
+        #submitModal .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.2s ease;
+        }
+
+        /* --- Settings Modal Fixes --- */
+        #settingsModal .modal-content .grid-cols-1 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        #settingsModal .modal-content .grid-cols-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        /* ====================================================== */
+        /* ========= DARK MODE OVERRIDES (FULL FIX) ============= */
+        /* ====================================================== */
+        .dark .results-card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .dark .results-card.bg-secondary {
+            background: #1e293b;
+        }
+        .dark .results-stat-row {
+            border-bottom-color: #374151;
+        }
+        .dark .results-stat-row .label {
+            color: #9ca3af;
+        }
+        .dark .results-stat-row .value {
+            color: #f3f4f6;
+        }
+        .dark .review-question-item {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .dark .review-question-item .q-text {
+            color: #f3f4f6;
+        }
+        .dark .review-question-item .q-label {
+            color: #9ca3af;
+        }
+        .dark .review-explain-content {
+            background: #1e293b;
+            color: #e5e7eb;
+        }
+        .dark .review-filter-tabs button {
+            color: #9ca3af;
+            border-color: #4b5563;
+        }
+        .dark .review-filter-tabs button:hover {
+            background: #374151;
+        }
+        .dark .review-filter-tabs button.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .dark .count-badge {
+            background: #374151;
+            color: #9ca3af;
+        }
+        .dark .notes-drawer {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .dark .notes-drawer-header {
+            border-bottom-color: #374151;
+        }
+        .dark .notes-drawer-header .font-semibold {
+            color: #f3f4f6;
+        }
+        .dark .notes-drawer-body .note-card {
+            background: #111827;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .dark .notes-drawer-footer {
+            background: #111827;
+            border-top-color: #374151;
+        }
+        .dark .notes-drawer-footer input {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        .dark .notes-drawer-footer input:focus {
+            border-color: #3b82f6;
+        }
+        .dark .note-popup {
+            background: #1f2937;
+            border-color: #4b5563;
+        }
+        .dark .note-popup textarea {
+            background: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        .dark .note-popup textarea:focus {
+            border-color: #3b82f6;
+        }
+        .dark .note-popup .actions .cancel {
+            background: #374151;
+            color: #9ca3af;
+        }
+        .dark .note-popup .actions .cancel:hover {
+            background: #4b5563;
+        }
+        .dark .results-btn {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        .dark .results-btn:hover {
+            background: #374151;
+        }
+        .dark .results-btn-primary {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+        .dark .results-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        .dark #submitModal .modal-content {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .dark #submitModal .modal-content h2 {
+            color: #f3f4f6;
+        }
+        .dark #submitModal .modal-content p {
+            color: #9ca3af;
+        }
+
+        /* --- SETTINGS MODAL DARK MODE (COMPLETE) --- */
+        .dark #settingsModal .modal-content {
+            background: #1f2937 !important;
+            border-color: #374151 !important;
+            color: #f3f4f6 !important;
+        }
+        .dark #settingsModal .modal-content h2,
+        .dark #settingsModal .modal-content h3,
+        .dark #settingsModal .modal-content .text-foreground {
+            color: #f3f4f6 !important;
+        }
+        .dark #settingsModal .modal-content .text-muted-foreground,
+        .dark #settingsModal .modal-content .text-xs.text-muted-foreground {
+            color: #9ca3af !important;
+        }
+        .dark #settingsModal .modal-content .border-border,
+        .dark #settingsModal .modal-content .border {
+            border-color: #4b5563 !important;
+        }
+        .dark #settingsModal .modal-content .bg-background {
+            background: #111827 !important;
+        }
+        .dark #settingsModal .modal-content .bg-muted {
+            background: #1e293b !important;
+        }
+        .dark #settingsModal .modal-content .hover\:bg-muted:hover {
+            background: #2d3748 !important;
+        }
+        .dark #settingsModal .modal-content .theme-option,
+        .dark #settingsModal .modal-content .size-option,
+        .dark #settingsModal .modal-content .speed-option {
+            background: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #9ca3af !important;
+        }
+        .dark #settingsModal .modal-content .theme-option:hover,
+        .dark #settingsModal .modal-content .size-option:hover,
+        .dark #settingsModal .modal-content .speed-option:hover {
+            background: #374151 !important;
+        }
+        .dark #settingsModal .modal-content .theme-option.active-theme,
+        .dark #settingsModal .modal-content .size-option.active-size,
+        .dark #settingsModal .modal-content .speed-option.active-speed {
+            background: #1e3a5f !important;
+            border-color: #3b82f6 !important;
+            color: #93c5fd !important;
+        }
+        .dark #settingsModal .modal-content .group.w-full.rounded-lg.border.border-amber-200.bg-amber-50 {
+            background: #422006 !important;
+            border-color: #78350f !important;
+        }
+        .dark #settingsModal .modal-content .group.w-full.rounded-lg.border.border-amber-200.bg-amber-50:hover {
+            background: #4c1d0e !important;
+        }
+        .dark #settingsModal .modal-content .text-amber-600 {
+            color: #f59e0b !important;
+        }
+        .dark #settingsModal .modal-content .group.w-full.rounded-lg.border.border-border.bg-card\/60 {
+            background: #1e293b !important;
+            border-color: #374151 !important;
+        }
+        .dark #settingsModal .modal-content .group.w-full.rounded-lg.border.border-border.bg-card\/60:hover {
+            background: #2d3748 !important;
+        }
+        .dark #settingsModal .modal-content .absolute.right-4.top-4.rounded-sm {
+            color: #9ca3af !important;
+        }
+        .dark #settingsModal .modal-content .absolute.right-4.top-4.rounded-sm:hover {
+            color: #f3f4f6 !important;
+        }
+
+        /* --- Responsive tweaks --- */
+        @media (max-width: 640px) {
+            #resultsSection .results-inner {
+                padding: 1.25rem 0.75rem 1rem;
+            }
+            #closeResultsBtn {
+                top: 0.75rem;
+                right: 0.75rem;
+                width: 2rem;
+                height: 2rem;
+                font-size: 1.2rem;
+            }
+            .notes-drawer {
+                width: 100%;
+                max-width: 100vw;
+                height: 50vh;
+                max-height: 400px;
+                border-radius: 0.75rem 0.75rem 0 0;
+            }
+            .selection-toolbar {
+                font-size: 0.7rem;
+            }
+            .selection-toolbar button {
+                padding: 0.15rem 0.4rem;
+                font-size: 0.7rem;
+            }
+            .highlight-menu {
+                font-size: 0.7rem;
+            }
+            .highlight-menu button {
+                padding: 0.15rem 0.4rem;
+                font-size: 0.7rem;
+            }
+            .note-popup {
+                width: 90vw;
+            }
+            #settingsModal .modal-content {
+                max-width: 95vw;
+                padding: 1rem;
+            }
+            #settingsModal .modal-content .grid-cols-5 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            #submitModal .modal-content {
+                max-width: 90vw;
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <!-- ===== AUDIO ELEMENT FOR AUTO-PLAY (HIDDEN) ===== -->
+        <audio id="ieltsAudio" src="/listening/audio/Pacific_tapa_cloth_IELTS_LISTENING_Vol_3_Test_4_Section_3IELTS.mp3" preload="auto" style="display:none;"></audio>
+
+        <div class="flex h-[100dvh] flex-col overflow-hidden bg-white">
+            <header id="appHeader"
+            class="grid shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(2.5rem,1fr)] items-center gap-2 border-b border-b-gray-300 px-2 py-1 sm:px-4 min-h-10 ">
+            <div class="flex min-w-0 items-center gap-2">
+                <div class="shrink-0 "><img class="h-8 sm:h-9 aspect-square w-auto"
+                    src="https://ieltsx.com/assets/ieltsx-only-logo-BajnupZg.png" alt="IELTS X"></div>
+                <div class="min-w-0 overflow-hidden">
+                    <div class="ml-1 min-w-0 text-xs sm:ml-3 sm:text-sm text-primary"><span
+                        class="font-semibold truncate block">[Demo] Test 6 - P3: Pacific tapa cloth</span></div>
+                </div>
+            </div>
+            <div class="flex min-w-0 items-center justify-center gap-2 whitespace-nowrap">
+                <div class="flex items-center gap-4">
+                    <div class="whitespace-nowrap text-xs sm:text-sm  font-semibold"><span class="sm:hidden" id="timerDisplay">7m left</span><span
+                        class="hidden sm:inline" id="timerDisplayDesktop">7 minutes remaining</span></div>
+                </div>
+            </div>
+            <div class="flex min-w-0 items-center justify-end gap-2">
+                <div class="flex items-center gap-2 text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20"
+                    height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="lucide lucide-volume2">
+                    <path
+                    d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z">
+                </path>
+                <path d="M16 9a5 5 0 0 1 0 6"></path>
+                <path d="M19.364 18.364a9 9 0 0 0 0-12.728"></path>
+            </svg><input id="volumeSlider" type="range" min="0" max="1" step="0.01" class="w-24" value="0.5"
+            style="background: linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) 50%, rgb(229, 231, 235) 50%, rgb(229, 231, 235) 100%);">
+        </div>
+        <div class="flex items-center gap-2 py-0.5"><button id="fullscreenBtn" type="button"
+            class="px-2 py-0.5 bg-secondary border border-gray-400 hover:bg-gray-200 text-primary rounded text-xs sm:px-4 sm:text-sm flex items-center gap-1"
+            title="Enter fullscreen"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" class="lucide lucide-maximize2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" x2="14" y1="3" y2="10"></line>
+            <line x1="3" x2="10" y1="21" y2="14"></line>
+        </svg></button><button id="settingsMenuBtn" type="button"
+        class="px-2 py-0.5 bg-secondary border border-gray-400 hover:bg-gray-200 text-primary rounded text-xs sm:px-4 sm:text-sm flex items-center gap-1"
+        aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:r6:" data-state="closed"><svg
+        xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-menu">
+        <line x1="4" x2="20" y1="12" y2="12"></line>
+        <line x1="4" x2="20" y1="6" y2="6"></line>
+        <line x1="4" x2="20" y1="18" y2="18"></line>
+    </svg></button><button id="submitBtn" type="button"
+    class="px-2 py-0.5 bg-secondary border border-gray-400 hover:bg-gray-200 text-primary rounded text-xs sm:px-4 sm:text-sm">Submit</button>
+</div>
+</div>
+</header>
+<main id="examSection" class="flex min-h-0 flex-1 flex-col overflow-hidden bg-white px-1">
+    <div class="shrink-0 border-gray-200">
+        <div class="p-2 sm:p-3">
+            <div class="rounded border border-gray-300 bg-[#F1F2EC] p-2 dark:bg-secondary sm:p-3">
+                <div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:gap-4">
+                    <div class="min-w-0 flex-[0.8] text-sm sm:text-base">
+                        <p class="font-bold">Part 3</p>
+                        <p class="">Listen and answer questions 1–40.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section class="min-h-0 flex-1 text-content">
+        <div id="exam-content" class="test-content h-full overflow-y-auto bg-white">
+            <div class="test-content space-y-20 p-4 pb-36 max-w-7xl">
+                <div data-exam-integrity-question-group="true" data-exam-integrity-question-type="MULTIPLE_CHOICE">
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <h5 class="font-semibold">Questions 21–24</h5>
+                            <p>Choose the correct answer.</p>
+                        </div>
+                        <div class="mb-6 text-center">
+                            <h4 class="font-bold"><span class="select-text "><span
+                                class="text-gray-900 dark:text-gray-100">Pacific tapa cloth</span></span></h4>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <div id="question-21" class="py-2 gap-2">
+                                    <div class="flex flex-row gap-1 items-center justify-between w-full">
+                                        <div class="flex flex-row gap-2 items-center flex-1">
+                                            <div
+                                            class="font-semibold justify-items-center rounded-sm cursor-pointer border-2 border-transparent">
+                                            <p class="mx-1">21</p>
+                                        </div>
+                                        <div class="flex-1"><span class="select-text "><span
+                                            class="text-gray-900 dark:text-gray-100">Pacific tapa cloth is different from other
+                                            types of tapa cloth because it is</span></span></div>
+                                        </div><button type="button"
+                                        class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                        aria-label="Flag question 21" aria-pressed="false" title="Flag question 21" tabindex="-1"
+                                        aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                        aria-hidden="true">
+                                        <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                    </svg></button>
+                                </div>
+                                <div class="flex flex-col py-3 space-y-1"><label class="flex items-center p-2 rounded-sm cursor-pointer
+                                    dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question21"
+                                    class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="A">
+                                    <div class="flex-1 min-w-0"><span class="select-text "><span
+                                        class="text-gray-900 dark:text-gray-100">the only tapa made today</span></span></div>
+                                    </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                                    dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question21"
+                                    class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="B">
+                                    <div class="flex-1 min-w-0"><span class="select-text "><span
+                                        class="text-gray-900 dark:text-gray-100">better quality than others</span></span></div>
+                                    </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                                    dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question21"
+                                    class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="C">
+                                    <div class="flex-1 min-w-0"><span class="select-text "><span
+                                        class="text-gray-900 dark:text-gray-100">put to a wider range of uses</span></span>
+                                    </div>
+                                </label></div>
+                            </div>
+                            <div id="question-22" class="py-2 gap-2">
+                                <div class="flex flex-row gap-1 items-center justify-between w-full">
+                                    <div class="flex flex-row gap-2 items-center flex-1">
+                                        <div
+                                        class="font-semibold justify-items-center rounded-sm cursor-pointer border-2 border-transparent">
+                                        <p class="mx-1">22</p>
+                                    </div>
+                                    <div class="flex-1"><span class="select-text "><span
+                                        class="text-gray-900 dark:text-gray-100">What does Helen say about the paper mulberry
+                                        tree?</span></span></div>
+                                    </div><button type="button"
+                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                    aria-label="Flag question 22" aria-pressed="false" title="Flag question 22" tabindex="-1"
+                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                    aria-hidden="true">
+                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                </svg></button>
+                            </div>
+                            <div class="flex flex-col py-3 space-y-1"><label class="flex items-center p-2 rounded-sm cursor-pointer
+                                dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question22"
+                                class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="A">
+                                <div class="flex-1 min-w-0"><span class="select-text "><span
+                                    class="text-gray-900 dark:text-gray-100">It is also a source of food</span></span></div>
+                                </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                                dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question22"
+                                class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="B">
+                                <div class="flex-1 min-w-0"><span class="select-text "><span
+                                    class="text-gray-900 dark:text-gray-100">It is not native to the Pacific</span></span>
+                                </div>
+                            </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                            dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question22"
+                            class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="C">
+                            <div class="flex-1 min-w-0"><span class="select-text "><span
+                                class="text-gray-900 dark:text-gray-100">It can grow in any environment</span></span>
+                            </div>
+                        </label></div>
+                    </div>
+                    <div id="question-23" class="py-2 gap-2">
+                        <div class="flex flex-row gap-1 items-center justify-between w-full">
+                            <div class="flex flex-row gap-2 items-center flex-1">
+                                <div
+                                class="font-semibold justify-items-center rounded-sm cursor-pointer border-2 border-transparent">
+                                <p class="mx-1">23</p>
+                            </div>
+                            <div class="flex-1"><span class="select-text "><span
+                                class="text-gray-900 dark:text-gray-100">Why did the Maori people of New Zealand stop
+                                making tapa?</span></span></div>
+                            </div><button type="button"
+                            class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                            aria-label="Flag question 23" aria-pressed="false" title="Flag question 23" tabindex="-1"
+                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                            aria-hidden="true">
+                            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                        </svg></button>
+                    </div>
+                    <div class="flex flex-col py-3 space-y-1"><label class="flex items-center p-2 rounded-sm cursor-pointer
+                        dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question23"
+                        class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="A">
+                        <div class="flex-1 min-w-0"><span class="select-text "><span
+                            class="text-gray-900 dark:text-gray-100">They could not find the right trees in New
+                            Zealand</span></span></div>
+                        </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                        dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question23"
+                        class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="B">
+                        <div class="flex-1 min-w-0"><span class="select-text "><span
+                            class="text-gray-900 dark:text-gray-100">They were introduced to other fabrics by the
+                            Europeans</span></span></div>
+                        </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                        dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question23"
+                        class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="C">
+                        <div class="flex-1 min-w-0"><span class="select-text "><span
+                            class="text-gray-900 dark:text-gray-100">They found a better material for making
+                            fabric</span></span></div>
+                        </label></div>
+                    </div>
+                    <div id="question-24" class="py-2 gap-2">
+                        <div class="flex flex-row gap-1 items-center justify-between w-full">
+                            <div class="flex flex-row gap-2 items-center flex-1">
+                                <div
+                                class="font-semibold justify-items-center rounded-sm cursor-pointer border-2 border-transparent">
+                                <p class="mx-1">24</p>
+                            </div>
+                            <div class="flex-1"><span class="select-text "><span
+                                class="text-gray-900 dark:text-gray-100">Large pieces of tapa are made from smaller
+                                pieces which are</span></span></div>
+                            </div><button type="button"
+                            class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                            aria-label="Flag question 24" aria-pressed="false" title="Flag question 24" tabindex="-1"
+                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                            aria-hidden="true">
+                            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                        </svg></button>
+                    </div>
+                    <div class="flex flex-col py-3 space-y-1"><label class="flex items-center p-2 rounded-sm cursor-pointer
+                        dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question24"
+                        class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="A">
+                        <div class="flex-1 min-w-0"><span class="select-text "><span
+                            class="text-gray-900 dark:text-gray-100">stuck together</span></span></div>
+                        </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                        dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question24"
+                        class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="B">
+                        <div class="flex-1 min-w-0"><span class="select-text "><span
+                            class="text-gray-900 dark:text-gray-100">woven together</span></span></div>
+                        </label><label class="flex items-center p-2 rounded-sm cursor-pointer
+                        dark:hover:bg-blue-100 hover:bg-gray-100"><input type="radio" name="question24"
+                        class="w-4 h-4 mr-2 text-blue-600 focus:ring-0 focus:ring-offset-0 flex-shrink-0" value="C">
+                        <div class="flex-1 min-w-0"><span class="select-text "><span
+                            class="text-gray-900 dark:text-gray-100">sewn together</span></span></div>
+                        </label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-exam-integrity-question-group="true" data-exam-integrity-question-type="MATCHING_FEATURES">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <h5 class="font-semibold">Questions 25–30</h5>
+                    <p>Choose the correct function, <strong>A, B, C or D</strong>, for each country.</p>
+                </div>
+                <div class="relative flex gap-2 items-start w-fit max-w-5xl">
+                    <div class="overflow-x-auto flex-1">
+                        <div class="w-fit max-w-4xl p-4 border border-gray-500 h-fit py-6">
+                            <table class="h-full w-full border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="whitespace-nowrap border-primary dark:border-white px-3 py-2 min-w-[300px]">
+                                            Countries</th>
+                                        <th class="whitespace-nowrap border-primary dark:border-white p-3 text-center border-l-2">
+                                            A</th>
+                                        <th class="whitespace-nowrap border-primary dark:border-white p-3 text-center border-l">B
+                                        </th>
+                                        <th class="whitespace-nowrap border-primary dark:border-white p-3 text-center border-l">C
+                                        </th>
+                                        <th class="whitespace-nowrap border-primary dark:border-white p-3 text-center border-l">D
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-primary dark:border-white h-full border-t-2">
+                                        <td class="flex p-2 items-center flex-1 justify-between">
+                                            <div class="flex gap-2 items-center flex-1">
+                                                <div id="question-25"
+                                                class="font-bold border whitespace-nowrap rounded-[4px] min-w-7 px-1 flex items-center justify-center border-2 border-transparent">
+                                                25</div>
+                                                <div class="flex-1"><span class="select-text "><span
+                                                    class="text-gray-900 dark:text-gray-100">Samoa</span></span></div>
+                                                </div>
+                                            </td>
+                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l-2">
+                                                <div role="radio" aria-checked="false"
+                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                aria-label="Question 25 answer A"></div>
+                                            </td>
+                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                <div role="radio" aria-checked="false"
+                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                aria-label="Question 25 answer B"></div>
+                                            </td>
+                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                <div role="radio" aria-checked="false"
+                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                aria-label="Question 25 answer C"></div>
+                                            </td>
+                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                <div role="radio" aria-checked="false"
+                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                aria-label="Question 25 answer D"></div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-primary dark:border-white h-full border-t">
+                                            <td class="flex p-2 items-center flex-1 justify-between">
+                                                <div class="flex gap-2 items-center flex-1">
+                                                    <div id="question-26"
+                                                    class="font-bold border whitespace-nowrap rounded-[4px] min-w-7 px-1 flex items-center justify-center border-2 border-transparent">
+                                                    26</div>
+                                                    <div class="flex-1"><span class="select-text "><span
+                                                        class="text-gray-900 dark:text-gray-100">Tonga</span></span></div>
+                                                    </div>
+                                                </td>
+                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l-2">
+                                                    <div role="radio" aria-checked="false"
+                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                    aria-label="Question 26 answer A"></div>
+                                                </td>
+                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                    <div role="radio" aria-checked="false"
+                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                    aria-label="Question 26 answer B"></div>
+                                                </td>
+                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                    <div role="radio" aria-checked="false"
+                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                    aria-label="Question 26 answer C"></div>
+                                                </td>
+                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                    <div role="radio" aria-checked="false"
+                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                    aria-label="Question 26 answer D"></div>
+                                                </td>
+                                            </tr>
+                                            <tr class="border-primary dark:border-white h-full border-t">
+                                                <td class="flex p-2 items-center flex-1 justify-between">
+                                                    <div class="flex gap-2 items-center flex-1">
+                                                        <div id="question-27"
+                                                        class="font-bold border whitespace-nowrap rounded-[4px] min-w-7 px-1 flex items-center justify-center border-2 border-transparent">
+                                                        27</div>
+                                                        <div class="flex-1"><span class="select-text "><span
+                                                            class="text-gray-900 dark:text-gray-100">Cook Islands</span></span></div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="border-0 border-primary dark:border-white h-full p-0 border-l-2">
+                                                        <div role="radio" aria-checked="false"
+                                                        class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                        <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                        aria-label="Question 27 answer A"></div>
+                                                    </td>
+                                                    <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                        <div role="radio" aria-checked="false"
+                                                        class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                        <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                        aria-label="Question 27 answer B"></div>
+                                                    </td>
+                                                    <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                        <div role="radio" aria-checked="false"
+                                                        class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                        <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                        aria-label="Question 27 answer C"></div>
+                                                    </td>
+                                                    <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                        <div role="radio" aria-checked="false"
+                                                        class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                        <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                        aria-label="Question 27 answer D"></div>
+                                                    </td>
+                                                </tr>
+                                                <tr class="border-primary dark:border-white h-full border-t">
+                                                    <td class="flex p-2 items-center flex-1 justify-between">
+                                                        <div class="flex gap-2 items-center flex-1">
+                                                            <div id="question-28"
+                                                            class="font-bold border whitespace-nowrap rounded-[4px] min-w-7 px-1 flex items-center justify-center border-2 border-transparent">
+                                                            28</div>
+                                                            <div class="flex-1"><span class="select-text "><span
+                                                                class="text-gray-900 dark:text-gray-100">Fiji</span></span></div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="border-0 border-primary dark:border-white h-full p-0 border-l-2">
+                                                            <div role="radio" aria-checked="false"
+                                                            class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                            <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                            aria-label="Question 28 answer A"></div>
+                                                        </td>
+                                                        <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                            <div role="radio" aria-checked="false"
+                                                            class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                            <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                            aria-label="Question 28 answer B"></div>
+                                                        </td>
+                                                        <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                            <div role="radio" aria-checked="false"
+                                                            class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                            <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                            aria-label="Question 28 answer C"></div>
+                                                        </td>
+                                                        <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                            <div role="radio" aria-checked="false"
+                                                            class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                            <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                            aria-label="Question 28 answer D"></div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-primary dark:border-white h-full border-t">
+                                                        <td class="flex p-2 items-center flex-1 justify-between">
+                                                            <div class="flex gap-2 items-center flex-1">
+                                                                <div id="question-29"
+                                                                class="font-bold border whitespace-nowrap rounded-[4px] min-w-7 px-1 flex items-center justify-center border-2 border-transparent">
+                                                                29</div>
+                                                                <div class="flex-1"><span class="select-text "><span
+                                                                    class="text-gray-900 dark:text-gray-100">Tahiti</span></span></div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l-2">
+                                                                <div role="radio" aria-checked="false"
+                                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                aria-label="Question 29 answer A"></div>
+                                                            </td>
+                                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                                <div role="radio" aria-checked="false"
+                                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                aria-label="Question 29 answer B"></div>
+                                                            </td>
+                                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                                <div role="radio" aria-checked="false"
+                                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                aria-label="Question 29 answer C"></div>
+                                                            </td>
+                                                            <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                                <div role="radio" aria-checked="false"
+                                                                class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                aria-label="Question 29 answer D"></div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="border-primary dark:border-white h-full border-t">
+                                                            <td class="flex p-2 items-center flex-1 justify-between">
+                                                                <div class="flex gap-2 items-center flex-1">
+                                                                    <div id="question-30"
+                                                                    class="font-bold border whitespace-nowrap rounded-[4px] min-w-7 px-1 flex items-center justify-center border-2 border-transparent">
+                                                                    30</div>
+                                                                    <div class="flex-1"><span class="select-text "><span
+                                                                        class="text-gray-900 dark:text-gray-100">Tikopia</span></span></div>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l-2">
+                                                                    <div role="radio" aria-checked="false"
+                                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                    aria-label="Question 30 answer A"></div>
+                                                                </td>
+                                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                                    <div role="radio" aria-checked="false"
+                                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                    aria-label="Question 30 answer B"></div>
+                                                                </td>
+                                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                                    <div role="radio" aria-checked="false"
+                                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                    aria-label="Question 30 answer C"></div>
+                                                                </td>
+                                                                <td class="border-0 border-primary dark:border-white h-full p-0 border-l">
+                                                                    <div role="radio" aria-checked="false"
+                                                                    class="w-full min-h-full flex items-center justify-center duration-200 cursor-pointer p-2.5 min-w-12 h-full flex-1 hover:bg-[#e4e4e4] dark:hover:bg-white/10">
+                                                                    <input type="radio" class="w-3.5 h-3.5 cursor-pointer pointer-events-none" readonly=""
+                                                                    aria-label="Question 30 answer D"></div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="w-4 relative self-stretch select-none flex-shrink-0" aria-hidden="true">
+                                                <div class="absolute" style="top: 81.4666px; left: 0px;"><button type="button"
+                                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                                    aria-label="Flag question 25" aria-pressed="false" title="Flag question 25" tabindex="-1"
+                                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                                    aria-hidden="true">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                                </svg></button></div>
+                                                <div class="absolute" style="top: 125.467px; left: 0px;"><button type="button"
+                                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                                    aria-label="Flag question 26" aria-pressed="false" title="Flag question 26" tabindex="-1"
+                                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                                    aria-hidden="true">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                                </svg></button></div>
+                                                <div class="absolute" style="top: 169.2px; left: 0px;"><button type="button"
+                                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                                    aria-label="Flag question 27" aria-pressed="false" title="Flag question 27" tabindex="-1"
+                                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                                    aria-hidden="true">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                                </svg></button></div>
+                                                <div class="absolute" style="top: 212.933px; left: 0px;"><button type="button"
+                                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                                    aria-label="Flag question 28" aria-pressed="false" title="Flag question 28" tabindex="-1"
+                                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                                    aria-hidden="true">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                                </svg></button></div>
+                                                <div class="absolute" style="top: 256.667px; left: 0px;"><button type="button"
+                                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                                    aria-label="Flag question 29" aria-pressed="false" title="Flag question 29" tabindex="-1"
+                                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                                    aria-hidden="true">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                                </svg></button></div>
+                                                <div class="absolute" style="top: 300.267px; left: 0px;"><button type="button"
+                                                    class="inline-flex items-center justify-center rounded-sm transition-opacity flex-shrink-0 text-primary pointer-events-none opacity-0 "
+                                                    aria-label="Flag question 30" aria-pressed="false" title="Flag question 30" tabindex="-1"
+                                                    aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark h-5 w-5"
+                                                    aria-hidden="true">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+                                                </svg></button></div>
+                                            </div>
+                                        </div>
+                                        <div class="w-fit">
+                                            <table class="border-collapse">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="2"
+                                                        class="border border-primary px-4 py-3 font-bold text-center whitespace-nowrap">Functions
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="border border-primary p-2 font-bold text-center align-middle">A</td>
+                                                    <td class="border border-primary px-4 py-2 align-middle"><span class="select-text "><span
+                                                        class="text-gray-900 dark:text-gray-100">recreational</span></span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="border border-primary p-2 font-bold text-center align-middle">B</td>
+                                                        <td class="border border-primary px-4 py-2 align-middle"><span class="select-text "><span
+                                                            class="text-gray-900 dark:text-gray-100">practical</span></span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="border border-primary p-2 font-bold text-center align-middle">C</td>
+                                                            <td class="border border-primary px-4 py-2 align-middle"><span class="select-text "><span
+                                                                class="text-gray-900 dark:text-gray-100">spiritual</span></span></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="border border-primary p-2 font-bold text-center align-middle">D</td>
+                                                                <td class="border border-primary px-4 py-2 align-middle"><span class="select-text "><span
+                                                                    class="text-gray-900 dark:text-gray-100">commercial</span></span></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </main>
+                            <div class="shrink-0 border-t border-gray-200 bg-white">
+                                <footer id="appFooter"
+                                class="flex min-w-0 items-center justify-between overflow-hidden border-t border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+                                aria-label="Exam navigation">
+                                <div class="flex h-[53px] min-w-0 flex-1 items-center gap-1 overflow-x-auto bg-white">
+                                    <div class="flex h-full min-w-max flex-shrink-0 items-center"><button type="button" class="h-full text-base text-foreground font-semibold justify-center border-t-[3px]
+                                        rounded-none shadow-none px-2 sm:px-4 flex items-center transition-colors border-gray-400"
+                                    aria-label="Part 3">Part 3</button>
+                                    <div
+                                    class="flex h-full max-w-[calc(100vw-9rem)] flex-row items-center space-x-1 overflow-x-auto sm:ml-2 sm:max-w-none sm:pr-2">
+                                    <div
+                                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+                                    hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                                aria-label="Question 21">21</button></div>
+                                <div
+                                class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                                <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+                                hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                            aria-label="Question 22">22</button></div>
+                            <div
+                            class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                            <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+                            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                        aria-label="Question 23">23</button></div>
+                        <div
+                        class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                        <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+                        hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                    aria-label="Question 24">24</button></div>
+                    <div
+                    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+                    hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+                aria-label="Question 25">25</button></div>
+                <div
+                class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+                <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+                hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+            aria-label="Question 26">26</button></div>
+            <div
+            class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+            <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+            hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+        aria-label="Question 27">27</button></div>
+        <div
+        class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+        <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+        hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+    aria-label="Question 28">28</button></div>
+    <div
+    class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+    <button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+    hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+aria-label="Question 29">29</button></div>
+<div
+class="relative border-t-[3px] flex h-full flex-shrink-0 items-center justify-center border-gray-400">
+<button type="button" class="h-7 min-w-6 text-base text-foreground shadow-none border-2 rounded-sm
+hover:border-blue-500 hover:font-semibold transition-colors border-transparent"
+aria-label="Question 30">30</button></div>
+</div>
+</div>
+</div>
+<div class="hidden lg:flex items-center space-x-2 mx-2 flex-shrink-0"><button
+    class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md text-xs h-10 w-10 p-0 border border-gray-500"
+    aria-label="Previous question"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+    stroke-linejoin="round" class="lucide lucide-arrow-left">
+    <path d="m12 19-7-7 7-7"></path>
+    <path d="M19 12H5"></path>
+</svg></button><button
+class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md text-xs h-10 w-10 p-0 border border-gray-500"
+aria-label="Next question"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+stroke-linejoin="round" class="lucide lucide-arrow-right">
+<path d="M5 12h14"></path>
+<path d="m12 5 7 7-7 7"></path>
+</svg></button></div>
+</footer>
+</div>
+</div>
+<!-- ===== RESULTS SECTION (Full Screen Overlay) ===== -->
+<div id="resultsSection" style="display:none;">
+    <div class="results-inner" style="position:relative;">
+        <button id="closeResultsBtn" title="Close results & exit">✕</button>
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold mb-2">Exam Results</h2>
+            <div class="inline-flex items-center px-3 py-2 bg-secondary rounded-full">
+                <span class="text-sm text-blue-600 font-medium">LISTENING Section</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="results-card bg-secondary">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold mb-2">Your Band Score</h3>
+                    <div id="bandScoreValue" class="text-4xl font-bold text-blue-600 mb-1">0</div>
+                    <div class="text-sm">out of 9</div>
+                    <div id="percentageCorrect" class="mt-2 text-sm text-gray-500">0% (0/10 correct)</div>
+                </div>
+            </div>
+            <div class="results-card">
+                <h4 class="text-lg font-semibold mb-4">Incorrect Questions</h4>
+                <div id="incorrectList" class="flex flex-wrap gap-2">
+                    <span class="text-gray-500 text-sm">No data yet.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-card mb-6">
+            <h4 class="text-lg font-semibold mb-4">Performance by Part</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="results-stat-row"><span class="label">Part 1</span><div class="text-right"><span id="part1Mistakes" class="value text-red-600">0</span><span class="text-sm ml-1">mistakes</span></div></div>
+            </div>
+        </div>
+
+        <div class="results-card mb-6">
+            <h4 class="text-lg font-semibold mb-4">Mistakes by Question Type</h4>
+            <div class="space-y-2">
+                <div class="results-stat-row"><span class="label capitalize">Table Completion</span><div class="text-right"><span id="tableMistakes" class="value text-red-600">0</span><span class="text-sm ml-1">mistakes</span></div></div>
+                <div class="results-stat-row"><span class="label capitalize">Note Completion</span><div class="text-right"><span id="noteMistakes" class="value text-red-600">0</span><span class="text-sm ml-1">mistakes</span></div></div>
+            </div>
+        </div>
+
+        <!-- ===== DETAILED REVIEW SECTION ===== -->
+        <div class="results-card mb-6" id="detailedReviewSection">
+            <div class="review-section-title">
+                <span>📋 Detailed Review</span>
+                <span class="count-badge" id="reviewCountBadge">10 questions</span>
+            </div>
+            <div class="review-filter-tabs">
+                <button class="active" data-filter="all">All</button>
+                <button data-filter="incorrect">Incorrect</button>
+                <button data-filter="correct">Correct</button>
+            </div>
+            <div id="reviewQuestionsContainer">
+                <!-- Questions will be rendered here by JS -->
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 mt-4">
+            <button id="reportIssueResultsBtn" class="results-btn">Report Issue</button>
+            <button id="reviewMistakesBtn" class="results-btn">Review Mistakes</button>
+            <button id="finishResultsBtn" class="results-btn results-btn-primary">Finish</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div id="settingsModal" class="hidden-modal" style="position:fixed;inset:0;z-index:50;">
+    <div id="settingsBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);animation:fadeIn 0.2s ease;"></div>
+    <div class="modal-content" style="position:fixed;left:50%;top:50%;z-index:51;transform:translate(-50%,-50%);width:100%;max-width:32rem;background:#fff;border:1px solid #e5e7eb;border-radius:0.5rem;padding:1.5rem;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);animation:zoomIn 0.2s ease;">
+        <div class="flex flex-col space-y-1.5 text-center sm:text-left">
+            <h2 class="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Exam Settings
+            </h2>
+        </div>
+        <div class="space-y-6" style="max-height:60vh;overflow-y:auto;">
+            <div>
+                <h3 class="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+                    Theme
+                </h3>
+                <div class="grid grid-cols-1 gap-2">
+                    <button class="theme-option p-2 rounded border flex items-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-theme="light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>Light</button>
+                    <button class="theme-option p-2 rounded border flex items-center gap-2 text-sm bg-muted border-border text-foreground transition-colors" data-theme="dark"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>Dark</button>
+                    <button class="theme-option p-2 rounded border flex items-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-theme="system"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-monitor"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>System</button>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-type"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" x2="15" y1="20" y2="20"></line><line x1="12" x2="12" y1="4" y2="20"></line></svg>
+                    Text Size
+                </h3>
+                <div class="grid grid-cols-1 gap-2">
+                    <button class="size-option p-2 rounded border flex items-center gap-2 text-sm bg-muted border-border text-foreground transition-colors" data-size="default"><span class="text-sm">Default</span></button>
+                    <button class="size-option p-2 rounded border flex items-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-size="large"><span class="text-base">Large</span></button>
+                    <button class="size-option p-2 rounded border flex items-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-size="extra-large"><span class="text-lg">Extra Large</span></button>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gauge"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
+                    Audio Speed
+                </h3>
+                <div class="grid grid-cols-5 gap-2">
+                    <button class="speed-option p-2 rounded border flex items-center justify-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-speed="0.75"><span>0.75x</span></button>
+                    <button class="speed-option p-2 rounded border flex items-center justify-center gap-2 text-sm bg-muted border-border text-foreground transition-colors" data-speed="1"><span>Normal</span></button>
+                    <button class="speed-option p-2 rounded border flex items-center justify-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-speed="1.25"><span>1.25x</span></button>
+                    <button class="speed-option p-2 rounded border flex items-center justify-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-speed="1.5"><span>1.5x</span></button>
+                    <button class="speed-option p-2 rounded border flex items-center justify-center gap-2 text-sm bg-background border-border text-muted-foreground hover:bg-muted transition-colors" data-speed="2"><span>2x</span></button>
+                </div>
+                <p class="mt-2 text-xs text-muted-foreground">Playback speed only affects practice audio.</p>
+            </div>
+            <div>
+                <button id="reportIssueSetting" class="group w-full rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-left transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-amber-900/50 dark:bg-amber-950/30 dark:hover:bg-amber-950/50">
+                    <span class="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert text-amber-600 dark:text-amber-400"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                        Report Issue
+                    </span>
+                    <span class="mt-1 block text-xs text-muted-foreground">Tell us if something is missing, broken, or incorrect.</span>
+                </button>
+            </div>
+            <div>
+                <button id="leaveTestSetting" class="group w-full rounded-lg border border-border bg-card/60 px-4 py-3 text-left transition-colors hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                    <span class="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left text-muted-foreground group-hover:text-foreground"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
+                        Leave Test Without Saving
+                    </span>
+                    <span class="mt-1 block text-xs text-muted-foreground">Return to the tests page.</span>
+                </button>
+            </div>
+        </div>
+        <button id="closeSettingsBtn" type="button" class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x h-4 w-4"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            <span class="sr-only">Close</span>
+        </button>
+    </div>
+</div>
+
+<!-- ===== NOTES DRAWER ===== -->
+<div id="notesDrawer" class="notes-drawer" style="display:none;">
+    <div class="notes-drawer-header">
+        <span class="font-semibold text-sm">📝 Notes</span>
+        <button id="closeNotesBtn" class="text-gray-500 hover:text-gray-700 text-lg">&times;</button>
+    </div>
+    <div id="notesList" class="notes-drawer-body">
+        <div class="note-card">No notes yet. Select text → click Note.</div>
+    </div>
+    <div class="notes-drawer-footer">
+        <input id="manualNoteInput" type="text" placeholder="Type a note..." class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" style="background:#fff;">
+        <button id="saveNoteBtn" class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">Save</button>
+    </div>
+</div>
+
+<!-- ===== SELECTION TOOLBAR (Highlight / Note on selection) ===== -->
+<div id="selectionToolbar" class="selection-toolbar" style="display:none;">
+    <button id="highlightSelectionBtn">✏️ Highlight</button>
+    <span class="divider"></span>
+    <button id="noteSelectionBtn">📝 Note</button>
+</div>
+
+<!-- ===== HIGHLIGHT CONTEXT MENU ===== -->
+<div id="highlightMenu" class="highlight-menu" style="display:none;">
+    <button id="menuRemove">Remove</button>
+    <span class="divider"></span>
+    <button id="menuEditNote">Edit Note</button>
+</div>
+
+<!-- ===== NOTE POPUP ===== -->
+<div id="notePopup" class="note-popup" style="display:none;">
+    <textarea id="notePopupText" placeholder="Type your note..."></textarea>
+    <div class="actions">
+        <button class="cancel" id="notePopupCancel">Cancel</button>
+        <button class="save" id="notePopupSave">Save</button>
+    </div>
+</div>
+
+<!-- ===== SUBMIT CONFIRMATION MODAL ===== -->
+<div id="submitModal" class="hidden-modal" style="position:fixed;inset:0;z-index:60;">
+    <div class="modal-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);animation:fadeIn 0.2s ease;"></div>
+    <div class="modal-content" style="position:fixed;left:50%;top:50%;z-index:61;transform:translate(-50%,-50%);width:100%;max-width:28rem;background:#fff;border:1px solid #e5e7eb;border-radius:0.5rem;padding:1.5rem;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);animation:zoomIn 0.2s ease;">
+        <button id="closeModalX" type="button" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        <h2 class="text-xl font-bold mb-2">Submit Test?</h2>
+        <p class="text-muted-foreground mb-6">You cannot change your answers after submission.</p>
+        <div class="flex gap-3 justify-end">
+            <button id="cancelSubmitBtn" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition">Cancel</button>
+            <button id="confirmSubmitBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== NOTIFICATIONS (single region) ===== -->
+<div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events:none;">
+    <ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol>
+</div>
+
+</div>
+
+<!-- Cloudflare Pages Analytics -->
+<script>
+    (function () {
+        'use strict';
+
+        const $ = (selector, root = document) => root.querySelector(selector);
+        const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+        const byId = (id) => document.getElementById(id);
+
+        const safeStorage = {
+            get(key, fallback = null) {
+                try {
+                    const value = localStorage.getItem(key);
+                    return value === null ? fallback : value;
+                } catch (_) {
+                    return fallback;
+                }
+            },
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+        };
+
+        const escapeHtml = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        // ===== CONTEXT MENU =====
+        document.addEventListener('contextmenu', (event) => event.preventDefault());
+
+        // ===== TIMER =====
+        let totalSeconds = 7 * 60;
+        let timerInterval = null;
+
+        const appHeader = byId('appHeader');
+        const mobileTimer = byId('timerDisplay');
+        const desktopTimer = byId('timerDisplayDesktop');
+
+        function updateTimerUI() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const time = `${minutes}:${String(seconds).padStart(2, '0')}`;
+
+            if (mobileTimer) mobileTimer.textContent = `${time} left`;
+            if (desktopTimer) desktopTimer.textContent = `${time} remaining`;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            updateTimerUI();
+
+            timerInterval = window.setInterval(() => {
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    updateTimerUI();
+                    return;
+                }
+
+                totalSeconds -= 1;
+                updateTimerUI();
+            }, 1000);
+        }
+
+        startTimer();
+
+        // ===== AUDIO / VOLUME =====
+        // Uses the hidden <audio id="ieltsAudio"> element added to the page.
+        const audio = byId('ieltsAudio') || $('audio');
+        const volumeSlider = byId('volumeSlider') || (appHeader ? $('input[type="range"]', appHeader) : null);
+        const playPauseBtn = byId('playPauseAudioBtn');
+        const playIcon = byId('playIcon');
+        const pauseIcon = byId('pauseIcon');
+        const audioTimeDisplay = byId('audioTime');
+
+        function setVolumeSliderFill(slider) {
+            if (!slider) return;
+            const min = Number(slider.min || 0);
+            const max = Number(slider.max || 1);
+            const value = Number(slider.value || 0);
+            const percent = max === min ? 0 : ((value - min) / (max - min)) * 100;
+            slider.style.background =
+                `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${percent}%, rgb(229, 231, 235) ${percent}%, rgb(229, 231, 235) 100%)`;
+        }
+
+        if (volumeSlider) {
+            setVolumeSliderFill(volumeSlider);
+            volumeSlider.addEventListener('input', () => {
+                setVolumeSliderFill(volumeSlider);
+                if (audio) audio.volume = Math.max(0, Math.min(1, Number(volumeSlider.value)));
+            });
+        }
+
+        if (audio) {
+            if (volumeSlider) audio.volume = Math.max(0, Math.min(1, Number(volumeSlider.value)));
+
+            const formatTime = (seconds) => {
+                if (!Number.isFinite(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${String(secs).padStart(2, '0')}`;
+            };
+
+            const updatePlayPauseUI = () => {
+                if (!playIcon || !pauseIcon) return;
+                playIcon.classList.toggle('hidden', !audio.paused);
+                pauseIcon.classList.toggle('hidden', audio.paused);
+            };
+
+            const updateAudioTime = () => {
+                if (!audioTimeDisplay) return;
+                audioTimeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+            };
+
+            audio.addEventListener('play', updatePlayPauseUI);
+            audio.addEventListener('pause', updatePlayPauseUI);
+            audio.addEventListener('timeupdate', updateAudioTime);
+            audio.addEventListener('loadedmetadata', updateAudioTime);
+
+            if (playPauseBtn) {
+                playPauseBtn.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    try {
+                        if (audio.paused) await audio.play();
+                        else audio.pause();
+                    } catch (_) {
+                        updatePlayPauseUI();
+                    }
+                });
+            }
+
+            $$('.speed-option').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const speed = Number(button.dataset.speed);
+                    if (Number.isFinite(speed) && speed > 0) audio.playbackRate = speed;
+                    $$('.speed-option').forEach((item) => item.classList.remove('active-speed'));
+                    button.classList.add('active-speed');
+                });
+            });
+
+            const defaultSpeed = $('.speed-option[data-speed="1"]');
+            if (defaultSpeed) defaultSpeed.classList.add('active-speed');
+            updatePlayPauseUI();
+            updateAudioTime();
+
+            // ================================================================
+            // ===== AUTO-PLAY LOGIC =====
+            // ================================================================
+            // Try to play immediately. If blocked, start on first user interaction.
+            audio.play().catch(() => {
+                // Autoplay was prevented by the browser.
+            });
+
+            const startAudioOnInteraction = () => {
+                if (audio.paused) {
+                    audio.play().catch(() => {});
+                }
+                document.removeEventListener('click', startAudioOnInteraction);
+                document.removeEventListener('touchstart', startAudioOnInteraction);
+                document.removeEventListener('keydown', startAudioOnInteraction);
+            };
+            document.addEventListener('click', startAudioOnInteraction);
+            document.addEventListener('touchstart', startAudioOnInteraction);
+            document.addEventListener('keydown', startAudioOnInteraction);
+            // ================================================================
+        }
+
+        // ===== FULLSCREEN =====
+        const fullscreenBtn = byId('fullscreenBtn');
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', async () => {
+                try {
+                    if (!document.fullscreenElement) {
+                        if (document.documentElement.requestFullscreen) {
+                            await document.documentElement.requestFullscreen();
+                        }
+                    } else if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    }
+                } catch (_) {}
+            });
+        }
+
+        // ===== QUESTION 25-30 MATCHING TABLE =====
+        function getMatchingRow(questionNumber) {
+            const marker = byId(`question-${questionNumber}`);
+            return marker ? marker.closest('tr') : null;
+        }
+
+        function setMatchingAnswer(questionNumber, answerLetter) {
+            const row = getMatchingRow(questionNumber);
+            if (!row) return;
+
+            $$('[role="radio"]', row).forEach((option) => {
+                const input = $('input[type="radio"]', option);
+                const label = input ? input.getAttribute('aria-label') || '' : '';
+                const match = label.match(/answer\s+([A-D])\b/i);
+                const letter = match ? match[1].toUpperCase() : '';
+                const selected = letter === answerLetter;
+
+                option.setAttribute('aria-checked', selected ? 'true' : 'false');
+                if (input) input.checked = selected;
+            });
+        }
+
+        function initMatchingQuestions() {
+            for (let questionNumber = 25; questionNumber <= 30; questionNumber += 1) {
+                const row = getMatchingRow(questionNumber);
+                if (!row) continue;
+
+                $$('[role="radio"]', row).forEach((option) => {
+                    const input = $('input[type="radio"]', option);
+                    const label = input ? input.getAttribute('aria-label') || '' : '';
+                    const match = label.match(/answer\s+([A-D])\b/i);
+                    if (!match) return;
+
+                    const letter = match[1].toUpperCase();
+                    option.tabIndex = 0;
+
+                    option.addEventListener('click', () => setMatchingAnswer(questionNumber, letter));
+                    option.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            setMatchingAnswer(questionNumber, letter);
+                        }
+                    });
+                });
+            }
+        }
+
+        initMatchingQuestions();
+
+        // ===== FOOTER QUESTION NAVIGATION =====
+        const questionNumbers = Array.from({ length: 10 }, (_, index) => 21 + index);
+        let currentQuestionIndex = 0;
+
+        function scrollToQuestion(questionNumber) {
+            const target = byId(`question-${questionNumber}`);
+            if (!target) return;
+            currentQuestionIndex = Math.max(0, questionNumbers.indexOf(questionNumber));
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        const footer = byId('appFooter');
+        if (footer) {
+            questionNumbers.forEach((questionNumber) => {
+                const button = $(`button[aria-label="Question ${questionNumber}"]`, footer);
+                if (button) button.addEventListener('click', () => scrollToQuestion(questionNumber));
+            });
+
+            const previousBtn = $('button[aria-label="Previous question"]', footer);
+            const nextBtn = $('button[aria-label="Next question"]', footer);
+
+            if (previousBtn) {
+                previousBtn.addEventListener('click', () => {
+                    currentQuestionIndex = Math.max(0, currentQuestionIndex - 1);
+                    scrollToQuestion(questionNumbers[currentQuestionIndex]);
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    currentQuestionIndex = Math.min(questionNumbers.length - 1, currentQuestionIndex + 1);
+                    scrollToQuestion(questionNumbers[currentQuestionIndex]);
+                });
+            }
+        }
+
+        // ===== ANSWERS / RESULTS =====
+        const answerKey = {
+            21: 'C',
+            22: 'B',
+            23: 'C',
+            24: 'A',
+            25: 'C',
+            26: 'B',
+            27: 'C',
+            28: 'D',
+            29: 'A',
+            30: 'B'
+        };
+
+        const questionHints = {
+            21: 'Pacific tapa is distinguished by the wider variety of uses it has had.',
+            22: 'The paper mulberry was introduced to the Pacific rather than originating there.',
+            23: 'The speakers explain that Maori people found another material that suited clothing better.',
+            24: 'Large sheets are produced by sticking smaller pieces together.',
+            25: 'Samoa — spiritual.',
+            26: 'Tonga — practical.',
+            27: 'Cook Islands — spiritual.',
+            28: 'Fiji — commercial.',
+            29: 'Tahiti — recreational.',
+            30: 'Tikopia — practical.'
+        };
+
+        const questionText = {
+            21: 'Pacific tapa cloth is different from other types of tapa cloth because it is',
+            22: 'What does Helen say about the paper mulberry tree?',
+            23: 'Why did the Maori people of New Zealand stop making tapa?',
+            24: 'Large pieces of tapa are made from smaller pieces which are',
+            25: 'Samoa',
+            26: 'Tonga',
+            27: 'Cook Islands',
+            28: 'Fiji',
+            29: 'Tahiti',
+            30: 'Tikopia'
+        };
+
+        function getAnswerValue(questionNumber) {
+            if (questionNumber >= 21 && questionNumber <= 24) {
+                const checked = $(`input[name="question${questionNumber}"]:checked`);
+                return checked ? String(checked.value || '').trim().toUpperCase() : '';
+            }
+
+            if (questionNumber >= 25 && questionNumber <= 30) {
+                const row = getMatchingRow(questionNumber);
+                if (!row) return '';
+                const checked = $('input[type="radio"]:checked', row);
+                if (!checked) return '';
+                const label = checked.getAttribute('aria-label') || '';
+                const match = label.match(/answer\s+([A-D])\b/i);
+                return match ? match[1].toUpperCase() : '';
+            }
+
+            return '';
+        }
+
+        function computeResults() {
+            let correctCount = 0;
+            const incorrectQ = [];
+            const details = [];
+            const partMistakes = { 3: 0 };
+            const typeMistakes = { table: 0, note: 0 };
+
+            questionNumbers.forEach((questionNumber) => {
+                const userAnswer = getAnswerValue(questionNumber);
+                const correctAnswer = answerKey[questionNumber] || '';
+                const isCorrect = userAnswer === correctAnswer;
+                const type = questionNumber <= 24 ? 'table' : 'note';
+
+                details.push({
+                    qNum: questionNumber,
+                    userAnswer: userAnswer || '(empty)',
+                    correctAnswer,
+                    isCorrect,
+                    hint: questionHints[questionNumber] || '',
+                    text: questionText[questionNumber] || `Question ${questionNumber}`,
+                    type
+                });
+
+                if (isCorrect) {
+                    correctCount += 1;
+                } else {
+                    incorrectQ.push(questionNumber);
+                    partMistakes[3] += 1;
+                    typeMistakes[type] += 1;
+                }
+            });
+
+            const totalQ = questionNumbers.length;
+            const percent = totalQ ? (correctCount / totalQ) * 100 : 0;
+            const bandScore = Math.round((correctCount / totalQ) * 9 * 2) / 2;
+
+            return {
+                correctCount,
+                totalQ,
+                percent,
+                bandScore,
+                incorrectQ,
+                partMistakes,
+                typeMistakes,
+                details
+            };
+        }
+
+        // ===== SUBMIT MODAL =====
+        const submitModal = byId('submitModal');
+        const submitBtn = byId('submitBtn');
+        const examSection = byId('examSection');
+        const resultsSection = byId('resultsSection');
+        const appFooter = byId('appFooter');
+        let isSubmitted = false;
+
+        function openSubmitModal() {
+            if (!submitModal || isSubmitted) return;
+            submitModal.classList.remove('hidden-modal');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSubmitModal() {
+            if (!submitModal) return;
+            submitModal.classList.add('hidden-modal');
+            document.body.style.overflow = '';
+        }
+
+        if (submitBtn) submitBtn.addEventListener('click', openSubmitModal);
+        byId('cancelSubmitBtn')?.addEventListener('click', closeSubmitModal);
+        byId('closeModalX')?.addEventListener('click', closeSubmitModal);
+        submitModal?.querySelector('.modal-backdrop')?.addEventListener('click', closeSubmitModal);
+
+        // ===== DETAILED REVIEW =====
+        let currentFilter = 'all';
+
+        function renderDetailedReview(details) {
+            const container = byId('reviewQuestionsContainer');
+            const badge = byId('reviewCountBadge');
+            if (!container) return;
+
+            const correct = details.filter((detail) => detail.isCorrect).length;
+            const incorrect = details.length - correct;
+            if (badge) badge.textContent = `${details.length} questions (${correct} correct, ${incorrect} incorrect)`;
+
+            let filtered = details;
+            if (currentFilter === 'incorrect') filtered = details.filter((detail) => !detail.isCorrect);
+            if (currentFilter === 'correct') filtered = details.filter((detail) => detail.isCorrect);
+
+            if (!filtered.length) {
+                container.innerHTML =
+                    '<div class="text-center text-gray-500 py-4">No questions to display for this filter.</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map((detail) => {
+                const statusIcon = detail.isCorrect ? '✅' : '❌';
+                const cls = detail.isCorrect ? 'correct' : 'incorrect';
+                const userAnsClass = detail.isCorrect ? 'correct-ans' : 'wrong';
+                const typeLabel = detail.qNum <= 24 ? 'Multiple Choice' : 'Matching';
+
+                return `
+                        <div class="review-question-item ${cls}" data-q="${detail.qNum}" data-correct="${detail.isCorrect}">
+                            <div class="q-label">Question ${detail.qNum} · ${typeLabel}</div>
+                            <div class="q-text">${escapeHtml(detail.text)}</div>
+                            <div class="q-answer">
+                                <span class="status-icon">${statusIcon}</span>
+                                <span>Your answer:</span>
+                                <span class="user-ans ${userAnsClass}">${escapeHtml(detail.userAnswer)}</span>
+                                ${detail.isCorrect ? '<span class="correct-badge">✓ Correct</span>' : '<span class="wrong-badge">✗ Incorrect</span>'}
+                                ${detail.isCorrect ? '' : `<span class="user-ans correct-ans">→ ${escapeHtml(detail.correctAnswer)}</span>`}
+                            </div>
+                            <button class="review-explain-btn" data-q="${detail.qNum}">
+                                💡 Explain More <span class="arrow">▶</span>
+                            </button>
+                            <div class="review-explain-content" data-q="${detail.qNum}">
+                                <strong>Hint:</strong> ${escapeHtml(detail.hint)}
+                                ${detail.isCorrect ? '' : `<br><strong>Correct answer:</strong> "${escapeHtml(detail.correctAnswer)}"`}
+                            </div>
+                        </div>`;
+            }).join('');
+
+            $$('.review-explain-btn', container).forEach((button) => {
+                button.addEventListener('click', () => {
+                    const questionNumber = button.dataset.q;
+                    const content = $(`.review-explain-content[data-q="${questionNumber}"]`, container);
+                    const arrow = $('.arrow', button);
+                    content?.classList.toggle('open');
+                    arrow?.classList.toggle('open');
+                });
+            });
+        }
+
+        function renderResults() {
+            const result = computeResults();
+
+            if (byId('bandScoreValue')) byId('bandScoreValue').textContent = String(result.bandScore);
+            if (byId('percentageCorrect')) {
+                byId('percentageCorrect').textContent =
+                    `${Math.round(result.percent)}% (${result.correctCount}/${result.totalQ} correct)`;
+            }
+
+            const incorrectList = byId('incorrectList');
+            if (incorrectList) {
+                incorrectList.innerHTML = result.incorrectQ.length ?
+                    result.incorrectQ.map((questionNumber) =>
+                        `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">Question ${questionNumber}</span>`
+                    ).join('') :
+                    '<span class="text-green-600">No incorrect answers! Perfect score.</span>';
+            }
+
+            if (byId('part1Mistakes')) byId('part1Mistakes').textContent = String(result.partMistakes[3] || 0);
+            if (byId('tableMistakes')) byId('tableMistakes').textContent = String(result.typeMistakes.table || 0);
+            if (byId('noteMistakes')) byId('noteMistakes').textContent = String(result.typeMistakes.note || 0);
+
+            renderDetailedReview(result.details);
+        }
+
+        function showResults() {
+            if (isSubmitted || !resultsSection || !examSection) return;
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            isSubmitted = true;
+            closeSubmitModal();
+
+            examSection.style.display = 'none';
+            appHeader?.classList.add('hidden');
+            appFooter?.classList.add('hidden');
+            resultsSection.style.display = 'flex';
+            resultsSection.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+
+            renderResults();
+        }
+
+        byId('confirmSubmitBtn')?.addEventListener('click', showResults);
+
+        byId('closeResultsBtn')?.addEventListener('click', () => {
+            if (window.confirm('Exit test?')) window.location.reload();
+        });
+
+        byId('reportIssueResultsBtn')?.addEventListener('click', () => {
+            window.alert('Thank you! Please describe the issue.');
+        });
+
+        byId('reviewMistakesBtn')?.addEventListener('click', () => {
+            byId('detailedReviewSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // ===== FINISH BUTTON — Navigate to /part/practice/reading.html =====
+        byId('finishResultsBtn')?.addEventListener('click', () => {
+            window.location.href = '/part/practice/reading.html';
+        });
+
+        $$('.review-filter-tabs button').forEach((button) => {
+            button.addEventListener('click', () => {
+                $$('.review-filter-tabs button').forEach((item) => item.classList.remove('active'));
+                button.classList.add('active');
+                currentFilter = button.dataset.filter || 'all';
+                renderDetailedReview(computeResults().details);
+            });
+        });
+
+        // ===== SETTINGS MODAL =====
+        const settingsModal = byId('settingsModal');
+        const settingsBtn = byId('settingsMenuBtn');
+
+        function openSettings() {
+            if (!settingsModal) return;
+            settingsModal.classList.remove('hidden-modal');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSettings() {
+            if (!settingsModal) return;
+            settingsModal.classList.add('hidden-modal');
+            document.body.style.overflow = '';
+        }
+
+        settingsBtn?.addEventListener('click', openSettings);
+        byId('closeSettingsBtn')?.addEventListener('click', closeSettings);
+        byId('settingsBackdrop')?.addEventListener('click', closeSettings);
+
+        // ===== THEME =====
+        const systemDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+        function setTheme(theme) {
+            const useDark = theme === 'dark' || (theme === 'system' && systemDark?.matches);
+            document.documentElement.classList.toggle('dark', Boolean(useDark));
+            document.documentElement.style.backgroundColor = useDark ? '#202222' : '';
+            safeStorage.set('ielts_theme', theme);
+
+            $$('.theme-option').forEach((button) => {
+                button.classList.toggle('active-theme', button.dataset.theme === theme);
+            });
+        }
+
+        $$('.theme-option').forEach((button) => {
+            button.addEventListener('click', () => {
+                setTheme(button.dataset.theme || 'light');
+                closeSettings();
+            });
+        });
+
+        setTheme(safeStorage.get('ielts_theme', 'light'));
+
+        if (systemDark) {
+            const onSystemThemeChange = () => {
+                if (safeStorage.get('ielts_theme', 'light') === 'system') setTheme('system');
+            };
+
+            if (typeof systemDark.addEventListener === 'function') {
+                systemDark.addEventListener('change', onSystemThemeChange);
+            } else if (typeof systemDark.addListener === 'function') {
+                systemDark.addListener(onSystemThemeChange);
+            }
+        }
+
+        // ===== TEXT SIZE =====
+        function setTextSize(size) {
+            document.body.classList.remove('text-large', 'text-extra-large');
+            if (size === 'large') document.body.classList.add('text-large');
+            if (size === 'extra-large') document.body.classList.add('text-extra-large');
+            safeStorage.set('ielts_textsize', size);
+
+            $$('.size-option').forEach((button) => {
+                button.classList.toggle('active-size', button.dataset.size === size);
+            });
+        }
+
+        $$('.size-option').forEach((button) => {
+            button.addEventListener('click', () => {
+                setTextSize(button.dataset.size || 'default');
+                closeSettings();
+            });
+        });
+
+        setTextSize(safeStorage.get('ielts_textsize', 'default'));
+
+        byId('reportIssueSetting')?.addEventListener('click', () => {
+            window.alert('Report issue (demo). Please describe the problem.');
+            closeSettings();
+        });
+
+        byId('leaveTestSetting')?.addEventListener('click', () => {
+            if (window.confirm('Leave test without saving?')) window.location.reload();
+        });
+
+        // ===== INPUT NUMBER OVERLAYS =====
+        function initInputOverlays() {
+            $$('input[type="text"]').forEach((input) => {
+                const parent = input.closest('.relative');
+                const overlay = parent ? $('.question-overlay', parent) : null;
+                if (!overlay) return;
+
+                const update = () => {
+                    overlay.classList.toggle('hidden-overlay', input.value.trim().length > 0);
+                };
+
+                update();
+                input.addEventListener('input', update);
+                input.addEventListener('change', update);
+            });
+        }
+
+        initInputOverlays();
+
+        // ===== HIGHLIGHT & NOTES =====
+        const examRoot = byId('exam-content');
+        const selectionToolbar = byId('selectionToolbar');
+        const highlightSelectionBtn = byId('highlightSelectionBtn');
+        const noteSelectionBtn = byId('noteSelectionBtn');
+        const highlightMenu = byId('highlightMenu');
+        const menuRemoveBtn = byId('menuRemove');
+        const menuEditNoteBtn = byId('menuEditNote');
+        const notePopup = byId('notePopup');
+        const notePopupText = byId('notePopupText');
+        const notePopupSave = byId('notePopupSave');
+        const notePopupCancel = byId('notePopupCancel');
+        const notesDrawer = byId('notesDrawer');
+        const closeNotesBtn = byId('closeNotesBtn');
+        const notesInput = byId('manualNoteInput');
+        const notesList = byId('notesList');
+        const saveNoteBtn = byId('saveNoteBtn');
+        const notesKey = 'ieltsx_notes_v1';
+        const highlightsKey = 'highlights_v2';
+
+        let currentSelectionRange = null;
+        let currentHighlightId = null;
+
+        function getNotes() {
+            try {
+                const parsed = JSON.parse(safeStorage.get(notesKey, '[]'));
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function renderNotes() {
+            if (!notesList) return;
+            const notes = getNotes();
+            notesList.innerHTML = '';
+
+            if (!notes.length) {
+                notesList.innerHTML = '<div class="note-card">No notes yet. Select text → click Note.</div>';
+                return;
+            }
+
+            notes.forEach((note) => {
+                const card = document.createElement('div');
+                card.className = 'note-card';
+                card.textContent = note;
+                notesList.appendChild(card);
+            });
+        }
+
+        function openNotesDrawer() {
+            if (!notesDrawer) return;
+            notesDrawer.style.display = 'flex';
+            notesDrawer.classList.add('open');
+        }
+
+        function closeNotesDrawer() {
+            if (!notesDrawer) return;
+            notesDrawer.classList.remove('open');
+            window.setTimeout(() => {
+                if (!notesDrawer.classList.contains('open')) notesDrawer.style.display = 'none';
+            }, 300);
+        }
+
+        function saveNoteToStorage(text) {
+            const clean = String(text || '').trim();
+            if (!clean) return;
+
+            const notes = getNotes();
+            notes.unshift(clean);
+            safeStorage.set(notesKey, JSON.stringify(notes.slice(0, 40)));
+            if (notesInput) notesInput.value = '';
+            renderNotes();
+            openNotesDrawer();
+        }
+
+        closeNotesBtn?.addEventListener('click', closeNotesDrawer);
+        saveNoteBtn?.addEventListener('click', () => saveNoteToStorage(notesInput?.value));
+        notesInput?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveNoteToStorage(notesInput.value);
+            }
+        });
+        renderNotes();
+
+        function getHighlights() {
+            try {
+                const parsed = JSON.parse(safeStorage.get(highlightsKey, '[]'));
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function saveHighlights(items) {
+            safeStorage.set(highlightsKey, JSON.stringify(items));
+        }
+
+        function generateId() {
+            return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+        }
+
+        function getTextOffset(container, node, offset) {
+            const range = document.createRange();
+            range.setStart(container, 0);
+            range.setEnd(node, offset);
+            return range.toString().length;
+        }
+
+        function getNodeAtOffset(container, index) {
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+            let currentPosition = 0;
+            let node = walker.nextNode();
+
+            while (node) {
+                const length = node.textContent.length;
+                if (currentPosition + length >= index) {
+                    return { node, offset: Math.max(0, index - currentPosition) };
+                }
+                currentPosition += length;
+                node = walker.nextNode();
+            }
+
+            return null;
+        }
+
+        function selectionInsideExam(range) {
+            if (!examRoot || !range) return false;
+            const ancestor = range.commonAncestorContainer.nodeType === Node.TEXT_NODE ?
+                range.commonAncestorContainer.parentElement :
+                range.commonAncestorContainer;
+            return ancestor === examRoot || examRoot.contains(ancestor);
+        }
+
+        function selectionHitsInteractiveElement(range) {
+            let node = range.commonAncestorContainer.nodeType === Node.TEXT_NODE ?
+                range.commonAncestorContainer.parentElement :
+                range.commonAncestorContainer;
+
+            while (node && node !== examRoot) {
+                if (['INPUT', 'BUTTON', 'TEXTAREA', 'SELECT'].includes(node.tagName)) return true;
+                node = node.parentElement;
+            }
+            return false;
+        }
+
+        function unwrapHighlights() {
+            if (!examRoot) return;
+            $$('mark.user-highlight', examRoot).forEach((mark) => {
+                const parent = mark.parentNode;
+                if (!parent) return;
+                while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+                parent.removeChild(mark);
+                parent.normalize();
+            });
+        }
+
+        function renderHighlights() {
+            if (!examRoot) return;
+            unwrapHighlights();
+
+            getHighlights()
+                .slice()
+                .sort((a, b) => b.startOffset - a.startOffset)
+                .forEach((highlight) => {
+                    const start = getNodeAtOffset(examRoot, highlight.startOffset);
+                    const end = getNodeAtOffset(examRoot, highlight.endOffset);
+                    if (!start || !end) return;
+
+                    try {
+                        const range = document.createRange();
+                        range.setStart(start.node, start.offset);
+                        range.setEnd(end.node, end.offset);
+
+                        const mark = document.createElement('mark');
+                        mark.className = 'user-highlight';
+                        if (String(highlight.note || '').trim()) mark.classList.add('has-note');
+                        mark.dataset.highlightId = highlight.id;
+                        mark.style.backgroundColor = '#820241';
+                        mark.style.color = '#ffffff';
+
+                        range.surroundContents(mark);
+                    } catch (_) {}
+                });
+
+            $$('mark.user-highlight', examRoot).forEach((mark) => {
+                mark.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    if (mark.dataset.highlightId) {
+                        showHighlightMenu(event.clientX, event.clientY, mark.dataset.highlightId);
+                    }
+                });
+            });
+        }
+
+        function addHighlight(startOffset, endOffset, text, note = '') {
+            const highlights = getHighlights().filter((item) =>
+                !(item.startOffset < endOffset && item.endOffset > startOffset)
+            );
+
+            const id = generateId();
+            highlights.push({ id, startOffset, endOffset, text, note });
+            saveHighlights(highlights);
+            renderHighlights();
+            return id;
+        }
+
+        function updateHighlightNote(id, note) {
+            const highlights = getHighlights();
+            const highlight = highlights.find((item) => item.id === id);
+            if (!highlight) return;
+            highlight.note = note;
+            saveHighlights(highlights);
+            renderHighlights();
+        }
+
+        function removeHighlight(id) {
+            saveHighlights(getHighlights().filter((item) => item.id !== id));
+            renderHighlights();
+            hideHighlightMenu();
+        }
+
+        function handleTextSelection() {
+            const selection = window.getSelection();
+            if (!selectionToolbar) return;
+
+            if (!selection || selection.isCollapsed || !selection.rangeCount) {
+                selectionToolbar.style.display = 'none';
+                return;
+            }
+
+            const range = selection.getRangeAt(0);
+            const selectedText = selection.toString().trim();
+
+            if (!selectedText || !selectionInsideExam(range) || selectionHitsInteractiveElement(range)) {
+                selectionToolbar.style.display = 'none';
+                return;
+            }
+
+            try {
+                const start = getTextOffset(examRoot, range.startContainer, range.startOffset);
+                const end = getTextOffset(examRoot, range.endContainer, range.endOffset);
+                if (start === end) {
+                    selectionToolbar.style.display = 'none';
+                    return;
+                }
+
+                currentSelectionRange = {
+                    startOffset: Math.min(start, end),
+                    endOffset: Math.max(start, end),
+                    text: selectedText
+                };
+
+                const rect = range.getBoundingClientRect();
+                selectionToolbar.style.display = 'flex';
+                const left = Math.max(10, Math.min(rect.left + rect.width / 2 - 80, window.innerWidth - 170));
+                selectionToolbar.style.left = `${left}px`;
+                selectionToolbar.style.top = `${Math.max(10, rect.top - 45)}px`;
+            } catch (_) {
+                selectionToolbar.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('mouseup', () => window.setTimeout(handleTextSelection, 10));
+        document.addEventListener('keyup', handleTextSelection);
+        document.addEventListener('scroll', () => {
+            if (selectionToolbar) selectionToolbar.style.display = 'none';
+        }, true);
+
+        document.addEventListener('mousedown', (event) => {
+            if (selectionToolbar && !selectionToolbar.contains(event.target)) {
+                selectionToolbar.style.display = 'none';
+            }
+        });
+
+        highlightSelectionBtn?.addEventListener('click', () => {
+            if (!currentSelectionRange) return;
+            addHighlight(
+                currentSelectionRange.startOffset,
+                currentSelectionRange.endOffset,
+                currentSelectionRange.text,
+                ''
+            );
+            window.getSelection()?.removeAllRanges();
+            if (selectionToolbar) selectionToolbar.style.display = 'none';
+            currentSelectionRange = null;
+        });
+
+        noteSelectionBtn?.addEventListener('click', () => {
+            if (!currentSelectionRange) return;
+            const id = addHighlight(
+                currentSelectionRange.startOffset,
+                currentSelectionRange.endOffset,
+                currentSelectionRange.text,
+                ''
+            );
+            window.getSelection()?.removeAllRanges();
+            if (selectionToolbar) selectionToolbar.style.display = 'none';
+            currentSelectionRange = null;
+            showNotePopup(id);
+        });
+
+        function showHighlightMenu(x, y, highlightId) {
+            if (!highlightMenu) return;
+            currentHighlightId = highlightId;
+            highlightMenu.style.display = 'flex';
+            highlightMenu.style.left = `${x}px`;
+            highlightMenu.style.top = `${y}px`;
+
+            const rect = highlightMenu.getBoundingClientRect();
+            if (rect.right > window.innerWidth) highlightMenu.style.left = `${Math.max(5, x - rect.width)}px`;
+            if (rect.bottom > window.innerHeight) highlightMenu.style.top = `${Math.max(5, y - rect.height)}px`;
+
+            const highlight = getHighlights().find((item) => item.id === highlightId);
+            if (menuEditNoteBtn) {
+                menuEditNoteBtn.textContent = highlight && String(highlight.note || '').trim() ? 'Edit Note' : 'Add Note';
+            }
+        }
+
+        function hideHighlightMenu() {
+            if (highlightMenu) highlightMenu.style.display = 'none';
+            currentHighlightId = null;
+        }
+
+        menuRemoveBtn?.addEventListener('click', () => {
+            if (currentHighlightId) removeHighlight(currentHighlightId);
+        });
+
+        menuEditNoteBtn?.addEventListener('click', () => {
+            if (currentHighlightId) showNotePopup(currentHighlightId);
+        });
+
+        function showNotePopup(highlightId) {
+            if (!notePopup || !notePopupText) return;
+            const highlight = getHighlights().find((item) => item.id === highlightId);
+            if (!highlight) return;
+
+            notePopupText.value = highlight.note || '';
+            notePopup.dataset.highlightId = highlightId;
+            notePopup.style.display = 'block';
+            notePopup.style.left = '50%';
+            notePopup.style.top = '50%';
+            notePopup.style.transform = 'translate(-50%, -50%)';
+            hideHighlightMenu();
+            notePopupText.focus();
+        }
+
+        function hideNotePopup() {
+            if (!notePopup) return;
+            notePopup.style.display = 'none';
+            notePopup.dataset.highlightId = '';
+        }
+
+        notePopupSave?.addEventListener('click', () => {
+            if (!notePopup || !notePopupText) return;
+            const id = notePopup.dataset.highlightId;
+            if (!id) return;
+            updateHighlightNote(id, notePopupText.value.trim());
+            hideNotePopup();
+        });
+
+        notePopupCancel?.addEventListener('click', hideNotePopup);
+
+        document.addEventListener('click', (event) => {
+            if (highlightMenu && !highlightMenu.contains(event.target) && !event.target.closest('mark.user-highlight')) {
+                hideHighlightMenu();
+            }
+
+            if (
+                notesDrawer?.classList.contains('open') &&
+                !notesDrawer.contains(event.target) &&
+                !selectionToolbar?.contains(event.target) &&
+                !highlightMenu?.contains(event.target)
+            ) {
+                closeNotesDrawer();
+            }
+        });
+
+        renderHighlights();
+
+        // ===== ESCAPE KEY =====
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+
+            if (notePopup && notePopup.style.display !== 'none') hideNotePopup();
+            if (highlightMenu && highlightMenu.style.display !== 'none') hideHighlightMenu();
+            if (submitModal && !submitModal.classList.contains('hidden-modal')) closeSubmitModal();
+            if (settingsModal && !settingsModal.classList.contains('hidden-modal')) closeSettings();
+            if (notesDrawer?.classList.contains('open')) closeNotesDrawer();
+        });
+
+        // ===== INITIAL STATE =====
+        submitModal?.classList.add('hidden-modal');
+        settingsModal?.classList.add('hidden-modal');
+
+        if (resultsSection) {
+            resultsSection.style.display = 'none';
+            resultsSection.classList.remove('visible');
+        }
+
+        if (examSection) examSection.style.display = 'flex';
+        appHeader?.classList.remove('hidden');
+        appFooter?.classList.remove('hidden');
+
+        console.log('IELTSX Part 3 interface loaded successfully.');
+    })();
+</script>
+</body>
+
+</html>

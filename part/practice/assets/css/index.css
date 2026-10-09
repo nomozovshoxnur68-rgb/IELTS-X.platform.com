@@ -1,0 +1,1775 @@
+/* IELTSX — single stylesheet (assets/css/index.css)
+   Each page block is scoped with  html.page-<name>  (zero extra specificity via :where),
+   so pages keep exactly their original look. */
+
+/* ═══════════ page: listening ═══════════ */
+/* ── reset / base ── */
+        :where(html.page-listening) * {
+            border-color: hsl(var(--border));
+        }
+
+        html.page-listening {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222 47% 11%;
+        }
+
+        /* dark mode overrides — same as reading page */
+        html.page-listening.dark-mode {
+            --background: 0 0% 13%; /* #202222 */
+            --foreground: 210 20% 90%;
+            --card: 0 0% 15%;
+            --card-foreground: 210 20% 90%;
+            --border: 0 0% 25%;
+            --primary: 221 83% 60%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 0 0% 20%;
+            --secondary-foreground: 210 20% 90%;
+            --muted-foreground: 210 10% 60%;
+            --accent: 0 0% 20%;
+            --accent-foreground: 210 20% 90%;
+            --ring: 215 20% 40%;
+            --popover: 0 0% 15%;
+            --popover-foreground: 210 20% 90%;
+            --sidebar: 0 0% 12%;
+            --sidebar-foreground: 210 20% 85%;
+            --sidebar-accent: 0 0% 18%;
+            --sidebar-accent-foreground: 210 20% 90%;
+            --sidebar-border: 0 0% 22%;
+        }
+
+        :where(html.page-listening) body {
+            background: hsl(var(--background));
+            font-feature-settings: "rlig" 1, "calt" 1;
+            color: hsl(var(--foreground));
+            transition: background 0.2s, color 0.2s;
+        }
+
+        :where(html.page-listening) [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        :where(html.page-listening) .group[data-collapsible="icon"] [data-sidebar="sidebar"] {
+            width: var(--sidebar-width-icon);
+        }
+
+        :where(html.page-listening) .group[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        :where(html.page-listening) .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        :where(html.page-listening) .rounded-xl {
+            transition: all 0.2s ease;
+        }
+
+        :where(html.page-listening) .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        /* ── theme toggle button ── */
+        :where(html.page-listening) .theme-toggle-btn {
+            background: hsl(var(--background));
+            border-color: hsl(var(--border));
+            color: hsl(var(--foreground));
+        }
+        :where(html.page-listening) .theme-toggle-btn:hover {
+            background: hsl(var(--accent));
+        }
+
+        /* card hidden state */
+        :where(html.page-listening) .card-hidden {
+            display: none !important;
+        }
+
+/* ═══════════ page: reading ═══════════ */
+/* ── reset / base ── */
+        :where(html.page-reading) * {
+            border-color: hsl(var(--border));
+        }
+
+        html.page-reading {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222 47% 11%;
+        }
+
+        /* dark mode overrides */
+        html.page-reading.dark-mode {
+            --background: 0 0% 13%; /* #202222 */
+            --foreground: 210 20% 90%;
+            --card: 0 0% 15%;
+            --card-foreground: 210 20% 90%;
+            --border: 0 0% 25%;
+            --primary: 221 83% 60%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 0 0% 20%;
+            --secondary-foreground: 210 20% 90%;
+            --muted-foreground: 210 10% 60%;
+            --accent: 0 0% 20%;
+            --accent-foreground: 210 20% 90%;
+            --ring: 215 20% 40%;
+            --popover: 0 0% 15%;
+            --popover-foreground: 210 20% 90%;
+            --sidebar: 0 0% 12%;
+            --sidebar-foreground: 210 20% 85%;
+            --sidebar-accent: 0 0% 18%;
+            --sidebar-accent-foreground: 210 20% 90%;
+            --sidebar-border: 0 0% 22%;
+        }
+
+        :where(html.page-reading) body {
+            background: hsl(var(--background));
+            font-feature-settings: "rlig" 1, "calt" 1;
+            color: hsl(var(--foreground));
+            transition: background 0.2s, color 0.2s;
+        }
+
+        :where(html.page-reading) [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        :where(html.page-reading) .group[data-collapsible="icon"] [data-sidebar="sidebar"] {
+            width: var(--sidebar-width-icon);
+        }
+
+        :where(html.page-reading) .group[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        :where(html.page-reading) .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        :where(html.page-reading) .rounded-xl {
+            transition: all 0.2s ease;
+        }
+
+        :where(html.page-reading) .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        :where(html.page-reading) .card-hidden {
+            display: none !important;
+        }
+
+        /* ── theme toggle button ── */
+        :where(html.page-reading) .theme-toggle-btn {
+            background: hsl(var(--background));
+            border-color: hsl(var(--border));
+            color: hsl(var(--foreground));
+        }
+        :where(html.page-reading) .theme-toggle-btn:hover {
+            background: hsl(var(--accent));
+        }
+
+/* ═══════════ page: speaking ═══════════ */
+/* ─── base & sidebar ─── */
+        :where(html.page-speaking) * {
+            border-color: hsl(var(--border));
+        }
+
+        html.page-speaking {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            /* light mode */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+        }
+
+        html.page-speaking.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32, 34, 34, 0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --background: 32 34 34;
+            --foreground: 229 231 235;
+            --card: 42 44 44;
+            --card-foreground: 229 231 235;
+            --border: 58 60 60;
+            --secondary: 42 44 44;
+            --secondary-foreground: 229 231 235;
+            --muted-foreground: 156 163 175;
+            --accent: 42 44 44;
+            --accent-foreground: 229 231 235;
+            --ring: 58 60 60;
+            --sidebar: 36 38 38;
+            --sidebar-foreground: 229 231 235;
+            --sidebar-accent: 42 44 44;
+            --sidebar-accent-foreground: 229 231 235;
+            --sidebar-border: 58 60 60;
+            --sidebar-ring: 58 60 60;
+        }
+
+        :where(html.page-speaking) body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        :where(html.page-speaking) .bg-background {
+            background-color: var(--bg-body) !important;
+        }
+        :where(html.page-speaking) .bg-card {
+            background-color: var(--bg-card) !important;
+        }
+        :where(html.page-speaking) .border-border {
+            border-color: var(--border-color) !important;
+        }
+        :where(html.page-speaking) .text-foreground {
+            color: var(--text-primary) !important;
+        }
+        :where(html.page-speaking) .text-muted-foreground {
+            color: var(--text-secondary) !important;
+        }
+        :where(html.page-speaking) .bg-sidebar {
+            background-color: var(--sidebar-bg) !important;
+        }
+        :where(html.page-speaking) .bg-background\/95 {
+            background-color: var(--header-bg) !important;
+        }
+        :where(html.page-speaking) .bg-muted\/40 {
+            background-color: var(--badge-bg) !important;
+        }
+        :where(html.page-speaking) input, :where(html.page-speaking) select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        :where(html.page-speaking) input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        /* ─── SIDEBAR CORE ─── */
+        :where(html.page-speaking) [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        /* collapse state – hide text, keep icons */
+        :where(html.page-speaking) [data-collapsible="icon"] [data-sidebar="sidebar"] {
+            width: var(--sidebar-width-icon);
+        }
+        :where(html.page-speaking) [data-collapsible="icon"] .sidebar-hidden-text {
+            display: none !important;
+        }
+        :where(html.page-speaking) [data-collapsible="icon"] [data-sidebar="menu-button"] {
+            justify-content: center !important;
+            padding: 0.5rem !important;
+            width: 2.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        :where(html.page-speaking) [data-collapsible="icon"] [data-sidebar="menu-button"] svg {
+            display: inline-block !important;
+            flex-shrink: 0 !important;
+        }
+        :where(html.page-speaking) [data-collapsible="icon"] [data-sidebar="group-label"] {
+            display: none !important;
+        }
+
+        /* ─── MOBILE SIDEBAR ─── */
+        :where(html.page-speaking) .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 35;
+            display: none;
+        }
+        :where(html.page-speaking) .sidebar-overlay.active {
+            display: block;
+        }
+
+        :where(html.page-speaking) #sidebarContainer {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
+            transition: left 0.2s ease;
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        :where(html.page-speaking) #sidebarContainer.mobile-open {
+            left: 0;
+        }
+        :where(html.page-speaking) #sidebarContainer .sidebar-desktop-root {
+            width: 100% !important;
+            height: 100% !important;
+            position: relative !important;
+            inset: auto !important;
+            display: block !important;
+            border: none !important;
+        }
+        :where(html.page-speaking) #sidebarContainer .sidebar-desktop-root [data-sidebar="sidebar"] {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* hide desktop sidebar on mobile, but show inside #sidebarContainer */
+        @media (min-width: 768px) {
+            :where(html.page-speaking) #sidebarContainer {
+                position: relative;
+                left: auto;
+                top: auto;
+                bottom: auto;
+                width: auto;
+                background: transparent;
+                border: none;
+                overflow: visible;
+                z-index: auto;
+                transition: none;
+            }
+            :where(html.page-speaking) #sidebarContainer.mobile-open {
+                left: auto;
+            }
+            :where(html.page-speaking) .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* theme toggle */
+        :where(html.page-speaking) .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        :where(html.page-speaking) .theme-toggle-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* pagination */
+        :where(html.page-speaking) .pagination-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        :where(html.page-speaking) .pagination-btn:hover {
+            background: var(--badge-bg);
+        }
+        :where(html.page-speaking) .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* filter selects */
+
+        /* card hover */
+        :where(html.page-speaking) .rounded-xl {
+            transition: all 0.2s ease;
+        }
+        :where(html.page-speaking) .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+/* ═══════════ page: writing ═══════════ */
+/* ─── base & sidebar ─── */
+        :where(html.page-writing) * { border-color: hsl(var(--border)); }
+        html.page-writing {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            /* light mode */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255,255,255,0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+        }
+        html.page-writing.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32,34,34,0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --background: 32 34 34;
+            --foreground: 229 231 235;
+            --card: 42 44 44;
+            --card-foreground: 229 231 235;
+            --border: 58 60 60;
+            --secondary: 42 44 44;
+            --secondary-foreground: 229 231 235;
+            --muted-foreground: 156 163 175;
+            --accent: 42 44 44;
+            --accent-foreground: 229 231 235;
+            --ring: 58 60 60;
+            --sidebar: 36 38 38;
+            --sidebar-foreground: 229 231 235;
+            --sidebar-accent: 42 44 44;
+            --sidebar-accent-foreground: 229 231 235;
+            --sidebar-border: 58 60 60;
+            --sidebar-ring: 58 60 60;
+        }
+        :where(html.page-writing) body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+        :where(html.page-writing) .bg-background { background-color: var(--bg-body) !important; }
+        :where(html.page-writing) .bg-card { background-color: var(--bg-card) !important; }
+        :where(html.page-writing) .border-border { border-color: var(--border-color) !important; }
+        :where(html.page-writing) .text-foreground { color: var(--text-primary) !important; }
+        :where(html.page-writing) .text-muted-foreground { color: var(--text-secondary) !important; }
+        :where(html.page-writing) .bg-sidebar { background-color: var(--sidebar-bg) !important; }
+        :where(html.page-writing) .bg-background\/95 { background-color: var(--header-bg) !important; }
+        :where(html.page-writing) .bg-muted\/40 { background-color: var(--badge-bg) !important; }
+        :where(html.page-writing) input, :where(html.page-writing) select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        :where(html.page-writing) input::placeholder { color: var(--text-secondary) !important; }
+
+        /* ─── sidebar core ─── */
+        /* ─── sidebar core / stable collapsed layout ─── */
+        :where(html.page-writing) #sidebarContainer, :where(html.page-writing) #sidebarContainer .sidebar-desktop-root, :where(html.page-writing) #sidebarContainer [data-sidebar="sidebar"], :where(html.page-writing) #sidebarContainer > #main-sidebar-root > div:nth-child(2), :where(html.page-writing) #sidebarContainer > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"], :where(html.page-writing) #sidebarContainer > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"] > div {
+            box-sizing: border-box;
+        }
+
+        :where(html.page-writing) #sidebarContainer {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] {
+            width: var(--sidebar-width-icon);
+            min-width: var(--sidebar-width-icon);
+        }
+
+        :where(html.page-writing) #sidebarContainer [data-sidebar="sidebar"] {
+            width: var(--sidebar-width) !important;
+            min-width: var(--sidebar-width) !important;
+            transition: width 0.2s ease-in-out;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="sidebar"] {
+            width: var(--sidebar-width-icon) !important;
+            min-width: var(--sidebar-width-icon) !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] .sidebar-hidden-text, :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="group-label"] {
+            display: none !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="sidebar"] > div {
+            width: var(--sidebar-width-icon) !important;
+            min-width: var(--sidebar-width-icon) !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="menu-button"] {
+            justify-content: center !important;
+            padding: 0.5rem !important;
+            width: 2.5rem !important;
+            min-width: 2.5rem !important;
+            margin: 0 auto !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="menu-button"] svg {
+            display: inline-block !important;
+            flex: 0 0 auto !important;
+            flex-shrink: 0 !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="menu-button"] > svg:last-child {
+            display: none !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="group"] {
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="content"] {
+            overflow-x: hidden !important;
+        }
+
+        :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] [data-sidebar="header"] {
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+
+        @media (min-width: 768px) {
+            :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] {
+                width: var(--sidebar-width-icon);
+                min-width: var(--sidebar-width-icon);
+            }
+
+            :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:first-child {
+                width: var(--sidebar-width-icon) !important;
+            }
+
+            :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:nth-child(2) {
+                width: var(--sidebar-width-icon) !important;
+            }
+
+            :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"] {
+                width: var(--sidebar-width-icon) !important;
+            }
+
+            :where(html.page-writing) #sidebarContainer[data-collapsible="icon"] > #main-sidebar-root > div:nth-child(2) > [data-sidebar="sidebar"] > div {
+                width: var(--sidebar-width-icon) !important;
+            }
+        }
+
+        /* ─── mobile sidebar ─── */
+        :where(html.page-writing) .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 35; display: none; }
+        :where(html.page-writing) .sidebar-overlay.active { display: block; }
+        :where(html.page-writing) #sidebarContainer { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 40; transition: left 0.2s ease; width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); overflow-y: auto; }
+        :where(html.page-writing) #sidebarContainer.mobile-open { left: 0; }
+        :where(html.page-writing) #sidebarContainer .sidebar-desktop-root { width: 100% !important; height: 100% !important; position: relative !important; inset: auto !important; display: block !important; border: none !important; }
+        :where(html.page-writing) #sidebarContainer .sidebar-desktop-root [data-sidebar="sidebar"] { width: 100% !important; height: 100% !important; }
+        @media (min-width: 768px) {
+            :where(html.page-writing) #sidebarContainer { position: relative; left: auto; top: auto; bottom: auto; width: auto; background: transparent; border: none; overflow: visible; z-index: auto; transition: none; }
+            :where(html.page-writing) #sidebarContainer.mobile-open { left: auto; }
+            :where(html.page-writing) .sidebar-overlay { display: none !important; }
+        }
+
+        /* theme toggle */
+        :where(html.page-writing) .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        :where(html.page-writing) .theme-toggle-btn:hover { background: var(--badge-bg); }
+
+        /* pagination */
+        :where(html.page-writing) .pagination-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        :where(html.page-writing) .pagination-btn:hover { background: var(--badge-bg); }
+        :where(html.page-writing) .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* filter selects */
+
+        /* card hover */
+        :where(html.page-writing) .rounded-xl { transition: all 0.2s ease; }
+        :where(html.page-writing) .hover\:shadow-lg:hover { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.02); }
+
+/* ═══════════ page: index ═══════════ */
+/* refined color system — slightly more vibrant and clear */
+        html.page-index {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+        }
+
+        :where(html.page-index) html, :where(html.page-index) body {
+            background: hsl(var(--background));
+            font-feature-settings: "rlig" 1, "calt" 1;
+        }
+
+        :where(html.page-index) .rounded-xl {
+            transition: all 0.2s ease;
+        }
+
+        :where(html.page-index) .hover\:shadow-lg:hover {
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        :where(html.page-index) [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        :where(html.page-index) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"]>div {
+            width: var(--sidebar-width-icon) !important;
+        }
+
+        :where(html.page-index) #main-sidebar-root[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        :where(html.page-index) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] ul li a span.flex-1 {
+            display: none;
+        }
+
+        :where(html.page-index) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] .menu-label {
+            display: none;
+        }
+
+        :where(html.page-index) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+            opacity: 0;
+            margin-top: -2rem;
+            height: 0;
+            overflow: hidden;
+        }
+
+        :where(html.page-index) .bg-gradient-to-r {
+            background-size: auto;
+        }
+
+        :where(html.page-index) .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        :where(html.page-index) .group\/sidebar-wrapper {
+            min-height: 100vh;
+        }
+
+        :where(html.page-index) .bg-sidebar {
+            background-color: hsl(var(--sidebar));
+        }
+
+        :where(html.page-index) .text-sidebar-foreground {
+            color: hsl(var(--sidebar-foreground));
+        }
+
+        :where(html.page-index) .border-sidebar-border {
+            border-color: hsl(var(--sidebar-border));
+        }
+
+        :where(html.page-index) .ring-sidebar-ring {
+            --tw-ring-color: hsl(var(--sidebar-ring));
+        }
+
+        /* sidebar link base */
+        :where(html.page-index) .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.6rem;
+            color: #334155;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        :where(html.page-index) .sidebar-link:hover, :where(html.page-index) .sidebar-link.active {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* make sidebar outer fill properly */
+        :where(html.page-index) .sidebar-outer {
+            transition: width 0.2s ease, left 0.2s ease, right 0.2s ease;
+        }
+
+        /* ensure group-data variants work */
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:w-\[--sidebar-width-icon\] {
+            width: var(--sidebar-width-icon);
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:overflow-hidden {
+            overflow: hidden;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:opacity-0 {
+            opacity: 0;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:-mt-8 {
+            margin-top: -2rem;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:h-0 {
+            height: 0;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:p-0 {
+            padding: 0;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\: !size-8 {
+            width: 2rem !important;
+            height: 2rem !important;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\: !p-2 {
+            padding: 0.5rem !important;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\: !p-0 {
+            padding: 0 !important;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=icon\]\:w-0 {
+            width: 0;
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=offcanvas\]\:left-\[calc(var\(--sidebar-width\)\*-1)\] {
+            left: calc(var(--sidebar-width) * -1);
+        }
+
+        :where(html.page-index) .group-data\[collapsible\=offcanvas\]\:w-0 {
+            width: 0;
+        }
+
+        :where(html.page-index) .group-data\[side\=left\]\:border-r {
+            border-right-width: 1px;
+            border-right-style: solid;
+            border-color: hsl(var(--sidebar-border));
+        }
+
+        :where(html.page-index) .group-data\[side\=right\]\:border-l {
+            border-left-width: 1px;
+            border-left-style: solid;
+            border-color: hsl(var(--sidebar-border));
+        }
+
+        :where(html.page-index) .group-data\[variant\=floating\]\:rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        :where(html.page-index) .group-data\[variant\=floating\]\:border {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        :where(html.page-index) .group-data\[variant\=floating\]\:shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        :where(html.page-index) .peer\/menu-button~.peer\/menu-button {
+            margin-top: 0;
+        }
+
+        :where(html.page-index) .peer\/menu-button:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 2px;
+        }
+
+        /* sidebar inner scroll */
+        :where(html.page-index) .sidebar-inner {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        :where(html.page-index) .sidebar-inner>[data-sidebar="content"] {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        :where(html.page-index) .sidebar-inner>[data-sidebar="content"]::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        :where(html.page-index) .sidebar-inner>[data-sidebar="content"]::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        :where(html.page-index) .sidebar-inner>[data-sidebar="content"]::-webkit-scrollbar-thumb {
+            background: hsl(var(--sidebar-border));
+            border-radius: 4px;
+        }
+
+        /* menu item hover */
+        :where(html.page-index) .group\/menu-item:hover .peer\/menu-button:not([data-active="true"]) {
+            background: hsl(var(--sidebar-accent));
+            color: hsl(var(--sidebar-accent-foreground));
+        }
+
+        :where(html.page-index) .group\/menu-item .peer\/menu-button[data-active="true"] {
+            background: hsl(var(--sidebar-accent));
+            font-weight: 500;
+            color: hsl(var(--sidebar-accent-foreground));
+        }
+
+        /* rail button */
+        :where(html.page-index) [data-sidebar="rail"] {
+            cursor: col-resize;
+        }
+
+        :where(html.page-index) [data-sidebar="rail"]:hover::after {
+            background: hsl(var(--sidebar-border));
+        }
+
+        /* user avatar in sidebar */
+        :where(html.page-index) .sidebar-user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Fix for collapsed state on group labels */
+        :where(html.page-index) .group-data\[collapsible\=icon\] .group-data-collapsible-icon-hidden {
+            display: none;
+        }
+
+        /* dropdown menu for user in sidebar */
+        :where(html.page-index) .sidebar-user-menu {
+            position: relative;
+        }
+
+        /* Card styling to match index design */
+        :where(html.page-index) .test-pack-card {
+            border-radius: 0.75rem;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--card));
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+        }
+        :where(html.page-index) .test-pack-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            border-color: hsl(var(--border));
+        }
+        :where(html.page-index) .test-pack-card .card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+/* dark mode + theme button (same as listening / reading) */
+html.page-index.dark-mode {
+    --background: 0 0% 13%; --foreground: 210 20% 90%; --card: 0 0% 15%; --card-foreground: 210 20% 90%;
+    --border: 0 0% 25%; --primary: 221 83% 60%; --primary-foreground: 210 40% 98%; --secondary: 0 0% 20%;
+    --secondary-foreground: 210 20% 90%; --muted-foreground: 210 10% 60%; --accent: 0 0% 20%;
+    --accent-foreground: 210 20% 90%; --ring: 215 20% 40%; --popover: 0 0% 15%; --popover-foreground: 210 20% 90%;
+    --sidebar: 0 0% 12%; --sidebar-foreground: 210 20% 85%; --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 210 20% 90%; --sidebar-border: 0 0% 22%;
+}
+:where(html.page-index) body { color: hsl(var(--foreground)); transition: background 0.2s, color 0.2s; }
+:where(html.page-index) .theme-toggle-btn { background: hsl(var(--background)); border-color: hsl(var(--border)); color: hsl(var(--foreground)); }
+:where(html.page-index) .theme-toggle-btn:hover { background: hsl(var(--accent)); }
+
+
+/* ═══════════ page: articles ═══════════ */
+/* reset & base */
+        :where(html.page-articles) body {
+            background: #f8fafc;
+        }
+
+        /* ─── dark mode ─── */
+        html.page-articles {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+            --badge-text: #1e293b;
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 4rem;
+        }
+
+        html.page-articles.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32, 34, 34, 0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --badge-text: #d1d5db;
+        }
+
+        :where(html.page-articles) body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        :where(html.page-articles) .bg-white {
+            background-color: var(--bg-card) !important;
+        }
+        :where(html.page-articles) .bg-gray-50 {
+            background-color: var(--bg-body) !important;
+        }
+        :where(html.page-articles) .border-gray-200 {
+            border-color: var(--border-color) !important;
+        }
+        :where(html.page-articles) .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        :where(html.page-articles) .text-muted-foreground {
+            color: var(--text-secondary) !important;
+        }
+        :where(html.page-articles) .shadow-sm {
+            box-shadow: var(--shadow) !important;
+        }
+        :where(html.page-articles) .bg-sidebar {
+            background-color: var(--sidebar-bg) !important;
+        }
+        :where(html.page-articles) .bg-white\/95 {
+            background-color: var(--header-bg) !important;
+        }
+        :where(html.page-articles) .bg-muted\/40 {
+            background-color: var(--badge-bg) !important;
+        }
+        :where(html.page-articles) .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        :where(html.page-articles) .hover\:bg-gray-50:hover {
+            background-color: var(--badge-bg) !important;
+        }
+        :where(html.page-articles) input, :where(html.page-articles) select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        :where(html.page-articles) input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        /* ─── sidebar core ─── */
+        :where(html.page-articles) .sidebar-container {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 4rem;
+        }
+
+        /* desktop sidebar wrapper */
+        :where(html.page-articles) .sidebar-desktop-root {
+            transition: width 0.2s ease-in-out;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] {
+            width: var(--sidebar-width-icon) !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-text {
+            display: none !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-item {
+            justify-content: center !important;
+            padding: 0.5rem !important;
+            width: 2.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* ensure icons are always visible when collapsed */
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-item svg {
+            display: inline-block !important;
+            flex-shrink: 0;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-group-label {
+            display: none !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .logo-text {
+            display: none !important;
+        }
+        /* collapsed desktop: keep logo/icon visible and shrink every sidebar layer together */
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] > div:first-child {
+            width: var(--sidebar-width-icon) !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] > div:nth-child(2) {
+            width: var(--sidebar-width-icon) !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-desktop-inner {
+            width: var(--sidebar-width-icon) !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] {
+            width: 2.5rem !important;
+            min-width: 2.5rem !important;
+            height: 2.5rem !important;
+            justify-content: center !important;
+            gap: 0 !important;
+            padding: 0.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] > div:first-child {
+            flex-shrink: 0 !important;
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] .sidebar-nav-text {
+            display: none !important;
+        }
+
+        /* FINAL SIDEBAR COLLAPSE FIX — keep logo/features intact */
+        @media (min-width: 769px) {
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] > div:first-child {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] > div:nth-child(2) {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                left: 0 !important;
+                right: auto !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] .sidebar-desktop-inner {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                flex: 0 0 var(--sidebar-width-icon) !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                box-sizing: border-box !important;
+                padding: 0.5rem !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu"] {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-item"] {
+                width: 100% !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] {
+                display: flex !important;
+                width: 2.5rem !important;
+                min-width: 2.5rem !important;
+                max-width: 2.5rem !important;
+                height: 2.5rem !important;
+                min-height: 2.5rem !important;
+                max-height: 2.5rem !important;
+                margin: 0 auto !important;
+                padding: 0.5rem !important;
+                gap: 0 !important;
+                overflow: visible !important;
+                justify-content: center !important;
+                align-items: center !important;
+                box-sizing: border-box !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] > div:first-child {
+                display: flex !important;
+                width: 2rem !important;
+                min-width: 2rem !important;
+                max-width: 2rem !important;
+                height: 2rem !important;
+                min-height: 2rem !important;
+                max-height: 2rem !important;
+                flex: 0 0 2rem !important;
+                align-items: center !important;
+                justify-content: center !important;
+                overflow: visible !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] img {
+                display: block !important;
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+                min-width: 1.5rem !important;
+                min-height: 1.5rem !important;
+                max-width: 1.5rem !important;
+                max-height: 1.5rem !important;
+                object-fit: cover !important;
+                flex-shrink: 0 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            :where(html.page-articles) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="content"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+        }
+
+        /* inner scroll */
+        :where(html.page-articles) .sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        :where(html.page-articles) .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        :where(html.page-articles) .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* mobile */
+        @media (max-width: 768px) {
+            :where(html.page-articles) .sidebar-container {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                transition: left 0.2s ease;
+                width: 280px;
+            }
+            :where(html.page-articles) .sidebar-container.mobile-open {
+                left: 0;
+            }
+            :where(html.page-articles) .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 35;
+                display: none;
+            }
+            :where(html.page-articles) .sidebar-overlay.active {
+                display: block;
+            }
+            :where(html.page-articles) .sidebar-container .sidebar-desktop-root {
+                width: 100% !important;
+            }
+            :where(html.page-articles) .sidebar-container .sidebar-desktop-root[data-collapsible="icon"] {
+                width: 100% !important;
+            }
+        }
+
+        /* theme toggle */
+        :where(html.page-articles) .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        :where(html.page-articles) .theme-toggle-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* tab active */
+        :where(html.page-articles) .tab-active {
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            color: #0f172a;
+        }
+        html.page-articles.dark-mode .tab-active {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* rail button */
+        :where(html.page-articles) .sidebar-rail {
+            cursor: pointer;
+            position: absolute;
+            inset-y: 0;
+            z-index: 20;
+            width: 1rem;
+            transform: translateX(-50%);
+            transition: all 0.2s ease-linear;
+            display: none;
+        }
+        :where(html.page-articles) .sidebar-rail::after {
+            content: '';
+            position: absolute;
+            inset-y: 0;
+            left: 50%;
+            width: 2px;
+            transform: translateX(-50%);
+            background: transparent;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+        :where(html.page-articles) .sidebar-rail:hover::after {
+            background: var(--border-color);
+        }
+        @media (min-width: 768px) {
+            :where(html.page-articles) .sidebar-rail {
+                display: flex;
+            }
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-rail {
+            transform: translateX(-50%);
+        }
+        :where(html.page-articles) .sidebar-desktop-root[data-collapsible="icon"] .sidebar-rail::after {
+            background: var(--border-color);
+        }
+
+/* ═══════════ page: pdf_materials ═══════════ */
+:where(html.page-pdf-materials) * {
+            border-color: hsl(var(--border));
+        }
+        html.page-pdf-materials {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+        }
+        :where(html.page-pdf-materials) body {
+            background: hsl(var(--background));
+            font-feature-settings: "rlig" 1, "calt" 1;
+        }
+        :where(html.page-pdf-materials) [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+        :where(html.page-pdf-materials) .group[data-collapsible="icon"] [data-sidebar="sidebar"] {
+            width: var(--sidebar-width-icon);
+        }
+        :where(html.page-pdf-materials) .group[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+        :where(html.page-pdf-materials) .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+        :where(html.page-pdf-materials) .rounded-xl {
+            transition: all 0.2s ease;
+        }
+        :where(html.page-pdf-materials) .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+        /* ensure anchor links inside cards have same styling as buttons */
+        :where(html.page-pdf-materials) .pdf-download-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            height: 2rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            width: 100%;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        :where(html.page-pdf-materials) .pdf-download-link:active {
+            transform: translateY(1px);
+        }
+
+/* dark mode + theme button (same as listening / reading) */
+html.page-pdf-materials.dark-mode {
+    --background: 0 0% 13%; --foreground: 210 20% 90%; --card: 0 0% 15%; --card-foreground: 210 20% 90%;
+    --border: 0 0% 25%; --primary: 221 83% 60%; --primary-foreground: 210 40% 98%; --secondary: 0 0% 20%;
+    --secondary-foreground: 210 20% 90%; --muted-foreground: 210 10% 60%; --accent: 0 0% 20%;
+    --accent-foreground: 210 20% 90%; --ring: 215 20% 40%; --popover: 0 0% 15%; --popover-foreground: 210 20% 90%;
+    --sidebar: 0 0% 12%; --sidebar-foreground: 210 20% 85%; --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 210 20% 90%; --sidebar-border: 0 0% 22%;
+}
+:where(html.page-pdf-materials) body { color: hsl(var(--foreground)); transition: background 0.2s, color 0.2s; }
+:where(html.page-pdf-materials) .theme-toggle-btn { background: hsl(var(--background)); border-color: hsl(var(--border)); color: hsl(var(--foreground)); }
+:where(html.page-pdf-materials) .theme-toggle-btn:hover { background: hsl(var(--accent)); }
+
+
+/* ═══════════ page: performance ═══════════ */
+:where(html.page-performance) * {
+            border-color: hsl(var(--border));
+        }
+
+        html.page-performance {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            /* light mode */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255,255,255,0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+        }
+
+        html.page-performance.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32,34,34,0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --background: 32 34 34;
+            --foreground: 229 231 235;
+            --card: 42 44 44;
+            --card-foreground: 229 231 235;
+            --border: 58 60 60;
+            --secondary: 42 44 44;
+            --secondary-foreground: 229 231 235;
+            --muted-foreground: 156 163 175;
+            --accent: 42 44 44;
+            --accent-foreground: 229 231 235;
+            --ring: 58 60 60;
+            --sidebar: 36 38 38;
+            --sidebar-foreground: 229 231 235;
+            --sidebar-accent: 42 44 44;
+            --sidebar-accent-foreground: 229 231 235;
+            --sidebar-border: 58 60 60;
+            --sidebar-ring: 58 60 60;
+        }
+
+        :where(html.page-performance) body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        :where(html.page-performance) .bg-background { background-color: var(--bg-body) !important; }
+        :where(html.page-performance) .bg-card { background-color: var(--bg-card) !important; }
+        :where(html.page-performance) .border-border { border-color: var(--border-color) !important; }
+        :where(html.page-performance) .text-foreground { color: var(--text-primary) !important; }
+        :where(html.page-performance) .text-muted-foreground { color: var(--text-secondary) !important; }
+        :where(html.page-performance) .bg-sidebar { background-color: var(--sidebar-bg) !important; }
+        :where(html.page-performance) .bg-background\/95 { background-color: var(--header-bg) !important; }
+        :where(html.page-performance) .bg-muted\/40 { background-color: var(--badge-bg) !important; }
+        :where(html.page-performance) input, :where(html.page-performance) select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        :where(html.page-performance) input::placeholder { color: var(--text-secondary) !important; }
+
+        :where(html.page-performance) [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        :where(html.page-performance) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"]>div {
+            width: var(--sidebar-width-icon) !important;
+        }
+
+        :where(html.page-performance) #main-sidebar-root[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        :where(html.page-performance) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] ul li a span.flex-1 {
+            display: none;
+        }
+
+        :where(html.page-performance) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] .menu-label {
+            display: none;
+        }
+
+        :where(html.page-performance) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+            opacity: 0;
+            margin-top: -2rem;
+            height: 0;
+            overflow: hidden;
+        }
+
+        :where(html.page-performance) .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        :where(html.page-performance) .rounded-xl {
+            transition: all 0.2s ease;
+        }
+
+        :where(html.page-performance) .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        :where(html.page-performance) .animation-delay-1000 {
+            animation-delay: 1000ms;
+        }
+
+        /* theme toggle button */
+        :where(html.page-performance) .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        :where(html.page-performance) .theme-toggle-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* ─── SIDEBAR OVERFLOW FIX ─── */
+        :where(html.page-performance) #main-sidebar-root .sidebar-inner-scroll {
+            overflow-y: auto !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        :where(html.page-performance) #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        :where(html.page-performance) #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        :where(html.page-performance) #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar-thumb {
+            background: hsl(var(--sidebar-border));
+            border-radius: 4px;
+        }
+        /* Ensure sidebar container takes full height */
+        :where(html.page-performance) #main-sidebar-root .sidebar-outer-container {
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        :where(html.page-performance) #main-sidebar-root .sidebar-flex-col {
+            height: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Fix for the content area inside sidebar */
+        :where(html.page-performance) #main-sidebar-root [data-sidebar="content"] {
+            overflow-y: auto !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        /* Hide scrollbar when collapsed */
+        :where(html.page-performance) #main-sidebar-root[data-collapsible="icon"] [data-sidebar="content"] {
+            overflow: hidden !important;
+        }
+
+        /* ─── MAIN CONTENT OVERFLOW FIX ─── */
+        :where(html.page-performance) .main-content-scroll {
+            overflow-y: auto !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        :where(html.page-performance) .main-content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        :where(html.page-performance) .main-content-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        :where(html.page-performance) .main-content-scroll::-webkit-scrollbar-thumb {
+            background: hsl(var(--border));
+            border-radius: 4px;
+        }
+        /* Ensure the main container takes full height */
+        :where(html.page-performance) .main-flex-container {
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+/* ═══════════ unified look (all pages) ═══════════
+   light background / card / sidebar colours are the same on every page
+   (white, like listening & reading); dark mode keeps #202222. */
+html[class*="page-"] {
+    --bg-body: #ffffff;
+    --bg-card: #ffffff;
+    --sidebar-bg: #ffffff;
+}
+
+/* ═══════════ shared: filter bar ═══════════ */
+:root {
+    --fl-bg: #ffffff;
+    --fl-border: #e2e8f0;
+    --fl-text: #0f172a;
+    --fl-hover: #f1f5f9;
+    --fl-muted: #64748b;
+    --fl-box: #94a3b8;
+    --fl-primary: #2563eb;
+}
+html.dark-mode {
+    --fl-bg: #2a2c2c;
+    --fl-border: #3a3c3c;
+    --fl-text: #e5e7eb;
+    --fl-hover: #333636;
+    --fl-muted: #9ca3af;
+    --fl-box: #6b7280;
+    --fl-primary: #3b82f6;
+}
+
+.filter-btn-wrap { position: relative; display: inline-flex; }
+.filter-btn-wrap .filter-trigger { cursor: pointer; user-select: none; }
+.filter-btn-wrap .filter-trigger .trigger-label { pointer-events: none; }
+.filter-btn-wrap .filter-trigger.has-value { border-color: var(--fl-primary); }
+
+/* dropdown container */
+.filter-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 50;
+    min-width: 180px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--fl-bg);
+    color: var(--fl-text);
+    border: 1px solid var(--fl-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    padding: 0.25rem;
+    display: none;
+}
+.filter-dropdown.open { display: block; }
+.filter-dropdown.align-right { left: auto; right: 0; }
+
+/* single-choice list (All Status / All Plans / All Packs) */
+.filter-dropdown .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--fl-text);
+    transition: background 0.15s;
+}
+.filter-dropdown .filter-option:hover { background: var(--fl-hover); }
+.filter-dropdown .filter-option.active { background: var(--fl-hover); font-weight: 600; }
+.filter-dropdown .filter-option .check { margin-left: auto; opacity: 0; }
+.filter-dropdown .filter-option.active .check { opacity: 1; }
+
+/* checkbox panel (All Types / All Passages / All Sections / All Parts / All Tasks) */
+.filter-dropdown.filter-panel {
+    width: 440px;
+    max-width: calc(100vw - 3rem);
+    max-height: min(75vh, 560px);
+    padding: 1rem 1.1rem 1.1rem;
+}
+.filter-dropdown.filter-panel.compact {
+    width: auto;
+    min-width: 200px;
+    padding: 0.85rem 1rem;
+}
+.filter-panel-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.85rem;
+}
+.filter-group-title {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fl-muted);
+    margin: 0.9rem 0 0.55rem;
+}
+.filter-panel-title + .filter-group-title { margin-top: 0; }
+.filter-checks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.25rem;
+}
+.filter-checks.one-col { grid-template-columns: 1fr; }
+.filter-check {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.25;
+    cursor: pointer;
+    color: var(--fl-text);
+}
+.filter-check input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1.5px solid var(--fl-box);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    display: inline-grid;
+    place-content: center;
+    transition: background 0.15s, border-color 0.15s;
+}
+.filter-check input[type="checkbox"]::after {
+    content: "";
+    width: 9px;
+    height: 5px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: translateY(-1px) rotate(-45deg) scale(0);
+    transition: transform 0.12s;
+}
+.filter-check input[type="checkbox"]:checked {
+    background: var(--fl-primary);
+    border-color: var(--fl-primary);
+}
+.filter-check input[type="checkbox"]:checked::after {
+    transform: translateY(-1px) rotate(-45deg) scale(1);
+}
+
+/* active filter badges */
+.filter-badge-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--fl-hover);
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--fl-text);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.filter-badge-clear:hover { background: var(--fl-border); }
+.filter-badge-clear svg { width: 12px; height: 12px; }
+
+@media (max-width: 480px) {
+    .filter-checks { grid-template-columns: 1fr; }
+}

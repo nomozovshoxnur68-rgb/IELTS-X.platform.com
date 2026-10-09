@@ -1,0 +1,281 @@
+/* ==========================================================================
+   IELTSX UI — theme switch (light / dark / system) + filter dropdowns
+   Loaded after the page CSS. Self-contained: it brings its own tokens so it
+   looks the same on every page.
+   ========================================================================== */
+:root {
+    --ix-bg: #fff;
+    --ix-fg: hsl(222 47% 11%);
+    --ix-muted: hsl(215 16% 47%);
+    --ix-group: hsl(215 18% 50%);
+    --ix-border: hsl(214 32% 91%);
+    --ix-border-strong: hsl(215 20% 72%);
+    --ix-hover: hsl(210 40% 96%);
+    --ix-primary: hsl(221 83% 53%);
+    --ix-popover: #fff;
+    --ix-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+html.dark-mode {
+    --ix-bg: hsl(0 0% 15%);
+    --ix-fg: hsl(210 20% 90%);
+    --ix-muted: hsl(210 10% 62%);
+    --ix-group: hsl(210 12% 62%);
+    --ix-border: hsl(0 0% 25%);
+    --ix-border-strong: hsl(0 0% 42%);
+    --ix-hover: hsl(0 0% 21%);
+    --ix-primary: hsl(221 83% 60%);
+    --ix-popover: hsl(0 0% 15%);
+    --ix-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.55);
+}
+
+/* ── theme switch: sun | moon | monitor ── */
+.theme-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 2rem;
+    padding: 2px;
+    border: 1px solid var(--ix-border);
+    border-radius: 0.5rem;
+    background: var(--ix-bg);
+}
+
+.theme-switch button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--ix-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.theme-switch button:hover {
+    color: var(--ix-fg);
+}
+
+.theme-switch button[aria-checked="true"] {
+    background: var(--ix-hover);
+    color: var(--ix-fg);
+}
+
+.theme-switch button:focus-visible {
+    outline: 2px solid var(--ix-primary);
+    outline-offset: 1px;
+}
+
+.theme-switch svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* ── filter dropdowns (single list) ── */
+.filter-btn-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.filter-btn-wrap .filter-trigger {
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-btn-wrap .filter-trigger .trigger-label {
+    pointer-events: none;
+}
+
+.filter-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 50;
+    min-width: 180px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--ix-popover);
+    color: var(--ix-fg);
+    border: 1px solid var(--ix-border);
+    border-radius: 0.5rem;
+    box-shadow: var(--ix-shadow);
+    padding: 0.25rem;
+    display: none;
+}
+
+.filter-dropdown.open {
+    display: block;
+}
+
+.filter-dropdown.align-right {
+    left: auto;
+    right: 0;
+}
+
+.filter-dropdown .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--ix-fg);
+    transition: background 0.15s;
+}
+
+.filter-dropdown .filter-option:hover,
+.filter-dropdown .filter-option.active {
+    background: var(--ix-hover);
+}
+
+.filter-dropdown .filter-option.active {
+    font-weight: 500;
+}
+
+.filter-dropdown .filter-option .check {
+    margin-left: auto;
+    opacity: 0;
+}
+
+.filter-dropdown .filter-option.active .check {
+    opacity: 1;
+}
+
+/* ── filter panels (checkboxes, grouped) ── */
+.filter-dropdown.filter-panel {
+    padding: 1rem 1.1rem 1.1rem;
+    width: 27rem;
+    max-width: calc(100vw - 2rem);
+    max-height: 75vh;
+}
+
+.filter-dropdown.filter-panel.compact {
+    width: auto;
+    min-width: 11rem;
+    padding: 0.9rem 1.1rem;
+}
+
+.filter-panel-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.filter-group-title {
+    margin: 0.9rem 0 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ix-group);
+}
+
+.filter-checks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.25rem;
+}
+
+.filter-checks.one-col {
+    grid-template-columns: 1fr;
+}
+
+@media (max-width: 480px) {
+    .filter-checks {
+        grid-template-columns: 1fr;
+    }
+}
+
+.filter-check {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    cursor: pointer;
+    user-select: none;
+    color: var(--ix-fg);
+}
+
+.filter-check input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: none;
+    display: grid;
+    place-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    border: 1px solid var(--ix-border-strong);
+    border-radius: 0.25rem;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.filter-check input[type="checkbox"]::after {
+    content: "";
+    width: 0.5rem;
+    height: 0.28rem;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translate(1px, -1px) scale(0);
+    transition: transform 0.12s;
+}
+
+.filter-check input[type="checkbox"]:checked {
+    background: var(--ix-primary);
+    border-color: var(--ix-primary);
+}
+
+.filter-check input[type="checkbox"]:checked::after {
+    transform: rotate(-45deg) translate(1px, -1px) scale(1);
+}
+
+.filter-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--ix-primary);
+    outline-offset: 2px;
+}
+
+/* ── active filter badges ── */
+.filter-badge-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--ix-hover);
+    color: var(--ix-fg);
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-badge-clear:hover {
+    background: var(--ix-border);
+}
+
+.filter-badge-clear svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* ── filter triggers on pages without the shadcn tokens (speaking, writing) ── */
+.ix-filters .filter-btn-wrap .filter-trigger {
+    background: var(--ix-bg);
+    color: var(--ix-fg);
+    border: 1px solid var(--ix-border);
+}
+
+.ix-filters .filter-btn-wrap .filter-trigger:hover {
+    background: var(--ix-hover);
+}
+
+.ix-filters .filter-btn-wrap .filter-trigger.has-value {
+    border-color: var(--ix-primary);
+}

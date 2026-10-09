@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IELTS X — Welcome</title>
 <link rel="stylesheet" href="index-BxgEAFAf.css">
+    <link rel="stylesheet" href="assets/css/login.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -89,6 +90,24 @@
                     </span>
                 </button>
 
+                <!-- EMAIL -->
+                <div id="ieltsx-email-login">
+                    <div class="login-divider" role="separator"><span>or continue with email</span></div>
+                    <form id="ieltsx-auth-form" class="space-y-2">
+                        <label for="ieltsx-name" class="sr-only">Full name</label>
+                        <input id="ieltsx-name" class="login-input w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Full name (for registration)" autocomplete="name">
+                        <label for="ieltsx-email" class="sr-only">Email</label>
+                        <input id="ieltsx-email" type="email" required class="login-input w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false">
+                        <label for="ieltsx-password" class="sr-only">Password</label>
+                        <input id="ieltsx-password" type="password" required minlength="8" class="login-input w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Password (8+ characters)" autocomplete="current-password">
+                        <div class="flex gap-2">
+                            <button type="submit" data-mode="login" class="flex-1 border border-gray-300 rounded-xl px-4 py-3">Login</button>
+                            <button type="button" id="ieltsx-register" class="flex-1 bg-black text-white rounded-xl px-4 py-3">Register</button>
+                        </div>
+                        <div id="ieltsx-auth-error" class="text-xs text-red-500" role="alert" aria-live="polite"></div>
+                    </form>
+                </div>
+
             </div>
         </div>
 
@@ -104,119 +123,14 @@
                 Privacy Policy
             </a>
         </div>
-<div id="ieltsx-email-login" class="w-full max-w-sm mt-4"><div class="text-xs text-gray-500 mb-2">Email account</div><form id="ieltsx-auth-form" class="space-y-2"><input id="ieltsx-name" class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Full name (for registration)"><input id="ieltsx-email" type="email" required class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Email"><input id="ieltsx-password" type="password" required minlength="8" class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Password (8+ characters)"><div class="flex gap-2"><button type="submit" data-mode="login" class="flex-1 border border-gray-300 rounded-xl px-4 py-3">Login</button><button type="button" id="ieltsx-register" class="flex-1 bg-black text-white rounded-xl px-4 py-3">Register</button></div><div id="ieltsx-auth-error" class="text-xs text-red-500"></div></form></div>
     </div>
 
     <!-- SITE ACCESS -->
     <script type="module" src="./site-access.js"></script>
 
-    <!-- SAVED ACCOUNTS HANDLER -->
-    <script type="module">
-        import { getKnownAccounts, removeKnownAccount } from "./auth.js";
+    <!-- LOGIN (saved accounts, Telegram, email) -->
+    <script type="module" src="login.js"></script>
 
-        function renderSavedAccounts() {
-            const accounts = getKnownAccounts();
-            const container = document.getElementById("saved-accounts-container");
-            const list = document.getElementById("saved-accounts-list");
-
-            if (!accounts || accounts.length === 0) {
-                if (container) container.classList.add("hidden");
-                return;
-            }
-
-            // Show container
-            if (container) container.classList.remove("hidden");
-
-            // Clear list
-            list.innerHTML = "";
-
-            // Render each account
-            accounts.forEach((account) => {
-                const accountEl = document.createElement("div");
-                accountEl.className = "flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition";
-
-                const accountInfo = document.createElement("button");
-                accountInfo.type = "button";
-                accountInfo.className = "flex-1 flex items-center gap-3 text-left";
-                accountInfo.setAttribute("data-quick-login", "true");
-                accountInfo.setAttribute("data-account-uid", account.uid || "");
-                accountInfo.setAttribute("data-account-email", account.email || "");
-                accountInfo.setAttribute("data-account-name", account.displayName || "User");
-
-                // Photo
-                if (account.photoURL) {
-                    const photo = document.createElement("img");
-                    photo.src = account.photoURL;
-                    photo.className = "w-8 h-8 rounded-full object-cover";
-                    accountInfo.appendChild(photo);
-                } else {
-                    const avatar = document.createElement("div");
-                    avatar.className = "w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold";
-                    avatar.textContent = (account.displayName || "?").charAt(0).toUpperCase();
-                    accountInfo.appendChild(avatar);
-                }
-
-                // Info
-                const info = document.createElement("div");
-                info.className = "flex-1";
-
-                const name = document.createElement("div");
-                name.className = "text-sm font-medium text-gray-900";
-                name.textContent = account.displayName || "User";
-                info.appendChild(name);
-
-                const email = document.createElement("div");
-                email.className = "text-xs text-gray-500 truncate";
-                email.textContent = account.email;
-                info.appendChild(email);
-
-                if (account.premium) {
-                    const premium = document.createElement("div");
-                    premium.className = "mt-1 inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700";
-                    premium.innerHTML = "&#128081; Premium";
-                    info.appendChild(premium);
-                }
-
-                accountInfo.appendChild(info);
-
-                // Remove button
-                const removeBtn = document.createElement("button");
-                removeBtn.type = "button";
-                removeBtn.className = "ml-2 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition";
-                removeBtn.title = "O'chirish";
-                removeBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
-                removeBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    if (confirm(`${account.displayName} hisobini o'chirasizmi?`)) {
-                        removeKnownAccount(account.uid);
-                        renderSavedAccounts();
-                    }
-                };
-
-                accountEl.appendChild(accountInfo);
-                accountEl.appendChild(removeBtn);
-                list.appendChild(accountEl);
-            });
-
-            // Emit event so site-access.js can attach login handlers
-            document.dispatchEvent(new CustomEvent("saved-accounts-rendered"));
-        }
-
-        // Initialize on page load
-        renderSavedAccounts();
-    </script>
-
-    <!-- TELEGRAM BUTTON -->
-    <script>
-        document
-            .getElementById("telegram-btn")
-            .addEventListener("click", () => {
-
-                alert("Telegram login coming soon.");
-
-            });
-    </script>
-
-<script src="premium-access.js"></script><script>window.IELTSXPremium&&window.IELTSXPremium.protect();</script><script type="module">import {login,register} from './auth.js';const f=document.querySelector('#ieltsx-auth-form'),reg=document.querySelector('#ieltsx-register'),err=document.querySelector('#ieltsx-auth-error');f?.addEventListener('submit',async e=>{e.preventDefault();try{await login(document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='index.html'}catch(x){err.textContent=x.message}});reg?.addEventListener('click',async()=>{try{await register(document.querySelector('#ieltsx-name').value,document.querySelector('#ieltsx-email').value,document.querySelector('#ieltsx-password').value);location.href='index.html'}catch(x){err.textContent=x.message}});</script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
+<script src="premium-access.js"></script><script src="assets/js/premium-protect.js"></script><a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body>
 
 </html>

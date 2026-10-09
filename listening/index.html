@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listening test 7</title>
+<!-- No script is loaded from a CDN. html2canvas and jsPDF used to be pulled in
+     here and were never called by anything; offline they only delayed the boot.
+     The score report is produced by the browser's own print engine instead
+     (see printStylesheet / saveReportPDF), which is vector, selectable and
+     exactly A4 — and works with no network at all. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+
+<!-- vendored: html2canvas.min.js — embedded rather than linked, so the
+     download needs no connection -->
+<script src="js/vendor/html2canvas.min.js"></script>
+
+<!-- vendored: jspdf.umd.min.js — embedded rather than linked, so the
+     download needs no connection -->
+<script src="js/vendor/jspdf.umd.min.js"></script>
+</head>
+<body class="pre-entry">
+
+<!-- ============================================================
+     ENTRY — candidate name, then the recording is preloaded
+     ============================================================ -->
+<div id="entry-overlay">
+  <div class="entry-card">
+    <div class="entry-inner" id="entry-form">
+      <div class="entry-brand">
+        <div class="ielts-wordmark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+        <div class="entry-brand-txt"><b>READING_CDI</b><span>Academic &middot; Listening</span></div>
+      </div>
+      <h1 class="entry-title">Listening &mdash; Listening test 7</h1>
+      <div class="entry-sub">The recording plays once, exactly as it does in the real exam.</div>
+      <div class="entry-meta">
+        <div><div class="n">4</div><div class="l">Parts</div></div>
+        <div><div class="n">40</div><div class="l">Questions</div></div>
+        <div><div class="n">40</div><div class="l">Minutes</div></div>
+      </div>
+      <div class="entry-field" id="entry-field">
+        <label for="entry-name">Candidate name</label>
+        <input id="entry-name" type="text" placeholder="e.g. Shaxriyor" autocomplete="off" spellcheck="false">
+        <div class="entry-hint" id="entry-hint">It appears on your score report.</div>
+      </div>
+      <div class="entry-banner"><b>Before you start:</b> the audio plays straight through &mdash; no pausing and no rewinding. When you finish, press the <b>&#10003;</b> button at the bottom right and confirm: you get your band score with every answer marked, and the paper reopens with the transcript beside it.</div>
+      <button class="entry-btn" id="entry-start" type="button">Start test &rarr;</button>
+    </div>
+    <div class="entry-inner" id="entry-loading" hidden>
+      <div class="entry-brand">
+        <div class="ielts-wordmark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+        <div class="entry-brand-txt"><b>READING_CDI</b><span>Academic &middot; Listening</span></div>
+      </div>
+      <h1 class="entry-title">Preparing your test&hellip;</h1>
+      <div class="entry-sub" id="entry-loading-sub">Loading the recording for Listening test 7</div>
+      <div class="entry-progress-track"><div class="entry-progress-fill" id="entry-progress-fill"></div></div>
+      <div class="entry-progress-label" id="entry-progress-label">0%</div>
+    </div>
+    <a class="entry-tg" href="https://t.me/READING_CDI" target="_blank" rel="noopener">
+      <div><div class="tgn">@READING_CDI</div><div class="tgd">New authentic practice tests every week</div></div>
+      <div class="tgj">Join</div>
+    </a>
+  </div>
+</div>
+
+
+<div class="stage active" id="stage-listening">
+  <div id="hdr">
+    <div id="hdr-left">
+      <div class="ielts-wordmark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+      <div class="test-taker-block">
+        <div class="ttid-label">Test taker ID</div>
+        <div class="ttid-sub"><span class="ttid-sub-inline" id="audio-hdr-badge"></span></div>
+      </div>
+      <!-- PRACTICE-PRODUCT ADDITION. The official Listening player carries no clock
+           at any point; this is the Writing build's precedent, set in the candidate
+           block's own type so it reads as chrome, not as an alarm. -->
+      <div class="test-taker-block" id="hdr-clock">
+        <div class="ttid-label">Time remaining</div>
+        <div class="ttid-sub"><span class="ttid-sub-inline"><svg class="fa-glyph" width="13.3333" height="13.3333" viewBox="0 0 1792 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1024 1056v-320q0 -13 -9.5 -22.5t-22.5 -9.5h-224q-13 0 -22.5 9.5t-9.5 22.5v64q0 13 9.5 22.5t22.5 9.5h128v224q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5 -9.5t9.5 -22.5zM1312 640q0 148 -73 273t-198 198t-273 73t-273 -73t-198 -198t-73 -273t73 -273t198 -198t273 -73t273 73t198 198t73 273zM1600 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z"/></g></svg><span class="ttid-sub-title" id="timer-listening">40:00</span></span></div>
+      </div>
+    </div>
+    <div id="hdr-right">
+      <button class="hdr-icon-btn" id="fs-btn" type="button" title="Full screen" aria-label="Toggle full screen" onclick="ExamApp.toggleFullscreen()">
+        <span class="hdr-icon"><svg class="fs-glyph" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="fs-in" d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><path class="fs-out" d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" style="display:none"/></svg></span>
+      </button>
+      <button class="hdr-icon-btn" id="wifi-btn" aria-label="Connected">
+        <span class="hdr-conn-status" id="hdr-conn-status"></span>
+        <span class="hdr-icon"><svg class="fa-glyph" width="27.4297" height="24" viewBox="0 0 2048 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75zM1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z"/></g></svg></span>
+      </button>
+      <div id="bell-wrap" style="display:contents">
+        <button class="hdr-icon-btn" id="bell-btn" title="Messages" onclick="LSN.openMessages()">
+          <span class="hdr-icon"><svg class="fa-glyph" width="24" height="24" viewBox="0 0 1792 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M912 -160q0 16 -16 16q-59 0 -101.5 42.5t-42.5 101.5q0 16 -16 16t-16 -16q0 -73 51.5 -124.5t124.5 -51.5q16 0 16 16zM246 128h1300q-266 300 -266 832q0 51 -24 105t-69 103t-121.5 80.5t-169.5 31.5t-169.5 -31.5t-121.5 -80.5t-69 -103t-24 -105q0 -532 -266 -832zM1728 128q0 -52 -38 -90t-90 -38h-448q0 -106 -75 -181t-181 -75t-181 75t-75 181h-448q-52 0 -90 38t-38 90q50 42 91 88t85 119.5t74.5 158.5t50 206t19.5 260q0 152 117 282.5t307 158.5q-8 19 -8 39q0 40 28 68t68 28t68 -28t28 -68q0 -20 -8 -39q190 -28 307 -158.5t117 -282.5q0 -139 19.5 -260t50 -206t74.5 -158.5t85 -119.5t91 -88z"/></g></svg></span>
+        </button>
+      </div>
+      <div id="menu-wrap">
+        <button class="hdr-icon-btn" id="menu-btn" onclick="LSN.openOptions()" aria-label="Options"><span class="hdr-icon"><svg class="fa-glyph" width="20.5781" height="24" viewBox="0 0 1536 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z"/></g></svg></span></button>
+      </div>
+      <button class="hdr-icon-btn" id="notes-btn" onclick="LSN.toggleNotes()" aria-label="Show notes">
+        <span class="hdr-icon"><svg class="fa-glyph" width="24" height="24" viewBox="0 0 1792 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M888 352l116 116l-152 152l-116 -116v-56h96v-96h56zM1328 1072q-16 16 -33 -1l-350 -350q-17 -17 -1 -33t33 1l350 350q17 17 1 33zM1408 478v-190q0 -119 -84.5 -203.5t-203.5 -84.5h-832q-119 0 -203.5 84.5t-84.5 203.5v832q0 119 84.5 203.5t203.5 84.5h832q63 0 117 -25q15 -7 18 -23q3 -17 -9 -29l-49 -49q-14 -14 -32 -8q-23 6 -45 6h-832q-66 0 -113 -47t-47 -113v-832q0 -66 47 -113t113 -47h832q66 0 113 47t47 113v126q0 13 9 22l64 64q15 15 35 7t20 -29zM1312 1216l288 -288l-672 -672h-288v288zM1756 1084l-92 -92l-288 288l92 92q28 28 68 28t68 -28l152 -152q28 -28 28 -68t-28 -68z"/></g></svg></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- submission page: the header grows by an 88px table-of-contents bar -->
+  <div id="hdr-toc">
+    <div class="toc-row">
+      <span class="toc-msg">Click next to continue</span>
+      <button type="button" id="toc-next" onclick="LSN.submitConfirm()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 2 2 10l7.2 2.8L12 20l10-18z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M22 2 9.2 12.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Next</button>
+    </div>
+  </div>
+
+  <div id="listening-area">
+    <div class="listening-content">
+
+      <div id="pbar">
+        <div id="pbar-inner">
+          <div id="pbar-info">
+            <h2 id="pbar-title">Part 1</h2>
+            <p id="pbar-desc">Listen and answer questions 1–10.</p>
+          </div>
+        </div>
+        <!-- REVIEW-MODE ONLY. Every control below is one the official player
+             deliberately withholds during the exam (§3): it lives outside
+             #pbar-inner so it cannot touch the rubric block's geometry, and it is
+             display:none unless body.review-mode is set. -->
+        <div id="pbar-audio">
+            <span id="audio-state-badge">◌ LOADING</span>
+            <button class="seek-btn" onclick="ExamApp.seekAudio(-10)" title="Rewind 10s">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>10s
+            </button>
+            <button class="pp-btn" id="pp-btn" onclick="ExamApp.togglePlayPause()" title="Play / Pause">▶</button>
+            <button class="seek-btn" onclick="ExamApp.seekAudio(10)" title="Skip 10s">
+              10s<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            </button>
+            <div id="audio-progress-track">
+              <div id="audio-click-overlay"></div>
+              <div id="audio-buffered"></div>
+              <div id="audio-progress-fill"></div>
+            </div>
+            <span id="audio-time-display">00:00 / 00:00</span>
+            <span style="font-size:13px;opacity:.5;flex-shrink:0">🔊</span>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="1" oninput="ExamApp.setVolume(this.value)" title="Volume">
+            <select id="speed-select" class="speed-select" onchange="ExamApp.setPlaybackRate(this.value)" title="Speed">
+              <option value="0.5">0.5×</option>
+              <option value="0.75">0.75×</option>
+              <option value="1" selected>1×</option>
+              <option value="1.25">1.25×</option>
+              <option value="1.5">1.5×</option>
+          </select>
+        </div>
+        <!-- ===== EDIT PER TEST · AUDIO (BUILD_INSTRUCTIONS.md §3): replace the src URL below with the new MP3 ===== -->
+        <audio id="exam-audio" preload="auto" style="display:none">
+          <source src="https://raw.githubusercontent.com/Shaxxriyor/premium-listening/main/TEST%207.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div id="listening-render"></div>
+    </div>
+  </div>
+
+  <div id="bnav">
+    <div id="listening-nav"></div>
+  </div>
+
+  <div id="qnav-arrows">
+    <button class="qnav-btn prev" onclick="ExamApp.prevSection()" title="Previous section" aria-label="Previous section">
+      <svg viewBox="0 0 448 512"><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8 .4 34.3z"></path></svg>
+    </button>
+    <button class="qnav-btn next" onclick="ExamApp.nextSection()" title="Next section" aria-label="Next section">
+      <svg viewBox="0 0 448 512"><path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path></svg>
+    </button>
+  </div>
+
+  <!-- ============================================================
+       OPTIONS — a full-screen replacement page. Three rows only:
+       Go to submission page / Contrast / Text size, plus Close options.
+       No volume, no playback speed, no theme picker, no full-screen toggle.
+       ============================================================ -->
+  <div id="opt-page" data-view="root" role="dialog" aria-label="Options">
+    <div class="opt-topbar">
+      <button type="button" class="opt-back" onclick="LSN.optionsRoot()" aria-label="Back to options">&#8592;&nbsp;Back to options</button>
+      <h1 id="opt-title">Options</h1>
+      <button type="button" class="opt-close" onclick="LSN.closeOptions()" aria-label="Close options">&#10005;</button>
+    </div>
+    <div class="opt-main">
+      <div class="opt-root">
+        <div class="opt-group">
+          <button type="button" class="opt-item main" onclick="LSN.goToSubmission()">
+            <span class="opt-ic"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 2 10l7.2 2.8L12 20l10-18z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M22 2 9.2 12.8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            <span class="opt-lbl">Go to submission page</span>
+            <span class="opt-chev"><svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><path d="M3 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+        </div>
+        <div class="opt-group">
+          <button type="button" class="opt-item" id="opt-contrast-btn" onclick="LSN.optionsView('contrast')">
+            <span class="opt-ic"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></svg></span>
+            <span class="opt-lbl">Contrast</span>
+            <span class="opt-chev"><svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><path d="M3 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <button type="button" class="opt-item" id="opt-zoom-btn" onclick="LSN.optionsView('zoom')">
+            <span class="opt-ic"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <span class="opt-lbl">Text size</span>
+            <span class="opt-chev"><svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><path d="M3 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+        </div>
+      </div>
+      <div class="opt-sub opt-sub-contrast">
+        <div class="opt-group">
+          <button type="button" class="opt-item" data-contrast="light" onclick="LSN.setContrast('light')"><span class="opt-lbl">Black on white</span><span class="opt-chev"></span></button>
+          <button type="button" class="opt-item" data-contrast="dark" onclick="LSN.setContrast('dark')"><span class="opt-lbl">White on black</span><span class="opt-chev"></span></button>
+          <button type="button" class="opt-item" data-contrast="yob" onclick="LSN.setContrast('yob')"><span class="opt-lbl">Yellow on black</span><span class="opt-chev"></span></button>
+        </div>
+      </div>
+      <div class="opt-sub opt-sub-zoom">
+        <div class="opt-group">
+          <button type="button" class="opt-item" data-size="regular" onclick="LSN.setTextSize('regular')"><span class="opt-lbl">Regular</span><span class="opt-chev"></span></button>
+          <button type="button" class="opt-item" data-size="large" onclick="LSN.setTextSize('large')"><span class="opt-lbl">Large</span><span class="opt-chev"></span></button>
+          <button type="button" class="opt-item" data-size="xlarge" onclick="LSN.setTextSize('xlarge')"><span class="opt-lbl">Extra large</span><span class="opt-chev"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages: an empty white full-screen page with the standard chrome. -->
+  <div id="msg-page" class="opt-page-like" role="dialog" aria-label="Messages">
+    <div class="opt-topbar">
+      <h1>Messages</h1>
+      <button type="button" class="opt-close" onclick="LSN.closeMessages()" aria-label="Close messages">&#10005;</button>
+    </div>
+  </div>
+
+  <div id="time-up" role="dialog" aria-modal="true" aria-label="Time is up">
+    <div class="tu-card">
+      <h2>Time is up</h2>
+      <p id="tu-msg">Your practice test time has run out. Your answers will now be submitted.</p>
+      <button type="button" onclick="LSN.timeUpAck()">Submit my answers</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ============================================================
+     RESULTS — score, band and the full answer key
+     ============================================================ -->
+<div class="stage" id="stage-results">
+  <div class="rs-top">
+    <div class="rs-top-l">
+      <div class="ielts-wordmark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+      <span class="t">Listening &mdash; Listening test 7</span>
+    </div>
+    <div class="rs-top-r">
+      <button class="rs-btn" type="button" onclick="ExamApp.resetExam()">New test</button>
+      <button class="rs-btn primary" type="button" onclick="ExamApp.reviewExam()">Back to the listening test &rarr;</button>
+    </div>
+  </div>
+  <div class="results-content" id="results-content"></div>
+</div>
+
+<!-- ============================================================
+     OVERLAYS
+     ============================================================ -->
+<div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
+  <div class="warning-card">
+    <div class="wc-body">
+      <div class="wc-top">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6 2.6 20h18.8L12 3.6Z"/><path d="M12 9.6v4.6"/><path d="M12 17.3h.01"/></svg>
+        </div>
+        <div class="wc-heads">
+          <div class="wc-eyebrow">Exam integrity</div>
+          <h2 id="warning-title">This session is being monitored</h2>
+        </div>
+      </div>
+      <div class="wc-reason">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        <p id="warning-body"></p>
+      </div>
+      <div class="wc-meter">
+        <div class="wc-meter-head"><span>Violations recorded</span></div>
+        <div class="strike-counter" id="strike-counter" role="img" aria-label="Violation counter">
+          <div class="strike"></div><div class="strike"></div><div class="strike"></div>
+        </div>
+        <p id="warning-strikes-text">Warning <strong>1 of 3</strong> &mdash; the test will be terminated on the third violation.</p>
+      </div>
+    </div>
+    <div class="wc-foot">
+      <div class="wc-note">Real IELTS test centres apply the same rule &mdash; and the recording has not stopped for you. Stay in full-screen until you submit.</div>
+      <button class="wc-btn" onclick="ExamApp.dismissWarning()">Return to the test</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESUME SHEET — replaces the browser confirm() -->
+<!-- ch-resume removed: a reload restarts the paper -->
+
+<div id="hl-popup" class="hl-popup">
+  <button class="tool-btn note" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Add a note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    <span>Note</span>
+  </button>
+  <button class="tool-btn hilite" onmousedown="event.preventDefault(); ExamApp.applyHighlight('hl-y')" title="Highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+    <span>Highlight</span>
+  </button>
+  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Remove highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+    <span>Clear</span>
+  </button>
+</div>
+  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Erase">⌫</button>
+</div>
+
+<!-- ============================================================
+     AUDIO GATE - pre-play overlay (real exam parity)
+     ============================================================ -->
+<div id="audio-gate" role="dialog" aria-modal="true" aria-label="Audio"><div id="audio-gate-inner"><svg class="ag-hp" width="104" height="112" viewBox="0 0 1664 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1664 650q0 -166 -60 -314l-20 -49l-185 -33q-22 -83 -90.5 -136.5t-156.5 -53.5v-32q0 -14 -9 -23t-23 -9h-64q-14 0 -23 9t-9 23v576q0 14 9 23t23 9h64q14 0 23 -9t9 -23v-32q71 0 130 -35.5t93 -95.5l68 12q29 95 29 193q0 148 -88 279t-236.5 209t-315.5 78t-315.5 -78t-236.5 -209t-88 -279q0 -98 29 -193l68 -12q34 60 93 95.5t130 35.5v32q0 14 9 23t23 9h64q14 0 23 -9t9 -23v-576q0 -14 -9 -23t-23 -9h-64q-14 0 -23 9t-9 23v32q-88 0 -156.5 53.5t-90.5 136.5l-185 33l-20 49q-60 148 -60 314q0 151 67 291t179 242.5t266 163.5t320 61t320 -61t266 -163.5t179 -242.5t67 -291z"/></g></svg><p>You will be listening to an audio clip during this test. You will not be permitted to pause or rewind the audio while answering the questions.</p><p>To continue, click Play.</p><button type="button" id="ag-play-btn" onclick="ExamApp.startGatedAudio()"><svg class="ag-pi" width="22.8594" height="26.6667" viewBox="0 0 1536 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M768 1408q209 0 385.5 -103t279.5 -279.5t103 -385.5t-103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103zM1152 585q32 18 32 55t-32 55l-544 320q-31 19 -64 1q-32 -19 -32 -56v-640q0 -37 32 -56q16 -8 32 -8q17 0 32 9z"/></g></svg><span class="caption">Play</span></button></div></div>
+<div id="note-modal" class="note-modal">
+  <div class="nm-head"><span class="nm-title">Note</span>
+    <button class="nm-x" onclick="ExamApp.closeNote()" title="Close">&times;</button></div>
+  <textarea id="note-textarea" class="nm-text" rows="4" placeholder="Write your note&hellip;"
+    onkeydown="if(event.key==='Escape'){ExamApp.closeNote();}if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){ExamApp.saveNote();}"></textarea>
+  <div class="nm-foot"><span class="nm-hint">&#8984;/Ctrl + Enter to save</span>
+    <div class="nm-actions"><button class="nm-btn ghost" onclick="ExamApp.deleteNote()">Delete</button>
+      <button class="nm-btn solid" onclick="ExamApp.saveNote()">Save</button></div></div>
+</div>
+<aside id="anno-drawer" class="anno-drawer" aria-label="Notes" aria-hidden="true">
+  <div class="nd-head"><span class="nd-title">Notes</span>
+    <button class="nd-x" onclick="ExamApp.toggleAnnoDrawer(false)" aria-label="Close notes">&times;</button></div>
+  <div class="nd-body" id="anno-drawer-body"></div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script src="js/ui.js"></script>
+
+<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+     Listening and Reading tests. Inlined, so it works from a memory stick
+     with the network off. See the header comment inside for what it does and
+     why it is not jsPDF + html2canvas. ══ -->
+
+<script src="js/exam-app.js"></script>
+<!-- ============================================================
+     WRAPPER-STAGE 3D LAYER  (Three.js r160 UMD, inlined)
+     Renders behind #stage-registration / -listening-intro /
+     -completion / -results only. The exam screen (#stage-listening)
+     hides the canvas and cancels the frame loop entirely.
+     No WebGL or prefers-reduced-motion -> the layer never activates
+     and every stage renders exactly as it did before.
+     ============================================================ -->
+<!-- Three.js was here only to draw the galaxy; both are gone. -->
+<script src="js/shell.js"></script>
+<!-- ============================================================
+     NOTES  (header pencil).  Body-level so it is never trapped in the
+     stage's stacking context — same reason as the popups below.
+     ============================================================ -->
+<div id="notes-panel" role="dialog" aria-label="Notes">
+  <div class="np-hdr">
+    <span class="np-title">Notes</span>
+    <button type="button" class="np-close" onclick="toggleNotesPanel()" aria-label="Close notes">&times;</button>
+  </div>
+  <textarea id="notes-area" spellcheck="false" placeholder="Jot down names, numbers, spellings&#8230;"></textarea>
+  <div class="np-foot">Saved automatically &middot; not marked</div>
+</div>
+<!-- Header popups, lifted out of #stage-listening so they can sit above the
+     transcript panel. Both are position:fixed, so this does not move them. -->
+        <div id="menu-dropdown">
+          <div class="md-title">Text size</div>
+          <div class="md-row">
+            <span class="md-lbl">Smaller</span>
+            <button class="fsz-btn" onclick="ExamApp.zoomText(-1)">A−</button>
+            <button class="fsz-btn" onclick="ExamApp.zoomText(1)">A+</button>
+            <span class="md-lbl" style="min-width:0">Larger</span>
+          </div>
+          <div class="md-title">Volume</div>
+          <div class="md-row" style="gap:8px">
+            <button class="fsz-btn" onclick="ExamApp.setVolume(Math.max(0,(document.getElementById('exam-audio').volume||1)-.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Decrease volume">−</button>
+            <input type="range" id="menu-vol-slider" min="0" max="1" step="0.1" value="1" oninput="ExamApp.setVolume(this.value)" style="flex:1;cursor:pointer;accent-color:var(--primary);height:4px">
+            <button class="fsz-btn" onclick="ExamApp.setVolume(Math.min(1,(document.getElementById('exam-audio').volume||0)+.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Increase volume">+</button>
+          </div>
+          <div class="md-title">Theme</div>
+          <div class="md-row md-dots">
+            <div class="theme-dot active" data-theme="light" style="background:#ffffff" onclick="ExamApp.setTheme('light')" title="Light"></div>
+            <div class="theme-dot" data-theme="dark" style="background:#1c1c1c" onclick="ExamApp.setTheme('dark')" title="Dark"></div>
+            <div class="theme-dot" data-theme="sepia" style="background:#f5f0e8" onclick="ExamApp.setTheme('sepia')" title="Sepia"></div>
+          </div>
+          <button class="md-fs" onclick="ExamApp.toggleFullscreen()">⛶ Toggle full-screen</button>
+        </div>
+        <div id="notif-popup" class="notif-popup">
+          <div class="notif-popup-hdr">Messages</div>
+          <div class="notif-popup-body">No messages</div>
+        </div>
+<div id="transcript-panel"></div>
+<!-- The procedural galaxy that used to sit behind every stage was removed:
+     this is an exam paper, not a backdrop. -->
+
+<script src="js/boot.js"></script>
+
+</body>
+</html>
