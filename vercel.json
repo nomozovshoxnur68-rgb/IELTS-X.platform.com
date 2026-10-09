@@ -12,7 +12,7 @@
     {"source": "/login", "destination": "/login.html", "permanent": false},
     {"source": "/privacy-policy", "destination": "/index.html", "permanent": false},
     {"source": "/terms-of-service", "destination": "/index.html", "permanent": false},
-    {"source": "/feedback", "destination": "/index.html", "permanent": false},
+    {"source": "/feedback", "destination": "/login.html", "permanent": false},
     {"source": "/practice/mock", "destination": "/Mock%20tests.html", "permanent": false},
     {"source": "/study/Tools/articles.html", "destination": "/study/Tools/Articles.html", "permanent": false},
     {"source": "/study/tools/Articles.html", "destination": "/study/Tools/Articles.html", "permanent": false},
