@@ -37,7 +37,7 @@
     {"source": "/full reading.html", "destination": "/part/practice/reading.html", "permanent": false},
     {"source": "/full writing.html", "destination": "/part/practice/writing.html", "permanent": false},
     {"source": "/full speaking.html", "destination": "/part/practice/speaking.html", "permanent": false}
-    {"source": "In_Deep_Water_P1_V3.html", "destination": "/In_Deep_Water_P1_V3.html", "permanent": false}
+    {"source": "/In_Deep_Water_P1_V3.html", "destination": "/In_Deep_Water_P1_V3.html", "permanent": false}
   ],
   "headers": [
     {
