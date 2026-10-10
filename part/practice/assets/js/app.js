@@ -1430,7 +1430,7 @@
             plan: 'Starter Pack',
             pack: 'Starter Pack',
             passage: 'Passage 1',
-            href: 'test',
+            href: 'test.html',
             img: 'pessage17.png',
             desc: 'Free Sample | Starter Pack',
             badge: 'FREE'
