@@ -1,94 +1,82 @@
-(function(){
-'use strict';
+/*
+ * IELTSX — locked premium cards.
+ * A card with data-premium-card (or .premium-card / .unlock-card) is locked for visitors
+ * without premium. The decision comes from the server (IELTSXPremium.status), not from localStorage.
+ */
+(function () {
+  'use strict';
 
-function email(){
-  return String(localStorage.getItem('ieltsx_logged_in_email') ||
-                localStorage.getItem('userEmail') || '').trim().toLowerCase();
-}
-
-function currentUser(){
-  try {
-    return JSON.parse(localStorage.getItem('ieltsx_current_user') || 'null');
-  } catch(e) {
-    return null;
+  function known() {
+    var P = window.IELTSXPremium;
+    return P && P.cached ? P.cached() : null;
   }
-}
+  function isPremium() {
+    var s = known();
+    return !!(s && s.premium);
+  }
+  function status() {
+    var P = window.IELTSXPremium;
+    return P ? P.status() : Promise.resolve({ premium: false, authenticated: false });
+  }
 
-function users(){
-  try{ return JSON.parse(localStorage.getItem('ieltsx_users') || '[]'); }catch(e){ return []; }
-}
+  function show(card, s) {
+    if (card.querySelector('.ieltsx-unlock-overlay')) return;
+    var loggedIn = s && s.authenticated;
+    var overlay = document.createElement('div');
+    overlay.className = 'ieltsx-unlock-overlay';
+    overlay.innerHTML =
+      '<div class="ieltsx-unlock-dialog">' +
+      '<button class="unlock-close" aria-label="Close">×</button>' +
+      '<h3>Premium Access Required</h3>' +
+      '<p>' + (loggedIn ? 'This test is locked. Upgrade to Premium to unlock this content.' : 'Sign in to your account to open this test.') + '</p>' +
+      '<a class="unlock-action" href="' + (loggedIn ? '/Price.html?premium=required' : '/login.html?next=' + encodeURIComponent(location.pathname + location.search)) + '">' +
+      (loggedIn ? 'Unlock Premium' : 'Sign in') + '</a>' +
+      '</div>';
+    card.appendChild(overlay);
+    overlay.querySelector('.unlock-close').onclick = function () { overlay.remove(); };
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+  }
 
-function isPremium(){
-  const user = currentUser();
-  if (user) {
-    if (user.role === 'admin' || user.plan === 'Admin') return true;
-    if (user.premiumActive) {
-      if (!user.premiumExpiresAt) return true;
-      return new Date(user.premiumExpiresAt).getTime() >= Date.now();
+  function paint(s) {
+    var locked = !(s && s.premium);
+    document.querySelectorAll('.ieltsx-unlock-card').forEach(function (card) {
+      card.classList.toggle('is-locked', locked);
+      card.classList.toggle('is-unlocked', !locked);
+    });
+  }
+
+  window.IELTSXUnlock = {
+    isPremium: isPremium,
+    requirePremium: function (target) {
+      return status().then(function (s) {
+        if (s.premium) { if (target) location.href = target; return true; }
+        var card = document.querySelector('.ieltsx-unlock-card');
+        if (card) show(card, s); else location.href = s.authenticated ? '/Price.html?premium=required' : '/login.html';
+        return false;
+      });
     }
-  }
+  };
 
-  const e = email();
-  if (!e) return false;
-  const u = users().find(x => String(x.email || '').toLowerCase() === e);
-  if(!u || !u.premium) return false;
-  if(!u.premiumUntil || String(u.premiumUntil).toLowerCase() === 'lifetime') return true;
-  return new Date(u.premiumUntil + (u.premiumUntil.includes('T') ? '' : 'T23:59:59')).getTime() >= Date.now();
-}
-
-function show(card, target){
-  if(card.querySelector('.ieltsx-unlock-overlay')) return;
-  const overlay = document.createElement('div');
-  overlay.className = 'ieltsx-unlock-overlay';
-  overlay.innerHTML =
-    '<div class="ieltsx-unlock-dialog">' +
-    '<button class="unlock-close" aria-label="Close">×</button>' +
-    '<h3>Premium Access Required</h3>' +
-    '<p>This test is locked. Upgrade to Premium to unlock this content.</p>' +
-    '<a class="unlock-action" href="/Price.html">Unlock Premium</a>' +
-    '</div>';
-  card.appendChild(overlay);
-  overlay.querySelector('.unlock-close').onclick = function(){ overlay.remove(); };
-  overlay.addEventListener('click', function(e){
-    if (e.target === overlay) overlay.remove();
-  });
-}
-
-window.IELTSXUnlock = {
-  isPremium: isPremium,
-  requirePremium: function(target){
-    if(isPremium()){
-      if (target) location.href = target;
-      return true;
-    }
-    const card = document.querySelector('.ieltsx-unlock-card');
-    if(card) show(card, target || '/Price.html');
-    else location.href = '/Price.html';
-    return false;
-  }
-};
-
-function init(){
-  document.querySelectorAll('[data-premium-card],.premium-card,.unlock-card').forEach(function(card){
-    card.classList.add('ieltsx-unlock-card');
-    const locked = !isPremium();
-    card.classList.toggle('is-locked', locked);
-    card.classList.toggle('is-unlocked', !locked);
-
-    if(locked){
-      const action = card.querySelector('[data-premium-link], a[href], button');
-      if(action && !action.dataset.unlockBound){
+  function init() {
+    document.querySelectorAll('[data-premium-card],.premium-card,.unlock-card').forEach(function (card) {
+      card.classList.add('ieltsx-unlock-card');
+      var action = card.querySelector('[data-premium-link], a[href], button');
+      if (action && !action.dataset.unlockBound) {
         action.dataset.unlockBound = '1';
-        action.addEventListener('click', function(e){
+        var href = action.getAttribute('href');
+        action.addEventListener('click', function (e) {
+          if (isPremium()) return;               // already known: let the link work
           e.preventDefault();
-          const href = action.getAttribute('href') || '/Price.html';
-          show(card, href);
+          status().then(function (s) {
+            if (s.premium) { if (href) location.href = href; return; }
+            show(card, s);
+          });
         });
       }
-    }
-  });
-}
-
-if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+    });
+    paint(known());                               // instant state from the short cache
+    status().then(paint);                         // then the server's answer
+  }
+  document.addEventListener('ieltsx:premium', function (e) { paint(e.detail); });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

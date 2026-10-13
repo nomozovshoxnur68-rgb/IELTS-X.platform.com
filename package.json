@@ -1,14 +1,14 @@
 {
   "name": "ieltsx",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
+  "description": "IELTSX website: static pages + accounts, premium and admin API",
   "main": "server.js",
+  "engines": { "node": ">=18" },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
-  },
-  "dependencies": {
-    "multer": "^2.0.0",
-    "express": "^5.1.0"
+    "dev": "node server.js",
+    "make-admin": "node scripts/make-admin.js",
+    "test": "node scripts/selftest.js"
   }
 }

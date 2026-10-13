@@ -3763,6 +3763,7 @@ function renderResults() {
   const tot  = qs.length || QTOTAL;
   const nC   = rd.counts.correct;
   const pct  = Math.round(nC / tot * 100);
+  try { window.dispatchEvent(new CustomEvent('ieltsx:test-finished', { detail: { correct: nC, total: tot, band: band } })); } catch (e) { /* tracking must never break the exam */ }
   const bad  = qs.filter(q => q.status !== 'correct');
 
   const TYPE_LABELS = {

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot password — IELTS X</title>
+    <meta name="robots" content="noindex">
+    <script src="/assets/js/theme-init.js"></script>
+    <link rel="icon" href="/assets/ieltsx-only-logo-BajnupZg.png">
+    <link rel="stylesheet" href="/assets/css/login.css">
+</head>
+<body data-page="forgot">
+    <header class="topbar">
+        <a href="/index.html" class="brand" aria-label="IELTS X home"><img src="/assets/ieltsx-logo-transparent.png" alt="IELTS X"></a>
+        <a href="/login.html" class="btn-ghost">Sign in</a>
+    </header>
+    <main class="stage">
+        <section class="card">
+            <h1>Forgot your password?</h1>
+            <p class="sub">Enter your email and we will send you a link to choose a new one.</p>
+            <form id="form" novalidate>
+                <div class="field"><label for="email">Email</label>
+                <input id="email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required placeholder="you@example.com"></div>
+                <p id="error" class="error" role="alert" aria-live="polite"></p>
+                <p id="done" class="ok" role="status" aria-live="polite" hidden></p>
+                <button type="submit" id="submit" class="btn-primary">Send reset link</button>
+            </form>
+            <p class="switch"><a class="link" href="/login.html">Back to sign in</a></p>
+        </section>
+    </main>
+    <script type="module" src="/assets/js/auth-pages.js"></script>
+</body>
+</html>

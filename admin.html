@@ -1,71 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
 <title>IELTSX — Admin Panel</title>
-<link rel="stylesheet" href="index-BxgEAFAf.css"><link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="/admin.css">
 </head>
 <body>
 <div class="admin-shell">
-<aside class="admin-sidebar">
+
+<aside class="admin-sidebar" id="sidebar" aria-label="Admin navigation">
   <div class="admin-brand">
-    <img src="./assets/ieltsx-logo-transparent.png" onerror="this.style.display='none'" alt="">
+    <img src="/assets/ieltsx-logo-transparent.png" onerror="this.style.display='none'" alt="">
     <div><strong>IELTSX</strong><small>Admin Panel</small></div>
   </div>
   <nav class="admin-nav">
     <div class="nav-label">Management</div>
-    <a class="nav-item active" href="#dashboard"><span>▦</span><span class="grow">Dashboard</span></a>
-    <a class="nav-item" href="#users"><span>♙</span><span class="grow">Users</span></a>
-    <a class="nav-item" href="#premium"><span>★</span><span class="grow">Premium Access</span></a>
-    <a class="nav-item" href="#tests"><span>▤</span><span class="grow">Tests & Materials</span></a>
+    <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico">▦</span><span class="grow">Dashboard</span></a>
+    <a class="nav-item" href="#users" data-nav="users"><span class="ico">♙</span><span class="grow">Users</span></a>
+    <a class="nav-item" href="#premium" data-nav="premium"><span class="ico">★</span><span class="grow">Premium</span></a>
+    <a class="nav-item" href="#orders" data-nav="orders"><span class="ico">◈</span><span class="grow">Orders</span><span id="orders-count" class="pill" hidden>0</span></a>
+    <a class="nav-item" href="#activity" data-nav="activity"><span class="ico">✎</span><span class="grow">Test activity</span></a>
+    <a class="nav-item" href="#audit" data-nav="audit"><span class="ico">☰</span><span class="grow">Activity log</span></a>
+    <div class="nav-label">Content</div>
+    <a class="nav-item" href="/admin/reading.html"><span class="ico">▤</span><span class="grow">Reading Manager</span></a>
+    <a class="nav-item" href="/admin/listening.html"><span class="ico">♪</span><span class="grow">Listening Manager</span></a>
     <div class="nav-label">Site</div>
-    <a class="nav-item" href="index.html"><span>⌂</span><span class="grow">Open Website</span></a>
-    <button class="nav-item" data-logout><span>↪</span><span class="grow">Sign out</span></button>
+    <a class="nav-item" href="/index.html"><span class="ico">⌂</span><span class="grow">Open website</span></a>
+    <button class="nav-item" data-logout type="button"><span class="ico">↪</span><span class="grow">Sign out</span></button>
   </nav>
 </aside>
+<div class="scrim" id="scrim"></div>
+
 <main class="admin-main">
   <header class="topbar">
-    <div class="topbar-title">Dashboard</div>
-    <div class="topbar-right"><div class="admin-user"><div><strong style="font-size:13px">Administrator</strong><div class="muted" style="font-size:11px">Full access</div></div><div class="avatar">A</div></div></div>
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu">☰</button>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <button class="btn btn-sm" id="refresh" type="button" title="Reload all data">↻ Refresh</button>
+    <div class="admin-user"><div><strong id="admin-name" style="font-size:13px">Administrator</strong><div id="admin-role" class="muted sm">Full access</div></div><div id="admin-avatar" class="avatar">A</div></div>
   </header>
-  <div class="container" id="dashboard">
+
+  <div class="page">
+
+  <!-- ═════════ Dashboard ═════════ -->
+  <section class="view active" id="view-dashboard">
     <div class="grid stats">
-      <div class="card stat"><div><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">0</div></div><div class="stat-icon">♙</div></div>
-      <div class="card stat"><div><div class="stat-label">Premium Users</div><div class="stat-value" id="stat-premium">0</div></div><div class="stat-icon">★</div></div>
-      <div class="card stat"><div><div class="stat-label">Free Users</div><div class="stat-value" id="stat-free">0</div></div><div class="stat-icon">○</div></div>
-      <div class="card stat"><div><div class="stat-label">Available Tests</div><div class="stat-value" id="stat-tests">0</div></div><div class="stat-icon">▤</div></div>
+      <div class="card stat"><div><div class="stat-label">Total users</div><div class="stat-value" id="stat-users">–</div><div class="stat-sub" id="stat-users-sub">&nbsp;</div></div><div class="stat-icon">♙</div></div>
+      <div class="card stat"><div><div class="stat-label">Premium users</div><div class="stat-value" id="stat-premium">–</div><div class="stat-sub" id="stat-premium-sub">&nbsp;</div></div><div class="stat-icon">★</div></div>
+      <div class="card stat"><div><div class="stat-label">Tests taken</div><div class="stat-value" id="stat-tests">–</div><div class="stat-sub" id="stat-tests-sub">&nbsp;</div></div><div class="stat-icon">✎</div></div>
+      <div class="card stat"><div><div class="stat-label">Revenue (confirmed)</div><div class="stat-value" id="stat-revenue">–</div><div class="stat-sub" id="stat-revenue-sub">&nbsp;</div></div><div class="stat-icon">◈</div></div>
     </div>
+    <div class="grid two-col">
+      <div class="card"><div class="section-head"><div><div class="section-title">New sign-ups</div><div class="muted sm">Last 14 days</div></div></div><div class="chart" id="chart-signups"></div><div class="chart-x" id="chart-signups-x"></div></div>
+      <div class="card"><div class="section-head"><div><div class="section-title">Tests finished</div><div class="muted sm">Last 14 days</div></div></div><div class="chart" id="chart-tests"></div><div class="chart-x" id="chart-tests-x"></div></div>
+    </div>
+    <div class="grid two-col">
+      <div class="card"><div class="section-head"><div class="section-title">Needs your attention</div></div><div id="attention"><div class="empty">Loading…</div></div></div>
+      <div class="card"><div class="section-head"><div class="section-title">Audience</div></div><div id="audience"></div></div>
+    </div>
+  </section>
 
-    <div id="users" class="card" style="margin-top:16px">
-      <div class="section-head"><div><div class="section-title">Users</div><div class="muted" style="font-size:12px">Manage accounts and premium access.</div></div></div>
-      <div class="search-row"><input id="user-search" class="field" placeholder="Search name, email or user ID"></div>
-      <div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Email</th><th>Plan</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="users-body"></tbody></table></div>
+  <!-- ═════════ Users ═════════ -->
+  <section class="view" id="view-users">
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Users</div><div class="muted sm">Everybody who signed in with an account stays here. Open a user to give or take Premium, see their tests, suspend or delete them.</div></div>
+        <a class="btn btn-sm" href="/api/admin/users.csv" download>⬇ Export CSV</a></div>
+      <div class="toolbar">
+        <input id="user-search" class="field grow" type="search" placeholder="Search name, e-mail or user ID" autocomplete="off">
+        <select id="user-filter" class="field" aria-label="Filter">
+          <option value="all">All users</option><option value="premium">Premium</option><option value="free">Free</option><option value="expiring">Premium expiring (7 days)</option>
+          <option value="admin">Admins</option><option value="blocked">Suspended</option><option value="unverified">E-mail not verified</option><option value="inactive">Inactive 30+ days</option>
+        </select>
+        <select id="user-sort" class="field" aria-label="Sort">
+          <option value="new">Newest first</option><option value="active">Recently active</option><option value="tests">Most tests</option><option value="name">Name A–Z</option><option value="old">Oldest first</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Plan</th><th>Status</th><th class="right">Tests</th><th>Avg band</th><th>Last active</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="users-body"></tbody></table></div>
+      <div class="pager"><span class="muted sm" id="users-info"></span><div class="actions"><button class="btn btn-sm" id="users-prev" type="button">← Prev</button><button class="btn btn-sm" id="users-next" type="button">Next →</button></div></div>
     </div>
+  </section>
 
-    <div class="grid two-col" style="margin-top:16px">
-      <div id="premium" class="card">
-        <div class="section-head"><div><div class="section-title">Premium Access</div><div class="muted" style="font-size:12px">Grant or revoke premium access from here.</div></div></div>
-        <div class="notice">Premium access is managed securely on the server. Admin changes are stored in the database and enforced by the server.</div>
-        <div id="premium-list" style="margin-top:12px"></div>
-      </div>
-      <div id="tests" class="card">
-        <div class="section-head"><div><div class="section-title">Tests & Materials</div><div class="muted" style="font-size:12px">Current site content overview.</div></div></div>
-        <div data-admin-test style="padding:11px 0;border-bottom:1px solid #e2e8f0"><strong>Reading</strong><div class="muted" style="font-size:12px">Practice passages and tests</div></div>
-        <div data-admin-test style="padding:11px 0;border-bottom:1px solid #e2e8f0"><strong>Listening</strong><div class="muted" style="font-size:12px">Listening practice</div></div>
-        <div data-admin-test style="padding:11px 0;border-bottom:1px solid #e2e8f0"><strong>Writing</strong><div class="muted" style="font-size:12px">Task 1 & Task 2 materials</div></div>
-        <div data-admin-test style="padding:11px 0"><strong>Speaking</strong><div class="muted" style="font-size:12px">Speaking practice</div></div>
-      </div>
+  <!-- ═════════ Premium ═════════ -->
+  <section class="view" id="view-premium">
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Give Premium</div><div class="muted sm">Type a name or e-mail, pick the person, choose the plan and duration.</div></div></div>
+      <input id="give-q" class="field" type="search" placeholder="Search a user to give Premium…" autocomplete="off">
+      <div id="give-results" style="margin-top:10px"></div>
     </div>
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Premium members</div><div class="muted sm">Sorted by the nearest expiry. Extending adds time on top of the current plan.</div></div></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Plan</th><th>Expires</th><th>Tests</th><th>Actions</th></tr></thead><tbody id="premium-body"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- ═════════ Orders ═════════ -->
+  <section class="view" id="view-orders">
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Orders</div><div class="muted sm">When a student has paid, press “Confirm payment” and the plan turns on (an active plan is extended).</div></div></div>
+      <div class="tabs" id="order-tabs"></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Code</th><th>Buyer</th><th>Plan</th><th>Amount</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="orders-body"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- ═════════ Test activity ═════════ -->
+  <section class="view" id="view-activity">
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Test activity</div><div class="muted sm">The latest finished tests of all students.</div></div></div>
+      <div class="tabs" id="activity-tabs"></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Section</th><th>Test</th><th class="right">Score</th><th>Band</th><th>Time</th><th>When</th></tr></thead><tbody id="activity-body"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- ═════════ Audit ═════════ -->
+  <section class="view" id="view-audit">
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Activity log</div><div class="muted sm">Every admin action is recorded: who changed what and when.</div></div></div>
+      <div class="toolbar"><input id="audit-search" class="field grow" type="search" placeholder="Filter by admin, action or target"></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Target</th><th>Details</th></tr></thead><tbody id="audit-body"></tbody></table></div>
+    </div>
+  </section>
+
   </div>
 </main>
 </div>
-<div id="grant-modal" class="modal-backdrop"><div class="modal">
-  <h3>Give Premium Access</h3><p>Grant premium access to <strong id="grant-name"></strong>.</p>
+
+<!-- user drawer -->
+<div id="drawer-backdrop" class="drawer-backdrop"><aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="User details"></aside></div>
+
+<!-- premium dialog -->
+<div id="grant-modal" class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="grant-title">
+  <h3 id="grant-title">Give Premium access</h3><p>For <strong id="grant-name"></strong></p>
   <input type="hidden" id="grant-id">
-  <label style="display:block;font-size:12px;font-weight:650;margin-bottom:6px">Plan</label>
-  <select id="grant-plan" class="field" style="width:100%"><option>Premium</option><option>Premium Annual</option><option>Lifetime</option></select>
-  <div class="modal-actions"><button class="btn" data-close-modal>Cancel</button><button class="btn btn-primary" data-save-grant>Give Premium</button></div>
+  <label class="lbl" for="grant-plan">Plan</label>
+  <select id="grant-plan" class="field"><option>Premium</option></select>
+  <label class="lbl" for="grant-days">Duration</label>
+  <select id="grant-days" class="field"><option value="30">30 days</option><option value="90">3 months</option><option value="180">6 months</option><option value="365" selected>1 year</option><option value="0">Lifetime (no expiry)</option></select>
+  <label class="lbl" for="grant-mode">If the user already has Premium</label>
+  <select id="grant-mode" class="field"><option value="extend">Add this time on top of the current plan</option><option value="set">Start again from today</option></select>
+  <div class="modal-actions"><button class="btn" data-close-modal type="button">Cancel</button><button class="btn btn-primary" data-save-grant type="button">Give Premium</button></div>
 </div></div>
-<div id="toast" class="toast"></div>
-<script src="premium-access.js"></script><script src="admin.js"></script>
-<a href="admin/admin.html" class="admin-panel-link">Admin Panel</a></body></html>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/admin.js"></script>
+</body>
+</html>

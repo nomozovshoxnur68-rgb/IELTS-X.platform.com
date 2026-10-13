@@ -2982,7 +2982,8 @@ body.anno-open #stage-listening{padding-right:300px;transition:padding-right .28
 .hl-popup .tool-btn.erase>svg{display:block;width:17px;height:17px;flex-shrink:0}
 .hl-popup .tool-btn.erase::before{display:none}
 .hl-popup .tool-btn span{font-family:var(--sans);font-size:12px;line-height:1;color:#737373;white-space:nowrap}
-). Reading's .stage.active has no z-index, so the
+/* Wrapper stages must paint above the starfield canvas (#cdi-stars-host).
+   Reading's .stage.active has no z-index, so the
    canvas painted OVER the registration card.
    This is deliberately scoped to the four WRAPPER stages: giving #stage-reading
    a z-index would turn it into a stacking context and trap the exam's own

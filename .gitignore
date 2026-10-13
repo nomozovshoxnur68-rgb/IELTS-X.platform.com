@@ -1,0 +1,5 @@
+data/db.json
+data/.session-secret
+uploads/
+.env
+node_modules/

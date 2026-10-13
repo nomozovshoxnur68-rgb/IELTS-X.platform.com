@@ -152,6 +152,9 @@
   }
 
   function wire() {
+    // the page's own script handles filtering + pagination: nothing to listen to
+    if (pageOwnsFiltering()) return;
+
     document.addEventListener('change', function (e) {
       if (e.target.matches && e.target.matches(CONTROL_SELECTOR)) applyFilters();
     });

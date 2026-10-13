@@ -200,3 +200,21 @@ body {
         grid-template-columns: 1fr
     }
 }
+
+/* ---- v3 additions ---- */
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,.input:focus-visible,.select:focus-visible,.nav a:focus-visible{outline:2px solid #820241;outline-offset:2px}
+.input:focus,.select:focus{border-color:#820241;outline:none;box-shadow:0 0 0 3px rgba(130,2,65,.12)}
+.nav a.active{box-shadow:inset 3px 0 0 #820241}
+.tablewrap{-webkit-overflow-scrolling:touch}
+.table td{vertical-align:middle}
+.card h2{margin-top:0;font-size:18px}
+.toolbar .input,.toolbar .select{flex:1 1 160px}
+@media(max-width:700px){
+  .side{position:static;width:100%;padding:12px}
+  .brand{padding:4px 8px 10px;font-size:18px}
+  .nav{grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;padding-bottom:4px}
+  .nav a{white-space:nowrap}
+  .main{padding:16px}
+  .title h1,.top h1{font-size:22px}
+}

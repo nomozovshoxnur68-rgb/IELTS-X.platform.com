@@ -2642,9 +2642,6 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
 #stage-results .pace-val.over{color:var(--cv-mid)}
 #stage-results .pace-foot{margin-top:10px;font-size:11.5px;line-height:1.55;color:var(--c-ink-3)}
 
-/* attempt history — one bar per sitting, this one lit */
-  color:var(--c-ink-2);font-variant-numeric:tabular-nums}
-
 /* ── Answer summary: filters, bubbles, the forty rows ── */
 #stage-results .answer-section{padding:0 38px;animation:certPart .5s .5s both}
 #stage-results .cert .v3-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 15px}

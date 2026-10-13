@@ -1,0 +1,214 @@
+
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        :root {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --sidebar-ring: 217 91% 60%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            /* light mode */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255,255,255,0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+        }
+
+        html.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32,34,34,0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --background: 32 34 34;
+            --foreground: 229 231 235;
+            --card: 42 44 44;
+            --card-foreground: 229 231 235;
+            --border: 58 60 60;
+            --secondary: 42 44 44;
+            --secondary-foreground: 229 231 235;
+            --muted-foreground: 156 163 175;
+            --accent: 42 44 44;
+            --accent-foreground: 229 231 235;
+            --ring: 58 60 60;
+            --sidebar: 36 38 38;
+            --sidebar-foreground: 229 231 235;
+            --sidebar-accent: 42 44 44;
+            --sidebar-accent-foreground: 229 231 235;
+            --sidebar-border: 58 60 60;
+            --sidebar-ring: 58 60 60;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .bg-background { background-color: var(--bg-body) !important; }
+        .bg-card { background-color: var(--bg-card) !important; }
+        .border-border { border-color: var(--border-color) !important; }
+        .text-foreground { color: var(--text-primary) !important; }
+        .text-muted-foreground { color: var(--text-secondary) !important; }
+        .bg-sidebar { background-color: var(--sidebar-bg) !important; }
+        .bg-background\/95 { background-color: var(--header-bg) !important; }
+        .bg-muted\/40 { background-color: var(--badge-bg) !important; }
+        input, select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        input::placeholder { color: var(--text-secondary) !important; }
+
+        [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"]>div {
+            width: var(--sidebar-width-icon) !important;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] ul li a span.flex-1 {
+            display: none;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] .menu-label {
+            display: none;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+            opacity: 0;
+            margin-top: -2rem;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rounded-xl {
+            transition: all 0.2s ease;
+        }
+
+        .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        .animation-delay-1000 {
+            animation-delay: 1000ms;
+        }
+
+        /* theme toggle button */
+        .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .theme-toggle-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* ─── SIDEBAR OVERFLOW FIX ─── */
+        #main-sidebar-root .sidebar-inner-scroll {
+            overflow-y: auto !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #main-sidebar-root .sidebar-inner-scroll::-webkit-scrollbar-thumb {
+            background: hsl(var(--sidebar-border));
+            border-radius: 4px;
+        }
+        /* Ensure sidebar container takes full height */
+        #main-sidebar-root .sidebar-outer-container {
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        #main-sidebar-root .sidebar-flex-col {
+            height: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Fix for the content area inside sidebar */
+        #main-sidebar-root [data-sidebar="content"] {
+            overflow-y: auto !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        /* Hide scrollbar when collapsed */
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="content"] {
+            overflow: hidden !important;
+        }
+
+        /* ─── MAIN CONTENT OVERFLOW FIX ─── */
+        .main-content-scroll {
+            overflow-y: auto !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        .main-content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .main-content-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .main-content-scroll::-webkit-scrollbar-thumb {
+            background: hsl(var(--border));
+            border-radius: 4px;
+        }
+        /* Ensure the main container takes full height */
+        .main-flex-container {
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+    
