@@ -94,3 +94,14 @@ See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUB
 * Replacing `cdn.tailwindcss.com` with a compiled CSS file (needs the Tailwind build step with your class list).
 * Files the saved pages point to but are not in this folder: images of `collections/`, card logos on `Price.html`,
   PDFs of `Pdf materials.html`, resources of `sections/test-5.html`.
+
+## Fixes (October 2026)
+
+* **Design**: 11 pages loaded Tailwind at runtime from `cdn.tailwindcss.com`; when that host was blocked/slow the layout broke.
+  The script is removed; the few utilities it supplied are now in `assets/css/tw-fallback.css` (works offline).
+* **Login**: if the page is opened without the Node server (file://, Live Server, any static host) the login page now says
+  so clearly instead of failing silently. Real use: `npm start` -> http://localhost:3000.
+* **Google**: if `GOOGLE_CLIENT_ID` is missing, or Google's script cannot load, the button explains why (see `GOOGLE_SETUP.md`).
+* **JS**: null-element error on `index.html` fixed; the avatar menu "Log out" no longer shows the "(demo)" alert, it really signs out.
+* Missing image files no longer show broken-image icons (`assets/js/img-fallback.js`).
+* Removed two broken, unlinked pages (`Full Reading Test 13/14.html`); the real tests are in `/full-tests/reading/`.

@@ -1,5 +1,5 @@
 /* IELTS X — forgot password, reset password and email verification pages */
-import { requestPasswordReset, resetPassword, verifyEmail, safeNext } from '/auth.js';
+import { requestPasswordReset, resetPassword, verifyEmail, safeNext } from '../../auth.js';
 
 const $ = (s) => document.querySelector(s);
 const page = document.body.dataset.page;

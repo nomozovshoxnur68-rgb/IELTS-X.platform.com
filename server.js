@@ -20,6 +20,16 @@ const { URL } = require('url');
 
 /* ───────────────────────── configuration ───────────────────────── */
 const ROOT = __dirname;
+
+// Load .env (KEY=value per line) without any package; real environment variables win.
+try {
+  fs.readFileSync(path.join(ROOT, '.env'), 'utf8').split(/\r?\n/).forEach((line) => {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+    if (!m || line.trim().startsWith('#')) return;
+    const v = m[2].replace(/^(['"])(.*)\1$/, '$2');
+    if (process.env[m[1]] === undefined) process.env[m[1]] = v;
+  });
+} catch (e) { /* no .env file: fine */ }
 const IS_VERCEL = !!process.env.VERCEL;
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');

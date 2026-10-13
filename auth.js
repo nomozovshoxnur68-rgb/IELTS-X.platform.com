@@ -5,6 +5,11 @@
  * so nothing secret (no password, no token, no premium flag) is ever kept in localStorage.
  */
 async function request(url, { method = 'GET', body } = {}) {
+  if (location.protocol === 'file:') {
+    const err = new Error('Sahifa fayl sifatida ochilgan (file://). Login ishlashi uchun saytni serverda oching: terminalda "npm start", keyin http://localhost:3000');
+    err.code = 'no-api';
+    throw err;
+  }
   let res;
   try {
     res = await fetch(url, {
@@ -19,6 +24,13 @@ async function request(url, { method = 'GET', body } = {}) {
   }
   let data = null;
   try { data = await res.json(); } catch (e) { /* empty or not json */ }
+  // The page is served by a plain static host (Live Server, GitHub Pages, ...): there is no /api there.
+  if (data === null && (res.status === 404 || res.status === 405 || res.status === 501 || res.ok)) {
+    const err = new Error('Server (API) topilmadi. Saytni "npm start" bilan ishga tushiring (http://localhost:3000) yoki Vercel/Render ga joylang. Faqat HTML fayllarni ochish bilan login ishlamaydi.');
+    err.code = 'no-api';
+    err.status = res.status;
+    throw err;
+  }
   if (!res.ok) {
     const err = new Error((data && data.error) || `Request failed (${res.status})`);
     err.status = res.status;

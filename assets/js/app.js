@@ -929,14 +929,14 @@
                 document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
 
                 document.getElementById('dropdown-logout')?.addEventListener('click', function () {
-                    alert('Logged out (demo)');
+                    if (window.IELTSXAuth && window.IELTSXAuth.logout) { window.IELTSXAuth.logout(); return; }
                     closeDropdown();
                 });
             }
         })();
     
       // ---- index-3.js ----
-(function(){var e=localStorage.getItem('ieltsx_logged_in_email')||localStorage.getItem('userEmail');var el=document.getElementById('ieltsx-account-status');if(e){el.textContent=e;el.style.display='block'}})();
+(function(){var e=localStorage.getItem('ieltsx_logged_in_email')||localStorage.getItem('userEmail');var el=document.getElementById('ieltsx-account-status');if(e&&el){el.textContent=e;el.style.display='block'}})();
   };
 
   pages['listening'] = function () {
@@ -1196,7 +1196,7 @@
                 });
                 document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
                 document.getElementById('dropdown-logout')?.addEventListener('click', () => {
-                    alert('Logged out (demo)');
+                    if (window.IELTSXAuth && window.IELTSXAuth.logout) { window.IELTSXAuth.logout(); return; }
                     closeDropdown();
                 });
             }
@@ -1341,17 +1341,13 @@
             badge: 'FREE'
         }, {
             id: 8,
-            title: 'Free: In Deep Water',
+            title: 'Free: The History of Ice Cream',
             status: 'FREE',
             types: ['True False Not Given', 'Note Completion'],
             plan: 'Starter Pack',
             pack: 'Starter Pack',
             passage: 'Passage 1',
-<<<<<<< HEAD:part/practice/assets/js/app.js
-            href: '/pessages/test.html',
-=======
             href: '/pessages/test-8.html',
->>>>>>> 7dc6a29 (Update project):assets/js/app.js
             img: 'pessage17.png',
             desc: 'Free Sample | Starter Pack',
             badge: 'FREE'
@@ -1743,7 +1739,7 @@
                 });
                 document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
                 document.getElementById('dropdown-logout')?.addEventListener('click', () => {
-                    alert('Logged out (demo)');
+                    if (window.IELTSXAuth && window.IELTSXAuth.logout) { window.IELTSXAuth.logout(); return; }
                     closeDropdown();
                 });
             }
@@ -2458,7 +2454,7 @@
             });
             document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
             document.getElementById('dropdown-logout')?.addEventListener('click', () => {
-                alert('Logged out (demo)');
+                if (window.IELTSXAuth && window.IELTSXAuth.logout) { window.IELTSXAuth.logout(); return; }
                 closeDropdown();
             });
         }

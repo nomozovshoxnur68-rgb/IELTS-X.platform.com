@@ -3,7 +3,7 @@
  * the name is saved on the server, the e-mail comes from your session, sign out is real
  * (site-access.js fills in the name / e-mail / avatar / plan and handles "Log out").
  */
-import { updateProfile } from '/auth.js';
+import { updateProfile } from '../../auth.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));

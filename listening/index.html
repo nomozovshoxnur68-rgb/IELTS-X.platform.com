@@ -12,15 +12,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/listening/css/style.css">
+<link rel="stylesheet" href="css/style.css">
 
 <!-- vendored: html2canvas.min.js — embedded rather than linked, so the
      download needs no connection -->
-<script src="/listening/js/vendor/html2canvas.min.js"></script>
+<script src="js/vendor/html2canvas.min.js"></script>
 
 <!-- vendored: jspdf.umd.min.js — embedded rather than linked, so the
      download needs no connection -->
-<script src="/listening/js/vendor/jspdf.umd.min.js"></script>
+<script src="js/vendor/jspdf.umd.min.js"></script>
 </head>
 <body class="pre-entry">
 
@@ -334,14 +334,14 @@
 </aside>
 <div class="toast" id="toast"></div>
 
-<script src="/listening/js/ui.js"></script>
+<script src="js/ui.js"></script>
 
 <!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
      Listening and Reading tests. Inlined, so it works from a memory stick
      with the network off. See the header comment inside for what it does and
      why it is not jsPDF + html2canvas. ══ -->
 
-<script src="/listening/js/exam-app.js"></script>
+<script src="js/exam-app.js"></script>
 <!-- ============================================================
      WRAPPER-STAGE 3D LAYER  (Three.js r160 UMD, inlined)
      Renders behind #stage-registration / -listening-intro /
@@ -351,7 +351,7 @@
      and every stage renders exactly as it did before.
      ============================================================ -->
 <!-- Three.js was here only to draw the galaxy; both are gone. -->
-<script src="/listening/js/shell.js"></script>
+<script src="js/shell.js"></script>
 <!-- ============================================================
      NOTES  (header pencil).  Body-level so it is never trapped in the
      stage's stacking context — same reason as the popups below.
@@ -396,10 +396,10 @@
 <!-- The procedural galaxy that used to sit behind every stage was removed:
      this is an exam paper, not a backdrop. -->
 
-<script src="/listening/js/boot.js"></script>
+<script src="js/boot.js"></script>
 
-<script src="/ieltsx-data.js"></script>
-<script src="/assets/js/test-complete.js"></script>
-<script type="module" src="/site-access.js"></script>
+<script src="../ieltsx-data.js"></script>
+<script src="../assets/js/test-complete.js"></script>
+<script type="module" src="../site-access.js"></script>
 </body>
 </html>

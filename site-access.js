@@ -7,14 +7,14 @@
  *  - <html data-require-login> sends signed-out visitors to the login page and back
  * No premium or role information is trusted from localStorage: it all comes from /api/auth/me.
  */
-import { getCurrentUser, logout, safeNext, resendVerification } from '/auth.js';
+import { getCurrentUser, logout, safeNext, resendVerification } from './auth.js';
 
 const LEGACY_KEYS = ['ieltsx_logged_in_email', 'userEmail']; // read by ieltsx-data.js to keep test results per user
 let userPromise = null;
 
 function loadUser(force) {
   if (!userPromise || force) {
-    userPromise = getCurrentUser().catch((e) => (e && e.code === 'network' ? undefined : null));
+    userPromise = getCurrentUser().catch((e) => (e && (e.code === 'network' || e.code === 'no-api') ? undefined : null));
   }
   return userPromise;
 }
