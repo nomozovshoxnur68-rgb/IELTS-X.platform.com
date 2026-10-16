@@ -1,0 +1,9 @@
+{
+  "_note": "Prices in UZS. Derived from the discount badges on Price.html (Standard list 66,000/mo, Max list 110,000/mo). Edit freely: the server uses this file for orders.",
+  "currency": "UZS",
+  "months": [1, 3, 6],
+  "plans": [
+    { "id": "standard", "name": "Standard", "prices": { "1": 59400, "3": 165000, "6": 265000 } },
+    { "id": "max", "name": "Max", "prices": { "1": 99000, "3": 264000, "6": 442000 } }
+  ]
+}

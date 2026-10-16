@@ -1,0 +1,519 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/features",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/teachers",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/vocabulary",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/support",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/terms-of-service",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/feedback",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/pricing",
+      "destination": "/Price",
+      "permanent": false
+    },
+    {
+      "source": "/practice/mock",
+      "destination": "/Mock%20tests",
+      "permanent": false
+    },
+    {
+      "source": "/listening.html",
+      "destination": "/part/practice/listening",
+      "permanent": false
+    },
+    {
+      "source": "/reading.html",
+      "destination": "/part/practice/reading",
+      "permanent": false
+    },
+    {
+      "source": "/writing.html",
+      "destination": "/part/practice/writing",
+      "permanent": false
+    },
+    {
+      "source": "/speaking.html",
+      "destination": "/part/practice/speaking",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/reading.html",
+      "destination": "/full-tests/reading/",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/listening.html",
+      "destination": "/full-tests/listening/",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/writing.html",
+      "destination": "/part/practice/writing",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/writing",
+      "destination": "/part/practice/writing",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/speaking.html",
+      "destination": "/part/practice/speaking",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/speaking",
+      "destination": "/part/practice/speaking",
+      "permanent": false
+    },
+    {
+      "source": "/full%20reading.html",
+      "destination": "/full-tests/reading/",
+      "permanent": false
+    },
+    {
+      "source": "/full%20reading",
+      "destination": "/full-tests/reading/",
+      "permanent": false
+    },
+    {
+      "source": "/full%20listening.html",
+      "destination": "/full-tests/listening/",
+      "permanent": false
+    },
+    {
+      "source": "/full%20listening",
+      "destination": "/full-tests/listening/",
+      "permanent": false
+    },
+    {
+      "source": "/full%20writing.html",
+      "destination": "/part/practice/writing",
+      "permanent": false
+    },
+    {
+      "source": "/full%20writing",
+      "destination": "/part/practice/writing",
+      "permanent": false
+    },
+    {
+      "source": "/full%20speaking.html",
+      "destination": "/part/practice/speaking",
+      "permanent": false
+    },
+    {
+      "source": "/full%20speaking",
+      "destination": "/part/practice/speaking",
+      "permanent": false
+    },
+    {
+      "source": "/performance.html",
+      "destination": "/study/Tools/Performance",
+      "permanent": false
+    },
+    {
+      "source": "/performance",
+      "destination": "/study/Tools/Performance",
+      "permanent": false
+    },
+    {
+      "source": "/pdf%20materials.html",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    },
+    {
+      "source": "/pdf%20materials",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    },
+    {
+      "source": "/materials.html",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    },
+    {
+      "source": "/materials",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    },
+    {
+      "source": "/articles.html",
+      "destination": "/study/Tools/Articles",
+      "permanent": false
+    },
+    {
+      "source": "/articles",
+      "destination": "/study/Tools/Articles",
+      "permanent": false
+    },
+    {
+      "source": "/study/tools/articles.html",
+      "destination": "/study/Tools/Articles",
+      "permanent": false
+    },
+    {
+      "source": "/study/tools/articles",
+      "destination": "/study/Tools/Articles",
+      "permanent": false
+    },
+    {
+      "source": "/study/tools/performance.html",
+      "destination": "/study/Tools/Performance",
+      "permanent": false
+    },
+    {
+      "source": "/study/tools/performance",
+      "destination": "/study/Tools/Performance",
+      "permanent": false
+    },
+    {
+      "source": "/study/tools/pdf%20materials.html",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    },
+    {
+      "source": "/study/tools/pdf%20materials",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    },
+    {
+      "source": "/pessage6.html",
+      "destination": "/pessages/test-3",
+      "permanent": false
+    },
+    {
+      "source": "/pessage6",
+      "destination": "/pessages/test-3",
+      "permanent": false
+    },
+    {
+      "source": "/pessage5.html",
+      "destination": "/pessages/test-4",
+      "permanent": false
+    },
+    {
+      "source": "/pessage5",
+      "destination": "/pessages/test-4",
+      "permanent": false
+    },
+    {
+      "source": "/pessage4.html",
+      "destination": "/pessages/test-5",
+      "permanent": false
+    },
+    {
+      "source": "/pessage4",
+      "destination": "/pessages/test-5",
+      "permanent": false
+    },
+    {
+      "source": "/pessage14.html",
+      "destination": "/pessages/test-6",
+      "permanent": false
+    },
+    {
+      "source": "/pessage14",
+      "destination": "/pessages/test-6",
+      "permanent": false
+    },
+    {
+      "source": "/pessage16.html",
+      "destination": "/pessages/test-7",
+      "permanent": false
+    },
+    {
+      "source": "/pessage16",
+      "destination": "/pessages/test-7",
+      "permanent": false
+    },
+    {
+      "source": "/pessage17.html",
+      "destination": "/pessages/test-8",
+      "permanent": false
+    },
+    {
+      "source": "/pessage17",
+      "destination": "/pessages/test-8",
+      "permanent": false
+    },
+    {
+      "source": "/pessage18.html",
+      "destination": "/pessages/test-9",
+      "permanent": false
+    },
+    {
+      "source": "/pessage18",
+      "destination": "/pessages/test-9",
+      "permanent": false
+    },
+    {
+      "source": "/pessage19.html",
+      "destination": "/pessages/test-10",
+      "permanent": false
+    },
+    {
+      "source": "/pessage19",
+      "destination": "/pessages/test-10",
+      "permanent": false
+    },
+    {
+      "source": "/pessage20.html",
+      "destination": "/pessages/test-11",
+      "permanent": false
+    },
+    {
+      "source": "/pessage20",
+      "destination": "/pessages/test-11",
+      "permanent": false
+    },
+    {
+      "source": "/pessage21.html",
+      "destination": "/pessages/test-12",
+      "permanent": false
+    },
+    {
+      "source": "/pessage21",
+      "destination": "/pessages/test-12",
+      "permanent": false
+    },
+    {
+      "source": "/pessage22.html",
+      "destination": "/pessages/test-13",
+      "permanent": false
+    },
+    {
+      "source": "/pessage22",
+      "destination": "/pessages/test-13",
+      "permanent": false
+    },
+    {
+      "source": "/pessage23.html",
+      "destination": "/pessages/test-14",
+      "permanent": false
+    },
+    {
+      "source": "/pessage23",
+      "destination": "/pessages/test-14",
+      "permanent": false
+    },
+    {
+      "source": "/pessage24.html",
+      "destination": "/pessages/test-15",
+      "permanent": false
+    },
+    {
+      "source": "/pessage24",
+      "destination": "/pessages/test-15",
+      "permanent": false
+    },
+    {
+      "source": "/pessage25.html",
+      "destination": "/pessages/test-16",
+      "permanent": false
+    },
+    {
+      "source": "/pessage25",
+      "destination": "/pessages/test-16",
+      "permanent": false
+    },
+    {
+      "source": "/free/section-2/library-services",
+      "destination": "/sections/test-2",
+      "permanent": false
+    },
+    {
+      "source": "/free/section-3/recycling-discussion",
+      "destination": "/sections/test-3",
+      "permanent": false
+    },
+    {
+      "source": "/free/section-4/ancient-civilizations",
+      "destination": "/sections/test-4",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_8.html",
+      "destination": "/full-tests/reading/test-1",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_8",
+      "destination": "/full-tests/reading/test-1",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_9.html",
+      "destination": "/full-tests/reading/test-2",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_9",
+      "destination": "/full-tests/reading/test-2",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_11.html",
+      "destination": "/full-tests/reading/test-3",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_11",
+      "destination": "/full-tests/reading/test-3",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_14.html",
+      "destination": "/full-tests/reading/test-4",
+      "permanent": false
+    },
+    {
+      "source": "/full_reading_test_14",
+      "destination": "/full-tests/reading/test-4",
+      "permanent": false
+    },
+    {
+      "source": "/dark_chocolate_passage_2.html",
+      "destination": "/pessages/test-19",
+      "permanent": false
+    },
+    {
+      "source": "/dark_chocolate_passage_2",
+      "destination": "/pessages/test-19",
+      "permanent": false
+    },
+    {
+      "source": "/growing_more_for_less_passsage_2.html",
+      "destination": "/pessages/test-20",
+      "permanent": false
+    },
+    {
+      "source": "/growing_more_for_less_passsage_2",
+      "destination": "/pessages/test-20",
+      "permanent": false
+    },
+    {
+      "source": "/in_deep_water_p1_v3.html",
+      "destination": "/pessages/test-21",
+      "permanent": false
+    },
+    {
+      "source": "/in_deep_water_p1_v3",
+      "destination": "/pessages/test-21",
+      "permanent": false
+    },
+    {
+      "source": "/admin-login.html",
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/admin-login",
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/price",
+      "destination": "/Price",
+      "permanent": false
+    },
+    {
+      "source": "/predictions",
+      "destination": "/Predictions",
+      "permanent": false
+    },
+    {
+      "source": "/mock-tests",
+      "destination": "/Mock%20tests",
+      "permanent": false
+    },
+    {
+      "source": "/mock",
+      "destination": "/Mock%20tests",
+      "permanent": false
+    },
+    {
+      "source": "/pdf-materials",
+      "destination": "/study/Tools/Pdf%20materials",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/test/:id",
+      "destination": "/test.html"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "{server.js,plans.json,*.html,data/**,supabase-schema.sql}",
+      "maxDuration": 30
+    }
+  }
+}

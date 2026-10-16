@@ -1,0 +1,342 @@
+
+        /* refined color system — slightly more vibrant and clear */
+        :root {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 3rem;
+            --sidebar: 0 0% 98%;
+            --sidebar-foreground: 240 5% 26%;
+            --sidebar-accent: 240 5% 96%;
+            --sidebar-accent-foreground: 240 6% 10%;
+            --sidebar-border: 220 13% 91%;
+            --background: 0 0% 100%;
+            --foreground: 222 47% 11%;
+            --card: 0 0% 100%;
+            --card-foreground: 222 47% 11%;
+            --border: 214 32% 91%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222 47% 11%;
+            --muted-foreground: 215 16% 47%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222 47% 11%;
+            --ring: 215 20% 65%;
+            --sidebar-ring: 217 91% 60%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222 47% 11%;
+        }
+
+        html,
+        body {
+            background: hsl(var(--background));
+            font-feature-settings: "rlig" 1, "calt" 1;
+        }
+
+        .rounded-xl {
+            transition: all 0.2s ease;
+        }
+
+        .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        [data-sidebar="sidebar"] {
+            transition: width 0.2s ease-in-out;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"]>div {
+            width: var(--sidebar-width-icon) !important;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] .sidebar-hidden-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] ul li a span.flex-1 {
+            display: none;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] .menu-label {
+            display: none;
+        }
+
+        #main-sidebar-root[data-collapsible="icon"] [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+            opacity: 0;
+            margin-top: -2rem;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient-to-r {
+            background-size: auto;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .group\/sidebar-wrapper {
+            min-height: 100vh;
+        }
+
+        .bg-sidebar {
+            background-color: hsl(var(--sidebar));
+        }
+
+        .text-sidebar-foreground {
+            color: hsl(var(--sidebar-foreground));
+        }
+
+        .border-sidebar-border {
+            border-color: hsl(var(--sidebar-border));
+        }
+
+        .ring-sidebar-ring {
+            --tw-ring-color: hsl(var(--sidebar-ring));
+        }
+
+        /* sidebar link base */
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.6rem;
+            color: #334155;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* make sidebar outer fill properly */
+        .sidebar-outer {
+            transition: width 0.2s ease, left 0.2s ease, right 0.2s ease;
+        }
+
+        /* ensure group-data variants work */
+        .group-data\[collapsible\=icon\]\:w-\[--sidebar-width-icon\] {
+            width: var(--sidebar-width-icon);
+        }
+
+        .group-data\[collapsible\=icon\]\:overflow-hidden {
+            overflow: hidden;
+        }
+
+        .group-data\[collapsible\=icon\]\:opacity-0 {
+            opacity: 0;
+        }
+
+        .group-data\[collapsible\=icon\]\:-mt-8 {
+            margin-top: -2rem;
+        }
+
+        .group-data\[collapsible\=icon\]\:h-0 {
+            height: 0;
+        }
+
+        .group-data\[collapsible\=icon\]\:p-0 {
+            padding: 0;
+        }
+
+        .group-data\[collapsible\=icon\]\:\!size-8 {
+            width: 2rem !important;
+            height: 2rem !important;
+        }
+
+        .group-data\[collapsible\=icon\]\:\!p-2 {
+            padding: 0.5rem !important;
+        }
+
+        .group-data\[collapsible\=icon\]\:\!p-0 {
+            padding: 0 !important;
+        }
+
+        .group-data\[collapsible\=icon\]\:w-0 {
+            width: 0;
+        }
+
+        .group-data\[collapsible\=offcanvas\]\:left-\[calc\(var\(--sidebar-width\)\*-1\)\] {
+            left: calc(var(--sidebar-width) * -1);
+        }
+
+        .group-data\[collapsible\=offcanvas\]\:w-0 {
+            width: 0;
+        }
+
+        .group-data\[side\=left\]\:border-r {
+            border-right-width: 1px;
+            border-right-style: solid;
+            border-color: hsl(var(--sidebar-border));
+        }
+
+        .group-data\[side\=right\]\:border-l {
+            border-left-width: 1px;
+            border-left-style: solid;
+            border-color: hsl(var(--sidebar-border));
+        }
+
+        .group-data\[variant\=floating\]\:rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .group-data\[variant\=floating\]\:border {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        .group-data\[variant\=floating\]\:shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .peer\/menu-button~.peer\/menu-button {
+            margin-top: 0;
+        }
+
+        .peer\/menu-button:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 2px;
+        }
+
+        /* sidebar inner scroll */
+        .sidebar-inner {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sidebar-inner>[data-sidebar="content"] {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .sidebar-inner>[data-sidebar="content"]::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-inner>[data-sidebar="content"]::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-inner>[data-sidebar="content"]::-webkit-scrollbar-thumb {
+            background: hsl(var(--sidebar-border));
+            border-radius: 4px;
+        }
+
+        /* menu item hover */
+        .group\/menu-item:hover .peer\/menu-button:not([data-active="true"]) {
+            background: hsl(var(--sidebar-accent));
+            color: hsl(var(--sidebar-accent-foreground));
+        }
+
+        .group\/menu-item .peer\/menu-button[data-active="true"] {
+            background: hsl(var(--sidebar-accent));
+            font-weight: 500;
+            color: hsl(var(--sidebar-accent-foreground));
+        }
+
+        /* rail button */
+        [data-sidebar="rail"] {
+            cursor: col-resize;
+        }
+
+        [data-sidebar="rail"]:hover::after {
+            background: hsl(var(--sidebar-border));
+        }
+
+        /* user avatar in sidebar */
+        .sidebar-user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Fix for collapsed state on group labels */
+        .group-data\[collapsible\=icon\] .group-data-collapsible-icon-hidden {
+            display: none;
+        }
+
+        /* dropdown menu for user in sidebar */
+        .sidebar-user-menu {
+            position: relative;
+        }
+
+        /* Card styling to match index design */
+        .test-pack-card {
+            border-radius: 0.75rem;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--card));
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+        }
+        .test-pack-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            border-color: hsl(var(--border));
+        }
+        .test-pack-card .card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+    
+
+/* ==== dark theme (light / dark / system switch) ==== */
+html.dark-mode {
+    --sidebar: 0 0% 12%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 0 0% 22%;
+    --background: 0 0% 13%;
+    --foreground: 210 20% 90%;
+    --card: 0 0% 15%;
+    --card-foreground: 210 20% 90%;
+    --border: 0 0% 25%;
+    --primary: 221 83% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 210 20% 90%;
+    --muted-foreground: 210 10% 60%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 210 20% 90%;
+    --ring: 215 20% 40%;
+    --sidebar-ring: 217 91% 60%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 210 20% 90%;
+}
+
+html.dark-mode .to-amber-100\/50 {
+    --tw-gradient-to: rgb(120 53 15 / 0.22) var(--tw-gradient-to-position);
+}
+
+
+/* ==== IELTSX shared design (same rules as the other pages) ==== */
+* {
+    border-color: hsl(var(--border));
+}
+
+body {
+    color: hsl(var(--foreground));
+    transition: background 0.2s, color 0.2s;
+}
+
+.group[data-collapsible="icon"] [data-sidebar="sidebar"] {
+    width: var(--sidebar-width-icon);
+}
+
+.group[data-collapsible="icon"] .sidebar-hidden-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}

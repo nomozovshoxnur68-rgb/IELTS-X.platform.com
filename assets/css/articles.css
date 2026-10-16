@@ -1,0 +1,357 @@
+
+        /* reset & base */
+        * {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+        }
+
+        /* ─── dark mode ─── */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: #ffffff;
+            --badge-bg: #f1f5f9;
+            --badge-text: #1e293b;
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 4rem;
+        }
+
+        html.dark-mode {
+            --bg-body: #202222;
+            --bg-card: #2a2c2c;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #3a3c3c;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --sidebar-bg: #242626;
+            --header-bg: rgba(32, 34, 34, 0.95);
+            --input-bg: #2a2c2c;
+            --badge-bg: #333636;
+            --badge-text: #d1d5db;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .bg-white {
+            background-color: var(--bg-card) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-body) !important;
+        }
+        .border-gray-200 {
+            border-color: var(--border-color) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-muted-foreground {
+            color: var(--text-secondary) !important;
+        }
+        .shadow-sm {
+            box-shadow: var(--shadow) !important;
+        }
+        .bg-sidebar {
+            background-color: var(--sidebar-bg) !important;
+        }
+        .bg-white\/95 {
+            background-color: var(--header-bg) !important;
+        }
+        .bg-muted\/40 {
+            background-color: var(--badge-bg) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .hover\:bg-gray-50:hover {
+            background-color: var(--badge-bg) !important;
+        }
+        input,
+        select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        /* ─── sidebar core ─── */
+        .sidebar-container {
+            --sidebar-width: 16rem;
+            --sidebar-width-icon: 4rem;
+        }
+
+        /* desktop sidebar wrapper */
+        .sidebar-desktop-root {
+            transition: width 0.2s ease-in-out;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-text {
+            display: none !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-item {
+            justify-content: center !important;
+            padding: 0.5rem !important;
+            width: 2.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* ensure icons are always visible when collapsed */
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-nav-item svg {
+            display: inline-block !important;
+            flex-shrink: 0;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-group-label {
+            display: none !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .logo-text {
+            display: none !important;
+        }
+        /* collapsed desktop: keep logo/icon visible and shrink every sidebar layer together */
+        .sidebar-desktop-root[data-collapsible="icon"] > div:first-child {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] > div:nth-child(2) {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-desktop-inner {
+            width: var(--sidebar-width-icon) !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] {
+            width: 2.5rem !important;
+            min-width: 2.5rem !important;
+            height: 2.5rem !important;
+            justify-content: center !important;
+            gap: 0 !important;
+            padding: 0.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] > div:first-child {
+            flex-shrink: 0 !important;
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] [data-sidebar="header"] .sidebar-nav-text {
+            display: none !important;
+        }
+
+        /* FINAL SIDEBAR COLLAPSE FIX — keep logo/features intact */
+        @media (min-width: 769px) {
+            #main-sidebar-root[data-collapsible="icon"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] > div:first-child {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] > div:nth-child(2) {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                left: 0 !important;
+                right: auto !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] .sidebar-desktop-inner {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                flex: 0 0 var(--sidebar-width-icon) !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+                box-sizing: border-box !important;
+                padding: 0.5rem !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu"] {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-item"] {
+                width: 100% !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] {
+                display: flex !important;
+                width: 2.5rem !important;
+                min-width: 2.5rem !important;
+                max-width: 2.5rem !important;
+                height: 2.5rem !important;
+                min-height: 2.5rem !important;
+                max-height: 2.5rem !important;
+                margin: 0 auto !important;
+                padding: 0.5rem !important;
+                gap: 0 !important;
+                overflow: visible !important;
+                justify-content: center !important;
+                align-items: center !important;
+                box-sizing: border-box !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] [data-sidebar="menu-button"] > div:first-child {
+                display: flex !important;
+                width: 2rem !important;
+                min-width: 2rem !important;
+                max-width: 2rem !important;
+                height: 2rem !important;
+                min-height: 2rem !important;
+                max-height: 2rem !important;
+                flex: 0 0 2rem !important;
+                align-items: center !important;
+                justify-content: center !important;
+                overflow: visible !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="header"] img {
+                display: block !important;
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+                min-width: 1.5rem !important;
+                min-height: 1.5rem !important;
+                max-width: 1.5rem !important;
+                max-height: 1.5rem !important;
+                object-fit: cover !important;
+                flex-shrink: 0 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            #main-sidebar-root[data-collapsible="icon"] [data-sidebar="content"] {
+                width: var(--sidebar-width-icon) !important;
+                min-width: var(--sidebar-width-icon) !important;
+                max-width: var(--sidebar-width-icon) !important;
+            }
+        }
+
+        /* inner scroll */
+        .sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* mobile */
+        @media (max-width: 768px) {
+            .sidebar-container {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                z-index: 40;
+                transition: left 0.2s ease;
+                width: 280px;
+            }
+            .sidebar-container.mobile-open {
+                left: 0;
+            }
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 35;
+                display: none;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .sidebar-container .sidebar-desktop-root {
+                width: 100% !important;
+            }
+            .sidebar-container .sidebar-desktop-root[data-collapsible="icon"] {
+                width: 100% !important;
+            }
+        }
+
+        /* theme toggle */
+        .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .theme-toggle-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* tab active */
+        .tab-active {
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            color: #0f172a;
+        }
+        html.dark-mode .tab-active {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* rail button */
+        .sidebar-rail {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 20;
+            width: 1rem;
+            transform: translateX(-50%);
+            transition: all 0.2s ease-linear;
+            display: none;
+        }
+        .sidebar-rail::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            transform: translateX(-50%);
+            background: transparent;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+        .sidebar-rail:hover::after {
+            background: var(--border-color);
+        }
+        @media (min-width: 768px) {
+            .sidebar-rail {
+                display: flex;
+            }
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-rail {
+            transform: translateX(-50%);
+        }
+        .sidebar-desktop-root[data-collapsible="icon"] .sidebar-rail::after {
+            background: var(--border-color);
+        }
+    

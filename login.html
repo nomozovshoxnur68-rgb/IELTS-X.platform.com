@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS X — Sign in</title>
+    <meta name="robots" content="noindex">
+    <script src="assets/js/theme-init.js"></script>
+    <link rel="icon" href="assets/ieltsx-only-logo-BajnupZg.png">
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+    <header class="topbar">
+        <a href="/" class="brand" aria-label="IELTS X home"><img src="assets/ieltsx-logo-transparent.png" alt="IELTS X"></a>
+        <a href="/" class="btn-ghost">Home</a>
+    </header>
+
+    <main class="stage">
+        <section class="card" aria-labelledby="title">
+            <h1 id="title">Welcome back</h1>
+            <p class="sub" id="subtitle">Sign in to continue your IELTS preparation.</p>
+
+            <div id="setup-notice" class="notice" role="alert" hidden></div>
+
+            <div id="saved-accounts-container" class="saved" hidden>
+                <p class="eyebrow">Continue as</p>
+                <div id="saved-accounts-list"></div>
+            </div>
+
+            <div id="google-block" hidden>
+                <div id="google-btn" class="google-slot"></div>
+                <div class="divider" role="separator"><span>or use your email</span></div>
+            </div>
+
+            <form id="auth-form" novalidate>
+                <div class="field" id="name-field" hidden>
+                    <label for="name">Full name</label>
+                    <input id="name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="Your name">
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required placeholder="you@example.com">
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="pw">
+                        <input id="password" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="200" required placeholder="At least 8 characters">
+                        <button type="button" id="toggle-pw" class="pw-toggle" aria-label="Show password" aria-pressed="false">Show</button>
+                    </div>
+                    <p class="forgot"><a class="link" href="/forgot">Forgot password?</a></p>
+                </div>
+                <p id="error" class="error" role="alert" aria-live="polite"></p>
+                <button type="submit" id="submit" class="btn-primary">Sign in</button>
+            </form>
+
+            <p class="switch"><span id="switch-text">New to IELTS X?</span> <button type="button" id="switch-mode" class="link">Create an account</button></p>
+        </section>
+    </main>
+
+    <footer class="legal">By continuing you agree to our <a href="/terms-of-service">Terms</a> and <a href="/privacy-policy">Privacy Policy</a>.</footer>
+
+    <script type="module" src="assets/js/login.js"></script>
+</body>
+</html>
