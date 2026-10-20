@@ -77,6 +77,7 @@
     </style>
     <script src="assets/js/img-fallback.js" defer></script>
     <script src="assets/js/mobile-nav.js" defer></script>
+<link rel="stylesheet" href="assets/css/ix-unified.css">
 </head>
 
 <body class="antialiased bg-background text-foreground">
@@ -675,31 +676,10 @@
                 });
             });
 
-            // Live countdown timer (starting from 2 days, 23 hours, 51 minutes, 4 seconds as shown in banner)
-            let totalSeconds = (2 * 86400) + (23 * 3600) + (51 * 60) + 4;
-            const daysSpan = document.getElementById('daysLeft');
-            const hoursSpan = document.getElementById('hoursLeft');
-            const minutesSpan = document.getElementById('minutesLeft');
-            const secondsSpan = document.getElementById('secondsLeft');
-            function updateCountdown() {
-                if (!daysSpan) return;
-                let remaining = totalSeconds;
-                if (remaining < 0) remaining = 0;
-                const days = Math.floor(remaining / 86400);
-                const hours = Math.floor((remaining % 86400) / 3600);
-                const mins = Math.floor((remaining % 3600) / 60);
-                const secs = remaining % 60;
-                daysSpan.innerText = String(days).padStart(2, '0');
-                hoursSpan.innerText = String(hours).padStart(2, '0');
-                minutesSpan.innerText = String(mins).padStart(2, '0');
-                secondsSpan.innerText = String(secs).padStart(2, '0');
-                if (remaining > 0) totalSeconds--;
-            }
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
         })();
     </script>
     <script type="module" src="site-access.js"></script>
+<script src="assets/js/promo.js" defer></script>
 </body>
 
 </html>

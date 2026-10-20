@@ -98,13 +98,17 @@
       if (key) counts.set(key, (counts.get(key) || 0) + 1);
     });
 
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
+    // weeks start on Sunday so every column of the heat-map is a real calendar week,
+    // and dates are local (toISOString() is UTC and shifted the cells by a day east of Greenwich)
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const localKey = (d) => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(today);
     start.setDate(start.getDate() - 363);
-    for (let offset = 0; offset < 364; offset += 1) {
-      const date = new Date(start);
-      date.setDate(start.getDate() + offset);
-      const key = date.toISOString().slice(0, 10);
+    start.setDate(start.getDate() - start.getDay());
+    for (const date = new Date(start); date <= today; date.setDate(date.getDate() + 1)) {
+      const key = localKey(date);
       days.push({ date: key, dayOfWeek: date.getDay(), count: counts.get(key) || 0 });
     }
     return days;

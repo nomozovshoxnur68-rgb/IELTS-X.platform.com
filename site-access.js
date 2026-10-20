@@ -92,11 +92,10 @@ function showVerifyBanner(user) {
   try { if (sessionStorage.getItem('ix-verify-dismissed')) return; } catch (e) { /* ignore */ }
   const bar = document.createElement('div');
   bar.id = 'ix-verify-banner'; bar.setAttribute('role', 'status');
-  bar.style.cssText = 'position:sticky;top:0;z-index:9998;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 14px;background:#fef3c7;color:#78350f;font:500 13px system-ui,sans-serif';
+  bar.className = 'ix-verify-banner';
   const msg = document.createElement('span'); msg.textContent = 'Please verify your email address.';
   const btn = document.createElement('button'); btn.type = 'button'; btn.textContent = 'Resend link';
   const x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'Dismiss');
-  for (const b of [btn, x]) b.style.cssText = 'border:1px solid #d97706;background:transparent;color:inherit;border-radius:6px;padding:3px 10px;font:inherit;cursor:pointer';
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     try { const r = await resendVerification(); msg.textContent = r.alreadyVerified ? 'Your email is already verified.' : 'Verification email sent. Check your inbox (and spam).'; btn.remove(); }
@@ -150,6 +149,9 @@ function ensureUserMenu() {
   if (document.getElementById('avatar-dropdown-trigger') || document.querySelector('[data-ix-user]')) return;
   const sw = document.querySelector('.theme-switch');
   if (!sw) return;
+  // a page that already ships its own avatar next to the switch must not get a second one
+  const next = sw.nextElementSibling;
+  if (next && (next.matches('[data-user-avatar]') || next.querySelector('[data-user-avatar]'))) return;
   const css = document.createElement('style');
   css.textContent =
     '.ix-user{position:relative;display:inline-flex}' +

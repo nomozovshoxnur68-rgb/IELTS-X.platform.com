@@ -21,7 +21,13 @@ function toast(message, bad) {
 
 /* sidebar */
 const sidebarPanel = $('#sidebar-panel'), sidebarBtn = $('#sidebar-toggle-btn');
-sidebarBtn?.addEventListener('click', (e) => { e.preventDefault(); sidebarPanel?.classList.toggle('sidebar-collapsed'); });
+try { if (localStorage.getItem('ix-sidebar') === 'collapsed') sidebarPanel?.classList.add('sidebar-collapsed'); } catch (e) { /* ignore */ }
+sidebarBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const collapsed = sidebarPanel?.classList.toggle('sidebar-collapsed');
+    sidebarBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    try { localStorage.setItem('ix-sidebar', collapsed ? 'collapsed' : 'open'); } catch (err) { /* ignore */ }
+});
 
 /* tabs */
 const tabBtns = $$('.tab-btn');
@@ -33,22 +39,6 @@ function activateTab(id) {
 }
 tabBtns.forEach((b) => b.addEventListener('click', () => { const id = b.getAttribute('data-tab'); if (id && panels[id]) activateTab(id); }));
 activateTab(panels[location.hash.slice(1)] ? location.hash.slice(1) : 'profile');
-
-/* promo countdown (2 days 12 hours from now, no drift while the tab sleeps) */
-(function countdown() {
-    const ids = ['days', 'hours', 'minutes', 'seconds'].map((i) => document.getElementById(i));
-    if (!ids[0]) return;
-    const end = Date.now() + (2 * 24 + 12) * 3600 * 1000;
-    const pad = (n) => String(n).padStart(2, '0');
-    function tick() {
-        const r = Math.max(0, Math.round((end - Date.now()) / 1000));
-        [Math.floor(r / 86400), Math.floor((r % 86400) / 3600), Math.floor((r % 3600) / 60), r % 60].forEach((v, i) => {
-            const text = pad(v); if (ids[i] && ids[i].textContent !== text) ids[i].textContent = text;
-        });
-    }
-    tick(); setInterval(() => { if (!document.hidden) tick(); }, 1000);
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
-})();
 
 /* profile: save the display name */
 $('#profileForm')?.addEventListener('submit', async (e) => {
@@ -160,7 +150,14 @@ $$('.bg-blue-600, .border-blue-300, .bg-primary\\/5 button, .bg-gradient-to-r bu
                     const actions = document.createElement('div'); actions.className = 'flex gap-2';
                     const tg = document.createElement('a'); tg.textContent = 'Send receipt'; tg.href = `${contact}?text=${encodeURIComponent('IELTSX order ' + o.ref)}`; tg.target = '_blank'; tg.rel = 'noopener noreferrer'; tg.className = 'text-sm underline underline-offset-4';
                     const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Cancel'; cancel.className = 'text-sm text-muted-foreground underline underline-offset-4';
-                    cancel.addEventListener('click', async () => { cancel.disabled = true; await fetch(`/api/orders/${encodeURIComponent(o.id)}/cancel`, { method: 'POST', credentials: 'same-origin' }); load(); });
+                    cancel.addEventListener('click', async () => {
+                        cancel.disabled = true;
+                        try {
+                            const res = await fetch(`/api/orders/${encodeURIComponent(o.id)}/cancel`, { method: 'POST', credentials: 'same-origin' });
+                            if (!res.ok) throw new Error('Could not cancel the order.');
+                        } catch (err) { toast(err.message || 'Could not cancel the order.', true); cancel.disabled = false; return; }
+                        load();
+                    });
                     actions.append(tg, cancel); row.appendChild(actions);
                 }
                 return row;
