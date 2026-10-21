@@ -21,6 +21,13 @@ To add a test: drop the real page over the matching placeholder file (keep the f
 in `assets/js/app.js` (reading, `cardData`) or `part/practice/listening.html` (listening). Old links such as
 `/pessage6.html` or `/Full_Reading_Test_8.html` still work (`ALIASES` in `server.js`).
 
+## Full Tests packs (`/full-tests/<skill>/<pack>`)
+
+Packs and their tests live in `assets/js/full-tests-data.js`. After adding a pack or a test run **`npm run build:packs`**:
+it writes a real page for every pack (`full-tests/<skill>/<pack>/index.html`, so the link never shows the 404 page, even on
+hosting without rewrite rules) and checks that every test link points at an existing file. Reading Pack 1 = `test-5`, `test-6`.
+The **Finish** button on the reading results screen returns to `/full-tests/reading/`.
+
 ## Accounts, e-mail, admin
 
 * Everybody signs in with **their own** account (`/login.html`: e-mail + password, or Google).

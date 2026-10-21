@@ -9,6 +9,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "make-admin": "node scripts/make-admin.js",
-    "test": "node scripts/selftest.js"
+    "test": "node scripts/selftest.js",
+    "build:packs": "node scripts/build-packs.js"
   }
 }
