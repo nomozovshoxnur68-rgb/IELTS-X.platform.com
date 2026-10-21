@@ -1040,9 +1040,9 @@ const ALIASES = {
   '/login': '/login.html', '/account': '/account.html', '/pricing': '/Price.html', '/practice/mock': '/Mock tests.html',
   '/listening.html': '/part/practice/listening.html', '/reading.html': '/part/practice/reading.html', '/writing.html': '/part/practice/writing.html', '/speaking.html': '/part/practice/speaking.html',
   '/full-tests/reading.html': '/full-tests/reading/index.html', '/full-tests/listening.html': '/full-tests/listening/index.html',
-  '/full-tests/writing.html': '/part/practice/writing.html', '/full-tests/speaking.html': '/part/practice/speaking.html',
+  '/full-tests/writing.html': '/full-tests/writing/index.html', '/full-tests/speaking.html': '/full-tests/speaking/index.html',
   '/full reading.html': '/full-tests/reading/index.html', '/full listening.html': '/full-tests/listening/index.html',
-  '/full writing.html': '/part/practice/writing.html', '/full speaking.html': '/part/practice/speaking.html',
+  '/full writing.html': '/full-tests/writing/index.html', '/full speaking.html': '/full-tests/speaking/index.html',
   '/performance.html': '/study/Tools/Performance.html', '/pdf materials.html': '/study/Tools/Pdf materials.html', '/materials.html': '/study/Tools/Pdf materials.html', '/articles.html': '/study/Tools/Articles.html',
   '/study/tools/articles.html': '/study/Tools/Articles.html', '/study/tools/performance.html': '/study/Tools/Performance.html', '/study/tools/pdf materials.html': '/study/Tools/Pdf materials.html',
   // links that existed before the tests were numbered test-1, test-2, ... in listing order
@@ -1090,7 +1090,9 @@ function notFound(req, res) {
 }
 
 async function staticFile(req, res, pathname) {
-  if (/^\/test\/[^/]+\/?$/.test(pathname)) pathname = '/test.html';   // /test/<id> shows the same player as /test?id=<id>
+  if (/^\/test\/[^/]+\/?$/.test(pathname)) pathname = '/test.html';
+  // /full-tests/<skill>/<pack> (e.g. /full-tests/reading/pack-5) is one shared page; test-N.html files and index keep their own files
+  if (/^\/full-tests\/(listening|reading|writing|speaking)\/(?!test-|index)[a-z0-9][a-z0-9_-]*\/?$/i.test(pathname)) pathname = '/full-tests/pack.html';   // /test/<id> shows the same player as /test?id=<id>
   let decoded;
   try { decoded = decodeURIComponent(pathname); } catch (e) { return send(res, 400, 'Bad URL'); }
   if (decoded.includes('\0')) return send(res, 400, 'Bad URL');

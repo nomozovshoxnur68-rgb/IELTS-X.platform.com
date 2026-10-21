@@ -10,6 +10,7 @@
         img.classList.add('img-missing');
         img.style.visibility = 'hidden';
         img.removeAttribute('alt');
+        if (img.parentElement) img.parentElement.classList.add('ix-thumb-fallback');
     }
     document.addEventListener('error', function (e) {
         if (e.target && e.target.tagName === 'IMG') hide(e.target);

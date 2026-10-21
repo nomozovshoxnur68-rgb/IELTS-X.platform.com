@@ -39,7 +39,6 @@
     const layer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     layer.setAttribute("id", "performanceActivityCells");
 
-    const startDate = new Date(activity[0] ? activity[0].date : new Date().toISOString().slice(0, 10));
     const maxCount = activity.reduce(function (max, day) {
       return Math.max(max, day.count);
     }, 0);
@@ -84,6 +83,42 @@
     });
 
     svg.appendChild(layer);
+
+    // size the svg to the real number of weeks and redraw the month labels so they sit above their columns
+    const weeks = Math.ceil(activity.length / 7);
+    const width = Math.max(0, weeks * (cellSize + gap) - gap);
+    svg.setAttribute("width", String(width));
+    svg.setAttribute("viewBox", "0 0 " + width + " 144");
+    const oldMonths = svg.querySelector(".react-activity-calendar__legend-month");
+    if (oldMonths) {
+      oldMonths.remove();
+    }
+    const monthLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    monthLayer.setAttribute("class", "react-activity-calendar__legend-month");
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    let lastMonth = -1;
+    let lastWeek = -10;
+    for (let w = 0; w < weeks; w += 1) {
+      const firstDay = activity[w * 7];
+      if (!firstDay) {
+        break;
+      }
+      const month = Number(firstDay.date.slice(5, 7)) - 1;
+      if (month !== lastMonth && w - lastWeek >= 3) {
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", String(w * (cellSize + gap)));
+        label.setAttribute("y", "6");
+        label.setAttribute("dominant-baseline", "central");
+        label.setAttribute("fill", "currentColor");
+        label.textContent = monthNames[month];
+        monthLayer.appendChild(label);
+        lastMonth = month;
+        lastWeek = w;
+      } else if (month !== lastMonth) {
+        lastMonth = month;
+      }
+    }
+    svg.insertBefore(monthLayer, svg.firstChild);
 
     const totalTests = results.length;
     const activeDays = new Set(

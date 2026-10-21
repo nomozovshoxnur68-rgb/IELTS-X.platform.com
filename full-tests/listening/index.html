@@ -1,21 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Listening full tests · IELTS X</title><meta name="robots" content="index">
-<script src="/assets/js/theme-init.js"></script>
-<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f8fafc;color:#0f172a;font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-html.dark-mode body{background:#0b0f14;color:#e5e7eb}main{width:100%;max-width:560px;padding:28px}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;box-shadow:0 10px 30px rgba(15,23,42,.06)}html.dark-mode .card{background:#131920;border-color:#263041}
-.eyebrow{margin:0 0 6px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#64748b}h1{margin:0 0 10px;font-size:24px;line-height:1.25}p{margin:0 0 18px;color:#64748b}
-.actions{display:flex;flex-wrap:wrap;gap:8px}a.btn{display:inline-block;padding:10px 16px;border-radius:10px;border:1px solid #cbd5e1;color:inherit;text-decoration:none;font-weight:600;font-size:14px}html.dark-mode a.btn{border-color:#334155}
-a.btn.primary{background:#0f172a;color:#fff;border-color:#0f172a}html.dark-mode a.btn.primary{background:#f8fafc;color:#0f172a}
-ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}li a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}li a:hover{background:#f1f5f9}html.dark-mode li a{border-color:#263041}html.dark-mode li a:hover{background:#1b2430}
-.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#dcfce7;color:#166534}.tag.pro{background:#fef3c7;color:#92400e}.num{color:#64748b;font-weight:500;margin-right:8px}</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>IELTSX — Listening Full Tests</title>
+    <meta name="description" content="Complete IELTS Listening tests with 4 sections and 40 questions.">
+    <meta property="og:title" content="IELTSX — Listening Full Tests">
+    <meta property="og:description" content="Complete IELTS Listening tests with 4 sections and 40 questions.">
+    <meta property="og:type" content="website">
+    <script src="/assets/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/assets/index-BxgEAFAf.css" />
+    <link rel="stylesheet" href="/assets/index-DNLr8-et.css" />
+    <link rel="stylesheet" href="/assets/css/tw-fallback.css">
+    <script src="/auth-bridge.js"></script>
+    <link rel="stylesheet" href="/assets/css/ui.css">
+    <script src="/assets/js/img-fallback.js" defer></script>
+    <script src="/assets/js/mobile-nav.js" defer></script>
+    <link rel="stylesheet" href="/assets/css/ix-unified.css">
+    <link rel="stylesheet" href="/assets/css/full-tests.css">
 </head>
-<body><main><div class="card">
-<p class="eyebrow">Full tests</p><h1>Listening full tests</h1><p>Complete exam-style papers. Premium members can open every test.</p><ul><li><a href="/full-tests/listening/test-1"><span><span class="num">1</span>Listening Test 7</span><span class="tag pro">Premium</span></a></li></ul><div class="actions" style="margin-top:18px"><a class="btn" href="/part/practice/listening">Listening practice sections</a><a class="btn" href="/Price">Get Premium</a></div>
-</div></main>
+
+<body class="antialiased bg-background text-foreground">
+
+    <div id="root">
+        <div class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar"
+        style="--sidebar-width: 16rem; --sidebar-width-icon: 3rem;">
+        <!-- SIDEBAR — exactly as provided, unchanged -->
+        <div class="group peer hidden md:block text-sidebar-foreground" data-state="expanded" data-collapsible=""
+        data-variant="sidebar" data-side="left">
+        <div
+        class="duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[--sidebar-width-icon]">
+    </div>
+    <div
+    class="duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l overflow-hidden [&amp;&gt;[data-sidebar=sidebar]]:flex-row">
+    <div data-sidebar="sidebar"
+    class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow">
+    <div
+    class="flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground border-r">
+    <div data-sidebar="header" class="flex flex-col gap-2 p-2">
+        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="brand"
+                data-sidebar="menu-button" data-size="lg" data-active="false"
+                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:!p-0 md:h-8 md:p-0"
+                href="/" data-discover="true">
+                <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1">
+                    <img src="/assets/ieltsx-only-logo-BajnupZg.png" alt="IELTSX" class="size-6" />
+                </div>
+                <div class="grid flex-1 text-left text-sm leading-tight">
+                    <span class="truncate font-semibold">IELTSX</span>
+                    <span class="truncate text-xs capitalize" data-plan-label>DEMO</span>
+                </div>
+            </a></li>
+        </ul>
+    </div>
+    <div data-sidebar="content"
+    class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden">
+    <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+        <div data-sidebar="group-label"
+        class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
+        Full Tests</div>
+        <div data-sidebar="group-content" class="w-full text-sm">
+            <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+                <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="listening"
+                    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+                    data-sidebar="menu-button" data-size="default" data-active="false"
+                    href="/full-tests/listening/" data-discover="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-headphones">
+                    <path
+                    d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3">
+                </path>
+            </svg>
+            <span class="flex-1">Listening</span>
+        </a></li>
+        <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="reading"
+            class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+            data-sidebar="menu-button" data-size="default" data-active="false"
+            href="/full-tests/reading/" data-discover="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-book-open">
+            <path d="M12 7v14"></path>
+            <path
+            d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z">
+        </path>
+    </svg>
+    <span class="flex-1">Reading</span>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="writing"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/full-tests/writing/" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-pencil">
+    <path
+    d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
+</path>
+<path d="m15 5 4 4"></path>
+</svg>
+<span class="flex-1">Writing</span>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="speaking"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/full-tests/speaking/" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-mic">
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z">
+    </path>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+    <line x1="12" x2="12" y1="19" y2="22"></line>
+</svg>
+<span class="flex-1">Speaking</span>
+</a></li>
+</ul>
+</div>
+</div>
+<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+    <div data-sidebar="group-label"
+    class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
+    Part Practice</div>
+    <div data-sidebar="group-content" class="w-full text-sm">
+        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="listening-sections"
+                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+                data-sidebar="menu-button" data-size="default" data-active="false"
+                href="/part/practice/listening" data-discover="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-headphones">
+                <path
+                d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3">
+            </path>
+        </svg>
+        <span class="flex-1">Listening Sections</span>
+    </a></li>
+    <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="reading-passages"
+        class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+        data-sidebar="menu-button" data-size="default" data-active="false"
+        href="/part/practice/reading" data-discover="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-book-open">
+        <path d="M12 7v14"></path>
+        <path
+        d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z">
+    </path>
+</svg>
+<span class="flex-1">Reading Passages</span>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="writing-tasks"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/part/practice/writing" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-pencil">
+    <path
+    d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
+</path>
+<path d="m15 5 4 4"></path>
+</svg>
+<span class="flex-1">Writing Tasks</span>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="speaking-topics"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/part/practice/speaking" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-message-square">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z">
+    </path>
+</svg>
+<span class="flex-1">Speaking Topics</span>
+</a></li>
+</ul>
+</div>
+</div>
+<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+    <div data-sidebar="group-label"
+    class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
+    Collections</div>
+    <div data-sidebar="group-content" class="w-full text-sm">
+        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="predictions"
+                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+                data-sidebar="menu-button" data-size="default" data-active="false"
+                href="/Predictions" data-discover="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-layers">
+                <path
+                d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z">
+            </path>
+            <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path>
+            <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path>
+        </svg>
+        <span class="flex-1">Predictions</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-crown size-4">
+        <path
+        d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
+    </path>
+    <path d="M5 21h14"></path>
+</svg>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="mock-tests"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/Mock%20tests" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-target">
+    <circle cx="12" cy="12" r="10"></circle>
+    <circle cx="12" cy="12" r="6"></circle>
+    <circle cx="12" cy="12" r="2"></circle>
+</svg>
+<span class="flex-1">Mock Tests</span>
+</a></li>
+</ul>
+</div>
+</div>
+<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
+    <div data-sidebar="group-label"
+    class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
+    Study Tools</div>
+    <div data-sidebar="group-content" class="w-full text-sm">
+        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="performance"
+                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+                data-sidebar="menu-button" data-size="default" data-active="false"
+                href="/study/Tools/Performance" data-discover="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-chart-line">
+                <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+            </svg>
+            <span class="flex-1">Performance</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-crown size-4">
+            <path
+            d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
+        </path>
+        <path d="M5 21h14"></path>
+    </svg>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="pdf-materials"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/study/Tools/Pdf%20materials" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-graduation-cap">
+    <path
+    d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z">
+</path>
+<path d="M22 10v6"></path>
+<path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+</svg>
+<span class="flex-1">Pdf materials</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+viewBox="0 0 24 24" fill="none" stroke="currentColor"
+stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+class="lucide lucide-crown size-4">
+<path
+d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
+</path>
+<path d="M5 21h14"></path>
+</svg>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="articles"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="default" data-active="false"
+    href="/study/Tools/Articles" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-bot">
+    <path d="M12 8V4H8"></path>
+    <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+    <path d="M2 14h2"></path>
+    <path d="M20 14h2"></path>
+    <path d="M15 13v2"></path>
+    <path d="M9 13v2"></path>
+</svg>
+<span class="flex-1">Articles</span>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+viewBox="0 0 24 24" fill="none" stroke="currentColor"
+stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+class="lucide lucide-crown size-4">
+<path
+d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
+</path>
+<path d="M5 21h14"></path>
+</svg>
+</a></li>
+</ul>
+</div>
+</div>
+<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
+    <div data-sidebar="group-content" class="w-full text-sm">
+        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
+            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="pricing"
+                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2"
+                data-sidebar="menu-button" data-size="sm" data-active="false"
+                href="/Price" data-discover="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-credit-card">
+                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                <line x1="2" x2="22" y1="10" y2="10"></line>
+            </svg>
+            <span class="flex-1">Pricing</span>
+        </a></li>
+        <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="telegram"
+            href="https://t.me/ieltsxuz" target="_blank" rel="noopener noreferrer"
+            class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2"
+            data-sidebar="menu-button" data-size="sm" data-active="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-send">
+            <path
+            d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z">
+        </path>
+        <path d="m21.854 2.147-10.94 10.939"></path>
+    </svg>
+    <span class="flex-1">Telegram Channel</span>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="support"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="sm" data-active="false"
+    href="mailto:support@ieltsx.com" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-life-buoy">
+    <circle cx="12" cy="12" r="10"></circle>
+    <path d="m4.93 4.93 4.24 4.24"></path>
+    <path d="m14.83 9.17 4.24-4.24"></path>
+    <path d="m14.83 14.83 4.24 4.24"></path>
+    <path d="m9.17 14.83-4.24 4.24"></path>
+    <circle cx="12" cy="12" r="4"></circle>
+</svg>
+<span class="flex-1">Support</span>
+</a></li>
+<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="feedback"
+    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2"
+    data-sidebar="menu-button" data-size="sm" data-active="false"
+    href="/" data-discover="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="lucide lucide-message-circle">
+    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+</svg>
+<span class="flex-1">Feedback</span>
+</a></li>
+</ul>
+</div>
+</div>
+</div>
+<button data-sidebar="rail" aria-label="Toggle Sidebar" tabindex="-1"
+title="Toggle Sidebar"
+class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex [[data-side=left]_&amp;]:cursor-w-resize [[data-side=right]_&amp;]:cursor-e-resize [[data-side=left][data-state=collapsed]_&amp;]:cursor-e-resize [[data-side=right][data-state=collapsed]_&amp;]:cursor-w-resize group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar [[data-side=left][data-collapsible=offcanvas]_&amp;]:-right-2 [[data-side=right][data-collapsible=offcanvas]_&amp;]:-left-2">
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="relative flex min-h-svh flex-col bg-background flex-1">
+    <!-- Header -->
+    <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 backdrop-blur md:pr-10 lg:pr-20">
+        <div class="flex items-center gap-2 pl-2">
+            <button id="sidebar-toggle-btn" class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent h-7 w-7" data-sidebar="trigger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+                <span class="sr-only">Toggle Sidebar</span>
+            </button>
+            <div data-orientation="vertical" class="shrink-0 bg-border w-[1px] h-4 mr-2"></div>
+            <nav id="ft-crumbs" class="ft-crumbs" aria-label="Breadcrumb"></nav>
+        </div>
+        <div class="flex items-center gap-3 relative" id="avatar-container">
+            <!-- Theme toggle button -->
+            <div class="theme-switch" role="radiogroup" aria-label="Theme">
+                        <button type="button" role="radio" aria-checked="false" data-theme-mode="light" aria-label="Light" title="Light"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg></button>
+                        <button type="button" role="radio" aria-checked="false" data-theme-mode="dark" aria-label="Dark" title="Dark"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+                        <button type="button" role="radio" aria-checked="false" data-theme-mode="system" aria-label="System" title="System"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></button>
+                    </div>
+            <!-- Avatar button -->
+            <button id="avatar-dropdown-trigger" class="flex h-8 w-8 items-center justify-center rounded-md border bg-background focus:outline-none">
+                <span class="relative flex shrink-0 overflow-hidden h-7 w-7 rounded-md">
+                    <span data-user-avatar aria-hidden="true" style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;background:#1e293b;color:#fff;font-size:12px;font-weight:600;border-radius:inherit">?</span>
+                </span>
+            </button>
+            <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 z-50 min-w-[12rem] w-56 rounded-lg border bg-popover shadow-md origin-top-right">
+                <div class="px-2 py-1.5 text-sm">
+                    <div class="flex flex-col space-y-1">
+                        <p class="text-sm font-medium leading-none" data-user-name>Guest</p>
+                        <p class="text-xs leading-none text-muted-foreground" data-user-email>Not signed in</p>
+                    </div>
+                </div>
+                <div role="separator" class="-mx-1 my-1 h-px bg-muted"></div>
+                <a href="/account" role="menuitem" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent" id="dropdown-account">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                    <span>Account</span>
+                </a>
+                <div role="separator" class="-mx-1 my-1 h-px bg-muted"></div>
+                <div role="menuitem" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent" id="dropdown-logout">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" x2="9" y1="12" y2="12" />
+                    </svg>
+                    <span>Log out</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="flex-1 overflow-auto">
+        <div id="ft-root" data-view="list" data-skill="listening"></div>
+    </div>
+</main>
+</div>
+    </div><!-- /#root -->
+
+<script src="/assets/js/sidebar-links.js"></script>
+<script src="/assets/js/app.js" data-page-script></script>
 <script type="module" src="/site-access.js"></script>
+<script src="/premium-access.js"></script>
+<script src="/ieltsx-data.js"></script>
+<script src="/assets/js/full-tests-data.js"></script>
+<script src="/assets/js/full-tests.js"></script>
 </body>
+
 </html>

@@ -179,28 +179,28 @@ const M = ({ className: a, size: i = "sm", children: r, onClick: l }) => {
                         time: "30 minutes",
                         icon: f,
                         color: "text-yellow-500",
-                        link: "/full-tests/listening"
+                        link: "/full-tests/listening/"
                     }, {
                         title: "Reading",
                         description: "Full reading test with passages and questions.",
                         time: "60 minutes",
                         icon: w,
                         color: "text-green-500",
-                        link: "/full-tests/reading"
+                        link: "/full-tests/reading/"
                     }, {
                         title: "Writing",
                         description: "Full writing test with real prompts.",
                         time: "60 minutes",
                         icon: b,
                         color: "text-blue-500",
-                        link: "/full-tests/writing"
+                        link: "/full-tests/writing/"
                     }, {
                         title: "Speaking",
                         description: "Speaking test with complete part flow.",
                         time: "11-14 minutes",
                         icon: v,
                         color: "text-red-500",
-                        link: "/full-tests/speaking"
+                        link: "/full-tests/speaking/"
                     }].map((t, a) => e.jsxs(i, {
                         className: "hover:shadow-lg transition-shadow",
                         children: [e.jsxs(c, {

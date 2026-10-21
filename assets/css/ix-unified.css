@@ -1,0 +1,374 @@
+/* ==========================================================================
+   IELTSX — UNIFIED DESIGN SYSTEM  (assets/css/ix-unified.css)
+
+   Loaded LAST on every page, so one set of tokens decides how the whole
+   site looks. Before this file each page carried its own colours, fonts and
+   dark-mode values, which is why Reading / Listening looked different from
+   Writing / Speaking / Articles / Performance / PDF / Account.
+
+   Rules of thumb
+   - Change a colour here (the tokens at the top) and every page follows.
+   - Light = html (no class).  Dark = html.dark-mode  (set by theme-init.js).
+   - Page-only CSS files keep layout that is truly unique to that page.
+   ========================================================================== */
+
+/* ── 1. TOKENS ─────────────────────────────────────────────────────────── */
+:root {
+    color-scheme: light;
+
+    /* shadcn-style tokens ("H S% L%" triplets, used as hsl(var(--x))) */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 51%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 215 20% 65%;
+    --radius: 0.5rem;
+    --ix-line-strong: 215 20% 75%;
+
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
+    --sidebar: 0 0% 98%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 222 47% 11%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 5% 94%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+
+    /* ix-* tokens used by ui.css (theme switch, filter dropdowns) */
+    --ix-bg: hsl(var(--background));
+    --ix-fg: hsl(var(--foreground));
+    --ix-muted: hsl(var(--muted-foreground));
+    --ix-group: hsl(215 18% 50%);
+    --ix-border: hsl(var(--border));
+    --ix-border-strong: hsl(215 20% 72%);
+    --ix-hover: hsl(var(--muted));
+    --ix-primary: hsl(var(--primary));
+    --ix-popover: hsl(var(--popover));
+    --ix-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+    /* status colours */
+    --ix-success-bg: #dcfce7;  --ix-success-fg: #166534;
+    --ix-warn-bg: #fef3c7;     --ix-warn-fg: #78350f;   --ix-warn-border: #d97706;
+    --ix-danger-bg: #fee2e2;   --ix-danger-fg: #991b1b;
+    --ix-info-bg: #dbeafe;     --ix-info-fg: #1e40af;
+
+    --ix-font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    --ix-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --ix-page-max: 80rem;
+    --ix-page-pad: 1.5rem;
+}
+
+html.dark-mode {
+    color-scheme: dark;
+
+    --background: 0 0% 13%;
+    --foreground: 210 20% 92%;
+    --card: 0 0% 16%;
+    --card-foreground: 210 20% 92%;
+    --popover: 0 0% 16%;
+    --popover-foreground: 210 20% 92%;
+    --primary: 217 91% 63%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 210 20% 92%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 210 10% 66%;
+    --accent: 0 0% 21%;
+    --accent-foreground: 210 20% 92%;
+    --destructive: 0 72% 58%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 215 20% 45%;
+    --ix-line-strong: 0 0% 33%;
+
+    --sidebar: 0 0% 11%;
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 210 16% 82%;
+    --sidebar-primary: 210 20% 92%;
+    --sidebar-primary-foreground: 0 0% 11%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 210 20% 94%;
+    --sidebar-border: 0 0% 21%;
+    --sidebar-ring: 217 91% 63%;
+
+
+    --ix-group: hsl(210 12% 62%);
+    --ix-border-strong: hsl(0 0% 42%);
+    --ix-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.65);
+
+    --ix-success-bg: #12301e;  --ix-success-fg: #86efac;
+    --ix-warn-bg: #3a2a08;     --ix-warn-fg: #fcd34d;   --ix-warn-border: #b45309;
+    --ix-danger-bg: #3b1212;   --ix-danger-fg: #fca5a5;
+    --ix-info-bg: #14264a;     --ix-info-fg: #93c5fd;
+}
+
+/* legacy names some page stylesheets still read: declared for BOTH themes so page-level dark blocks cannot win */
+:root, html.dark-mode {
+    --bg-body: hsl(var(--background));
+    --bg-card: hsl(var(--card));
+    --text-primary: hsl(var(--foreground));
+    --text-secondary: hsl(215 14% 34%);
+    --border-color: hsl(var(--border));
+    --sidebar-bg: hsl(var(--sidebar));
+    --header-bg: hsl(var(--background) / 0.92);
+    --input-bg: hsl(var(--background));
+    --badge-bg: hsl(var(--muted));
+    --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+html.dark-mode { --text-secondary: hsl(210 10% 68%); --shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+
+/* ── 2. BASE ───────────────────────────────────────────────────────────── */
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html, body { background: hsl(var(--background)); }
+body {
+    margin: 0;
+    font-family: var(--ix-font);
+    color: hsl(var(--foreground));
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+* { border-color: hsl(var(--border)); }
+::selection { background: hsl(var(--primary) / 0.25); }
+:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
+button, input, select, textarea { font-family: inherit; }
+img { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* a thin scrollbar that follows the theme */
+* { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
+html.dark-mode * { scrollbar-color: hsl(0 0% 32%) transparent; }
+
+/* ── 3. SHELL: sidebar + header + content area (same on every page) ─────── */
+.bg-background { background-color: hsl(var(--background)); }
+.bg-sidebar { background-color: hsl(var(--sidebar)); }
+.text-sidebar-foreground { color: hsl(var(--sidebar-foreground)); }
+.border-sidebar-border { border-color: hsl(var(--sidebar-border)); }
+
+[data-sidebar="sidebar"],
+#sidebar-panel,
+#sidebar-panel > div,
+#sidebar-panel > div > div {
+    background-color: hsl(var(--sidebar));
+    color: hsl(var(--sidebar-foreground));
+    border-color: hsl(var(--sidebar-border));
+}
+/* the sidebar always fills the screen height and never draws a white seam in dark mode */
+#sidebar-panel, .group.peer > .fixed { height: 100svh; }
+html.dark-mode [data-sidebar="sidebar"],
+html.dark-mode [data-sidebar="sidebar"] * { border-color: hsl(var(--sidebar-border)); }
+
+/* sidebar menu: one size / spacing / hover everywhere */
+[data-sidebar="menu-button"], #sidebar-panel .menu-item > a {
+    border-radius: 0.5rem;
+    color: hsl(var(--sidebar-foreground));
+    transition: background-color 0.15s, color 0.15s;
+}
+[data-sidebar="menu-button"]:hover, #sidebar-panel .menu-item > a:hover {
+    background-color: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+}
+[data-sidebar="menu-button"][data-active="true"], #sidebar-panel .menu-item > a[aria-current="page"] {
+    background-color: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+    font-weight: 600;
+}
+[data-sidebar="group-label"], #sidebar-panel .group-label { color: hsl(var(--sidebar-foreground) / 0.65); }
+html.dark-mode #sidebar-panel .text-gray-500,
+html.dark-mode #sidebar-panel .text-gray-600,
+html.dark-mode #sidebar-panel .text-gray-700 { color: hsl(var(--sidebar-foreground) / 0.7); }
+html.dark-mode #sidebar-panel .bg-gray-100,
+html.dark-mode #sidebar-panel .hover\:bg-gray-100:hover { background-color: hsl(var(--sidebar-accent)); }
+.ix-brand-img { height: 2rem; width: auto; object-fit: contain; }
+
+/* header (top bar) */
+main > header, main header.sticky, header.sticky {
+    height: 3.5rem;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid hsl(var(--border));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+header h1.text-sm { font-size: 0.875rem; font-weight: 500; }
+
+/* page content: same width, same padding on every page */
+.ix-page, main section.p-6 > .container, main > main > .container, main > section > .container {
+    width: 100%;
+    max-width: var(--ix-page-max);
+    margin-inline: auto;
+    padding-inline: 0;
+}
+main section.p-6, main > main { padding: var(--ix-page-pad); }
+main main { min-height: 0; }
+
+/* page heading (icon + title + subtitle) */
+.ix-page-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+.ix-page-head h1 { margin: 0; font-size: 1.5rem; line-height: 2rem; font-weight: 700; letter-spacing: -0.01em; color: hsl(var(--foreground)); }
+.ix-page-head p { margin: 0.125rem 0 0; font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
+.ix-page-head .ix-page-icon { display: inline-flex; color: hsl(var(--primary)); }
+main h1.text-2xl, main h1.text-3xl { letter-spacing: -0.01em; color: hsl(var(--foreground)); }
+.text-foreground { color: hsl(var(--foreground)); }
+.text-muted-foreground { color: hsl(var(--muted-foreground)); }
+
+/* ── 4. SURFACES: cards, search panel, inputs, buttons, badges ─────────── */
+.bg-card, .rounded-xl.border, .rounded-lg.border.bg-card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border-color: hsl(var(--border));
+}
+.rounded-xl.border { border-radius: 0.75rem; box-shadow: var(--shadow); }
+a .rounded-xl.border, a.group .rounded-xl.border { transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+a:hover > .rounded-xl.border, a.group:hover .rounded-xl.border {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.22);
+    border-color: hsl(var(--primary) / 0.45);
+}
+html.dark-mode a:hover > .rounded-xl.border, html.dark-mode a.group:hover .rounded-xl.border { box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.7); }
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--input));
+}
+input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground)); opacity: 0.85; }
+html.dark-mode input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+html.dark-mode select, html.dark-mode textarea { background-color: hsl(0 0% 18%); }
+html.dark-mode select option { background: hsl(0 0% 16%); color: hsl(var(--foreground)); }
+input:disabled, select:disabled, textarea:disabled { opacity: 0.65; cursor: not-allowed; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: hsl(var(--primary)); box-shadow: 0 0 0 3px hsl(var(--primary) / 0.18); }
+
+/* primary search button identical everywhere (was blue on some pages, black on others) */
+#searchBtn, .bg-primary { background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+#searchBtn:hover, .bg-primary:hover { filter: brightness(1.06); }
+html.dark-mode #searchBtn { color: #fff; }
+
+/* tag / badge chips on cards */
+.bg-secondary, .bg-muted, .badge { background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); }
+html.dark-mode .bg-white { background-color: hsl(var(--card)); }
+html.dark-mode .bg-gray-50, html.dark-mode .bg-slate-50, html.dark-mode .bg-gray-100, html.dark-mode .bg-slate-100 { background-color: hsl(var(--muted)); }
+html.dark-mode .text-gray-900, html.dark-mode .text-slate-900, html.dark-mode .text-black { color: hsl(var(--foreground)); }
+html.dark-mode .text-gray-800, html.dark-mode .text-gray-700, html.dark-mode .text-slate-800, html.dark-mode .text-slate-700 { color: hsl(210 14% 84%); }
+html.dark-mode .text-gray-600, html.dark-mode .text-gray-500, html.dark-mode .text-gray-400, html.dark-mode .text-slate-600, html.dark-mode .text-slate-500 { color: hsl(var(--muted-foreground)); }
+html.dark-mode .border-gray-200, html.dark-mode .border-gray-300, html.dark-mode .border-slate-200 { border-color: hsl(var(--border)); }
+html.dark-mode .hover\:bg-gray-100:hover, html.dark-mode .hover\:bg-gray-50:hover { background-color: hsl(var(--accent)); }
+html.dark-mode .shadow, html.dark-mode .shadow-sm, html.dark-mode .shadow-md { --tw-shadow-color: rgba(0, 0, 0, 0.5); }
+
+/* plan label (DEMO / PREMIUM / ADMIN) — readable in both themes */
+[data-plan-label].rounded-full, .plan-badge, .inline-flex.rounded-full[data-plan-label] {
+    background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: 1px solid hsl(var(--border));
+}
+html.dark-mode [data-plan-label].rounded-full { background-color: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
+
+/* ── 5. CARD IMAGES: a nice placeholder instead of a grey / broken box ───── */
+.ix-thumb-fallback, img.ix-img-failed {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.05) 55%, hsl(var(--muted)));
+}
+div.ix-thumb-fallback, div.bg-muted.ix-thumb-fallback {
+    background-image: linear-gradient(135deg, hsl(var(--primary) / 0.22), hsl(var(--primary) / 0.06) 60%, hsl(var(--muted)));
+}
+.ix-thumb-fallback > div[class*="bg-gradient"], .ix-thumb-fallback > [class*="from-black"] { opacity: 0.15; }
+img.ix-img-failed { object-fit: contain; padding: 18%; opacity: 0.55; }
+/* the dark "scrim" some cards lay on top of a photo must not turn the whole card grey when the photo is missing */
+.ix-thumb-fallback::after { opacity: 0.25; }
+/* gradient hero images fade to the card colour, never to hard white */
+.from-white, .to-white, .via-white { --tw-gradient-to: hsl(var(--card) / 0); }
+html.dark-mode [class*="to-white"], html.dark-mode [class*="from-white"] { --tw-gradient-to: hsl(var(--card) / 0); }
+
+/* gradient stops the Tailwind build forgot (they made card headers and buttons fade to white) */
+.to-amber-600{--tw-gradient-to:#d97706 var(--tw-gradient-to-position)}
+.to-fuchsia-700{--tw-gradient-to:#a21caf var(--tw-gradient-to-position)}
+.to-green-600\/80{--tw-gradient-to:rgb(22 163 74 / .8) var(--tw-gradient-to-position)}
+.to-pink-600{--tw-gradient-to:#db2777 var(--tw-gradient-to-position)}
+.to-yellow-700{--tw-gradient-to:#a16207 var(--tw-gradient-to-position)}
+.via-amber-600{--tw-gradient-stops:var(--tw-gradient-from),#d97706 var(--tw-gradient-via-position),var(--tw-gradient-to,rgb(217 119 6 / 0)) var(--tw-gradient-to-position)}
+.via-blue-600{--tw-gradient-stops:var(--tw-gradient-from),#2563eb var(--tw-gradient-via-position),var(--tw-gradient-to,rgb(37 99 235 / 0)) var(--tw-gradient-to-position)}
+.via-teal-500\/70{--tw-gradient-stops:var(--tw-gradient-from),rgb(20 184 166 / .7) var(--tw-gradient-via-position),var(--tw-gradient-to,rgb(20 184 166 / 0)) var(--tw-gradient-to-position)}
+
+.to-blue-600{--tw-gradient-to:#2563eb var(--tw-gradient-to-position)}
+.hover\:to-blue-700:hover{--tw-gradient-to:#1d4ed8 var(--tw-gradient-to-position)}
+
+/* ── 6. TOP-OF-PAGE BARS: verify-email + promo ───────────────────────────── */
+/* verify bar is a floating pill now: it no longer pushes the layout or hides the sidebar logo */
+#ix-verify-banner {
+    position: fixed !important;
+    left: 50%; bottom: 1rem; top: auto !important;
+    transform: translateX(-50%);
+    z-index: 9998;
+    max-width: calc(100vw - 2rem);
+    display: flex; gap: 0.75rem; align-items: center; justify-content: center; flex-wrap: wrap;
+    padding: 0.5rem 0.75rem 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid var(--ix-warn-border);
+    background: var(--ix-warn-bg) !important;
+    color: var(--ix-warn-fg) !important;
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.35);
+    font: 500 0.8125rem/1.3 var(--ix-font) !important;
+}
+#ix-verify-banner button {
+    border: 1px solid var(--ix-warn-border) !important;
+    background: transparent !important; color: inherit !important;
+    border-radius: 9999px !important; padding: 0.2rem 0.7rem !important; font: inherit !important; cursor: pointer;
+}
+#ix-verify-banner button:hover { background: rgba(217, 119, 6, 0.14) !important; }
+
+/* the purple "promo" strip stays inside the content column and never over the sidebar */
+main [class*="from-purple"][class*="to-blue"], main [class*="from-violet"][class*="to-blue"] { position: relative; z-index: 1; }
+
+/* ── 7. TABLES / TABS / MISC used by Performance + Account ──────────────── */
+table { border-color: hsl(var(--border)); }
+th, td { border-color: hsl(var(--border)); }
+html.dark-mode .tab-btn[data-active="true"], html.dark-mode [role="tab"][data-state="active"] {
+    background-color: hsl(var(--background)); color: hsl(var(--foreground));
+}
+.tab-btn[data-active="true"] { background-color: hsl(var(--background)); color: hsl(var(--foreground)); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); }
+.tab-btn { color: hsl(var(--muted-foreground)); transition: color 0.15s, background-color 0.15s; }
+.tab-btn:hover { color: hsl(var(--foreground)); }
+
+/* activity heat-map: month labels line up with their columns, empty cells readable in dark */
+.react-activity-calendar { max-width: 100%; overflow-x: auto; padding-bottom: 0.25rem; }
+html.dark-mode .react-activity-calendar rect[fill="#ebedf0"], html.dark-mode .react-activity-calendar rect[fill="#f0f0f0"] { fill: hsl(0 0% 22%); }
+html.dark-mode .react-activity-calendar text { fill: hsl(var(--muted-foreground)); }
+
+/* toast */
+#ix-toast { background: hsl(var(--foreground)) !important; color: hsl(var(--background)) !important; }
+
+/* Articles: search + three selects sit on one row on desktop and wrap cleanly on small screens
+   (the Tailwind build did not include the lg:/sm: utilities this row relied on) */
+#passagesPanel > div > div { display: flex; gap: 0.75rem; flex-direction: column; }
+#passagesPanel select { height: 2.5rem; padding: 0 0.75rem; border: 1px solid hsl(var(--input)); border-radius: 0.375rem; font-size: 0.875rem; width: 100%; }
+@media (min-width: 640px) { #passagesPanel select { width: auto; min-width: 9.5rem; } }
+@media (min-width: 1024px) {
+    #passagesPanel > div > div { flex-direction: row; align-items: center; justify-content: space-between; }
+    #passagesPanel > div > div > div:last-child { display: flex; flex-wrap: nowrap; gap: 0.5rem; width: auto; justify-content: flex-end; }
+}
+
+/* ── 8. RESPONSIVE ──────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    :root { --ix-page-pad: 1rem; }
+    .ix-page-head h1, main h1.text-2xl { font-size: 1.25rem; line-height: 1.75rem; }
+    #ix-verify-banner { border-radius: 0.9rem; bottom: 0.75rem; }
+    main > header, main header.sticky { padding-right: 0.5rem; }
+}
+@media print {
+    #sidebar-panel, [data-sidebar="sidebar"], header.sticky, #ix-verify-banner { display: none !important; }
+}

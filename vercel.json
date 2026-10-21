@@ -84,22 +84,22 @@
     },
     {
       "source": "/full-tests/writing.html",
-      "destination": "/part/practice/writing",
+      "destination": "/full-tests/writing/",
       "permanent": false
     },
     {
       "source": "/full-tests/writing",
-      "destination": "/part/practice/writing",
+      "destination": "/full-tests/writing/",
       "permanent": false
     },
     {
       "source": "/full-tests/speaking.html",
-      "destination": "/part/practice/speaking",
+      "destination": "/full-tests/speaking/",
       "permanent": false
     },
     {
       "source": "/full-tests/speaking",
-      "destination": "/part/practice/speaking",
+      "destination": "/full-tests/speaking/",
       "permanent": false
     },
     {
@@ -124,22 +124,22 @@
     },
     {
       "source": "/full%20writing.html",
-      "destination": "/part/practice/writing",
+      "destination": "/full-tests/writing/",
       "permanent": false
     },
     {
       "source": "/full%20writing",
-      "destination": "/part/practice/writing",
+      "destination": "/full-tests/writing/",
       "permanent": false
     },
     {
       "source": "/full%20speaking.html",
-      "destination": "/part/practice/speaking",
+      "destination": "/full-tests/speaking/",
       "permanent": false
     },
     {
       "source": "/full%20speaking",
-      "destination": "/part/practice/speaking",
+      "destination": "/full-tests/speaking/",
       "permanent": false
     },
     {
@@ -471,9 +471,23 @@
       "source": "/pdf-materials",
       "destination": "/study/Tools/Pdf%20materials",
       "permanent": false
+    },
+    {
+      "source": "/full-tests/reading",
+      "destination": "/full-tests/reading/",
+      "permanent": false
+    },
+    {
+      "source": "/full-tests/listening",
+      "destination": "/full-tests/listening/",
+      "permanent": false
     }
   ],
   "rewrites": [
+    {
+      "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack((?!test-|index)[a-z0-9][a-z0-9_-]*)",
+      "destination": "/full-tests/pack.html"
+    },
     {
       "source": "/test/:id",
       "destination": "/test.html"

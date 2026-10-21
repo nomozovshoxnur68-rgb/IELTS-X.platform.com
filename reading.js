@@ -200,7 +200,15 @@ function exLeaveTest(){
 function exFinish(){
   try{ localStorage.removeItem(window.READING_TEST.STORAGE_KEY); }catch(e){}
   window.__cdiIntentionalReload=true;
-  location.href=FINISH_URL;
+  var url=FINISH_URL;
+  if(!url||url==='#'){
+    /* default: full reading tests go back to the Full Reading Tests window, practice passages to Reading Passages */
+    var p=location.pathname;
+    if(/\/full-tests\/reading\//i.test(p)) url='/full-tests/reading/';
+    else if(/\/pessages?\//i.test(p)) url='/part/practice/reading';
+    else url='/';
+  }
+  location.href=url;
 }
 /* ── Highlight popup: new icons + labels ───────────────────────────────────
    Resting popup  : [Note] [Highlight]

@@ -21,8 +21,8 @@
         // ── full tests ──
         "listening": "/full-tests/listening/",
         "reading": "/full-tests/reading/",
-        "writing": "/part/practice/writing",
-        "speaking": "/part/practice/speaking",
+        "writing": "/full-tests/writing/",
+        "speaking": "/full-tests/speaking/",
 
         // ── part practice ──
         "listening-sections": "/part/practice/listening",
