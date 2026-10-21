@@ -485,11 +485,7 @@
   ],
   "rewrites": [
     {
-<<<<<<< HEAD
       "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack((?!test-|index)[a-z0-9][a-z0-9_-]*)",
-=======
-      "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack([A-Za-z0-9][A-Za-z0-9_-]*)",
->>>>>>> c49b256 (Update files)
       "destination": "/full-tests/pack.html"
     },
     {
