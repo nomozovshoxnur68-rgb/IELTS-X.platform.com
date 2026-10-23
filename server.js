@@ -58,7 +58,12 @@ const ADMIN_EMAILS = new Set(
 );
 // pages that need an active Premium plan (lower-case paths); extend with PREMIUM_PATHS=/a.html,/b.html
 // (a * matches anything; put premium-only audio / files under /premium-audio/ to protect them too)
+<<<<<<< HEAD
 const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/full-tests/reading/test-*.html', '/full-tests/listening/test-*.html', '/listening/index.html', '/premium-audio/*']
+=======
+// (the full test pages /full-tests/<skill>/test-N.html are decided by the Access rules below: admin panel -> Access)
+const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/listening/index.html', '/premium-audio/*']
+>>>>>>> fb33267 (Initial commit)
   .concat(String(process.env.PREMIUM_PATHS || '').split(',').map((p) => p.trim().toLowerCase()).filter(Boolean))
   .map((p) => new RegExp('^' + p.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'));
 const isPremiumPath = (p) => PREMIUM_PATHS.some((re) => re.test(p));
@@ -87,8 +92,14 @@ function loadDb() {
     const db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     db.users = Array.isArray(db.users) ? db.users : [];
     for (const k of ['materials', 'results', 'orders', 'audit']) db[k] = Array.isArray(db[k]) ? db[k] : [];
+<<<<<<< HEAD
     return db;
   } catch (e) { return { users: [], materials: [], results: [], orders: [], audit: [] }; }
+=======
+    db.settings = db.settings && typeof db.settings === 'object' && !Array.isArray(db.settings) ? db.settings : {};
+    return db;
+  } catch (e) { return { users: [], materials: [], results: [], orders: [], audit: [], settings: {} }; }
+>>>>>>> fb33267 (Initial commit)
 }
 function saveDb(db) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -210,6 +221,21 @@ const store = {
   async listAudit(limit = 200) {
     if (USE_SUPABASE) return (await sb(`ieltsx_audit?order=createdAt.desc&limit=${limit}`)) || [];
     return loadDb().audit.slice(0, limit);
+<<<<<<< HEAD
+=======
+  },
+  /* small key/value settings (the lock / plan rules of the packs and tests) */
+  async getSetting(key) {
+    if (USE_SUPABASE) { const row = ((await sb(`ieltsx_settings?select=value&key=eq.${eq(key)}&limit=1`)) || [])[0]; return row ? row.value : null; }
+    const v = loadDb().settings[key]; return v === undefined ? null : v;
+  },
+  async setSetting(key, value) {
+    if (USE_SUPABASE) {
+      await sb('ieltsx_settings?on_conflict=key', { method: 'POST', headers: { ...jsonHeaders, Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ key, value, updatedAt: new Date().toISOString() }) });
+      return value;
+    }
+    const db = loadDb(); db.settings[key] = value; saveDb(db); return value;
+>>>>>>> fb33267 (Initial commit)
   }
 };
 
@@ -413,8 +439,13 @@ function readBody(req, limit = 100 * 1024) {
     req.on('error', reject);
   });
 }
+<<<<<<< HEAD
 async function readJson(req) {
   const buf = await readBody(req);
+=======
+async function readJson(req, limit) {
+  const buf = await readBody(req, limit);
+>>>>>>> fb33267 (Initial commit)
   if (!buf.length) return {};
   try { return JSON.parse(buf.toString('utf8')); } catch (e) { throw new HttpError(400, 'Invalid JSON.'); }
 }
@@ -456,7 +487,11 @@ async function ensureBucket() {
 }
 
 /* ───────────────────────── tests created in the admin panel ───────────────────────── */
+<<<<<<< HEAD
 const MATERIAL_TYPES = ['reading', 'listening', 'writing'];
+=======
+const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'vocab'];
+>>>>>>> fb33267 (Initial commit)
 const Q_TYPES = ['short', 'tfng', 'ynng', 'mcq'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 function cleanUrl(v) {
@@ -480,6 +515,22 @@ function cleanMaterialData(type, d) {
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500) };
     }).filter((q) => q.prompt);
   }
+<<<<<<< HEAD
+=======
+  if (type === 'vocab') {
+    // a vocabulary collection (or a "study by test" word list): kind, level, source and the cards themselves
+    out.kind = d.kind === 'test' ? 'test' : 'collection';
+    out.level = cut(d.level, 40) || 'Intermediate';
+    out.source = cut(d.source, 120);
+    out.icon = d.icon === 'listening' ? 'listening' : 'reading';
+    const list = (v) => (Array.isArray(v) ? v : String(v || '').split(/[,;]/)).slice(0, 12).map((x) => cut(x, 60).trim()).filter(Boolean);
+    const seen = new Set();
+    out.words = (Array.isArray(d.words) ? d.words : []).slice(0, 2000).map((w) => { w = w || {};
+      return { word: cut(w.word, 80).trim(), pos: cut(w.pos, 30).trim(), definition: cut(w.definition, 600).trim(), example: cut(w.example, 600).trim(), synonyms: list(w.synonyms), opposites: list(w.opposites) };
+    }).filter((w) => { const k = w.word.toLowerCase(); if (!w.word || !w.definition || seen.has(k)) return false; seen.add(k); return true; });
+    delete out.images; delete out.instructions; delete out.durationMin;
+  }
+>>>>>>> fb33267 (Initial commit)
   if (type === 'writing') {
     out.tasks = (Array.isArray(d.tasks) ? d.tasks : []).slice(0, 4).map((t, i) => { t = t || {};
       return { id: 't' + (i + 1), title: cut(t.title, 120) || 'Task ' + (i + 1), prompt: cut(t.prompt, 4000), imageUrl: cleanUrl(t.imageUrl),
@@ -509,6 +560,13 @@ const publicMaterial = (m, withData) => {
   const d = m.data || {};
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length };
+<<<<<<< HEAD
+=======
+  if (m.type === 'vocab') {   // the list never carries the cards; they are sent only by the single-item call, after the Premium check
+    base.wordCount = (d.words || []).length; base.kind = d.kind || 'collection'; base.level = d.level || 'Intermediate'; base.source = d.source || ''; base.icon = d.icon || 'reading';
+    return withData ? { ...base, data: { kind: base.kind, level: base.level, source: base.source, icon: base.icon, words: d.words || [] } } : base;
+  }
+>>>>>>> fb33267 (Initial commit)
   if (!withData) return base;
   return { ...base, data: { ...d, questions: (d.questions || []).map(({ answer, explanation, ...q }) => q), transcript: undefined, tasks: (d.tasks || []).map(({ sample, ...t }) => ({ ...t, hasSample: !!sample })) } };
 };
@@ -566,6 +624,147 @@ async function verifyGoogleToken(idToken) {
   return { email: normEmail(d.email), name: cleanName(d.name || d.given_name || d.email.split('@')[0]) };
 }
 
+<<<<<<< HEAD
+=======
+/* ───────────────────────── access rules: free / locked + plan for every pack and test ─────────────────────────
+ * The catalog (assets/js/full-tests-data.js) says what is locked by default. The admin panel (Access) stores overrides:
+ *   rules['pack:<skill>/<slug>']            a whole pack (its tests inherit it unless they have their own rule)
+ *   rules['test:<skill>/<slug>/<id>']       one test of the catalog
+ *   rules['mat:<materialId>']               a test that was made in the admin panel
+ * A rule is { locked: false }  (free for everybody)  or  { locked: true, plan: 'standard' | 'max' }.
+ * Levels: Demo/Free 0, Standard 1, Max 2, Ultra 3 (Admin 3; any other paid plan name, e.g. "Premium", counts as Max so nobody loses access).
+ */
+const vm = require('vm');
+const PLAN_ORDER = { standard: 1, max: 2, ultra: 3 };
+const SKILL_LIST = ['reading', 'listening', 'writing', 'speaking'];
+const planOf = (v) => { const s = String(v || '').toLowerCase(); return s.includes('ultra') ? 'ultra' : s.includes('max') ? 'max' : (s.includes('standard') ? 'standard' : ''); };
+const slugOf = (s) => String(s || '').toLowerCase().trim().replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, '');
+const hrefPath = (h) => String(h || '').split(/[?#]/)[0].replace(/\/+$/, '').replace(/\.html$/i, '').toLowerCase();
+function userLevel(u) {
+  if (!u) return 0;
+  if (isAdmin(u)) return 3;
+  if (!isPremium(u)) return 0;
+  const n = String(u.plan || '').toLowerCase();
+  if (/ultra/.test(n)) return 3;
+  return /standard/.test(n) && !/max/.test(n) ? 1 : 2;
+}
+const levelName = (l) => (l >= 3 ? 'ultra' : l === 2 ? 'max' : l === 1 ? 'standard' : 'free');
+const levelNeeded = (r) => (r.locked ? PLAN_ORDER[r.plan] || 1 : 0);
+const allowsLevel = (r, level) => level >= levelNeeded(r);
+function effectiveRule(own, parent, def) {
+  const has = (r) => r && typeof r === 'object';
+  const locked = has(own) && typeof own.locked === 'boolean' ? own.locked : (has(parent) && typeof parent.locked === 'boolean' ? parent.locked : !!def.locked);
+  const plan = has(own) && PLAN_ORDER[own.plan] ? own.plan : (has(parent) && PLAN_ORDER[parent.plan] ? parent.plan : (def.plan || 'standard'));
+  return { locked, plan };
+}
+const modeOf = (own) => (!own || typeof own !== 'object' ? 'default' : own.locked === false ? 'free' : (PLAN_ORDER[own.plan] ? own.plan : 'default'));
+const ruleFromMode = (mode) => (mode === 'free' ? { locked: false } : (PLAN_ORDER[mode] ? { locked: true, plan: mode } : null));
+
+let CATALOG = null;
+function loadCatalog() {
+  if (CATALOG) return CATALOG;
+  const skills = [];
+  try {
+    const ctx = { window: {} }; vm.createContext(ctx);
+    vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets', 'js', 'full-tests-data.js'), 'utf8'), ctx, { timeout: 2000 });
+    const D = ctx.window.IELTSX_FULL_TESTS || { packs: {}, skills: {} };
+    let PRACTICE = {};
+    try { const c2 = { window: {} }; vm.createContext(c2); vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets', 'js', 'practice-cards.js'), 'utf8'), c2, { timeout: 2000 }); PRACTICE = c2.window.IELTSX_PRACTICE || {}; }
+    catch (e) { console.warn('practice-cards.js could not be read:', e.message); }
+    for (const skill of SKILL_LIST) {
+      const packs = ((D.packs || {})[skill] || []).map((p) => {
+        const def = { locked: !!p.premium, plan: planOf(p.minPlan) || 'standard' };   // the old "MAX" label is only a label; access follows minPlan (default: any paid plan)
+        const seen = {};
+        const tests = (p.tests || []).map((t, i) => ({ t, i })).sort((a, b) => ((a.t.number || 0) - (b.t.number || 0)) || (a.i - b.i)).map((x, n) => {
+          const t = x.t;
+          let id = t.number != null ? String(t.number) : slugOf(String(t.href || '').split(/[?#]/)[0].split('/').filter(Boolean).pop() || ('test-' + (x.i + 1)));
+          if (seen[id]) id += '-' + (x.i + 1);
+          seen[id] = true;
+          return { key: `test:${skill}/${p.slug}/${id}`, id, title: 'Test ' + (n + 1), source: String(t.source || ''), href: String(t.href || ''), tags: t.tags || [],
+            def: { locked: t.premium === undefined ? def.locked : !!t.premium, plan: planOf(t.minPlan) || def.plan } };
+        });
+        return { key: `pack:${skill}/${p.slug}`, slug: p.slug, title: p.title, tier: p.tier || '', def, tests };
+      });
+      const pc = PRACTICE[skill];
+      if (pc) {   // the cards of the practice page (part/practice/<skill>) are managed from the same panel
+        const def = { locked: !pc.cards.every((c) => c.free), plan: 'standard' };
+        packs.push({ key: `pack:${skill}/practice-cards`, slug: 'practice-cards', title: 'Practice cards - ' + pc.title, tier: '', practice: true, def,
+          tests: pc.cards.map((c, n) => ({ key: `test:${skill}/practice-cards/${c.id}`, id: c.id, title: c.title, source: 'Practice page card ' + (n + 1), href: c.href || pc.page, practiceHref: c.href || '', tags: [], def: { locked: !c.free, plan: 'standard' } })) });
+      }
+      skills.push({ skill, title: ((D.skills || {})[skill] || {}).title || skill, packs });
+    }
+  } catch (e) { console.warn('full-tests-data.js could not be read:', e.message); }
+  return (CATALOG = { skills });
+}
+
+let rulesCache = { t: 0, v: {} };
+async function accessRules(force) {
+  if (!force && Date.now() - rulesCache.t < 3000) return rulesCache.v;
+  let v = rulesCache.v;
+  try { const s = await store.getSetting('access-rules'); v = s && typeof s === 'object' && s.rules && typeof s.rules === 'object' ? s.rules : {}; }
+  catch (e) { console.warn('Access rules unavailable (defaults are used):', e.message); }
+  rulesCache = { t: Date.now(), v };
+  return v;
+}
+const KEY_RE = /^(pack|test|mat):[A-Za-z0-9_.\/-]{1,120}$/;
+function cleanRules(input) {
+  const out = {};
+  for (const [k, r] of Object.entries(input && typeof input === 'object' ? input : {})) {
+    if (!KEY_RE.test(k) || !r || typeof r !== 'object') continue;
+    if (r.locked === false) out[k] = { locked: false };
+    else if (r.locked === true && PLAN_ORDER[r.plan]) out[k] = { locked: true, plan: r.plan };
+  }
+  return out;
+}
+function catalogPackFor(type, packName) {
+  const want = slugOf(packName || 'Practice');
+  const sk = loadCatalog().skills.find((x) => x.skill === type);
+  return (sk && sk.packs.find((p) => p.slug === want || slugOf(p.title) === want)) || null;
+}
+function materialRule(m, rules) {
+  if (m.type === 'vocab') return { locked: !!m.premium, plan: 'standard' };      // vocabulary keeps its own Free / Premium switch
+  const pack = catalogPackFor(m.type, m.pack);
+  const parent = pack ? rules[pack.key] : rules[`pack:${m.type}/${slugOf(m.pack || 'Practice')}`];
+  return effectiveRule(rules['mat:' + m.id], parent, { locked: !!m.premium, plan: 'standard' });
+}
+// the rule that guards one /full-tests/<skill>/test-N.html file (the most generous one when several tests point at it)
+async function gateForPath(tl) {
+  const isFull = /^\/full-tests\/(reading|listening|writing|speaking)\/test-[^/]+\.html$/.test(tl);
+  const isPractice = /^\/(pessages|sections)\/test-\d+\.html$/.test(tl);     // practice passages / sections (Reading, Listening practice cards)
+  if (!isFull && !isPractice) return null;
+  const rules = await accessRules(); const want = hrefPath(tl); let best = null;
+  for (const sk of loadCatalog().skills) for (const pk of sk.packs) for (const t of pk.tests) {
+    if (hrefPath(t.href) !== want) continue;
+    const r = effectiveRule(rules[t.key], rules[pk.key], t.def);
+    if (!best || levelNeeded(r) < levelNeeded(best)) best = r;
+  }
+  return best || (isPractice ? null : { locked: true, plan: 'standard' });
+}
+const priceUrl = (plan, next) => `/Price?premium=required&plan=${plan || 'standard'}` + (next ? `&next=${encodeURIComponent(next)}` : '');
+
+async function adminAccessView() {
+  const rules = await accessRules(true);
+  const cat = loadCatalog();
+  const view = (own, parent, def) => { const r = effectiveRule(own, parent, def); return { locked: r.locked, plan: r.plan, mode: modeOf(own) }; };
+  const skills = cat.skills.map((sk) => ({
+    skill: sk.skill, title: sk.title,
+    packs: sk.packs.map((pk) => ({ key: pk.key, slug: pk.slug, title: pk.title, tier: pk.tier, practice: !!pk.practice, rule: view(rules[pk.key], null, pk.def), def: pk.def,
+      tests: pk.tests.map((t) => ({ key: t.key, id: t.id, title: t.title, source: t.source, href: t.href, rule: view(rules[t.key], rules[pk.key], t.def), def: t.def })) }))
+  }));
+  const mats = (await store.listMaterials()).filter((m) => m.type !== 'vocab');
+  for (const m of mats) {
+    const sk = skills.find((x) => x.skill === m.type); if (!sk) continue;
+    const slug = slugOf(m.pack || 'Practice');
+    let pk = sk.packs.find((p) => p.slug === slug || slugOf(p.title) === slug);
+    if (!pk) { pk = { key: `pack:${m.type}/${slug}`, slug, title: m.pack || 'Practice', tier: '', extra: true, def: { locked: false, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk); }
+    const parent = rules[pk.key]; const def = { locked: !!m.premium, plan: 'standard' };
+    pk.tests.push({ key: 'mat:' + m.id, id: m.id, title: m.title, source: m.description || '', href: '/test?id=' + m.id, material: true, published: m.published !== false, rule: view(rules['mat:' + m.id], parent, def), def });
+  }
+  return { skills, plans: ['standard', 'max', 'ultra'] };
+}
+
+
+>>>>>>> fb33267 (Initial commit)
 async function api(req, res, url) {
   const p = url.pathname.replace(/\/+$/, '') || '/';
   const method = req.method;
@@ -777,24 +976,63 @@ async function api(req, res, url) {
   /* ---- premium ---- */
   if (method === 'GET' && p === '/api/premium/status') {
     const u = await currentUser(req);
+<<<<<<< HEAD
     return send(res, 200, { authenticated: !!u, premium: isPremium(u), admin: isAdmin(u), expiresAt: u ? u.premiumExpiresAt || null : null, plan: u ? publicUser(u).plan : 'Free' });
+=======
+    return send(res, 200, { authenticated: !!u, premium: isPremium(u), admin: isAdmin(u), level: userLevel(u), planKey: levelName(userLevel(u)), expiresAt: u ? u.premiumExpiresAt || null : null, plan: u ? publicUser(u).plan : 'Free' });
+  }
+
+  /* ---- access rules (which packs / tests are free, locked, and for which plan) ---- */
+  if (method === 'GET' && p === '/api/access') {
+    const u = await currentUser(req); const level = userLevel(u);
+    return send(res, 200, { rules: await accessRules(), level, planKey: levelName(level), authenticated: !!u, admin: isAdmin(u) }, { 'Cache-Control': 'no-store, private' });
+  }
+  if (method === 'GET' && p === '/api/access/check') {      // used by the test pages themselves (assets/js/access-gate.js)
+    const u = await currentUser(req); const level = userLevel(u);
+    let want = String(url.searchParams.get('path') || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
+    const gate = await gateForPath(hrefPath(want) + '.html') || { locked: false, plan: 'standard' };
+    const allowed = allowsLevel(gate, level);
+    return send(res, 200, { allowed, locked: gate.locked, plan: gate.plan, authenticated: !!u, price: allowed ? null : priceUrl(gate.plan, want) }, { 'Cache-Control': 'no-store, private' });
+>>>>>>> fb33267 (Initial commit)
   }
 
   /* ---- public materials (tests the admins added) ---- */
   if (method === 'GET' && p === '/api/materials') {
     const type = MATERIAL_TYPES.includes(url.searchParams.get('type')) ? url.searchParams.get('type') : '';
+<<<<<<< HEAD
     const u = await currentUser(req); const prem = isPremium(u);
     const items = (await store.listMaterials(type)).filter((m) => m.published !== false).map((m) => ({ ...publicMaterial(m, false), locked: !!m.premium && !prem }));
     return send(res, 200, { items });
+=======
+    const u = await currentUser(req); const level = userLevel(u); const rules = await accessRules();
+    const items = (await store.listMaterials(type)).filter((m) => m.published !== false).map((m) => {
+      const r = materialRule(m, rules);
+      return { ...publicMaterial(m, false), premium: r.locked, plan: r.plan, locked: !allowsLevel(r, level) };
+    });
+    return send(res, 200, { items }, { 'Cache-Control': 'no-store, private' });
+>>>>>>> fb33267 (Initial commit)
   }
   let mm = p.match(/^\/api\/materials\/([^/]+)(\/grade|\/sample)?$/);
   if (mm) {
     const m = await store.getMaterial(decodeURIComponent(mm[1]));
     const u = await currentUser(req);
     if (!m || (m.published === false && !isAdmin(u))) throw new HttpError(404, 'Test not found.');
+<<<<<<< HEAD
     if (m.premium && !isPremium(u)) throw new HttpError(u ? 403 : 401, u ? 'This test is for Premium members.' : 'Please sign in to open this test.');
     const d = m.data || {};
     if (method === 'GET' && !mm[2]) return send(res, 200, { item: publicMaterial(m, true), signedIn: !!u });
+=======
+    const rule = materialRule(m, await accessRules());
+    if (!allowsLevel(rule, userLevel(u))) throw new HttpError(u ? 403 : 401, u ? (rule.plan === 'max' ? 'This test is for Max members.' : 'This test is for Premium members.') : 'Please sign in to open this test.');
+    const d = m.data || {};
+    if (method === 'GET' && !mm[2]) {
+      if (m.type === 'vocab') {   // cards are only handed to people who may see them, never cached, and not to scrapers
+        rateLimit('vocab:' + (u ? u.id : clientIp(req)), 240, 60 * 60000);
+        return send(res, 200, { item: publicMaterial(m, true), signedIn: !!u }, { 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex' });
+      }
+      return send(res, 200, { item: publicMaterial(m, true), signedIn: !!u });
+    }
+>>>>>>> fb33267 (Initial commit)
     if (method === 'GET' && mm[2] === '/sample') {
       return send(res, 200, { samples: (d.tasks || []).map((t) => ({ id: t.id, sample: t.sample || '' })) });
     }
@@ -951,9 +1189,36 @@ async function api(req, res, url) {
       await audit(admin, 'user.delete', u.email);
       return send(res, 200, { ok: true });
     }
+<<<<<<< HEAD
     if (method === 'GET' && p === '/api/admin/materials') return send(res, 200, { items: await store.listMaterials(url.searchParams.get('type') || '') });
     if (method === 'POST' && p === '/api/admin/materials') {
       const b = await readJson(req); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
+=======
+    if (method === 'GET' && p === '/api/admin/access') return send(res, 200, await adminAccessView(), { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/access') {
+      const b = await readJson(req, 512 * 1024);
+      const list = Array.isArray(b.changes) ? b.changes : [];
+      if (!list.length) throw new HttpError(400, 'Nothing to change.');
+      if (list.length > 800) throw new HttpError(400, 'Too many changes at once (800 max).');
+      const rules = { ...(await accessRules(true)) }; const matIds = [];
+      for (const c of list) {
+        const key = String(c && c.key || '');
+        if (!KEY_RE.test(key)) throw new HttpError(400, 'Unknown item: ' + cut(key, 60));
+        const mode = String(c.mode || '');
+        if (mode !== 'default' && !ruleFromMode(mode)) throw new HttpError(400, 'Mode must be default, free, standard or max.');
+        if (mode === 'default') delete rules[key]; else rules[key] = ruleFromMode(mode);
+        if (key.startsWith('mat:') && mode !== 'default') matIds.push([key.slice(4), mode !== 'free']);
+      }
+      await store.setSetting('access-rules', { rules: cleanRules(rules), updatedAt: new Date().toISOString() });
+      rulesCache = { t: 0, v: {} };
+      for (const [id, locked] of matIds) { try { await store.updateMaterial(id, { premium: locked, updatedAt: new Date().toISOString() }); } catch (e) { /* the rule still applies */ } }   // keeps the old Free / Premium flag in step
+      await audit(admin, 'access.set', list.length === 1 ? list[0].key : list.length + ' items', { mode: list.length === 1 ? list[0].mode : 'bulk' });
+      return send(res, 200, { ok: true, ...(await adminAccessView()) });
+    }
+    if (method === 'GET' && p === '/api/admin/materials') return send(res, 200, { items: await store.listMaterials(url.searchParams.get('type') || '') });
+    if (method === 'POST' && p === '/api/admin/materials') {
+      const b = await readJson(req, 2 * 1024 * 1024); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
+>>>>>>> fb33267 (Initial commit)
       const title = cleanName(b.title); if (!title) throw new HttpError(400, 'Title is required.');
       const now = new Date().toISOString();
       const item = await store.insertMaterial({ id: newId(), type, title, pack: cleanName(b.pack), description: cut(b.description, 2000), content: '', premium: !!b.premium,
@@ -968,7 +1233,11 @@ async function api(req, res, url) {
     }
     if (m && method === 'PATCH') {
       const id = decodeURIComponent(m[1]); const cur = await store.getMaterial(id); if (!cur) throw new HttpError(404, 'Material not found.');
+<<<<<<< HEAD
       const b = await readJson(req); const patch = { updatedAt: new Date().toISOString() };
+=======
+      const b = await readJson(req, 2 * 1024 * 1024); const patch = { updatedAt: new Date().toISOString() };
+>>>>>>> fb33267 (Initial commit)
       if (b.title !== undefined) { patch.title = cleanName(b.title); if (!patch.title) throw new HttpError(400, 'Title is required.'); }
       if (b.pack !== undefined) patch.pack = cleanName(b.pack);
       if (b.description !== undefined) patch.description = cut(b.description, 2000);
@@ -1035,7 +1304,11 @@ function isBlocked(rel) {
 }
 // old links that still exist in saved pages -> the real file
 const ALIASES = {
+<<<<<<< HEAD
   '/home': '/index.html', '/features': '/index.html', '/teachers': '/index.html', '/vocabulary': '/index.html', '/support': '/index.html',
+=======
+  '/home': '/index.html', '/features': '/index.html', '/teachers': '/index.html', '/support': '/index.html',
+>>>>>>> fb33267 (Initial commit)
   '/privacy-policy': '/index.html', '/terms-of-service': '/index.html', '/feedback': '/index.html',
   '/login': '/login.html', '/account': '/account.html', '/pricing': '/Price.html', '/practice/mock': '/Mock tests.html',
   '/listening.html': '/part/practice/listening.html', '/reading.html': '/part/practice/reading.html', '/writing.html': '/part/practice/writing.html', '/speaking.html': '/part/practice/speaking.html',
@@ -1129,17 +1402,32 @@ async function staticFile(req, res, pathname) {
   const tl = target.toLowerCase();
   const isHtml = tl.endsWith('.html');
   const needsAdmin = isHtml && (tl === '/admin.html' || tl.startsWith('/admin/'));
+<<<<<<< HEAD
   const needsPremium = isPremiumPath(tl);
+=======
+  const gate = isHtml ? await gateForPath(tl) : null;                // full test pages: free / Standard / Max, set in the admin panel
+  const gateLocked = !!(gate && gate.locked);
+  const needsPremium = isPremiumPath(tl) || gateLocked;
+  const needLevel = gateLocked ? levelNeeded(gate) : 1;
+>>>>>>> fb33267 (Initial commit)
   if (needsAdmin || needsPremium) {
     const u = await currentUser(req);
     const next = encodeURIComponent(pathname);
     if (!isHtml) { // audio, files: no page to redirect to
       if (!u) return send(res, 401, { error: 'Please sign in.' });
+<<<<<<< HEAD
       if (needsPremium && !isPremium(u)) return send(res, 403, { error: 'Premium required.' });
     }
     if (!u) return redirect(res, `/login?next=${next}`);
     if (needsAdmin && !isAdmin(u)) return redirect(res, '/?admin=denied');
     if (needsPremium && !isPremium(u)) return redirect(res, `/Price?premium=required&next=${next}`);
+=======
+      if (needsPremium && userLevel(u) < needLevel) return send(res, 403, { error: 'Premium required.' });
+    }
+    if (!u) return redirect(res, `/login?next=${next}`);
+    if (needsAdmin && !isAdmin(u)) return redirect(res, '/?admin=denied');
+    if (needsPremium && userLevel(u) < needLevel) return redirect(res, priceUrl(gateLocked ? gate.plan : 'standard', pathname));
+>>>>>>> fb33267 (Initial commit)
   }
   const extra = needsAdmin ? { 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY', 'X-Robots-Tag': 'noindex, nofollow', 'Content-Security-Policy': ADMIN_CSP }
     : needsPremium ? { 'Cache-Control': 'no-store' } : {};
@@ -1202,7 +1490,11 @@ const requestHandler = async (req, res) => {
 };
 
 if (require.main === module) {
+<<<<<<< HEAD
   if (!USE_SUPABASE) { try { fs.mkdirSync(DATA_DIR, { recursive: true }); if (!fs.existsSync(DB_FILE)) saveDb({ users: [], materials: [], results: [], orders: [], audit: [] }); } catch (e) { /* read-only disk */ } }
+=======
+  if (!USE_SUPABASE) { try { fs.mkdirSync(DATA_DIR, { recursive: true }); if (!fs.existsSync(DB_FILE)) saveDb({ users: [], materials: [], results: [], orders: [], audit: [], settings: {} }); } catch (e) { /* read-only disk */ } }
+>>>>>>> fb33267 (Initial commit)
   http.createServer(requestHandler).listen(PORT, () => {
     console.log(`IELTSX server running at http://localhost:${PORT}`);
     console.log(ADMIN_EMAILS.size ? `Admins: ${[...ADMIN_EMAILS].join(', ')}` : 'No ADMIN_EMAILS set: register an account, then run  node scripts/make-admin.js <email>');

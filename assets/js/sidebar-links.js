@@ -38,6 +38,10 @@
         "performance": "/study/Tools/Performance",
         "pdf-materials": "/study/Tools/Pdf%20materials",
         "articles": "/study/Tools/Articles",
+<<<<<<< HEAD
+=======
+        "vocabulary": "/vocabulary",
+>>>>>>> fb33267 (Initial commit)
 
         // ── account / support ──
         "pricing": "/Price",

@@ -113,7 +113,13 @@
   }, true);
 
   if (new URLSearchParams(location.search).get('premium') === 'required') {
+<<<<<<< HEAD
     var bar = el('div', 'ixp-bar', 'That content is for Premium members. Pick a plan below to unlock it.');
+=======
+    var need = new URLSearchParams(location.search).get('plan');
+    var bar = el('div', 'ixp-bar', need === 'max' ? 'That content needs the Max plan. Pick Max below to unlock it.'
+      : 'That content is for Premium members. Pick a plan below to unlock it.');
+>>>>>>> fb33267 (Initial commit)
     document.addEventListener('DOMContentLoaded', function () { document.body.prepend(bar); });
   }
 })();

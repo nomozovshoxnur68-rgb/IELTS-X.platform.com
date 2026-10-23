@@ -145,3 +145,14 @@ header .ft-crumbs, #ft-crumbs { display: flex; align-items: center; min-width: 0
 .ft-test-row .ft-start { height: 2rem; padding: 0 0.875rem; border-radius: 0.5rem; }
 #ft-count { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }   /* kept for screen readers, hidden like in the design */
 @media (max-width: 640px) { .ft-toolbar { flex-wrap: wrap; } .ft-search { flex: 1 1 100%; } }
+<<<<<<< HEAD
+=======
+
+/* ── access: Free badge + "Get Access" button (same look as the Writing cards) ── */
+.ft-badge-free { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+html.dark-mode .ft-badge-free { background: #12301f; color: #86efac; border-color: #14532d; }
+.ft-btn-access { background-image: linear-gradient(90deg, #dc2626, #e11d48 55%, #ea580c); color: #fff; border-color: transparent; box-shadow: 0 6px 16px -6px rgba(225, 29, 72, 0.55); }
+.ft-btn-access:hover { background-image: linear-gradient(90deg, #b91c1c, #be123c 55%, #c2410c); color: #fff; }
+.ft-btn-access svg { width: 14px; height: 14px; }
+.ft-pack-foot .ft-btn-access { height: 2.25rem; }
+>>>>>>> fb33267 (Initial commit)

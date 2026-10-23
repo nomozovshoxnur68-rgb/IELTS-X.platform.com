@@ -531,7 +531,11 @@
 
   // ---- FILTER SPECS (labels/groups exactly as in the design) ----
   function opt(value, label) { return { value: value, label: label || value }; }
+<<<<<<< HEAD
   var PLAN_OPTIONS = [opt('demo', 'Demo (Free)'), opt('max', 'Max')];
+=======
+  var PLAN_OPTIONS = [opt('demo', 'Demo (Free)'), opt('standard', 'Standard'), opt('max', 'Max'), opt('ultra', 'Ultra')];
+>>>>>>> fb33267 (Initial commit)
   var STATUS_OPTIONS = [opt('not-completed', 'Not Completed'), opt('completed', 'Completed')];
   var READING_TYPE_GROUPS = [
     { label: 'Completion', options: [opt('completion', 'Completion / Gap Fill'), opt('summary-options', 'Summary with Options'), opt('diagram-labeling', 'Diagram Labeling')] },
@@ -866,6 +870,17 @@
   window.IELTSX.completionKey = completionKey;
   window.IELTSX.isFreeItem = isFreeItem;
 
+<<<<<<< HEAD
+=======
+  // "Get Access" on a locked card sends the visitor to the Price page (same as the Full Tests cards)
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-get-access]');
+    if (!b || b.tagName === 'A') return;
+    e.preventDefault();
+    location.href = '/Price?premium=required&next=' + encodeURIComponent(location.pathname + location.search);
+  });
+
+>>>>>>> fb33267 (Initial commit)
   /* =====================================================================
    * 2) PAGE MODULES — original page scripts, copied verbatim
    * ===================================================================== */
@@ -1070,7 +1085,11 @@
                 return filterBar.matches('section', [card.section]) &&
                     filterBar.matches('status', [IELTSX.completionKey(card.key)]) &&
                     filterBar.matches('type', card.typeKeys) &&
+<<<<<<< HEAD
                     filterBar.matches('plan', [card.freeCard ? 'demo' : 'max']) &&
+=======
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(card, card.freeCard) : (card.freeCard ? 'demo' : 'max')]) &&
+>>>>>>> fb33267 (Initial commit)
                     filterBar.matches('pack', [card.pack]);
             });
         }
@@ -1567,7 +1586,11 @@
                 return filterBar.matches('passage', [card.passage]) &&
                     filterBar.matches('status', [IELTSX.completionKey(card.key)]) &&
                     filterBar.matches('type', card.typeKeys) &&
+<<<<<<< HEAD
                     filterBar.matches('plan', [card.freeCard ? 'demo' : 'max']) &&
+=======
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(card, card.freeCard) : (card.freeCard ? 'demo' : 'max')]) &&
+>>>>>>> fb33267 (Initial commit)
                     filterBar.matches('pack', [card.pack]);
             });
         }
@@ -1837,7 +1860,11 @@
                 if (!filterBar) return true;
                 return filterBar.matches('part', [item.part]) &&
                     filterBar.matches('status', [IELTSX.completionKey('speaking:' + item.id)]) &&
+<<<<<<< HEAD
                     filterBar.matches('plan', [IELTSX.isFreeItem(item) ? 'demo' : 'max']) &&
+=======
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, IELTSX.isFreeItem(item)) : (IELTSX.isFreeItem(item) ? 'demo' : 'max')]) &&
+>>>>>>> fb33267 (Initial commit)
                     filterBar.matches('pack', [item.pack]);
             });
         }
@@ -1887,7 +1914,11 @@
                                         </div>
                                     </div>
                                     <div class="flex gap-2 pt-1">
+<<<<<<< HEAD
                                         <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+=======
+                                        <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+>>>>>>> fb33267 (Initial commit)
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
                                                 <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
                                                 <path d="M5 21h14"></path>
@@ -2029,7 +2060,11 @@
                 return filterBar.matches('task', [item.task]) &&
                     filterBar.matches('status', [IELTSX.completionKey('writing:' + item.id)]) &&
                     filterBar.matches('type', IELTSX.canonicalWritingTypes(item.type)) &&
+<<<<<<< HEAD
                     filterBar.matches('plan', [IELTSX.isFreeItem(item) ? 'demo' : 'max']) &&
+=======
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, IELTSX.isFreeItem(item)) : (IELTSX.isFreeItem(item) ? 'demo' : 'max')]) &&
+>>>>>>> fb33267 (Initial commit)
                     filterBar.matches('pack', [item.pack]);
             });
         }
@@ -2080,7 +2115,11 @@
                                 </div>
                             </div>
                             <div class="flex gap-2 pt-1">
+<<<<<<< HEAD
                                 <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+=======
+                                <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+>>>>>>> fb33267 (Initial commit)
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
                                         <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
                                         <path d="M5 21h14" />

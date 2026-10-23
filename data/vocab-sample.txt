@@ -1,0 +1,4 @@
+# Paste into Admin -> Vocabulary -> New collection.  word | part of speech | definition | example | synonyms | opposites
+altogether | adverb | completely, or considering everything as a whole. | The new system is altogether more efficient than the previous one. | wholly, entirely, completely, totally, all | partly
+reluctant | adjective | not willing to do something and therefore slow to do it. | She was reluctant to admit that she had made a mistake. | unwilling, hesitant, loath | eager, willing
+approach | noun | a way of dealing with something. | The school takes a new approach to teaching maths. | method, strategy, technique |

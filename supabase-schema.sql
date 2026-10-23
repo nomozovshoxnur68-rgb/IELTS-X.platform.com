@@ -98,3 +98,22 @@ alter table public.ieltsx_materials add column if not exists data jsonb not null
 alter table public.ieltsx_materials add column if not exists published boolean not null default true;
 alter table public.ieltsx_materials add column if not exists "updatedAt" timestamptz not null default now();
 -- the panel creates the public "ieltsx-media" Storage bucket (audio + images) by itself on the first upload.
+<<<<<<< HEAD
+=======
+
+-- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
+-- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
+-- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
+alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab'));
+
+-- ───────────── added in v6: Access rules (admin panel -> Access: free / locked + plan for every pack and test) ─────────────
+-- Run this once on an existing database (safe to run again). Without it the site keeps working with the default locks,
+-- but the choices made in the panel cannot be saved.
+create table if not exists public.ieltsx_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  "updatedAt" timestamptz not null default now()
+);
+alter table public.ieltsx_settings enable row level security;
+>>>>>>> fb33267 (Initial commit)

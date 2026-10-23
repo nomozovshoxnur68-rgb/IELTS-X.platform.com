@@ -77,6 +77,20 @@ When a signed-in student finishes a reading or listening test, the result (score
 (`/api/results`), the card gets a **✓ Completed** pill, the **Completed / Not completed** filter works and the
 Performance dashboard shows the same data on every device. Signed-out visitors can still take the free tests.
 
+<<<<<<< HEAD
+=======
+## Access: free / locked + plan (`/admin#access`)
+
+Every pack and every test (Reading, Listening, Writing, Speaking, the cards of the four practice pages, and tests made in the admin panel) can be set to
+**Demo (Free)**, **Standard**, **Max**, **Ultra** or **Default**. A locked card shows **Get Access**, which opens the Price page.
+A test's own setting beats its pack's; a pack's setting is inherited by its tests. Default = the catalog
+(`assets/js/full-tests-data.js`: `premium: true` = any paid plan, optional `minPlan: 'max'`).
+Levels: Demo 0, Standard 1, Max 2, Ultra 3 (admin = Ultra; other paid plan names such as "Premium" count as Max).
+Rules are stored in `ieltsx_settings` (run the **v6 part** of `supabase-schema.sql` once on Supabase).
+The Node server refuses locked test pages itself; on Vercel the static test pages are only guarded by
+`assets/js/access-gate.js` (the API is still enforced).
+
+>>>>>>> fb33267 (Initial commit)
 ## Premium and payments
 
 * Premium pages: `Mock tests.html`, the full tests, `/listening/index.html`, anything under `/premium-audio/`
@@ -128,3 +142,9 @@ See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUB
 * **JS**: null-element error on `index.html` fixed; the avatar menu "Log out" no longer shows the "(demo)" alert, it really signs out.
 * Missing image files no longer show broken-image icons (`assets/js/img-fallback.js`).
 * Removed two broken, unlinked pages (`Full Reading Test 13/14.html`); the real tests are in `/full-tests/reading/`.
+<<<<<<< HEAD
+=======
+
+After adding or renaming a card on a practice page run `node scripts/build-practice-cards.js` so the admin panel lists it.
+Ultra is granted from the admin panel (Users -> Premium); its prices in `plans.json` are placeholders.
+>>>>>>> fb33267 (Initial commit)

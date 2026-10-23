@@ -18,11 +18,14 @@
       "permanent": false
     },
     {
+<<<<<<< HEAD
       "source": "/vocabulary",
       "destination": "/",
       "permanent": false
     },
     {
+=======
+>>>>>>> fb33267 (Initial commit)
       "source": "/support",
       "destination": "/",
       "permanent": false
@@ -485,7 +488,11 @@
   ],
   "rewrites": [
     {
+<<<<<<< HEAD
       "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack((?!test-|index)[a-z0-9][a-z0-9_-]*)",
+=======
+      "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack(pack-[A-Za-z0-9_-]+|volume-[A-Za-z0-9_-]+|jan-august|sep-dec|09_02-16_02)",
+>>>>>>> fb33267 (Initial commit)
       "destination": "/full-tests/pack.html"
     },
     {
@@ -526,7 +533,11 @@
   ],
   "functions": {
     "api/index.js": {
+<<<<<<< HEAD
       "includeFiles": "{server.js,plans.json,*.html,data/**,supabase-schema.sql}",
+=======
+      "includeFiles": "{server.js,plans.json,*.html,data/**,supabase-schema.sql,assets/js/full-tests-data.js,assets/js/practice-cards.js}",
+>>>>>>> fb33267 (Initial commit)
       "maxDuration": 30
     }
   }

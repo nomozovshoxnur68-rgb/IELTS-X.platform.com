@@ -9,6 +9,11 @@
  * ADD A TEST   -> add an object to  tests  of that pack:
  *                    { source: 'Original Exams | Test 4', tags: ['Gap Filling'], href: '/full-tests/reading/test-5', premium: true }
  *                 The title ("Test 1", "Test 2" …) is numbered automatically.
+<<<<<<< HEAD
+=======
+ * WHO CAN OPEN IT -> `premium: true` = locked (any paid plan), `premium: false` = free. Add `minPlan: 'max'` to require the Max plan.
+ *                 The admin panel (Access) overrides all of this per pack and per test, no code needed.
+>>>>>>> fb33267 (Initial commit)
  * NO CODE?     -> tests added in the Admin panel (Reading / Listening / Writing) show up here by themselves:
  *                 type the pack name in the admin form ("Pack 5", "Volume 9" …). A pack name that does not
  *                 exist yet gets its own card under "Practice".

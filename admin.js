@@ -5,7 +5,11 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
+<<<<<<< HEAD
   const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', reading: 'Reading tests', listening: 'Listening tests', writing: 'Writing tasks' };
+=======
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', reading: 'Reading tests', listening: 'Listening tests', writing: 'Writing tasks', vocab: 'Vocabulary', access: 'Access (lock / plans)' };
+>>>>>>> fb33267 (Initial commit)
 
   let me = null, users = [], orders = [], audit = [], results = [], stats = null, plans = [];
   let userPage = 1, orderFilter = 'all', activityFilter = '', openUserId = null;
