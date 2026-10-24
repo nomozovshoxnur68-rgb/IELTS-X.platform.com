@@ -1,7 +1,7 @@
 /* ====
    IELTSX UI — theme switch (light / dark / system) + filter dropdowns
    Loaded after the page CSS. Self-contained: it brings its own tokens so it
-   looks the same on every page.
+   looks the same on every page. ====*/
 :root {
     --ix-bg: #fff;
     --ix-fg: hsl(222 47% 11%);

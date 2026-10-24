@@ -279,6 +279,17 @@ server.listen(0, async () => {
     assert.equal(gr.json.correct, 3); assert.equal(gr.json.saved, false);
     const gr2 = await call('POST', '/api/materials/' + rid + '/grade', { jar: freeU, body: { answers: { q1: 'wax' } } });
     assert.equal(gr2.json.correct, 0); assert.equal(gr2.json.saved, true);
+    { // every IELTS question type is stored and graded
+      const qs = [
+        { type: 'completion', prompt: 'Name: ____', answer: 'smith|smyth' }, { type: 'tfng', prompt: 'a', answer: 'NOT GIVEN' }, { type: 'ynng', prompt: 'b', answer: 'NO' },
+        { type: 'mcq-multi', prompt: 'Choose two', options: ['x', 'y', 'z', 'w'], answer: 'A,C' }, { type: 'matching', prompt: 'Heading for para B', options: ['i. Cost', 'ii. Risk', 'iv. Hope'], answer: 'iv' },
+        { type: 'map', prompt: 'Library', options: ['A', 'B', 'C'], answer: 'B' } ];
+      const mr = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'All types', data: { audioUrl: '', questions: qs } } });
+      assert.equal(mr.status, 201); assert.equal(mr.json.item.data.questions.length, 6);
+      assert.equal(mr.json.item.data.questions[3].options.length, 4);
+      const g = await call('POST', '/api/materials/' + mr.json.item.id + '/grade', { body: { answers: { q1: 'Smith', q2: 'ng', q3: 'no', q4: 'c, a', q5: 'iv', q6: 'b' } } });
+      assert.equal(g.json.correct, 6, JSON.stringify(g.json).slice(0, 300));
+    }
     const wr = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'writing', title: 'Task 1 chart', premium: true, data: { tasks: [{ title: 'Task 1', prompt: 'Describe the chart', minWords: 150, minutes: 20, sample: 'secret sample' }, { prompt: 'Essay', minWords: 250 }] } } });
     assert.equal(wr.status, 201); const wid = wr.json.item.id;
     assert.equal((await call('GET', '/api/materials/' + wid)).status, 401);            // premium + guest

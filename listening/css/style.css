@@ -715,7 +715,7 @@ body.review-mode .timer{display:none}
    breakdown an objective 40-mark paper actually has.
    Everything is scoped to #stage-results (or to #print-report,
    built by buildPrintReport()) so nothing can reach the exam
-   screen, which stays a pixel clone of the Inspera player.
+   screen, which stays a pixel clone of the Inspera player. ====*/
 #stage-results{flex-direction:column}
 .results-content{margin:0 auto;padding:30px 24px 60px;overflow-y:auto;flex:1;width:100%}
 #stage-results .results-content{margin:0;padding:44px 24px 80px;overflow-y:auto;overscroll-behavior:contain;flex:1;width:100%;max-width:none}
@@ -1159,7 +1159,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
    integrity overlay, the toast and the resume sheet. Nothing in here may leak
    into #stage-listening or #audio-gate: those stay pixel-identical to the real
    Inspera player. #stage-results is excluded too — the certificate is a
-   document and is meant to read as paper.
+   document and is meant to read as paper. ====*/
 :root{
   --ch-ink:#f4f7ff;--ch-ink-2:#b0bdd4;--ch-ink-3:#7e8da3;--ch-ink-4:#5f6c82;
   --ch-line:rgba(152,184,236,.13);--ch-line-2:rgba(152,184,236,.24);--ch-line-3:rgba(152,184,236,.34);
@@ -1564,7 +1564,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
    WARNING OVERLAY (anti-cheat) + TOAST + RESUME SHEET
    All three are CDI chrome, not exam chrome. Selectors are
    id-scoped so nothing in the exam sheet can flip them back to a
-   half-styled state.
+   half-styled state. ====*/
 .warning-overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
 .warning-overlay.show{display:flex}
 #warning-overlay{--crimson:#ff5e78;background:radial-gradient(900px 600px at 50% 36%,rgba(24,8,14,.72),rgba(4,6,12,.90));
@@ -1820,7 +1820,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
    The Inspera-fidelity work hard-codes literal colours (#fff, #000,
    rgb(241,242,236) ...) which a variable flip cannot reach. This is the
    matching dark layer for those literals. Light mode is untouched: every rule
-   below is scoped under body.dark-mode.
+   below is scoped under body.dark-mode. ====*/
 body.dark-mode{
   --ex-ground:#121417;
   --ex-panel:#1c1f24;
@@ -1914,7 +1914,7 @@ body.dark-mode .listening-content{background:transparent}
 /* ======
    SEPIA — same root cause as dark mode.
    It is one click away in the same Options menu, so it needs the same layer for
-   the hard-coded Inspera literals, in a warm palette.
+   the hard-coded Inspera literals, in a warm palette. ====*/
 body.theme-sepia{
   --sp-ground:#f5f0e8; --sp-panel:#ece3d3; --sp-panel-2:#fffdf8;
   --sp-line:#d9cbb0; --sp-line-2:#b9a685;
@@ -1968,7 +1968,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 /* ======
    MAP + MATCHING LAYOUT
    The map was 720px with its answer column on flex:1, which stranded the
-   options far to the right with a dead gap. Smaller map, column sits next to it.
+   options far to the right with a dead gap. Smaller map, column sits next to it. ====*/
 [data-map-img]{width:520px !important}
 [data-map-img] img{width:100% !important;max-width:520px !important}
 /* the answer column follows the map directly; it must not stretch */
@@ -1985,7 +1985,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
    OPTIONS — the official full-screen replacement page, not a dropdown.
    Measured: div.options__candidateOptions 0,0,1440x900; the header and footer are
    removed from the layout; topbar 0,0,1440x80; h1 673.13,21,93.75x32 at 27.2px/400;
-   #exitOptionsMenuButton 1360.02,0,66.66x66.66; content column 700px wide at x=370.
+   #exitOptionsMenuButton 1360.02,0,66.66x66.66; content column 700px wide at x=370. ====*/
 #opt-page,#msg-page{position:absolute;inset:0;z-index:700;background:#fff;display:none;flex-direction:column;overflow:auto}
 #opt-page.open,#msg-page.open{display:flex}
 /* the 239x244 dropdown, the volume row, the theme dots, the full-screen toggle and
@@ -2022,7 +2022,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 /* ======
    SUBMISSION PAGE — reached from the deliver tick. Measured: the header grows to
    208 with an 88px TOC bar, the content area empties, the four-part footer stays,
-   the deliver button turns #333/white, previous is enabled and next disabled.
+   the deliver button turns #333/white, previous is enabled and next disabled. ====*/
 #hdr-toc{display:none;flex:0 0 auto;height:152px;box-sizing:border-box;background:#fff;
   border-bottom:1px solid #C1C1C1;position:relative;z-index:400}
 #stage-listening.submitting #hdr-toc{display:block}
@@ -2038,7 +2038,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 
 /* ======
    TIME-UP NOTICE — the practice product's own. The official Listening player has
-   no timer, and the file used to auto-submit silently at 40:00; it now warns.
+   no timer, and the file used to auto-submit silently at 40:00; it now warns. ====*/
 #time-up{position:absolute;inset:0;z-index:800;background:rgba(0,0,0,.7);display:none;
   align-items:center;justify-content:center}
 #time-up.open{display:flex}
@@ -2050,7 +2050,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 
 /* ======
    CONTRAST: "Yellow on black". Scoped to the exam screen so it never leaks into
-   the wrapper stages, which have their own skin.
+   the wrapper stages, which have their own skin. ====*/
 #stage-listening.yob{background:#000}
 #stage-listening.yob #hdr,#stage-listening.yob #listening-area,#stage-listening.yob #bnav,
 #stage-listening.yob .bnav-section,#stage-listening.yob #hdr-toc,#stage-listening.yob #opt-page{background:#000}
@@ -2300,7 +2300,7 @@ body.theme-sepia #stage-results .answer-table tr.alt td{background:rgba(58,44,26
 
    NOTHING here targets #stage-listening or #audio-gate. Do not add anything
    that does: the exam screen owns its own frame budget, because the audio must
-   never compete with the test for frames.
+   never compete with the test for frames. ====*/
 
 /* ---- the canvas host: full viewport, behind every card, inert ----------- */
 #cdi-webgl{
@@ -2439,7 +2439,7 @@ body.cdi-reduced .ch-cta{opacity:1;transform:none;pointer-events:auto}
    chamber to the warm paper, navy and gold the certificate is printed in.
 
    Everything is scoped to body.review-mode, which never applies during the
-   exam, so #stage-listening and #audio-gate are untouched.
+   exam, so #stage-listening and #audio-gate are untouched. ====*/
 body.review-mode{
   /* one palette, three themes; the panel and the transport both read from it */
   --rv-ink:#1e1a14; --rv-ink-2:#544b41; --rv-ink-3:#8b8074; --rv-ink-4:#a89c8d;
@@ -2936,7 +2936,7 @@ body.anno-open #stage-listening{padding-right:300px;transition:padding-right .28
 
 /* ── selection toolbar, identical to Reading's ── */
 /* ====
-   HIGHLIGHTER + DICTIONARY POPUPS
+   HIGHLIGHTER + DICTIONARY POPUPS ====*/
 /* Real player's adder: white card, 1px #737373, 4px radius, icon-above-label
    buttons with 12px #737373 labels, and a small arrow pointing at the text. */
 .hl-popup{position:absolute;z-index:9999;background:#fff;padding:0;border:1px solid #737373;border-radius:4px;

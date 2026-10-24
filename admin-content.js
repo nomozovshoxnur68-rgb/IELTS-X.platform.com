@@ -5,7 +5,8 @@
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles' };
   const TOPICS = ['General', 'History', 'Science', 'Technology', 'Environment', 'Health', 'Education', 'Society', 'Business', 'Culture', 'Nature', 'Psychology'];
-  const Q_LABEL = { short: 'Short answer / gap fill', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice' };
+  const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / table / flow-chart / summary completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
+  const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map'];
   const lists = { reading: null, listening: null, writing: null, speaking: null, article: null };
   const VIEW_FOR = { articles: 'article' };            // #articles in the address bar = the article list
   let draft = null, editingId = null, uploading = 0;
@@ -109,7 +110,13 @@
     if (type === 'writing') Object.assign(data, { tasks: [{ title: 'Task 1', prompt: '', imageUrl: '', minWords: 150, minutes: 20, sample: '' }, { title: 'Task 2', prompt: '', imageUrl: '', minWords: 250, minutes: 40, sample: '' }] });
     return { type, title: '', pack: '', description: '', premium: false, published: true, data };
   }
+  let PACKS = {};
+  const packNames = (type) => PACKS[type] || [];
+  async function loadPacks() {   // pack names that already exist on the Full Tests pages, for the Pack field
+    try { const d = await api('/api/admin/access'); PACKS = {}; (d.skills || []).forEach((sk) => { PACKS[sk.skill] = (sk.packs || []).filter((p) => !p.practice).map((p) => p.title); }); } catch (e) { /* the field still accepts any name */ }
+  }
   function openBuilder(type, item) {
+    loadPacks().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); });
     editingId = item ? item.id : null;
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type);
     draft.data = draft.data || {}; draft.data.images = draft.data.images || [];
@@ -137,8 +144,8 @@
         <div class="cb-row"><select class="field" data-p="data.questions.${i}.type" data-rerender="1">${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}" ${q.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
         <input class="field" placeholder="Heading before this question (optional), e.g. Questions 1–5: Complete the notes" data-p="data.questions.${i}.group" value="${esc(q.group)}"></div>
         <textarea class="field" rows="2" placeholder="Question text" data-p="data.questions.${i}.prompt">${esc(q.prompt)}</textarea>
-        ${q.type === 'mcq' ? `<textarea class="field" rows="4" placeholder="Options, one per line (A, B, C… in this order)" data-p="data.questions.${i}.options" data-lines="1">${esc((q.options || []).join('\n'))}</textarea>` : ''}
-        <div class="cb-row"><input class="field" placeholder="${q.type === 'tfng' ? 'TRUE / FALSE / NOT GIVEN' : q.type === 'ynng' ? 'YES / NO / NOT GIVEN' : q.type === 'mcq' ? 'Correct letter, e.g. B' : 'Correct answer (use | for alternatives)'}" data-p="data.questions.${i}.answer" value="${esc(q.answer)}">
+        ${OPT_TYPES.includes(q.type) ? `<textarea class="field" rows="5" placeholder="${q.type === 'mcq' || q.type === 'mcq-multi' ? 'Options, one per line (A, B, C… in this order)' : 'Options, one per line, each starting with its letter or number, e.g.  A. Paragraph A   or   i. The cost of change'}" data-p="data.questions.${i}.options" data-lines="1">${esc((q.options || []).join('\n'))}</textarea>` : ''}
+        <div class="cb-row"><input class="field" placeholder="${q.type === 'tfng' ? 'TRUE / FALSE / NOT GIVEN' : q.type === 'ynng' ? 'YES / NO / NOT GIVEN' : q.type === 'mcq' ? 'Correct letter, e.g. B' : q.type === 'mcq-multi' ? 'Correct letters, e.g. A,C' : q.type === 'matching' || q.type === 'map' ? 'Correct letter or number, e.g. D or iv' : 'Correct answer (use | for alternatives)'}" data-p="data.questions.${i}.answer" value="${esc(q.answer)}">
         <input class="field" placeholder="Explanation shown after submitting (optional)" data-p="data.questions.${i}.explanation" value="${esc(q.explanation)}"></div></div>
         <button class="btn btn-sm btn-danger" data-cb="q-del" data-i="${i}" type="button" title="Delete question">✕</button></div>`).join('')}</div>`;
   }
@@ -173,7 +180,7 @@
   function renderBuilder() {
     const t = draft.type, d = draft.data;
     $('#builder-body').innerHTML = `
-      <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field('Pack / group (optional)', 'pack', draft.pack, 'placeholder="e.g. Cambridge 18"')}</div>
+      <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field('Pack / group — pick one, or type a new name to create a new pack card', 'pack', draft.pack, 'list="ix-pack-list" placeholder="e.g. Pack 5" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
       <div class="cb-grid">${t === 'article' || t === 'speaking' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <div class="cb-checks"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
@@ -257,7 +264,7 @@
       if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { draft.data.images.push({ url, caption: '' }); renderBuilder(); } }
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
-      else if (a === 'q-add') { const last = draft.data.questions[draft.data.questions.length - 1]; draft.data.questions.push(blankQ(last && last.type)); renderBuilder(); const qs = document.querySelectorAll('.cb-q'); qs[qs.length - 1].scrollIntoView({ block: 'center' }); }
+      else if (a === 'q-add') { const last = draft.data.questions[draft.data.questions.length - 1]; const nq = blankQ(last && last.type); if (last && OPT_TYPES.includes(last.type)) nq.options = (last.options || []).slice(); draft.data.questions.push(nq); renderBuilder(); const qs = document.querySelectorAll('.cb-q'); qs[qs.length - 1].scrollIntoView({ block: 'center' }); }
       else if (a === 'q-del') { draft.data.questions.splice(i, 1); if (!draft.data.questions.length) draft.data.questions.push(blankQ()); renderBuilder(); }
       else if (a === 'q-bulk') { const b = $('#bulk-box'); b.hidden = !b.hidden; }
       else if (a === 'q-bulk-do') {

@@ -25,6 +25,7 @@
     if (r.status === 403) return state(`<h2>🔒 Locked</h2><p>${esc(d.error || 'This content is for paid members.')}</p><a class="tp-btn" href="/Price?premium=required&next=${encodeURIComponent(location.pathname + location.search)}">Get Access</a>`);
     if (!r.ok) return state(`<h2>Test not found</h2><p>${esc(d.error || 'It may have been removed.')}</p><a class="tp-btn" href="/part/practice/reading">Browse tests</a>`);
     item = d.item; document.title = item.title + ' — IELTSX';
+    if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace('/exam/reading/' + encodeURIComponent(item.id)); return; }   // Reading opens in the real-exam player
     $('#tp-title').textContent = item.title; const isArticle = item.type === 'article';
     $('#tp-back').href = isArticle ? '/study/Tools/Articles' : '/part/practice/' + item.type;
     $('#tp-back').textContent = isArticle ? '← Articles' : '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
@@ -51,6 +52,11 @@
       return `<div class="tp-opts">${opts.map((o) => `<label class="tp-opt"><input type="radio" name="${n}" value="${o}"><span>${o}</span></label>`).join('')}</div>`;
     }
     if (q.type === 'mcq') return `<div class="tp-opts col">${(q.options || []).map((o, i) => `<label class="tp-opt"><input type="radio" name="${n}" value="${String.fromCharCode(65 + i)}"><span><b>${String.fromCharCode(65 + i)}</b> ${esc(o)}</span></label>`).join('')}</div>`;
+    if (q.type === 'mcq-multi') return `<div class="tp-opts col">${(q.options || []).map((o, i) => `<label class="tp-opt"><input type="checkbox" name="${n}" value="${String.fromCharCode(65 + i)}"><span><b>${String.fromCharCode(65 + i)}</b> ${esc(o)}</span></label>`).join('')}</div>`;
+    if (q.type === 'matching' || q.type === 'map') {
+      const tok = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})[.):]\s/.exec(o); return m ? m[1] : String.fromCharCode(65 + i); };
+      return `<select class="tp-text" name="${n}"><option value="">Choose…</option>${(q.options || []).map((o, i) => `<option value="${esc(tok(o, i))}">${esc(o)}</option>`).join('')}</select>`;
+    }
     return `<input class="tp-text" name="${n}" type="text" autocomplete="off" spellcheck="false" placeholder="Your answer" maxlength="200">`;
   }
   function questionsHtml() {
@@ -83,7 +89,9 @@
   }
   function onAnswer(e) {
     const el = e.target; if (!el.name || submitted) return;
-    const v = el.value.trim(); if (v) answers[el.name] = v; else delete answers[el.name];
+    let v = el.value.trim();
+    if (el.type === 'checkbox') v = [...main.querySelectorAll('input[type=checkbox]')].filter((c) => c.name === el.name && c.checked).map((c) => c.value).join(',');
+    if (v) answers[el.name] = v; else delete answers[el.name];
     $('#box-' + el.name)?.classList.toggle('done', !!v);
     $('#tp-prog').textContent = Object.keys(answers).length + ' / ' + item.data.questions.length + ' answered';
   }

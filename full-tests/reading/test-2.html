@@ -10,7 +10,7 @@
 <body>
 
 <!-- ====
-     STAGE 1: REGISTRATION
+     STAGE 1: REGISTRATION ====-->
 <!-- COSMOS: the restart sheet is removed. A reload restarts the paper
      silently — restartSheet() falls through to startFresh() with no
      #resume-sheet in the document. -->
@@ -22,17 +22,17 @@
 
 
 <!-- ====
-     STAGE 2: READING INSTRUCTIONS
+     STAGE 2: READING INSTRUCTIONS ====-->
 
 <!-- ====
-     STAGE 3: READING TEST  (real-exam chrome)
+     STAGE 3: READING TEST  (real-exam chrome) ====-->
 <!-- The CDI mark used to live on the registration card. That card is gone, so the
      one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
      and paints the completion screen and the certificate from it. -->
 <img class="brand-logo" alt="READING CDI" hidden style="display:none" src="data:image/png;base64,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">
 
 <!-- ====
-     STAGE 1: LOGIN / REGISTRATION
+     STAGE 1: LOGIN / REGISTRATION ====-->
 <div class="stage active" id="stage-registration">
   <div class="rcx-card">
     <span class="rcx-wordmark">READING_CDI</span>
@@ -140,7 +140,7 @@
 </div>
 
 <!-- ====
-     STAGE 4: COMPLETION
+     STAGE 4: COMPLETION ====-->
 <div class="stage" id="stage-completion">
   <div class="complete-card">
     <div class="ch-comp-body">
@@ -197,7 +197,7 @@
 </div>
 
 <!-- ====
-     STAGE 5: RESULTS
+     STAGE 5: RESULTS ====-->
 <div class="stage" id="stage-results">
   <div class="results-modal-box">
     <button type="button" class="results-modal-close" aria-label="Close" onclick="ExamApp.closeResultsModal()">&times;</button>
@@ -215,7 +215,7 @@
 </div>
 
 <!-- ====
-     OVERLAYS
+     OVERLAYS ====-->
 <div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
   <div class="warning-card">
     <div class="wc-body">
@@ -310,7 +310,7 @@
 /* ====
    TEST DATA — Full Reading Test 9
    Passages, questions, answers and explanations for this test only.
-   The functions live in reading.js (shared by every test).
+   The functions live in reading.js (shared by every test). ====*/
 window.READING_TEST = (function () {
 const STORAGE_KEY = "cdi_reading_v3_full_reading_test_9";   // trailing digits also set CERT_TEST_NO
 

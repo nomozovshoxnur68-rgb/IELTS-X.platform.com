@@ -471,7 +471,8 @@ async function ensureBucket() {
 
 /* ───────────────────────── tests created in the admin panel ───────────────────────── */
 const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab'];
-const Q_TYPES = ['short', 'tfng', 'ynng', 'mcq'];
+const Q_TYPES = ['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map'];
+const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 function cleanUrl(v) {
   const u = String(v || '').trim().slice(0, 1000);
@@ -490,7 +491,7 @@ function cleanMaterialData(type, d) {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : 'short';
       return { id: 'q' + (i + 1), type: t, group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
-        options: t === 'mcq' ? (Array.isArray(q.options) ? q.options : []).slice(0, 8).map((o) => cut(o, 300)).filter(Boolean) : [],
+        options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500) };
     }).filter((q) => q.prompt);
   }
@@ -544,6 +545,8 @@ function isCorrect(q, given) {
     return (map[g] || g) === (map[norm(q.answer)] || norm(q.answer));
   }
   if (q.type === 'mcq') return g.charAt(0) === norm(q.answer).charAt(0);
+  if (q.type === 'matching' || q.type === 'map') { const tok = (v) => (norm(v).match(/^[a-z0-9]+/) || [''])[0]; return tok(given) === tok(q.answer); }
+  if (q.type === 'mcq-multi') { const set = (v) => String(v || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).sort().join(','); return set(given) === set(q.answer); }
   return String(q.answer || '').split('|').some((a) => { const n = norm(a); return n && n === g; });
 }
 const publicMaterial = (m, withData) => {
@@ -1411,6 +1414,16 @@ const requestHandler = async (req, res) => {
     }
     if (url.pathname === '/sitemap.xml' || url.pathname === '/api/sitemap') {
       return send(res, 200, sitemap(siteUrl(req)), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
+    }
+    if (url.pathname.startsWith('/exam/reading/') && (req.method === 'GET' || req.method === 'HEAD')) {   // admin-made Reading tests, shown in the real-exam player (same look as pessages/test-19)
+      const id = decodeURIComponent(url.pathname.slice('/exam/reading/'.length).replace(/\/$/, ''));
+      const m = id ? await store.getMaterial(id) : null;
+      const u = await currentUser(req);
+      if (!m || m.type !== 'reading' || (m.published === false && !isAdmin(u))) return send(res, 404, 'Test not found.');
+      const rule = materialRule(m, await accessRules());
+      if (!allowsLevel(rule, userLevel(u))) { res.statusCode = 302; res.setHeader('Location', u ? '/Price?premium=required' : '/login?next=' + encodeURIComponent(url.pathname)); return res.end(); }
+      const html = require('./reading-exam').buildExamHtml(m, fs.readFileSync(path.join(ROOT, 'pessages', 'test-19.html'), 'utf8'));
+      return send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex' });
     }
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed');

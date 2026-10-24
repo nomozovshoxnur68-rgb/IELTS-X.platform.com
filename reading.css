@@ -1,12 +1,12 @@
 /* ====
    reading.css — shared stylesheet for every Full Reading Test page
-   (base + cosmos-registration + mono-skin, in the original cascade order)
+   (base + cosmos-registration + mono-skin, in the original cascade order) ====*/
 
 /* ---------- 1. base ---------- */
 /* ====
    REAL-EXAM SKIN  —  fonts/colours/layout copied from the
    official computer-delivered IELTS interface.
-   All functions + content come from the CDI engine below.
+   All functions + content come from the CDI engine below. ====*/
 :root{
   --sans: Arial, Helvetica, sans-serif;
   --mono: Arial, Helvetica, sans-serif;
@@ -132,7 +132,7 @@ h2.passage-title{--base-size:17.6px}
 .bnav-plabel,.bnav-plabel2{--base-size:16px}
 
 /* ====
-   HEADER (real-exam top bar)
+   HEADER (real-exam top bar) ====*/
 /* Measured on the live Inspera Reading player at 1440x900 DPR2: the header is
    1440 x 56 of pure #fff with NO border and NO box-shadow. The rule under it is
    header::after — a 1px #C1C1C1 hairline sitting on the 55px row. Both the
@@ -219,7 +219,7 @@ h2.passage-title{--base-size:17.6px}
 #hdr .timer-text.hidden{visibility:hidden}
 
 /* ====
-   PASSAGE INFO BAR  (rounded card, real-exam style)
+   PASSAGE INFO BAR  (rounded card, real-exam style) ====*/
 /* Measured: warm off-white #F1F2EC, 1px #D5D5D5, 16px margin, and BOTH lines
    at 16px — the title is only distinguished by weight, not by size. */
 /* There is NO grey band behind the rubric card — the area around it is plain
@@ -236,7 +236,7 @@ h2.passage-title{--base-size:17.6px}
 body.dark-mode #pbar-inner{background:var(--panel);border-color:var(--line-2)}
 
 /* ====
-   MAIN SPLIT
+   MAIN SPLIT ====*/
 /* Arial only inside the exam region — the official player never falls back
    through Helvetica, and the global --sans stack does. */
 #stage-reading{flex-direction:column;background:#fff;font-family:Arial,sans-serif;color:#000}
@@ -367,7 +367,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#82024
 .hl-note{background:#820240;color:#fff;border-bottom:2px dashed #d4a017;cursor:pointer}
 
 /* ====
-   QUESTIONS  (re-styling the CDI engine output, flat exam look)
+   QUESTIONS  (re-styling the CDI engine output, flat exam look) ====*/
 /* Each question GROUP is one .QuestionDisplay__questionDisplayWrapper:
    padding 16px 16px 0 17px inside a 718px pane, and inside that a 645px text
    column with a 40px flag gutter reserved on the right. 17 + 645 + 56 = 718,
@@ -646,7 +646,7 @@ body.dark-mode .syn-hl-applied.syn-hl-3{background:rgba(147,197,253,0.28)}
 body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
 
 /* ====
-   HIGHLIGHTER + DICTIONARY POPUPS
+   HIGHLIGHTER + DICTIONARY POPUPS ====*/
 /* Real player's adder: white card, 1px #737373, 4px radius, icon-above-label
    buttons with 12px #737373 labels, and a small arrow pointing at the text. */
 .hl-popup{position:absolute;z-index:9999;background:#fff;padding:0;border:1px solid #737373;border-radius:4px;
@@ -702,7 +702,7 @@ body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
 .dict-example{line-height:1.55;color:#8fa0bb;font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09)}
 
 /* ====
-   BOTTOM NAVIGATOR (real-exam)
+   BOTTOM NAVIGATOR (real-exam) ====*/
 /* Measured on the live player: footer 1440 x 53 at y=847 — 50px of content
    under a 3px top border. Three part cells (flex:1 1 0%, min-width:auto, 1px
    side margins) plus a 76.8px deliver button, so the SELECTED cell grows past
@@ -951,13 +951,13 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
    .reg-input editorial card. Its markup is gone (the stage now
    carries Listening/Writing's .start-card), so the rules were
    dead weight and are deleted rather than layered over.
-   Only the stage box itself is kept, as the no-WebGL floor.
+   Only the stage box itself is kept, as the no-WebGL floor. ====*/
 #stage-registration{
   align-items:center;justify-content:center;overflow-y:auto;padding:24px;
   background:var(--panel);
 }
 /* ====
-   TRANSITION / INSTRUCTIONS
+   TRANSITION / INSTRUCTIONS ====*/
 .transition-stage{background:var(--panel);align-items:center;justify-content:center;padding:30px}
 .trans-card{width:100%;max-width:720px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:44px 48px 40px;box-shadow:var(--shadow-md);text-align:center}
 .trans-icon{font-size:44px;margin-bottom:6px}
@@ -971,7 +971,7 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
 .trans-rules li::before{content:'✓';position:absolute;left:0;color:var(--emerald);font-weight:800}
 
 /* ====
-   COMPLETION
+   COMPLETION ====*/
 #stage-completion{background:var(--panel);align-items:center;justify-content:center;padding:30px;overflow-y:auto}
 .complete-card{width:100%;max-width:600px;background:var(--paper);border-radius:var(--radius-lg);padding:48px 44px 40px;text-align:center;box-shadow:var(--shadow-md);border:1px solid var(--line)}
 .complete-icon{font-size:56px;margin-bottom:14px}
@@ -984,7 +984,7 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
    Owner: R3.  Only the stage shell lives here.  The certificate
    itself is typeset further down this sheet, under
    "CERTIFICATE — the CDI document", because it has to sit after
-   every other #stage-results rule the wrapper skins left behind.
+   every other #stage-results rule the wrapper skins left behind. ====*/
 #stage-results{background:var(--panel);flex-direction:column}
 #stage-results .results-content{margin:0;padding:44px 24px 80px;overflow-y:auto;overscroll-behavior:contain;flex:1;width:100%}
 
@@ -994,7 +994,7 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
    exam chrome. Selectors are id-scoped so no later block in
    this stylesheet can flip them back to a half-styled state —
    and the toast itself is styled with the shell, at the foot
-   of the file, because a later `.toast` rule exists down there.
+   of the file, because a later `.toast` rule exists down there. ====*/
 .warning-overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
 .warning-overlay.show{display:flex}
 #warning-overlay{--crimson:#ff5e78;background:radial-gradient(900px 600px at 50% 36%,rgba(24,8,14,.72),rgba(4,6,12,.90));
@@ -1067,7 +1067,7 @@ body.is-fullscreen #hdr #fs-btn .fs-out{display:inline !important}
 .fs-review-btn{display:none}
 
 /* ====
-   VOCAB PDF (off-screen, white)
+   VOCAB PDF (off-screen, white) ====*/
 #vocab-print{position:absolute;left:-10000px;top:0;width:794px;background:#fff;color:#0f172a;font-family:var(--sans)}
 .vp-page{width:794px;min-height:1122px;padding:48px 52px;box-sizing:border-box;background:#fff}
 .vp-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:2px solid #16305c;margin-bottom:22px}
@@ -1522,7 +1522,7 @@ body.dark-mode .reg-cta{color:#8FB8E4}
 /* ====
    UNIVERSAL ENGINE — extra question types
    (map / plan / diagram · table · flow-chart)
-   Added, never editing the rules above.
+   Added, never editing the rules above. ====*/
 /* ── Map / plan / diagram labelling — measured on the official demo player 2026-09-02 ──
    The image sits bare (no frame). A gap is placed ON the image at its coordinates: a typed
    box (mode:'input'), or a drop zone with the word list beside the image (mode:'drag'). The
@@ -2291,10 +2291,10 @@ body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
    a per-element re-skin of the wrapper stages); keeping both meant two rule
    sets fighting over one card, so the older one is deleted rather than
    layered under. The --ch-* tokens the certificate and dark-mode blocks below
-   still reference are declared by the shell.
+   still reference are declared by the shell. ====*/
 /* ======
    RESULTS TOPBAR — chamber glass with the pill buttons
-   crimson (primary) / glass (ghost) / gold hairline (new test)
+   crimson (primary) / glass (ghost) / gold hairline (new test) ====*/
 #stage-results .topbar{
   background:linear-gradient(180deg,rgba(18,30,54,.86),rgba(9,16,30,.92));
   border-bottom:1px solid var(--ch-line);
@@ -2341,12 +2341,12 @@ body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
    Moved. The document, its dark and sepia palettes and the print reset are
    now typeset together at the end of this sheet, under "CERTIFICATE — the CDI
    document", where they sit after every other #stage-results rule and no
-   longer need to fight the cascade. Nothing is defined here.
+   longer need to fight the cascade. Nothing is defined here. ====*/
 
 /* ======
    SEPIA — the chamber stays navy (it is a lit room, not paper), but every
    surface Reading paints warm needs its counterpart here. Same root cause as
-   dark mode: the fidelity work hard-codes literals a var flip cannot reach.
+   dark mode: the fidelity work hard-codes literals a var flip cannot reach. ====*/
 body.theme-sepia{
   --sp-ground:#f5f0e8; --sp-panel:#ece3d3; --sp-panel-2:#fffdf8;
   --sp-line:#d9cbb0; --sp-line-2:#b9a685;
@@ -2378,7 +2378,7 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
    Everything is scoped to #stage-results .cert (or to #print-report, built by
    buildPrintReport()) so it never reaches the exam screen, and the whole block
    sits last in the sheet so it beats the older #stage-results rules the
-   wrapper skins left behind.
+   wrapper skins left behind. ====*/
 
 /* ── Document tokens + band-tier chrome ───────────────────────
    data-tier is set from the overall band in renderResults(). Only the chrome
@@ -2921,14 +2921,14 @@ body.theme-sepia .toast{background:linear-gradient(180deg,#3a2c1a,#2b2013);borde
      #stage-listening -> #stage-reading     #listening-area -> .exam-main
      .listening-content -> .passage-text    .ms-option -> .multi-opts .option
      .drag-chip -> .word-tile               .drag-drop -> .drop-zone
-   Placed last so it wins over Reading's own dark rules at equal specificity.
+   Placed last so it wins over Reading's own dark rules at equal specificity. ====*/
 /* ======
    DARK MODE — the exam screen
    ----------------------------------------------------------------------------
    The Inspera-fidelity work hard-codes literal colours (#fff, #000,
    rgb(241,242,236) ...) which a variable flip cannot reach. This is the
    matching dark layer for those literals. Light mode is untouched: every rule
-   below is scoped under body.dark-mode.
+   below is scoped under body.dark-mode. ====*/
 body.dark-mode{
   --ex-ground:#121417;
   --ex-panel:#1c1f24;
@@ -3013,7 +3013,7 @@ body.dark-mode .passage-text{background:transparent}
 /* ======
    SEPIA — same root cause as dark mode.
    It is one click away in the same Options menu, so it needs the same layer for
-   the hard-coded Inspera literals, in a warm palette.
+   the hard-coded Inspera literals, in a warm palette. ====*/
 body.theme-sepia{
   --sp-ground:#f5f0e8; --sp-panel:#ece3d3; --sp-panel-2:#fffdf8;
   --sp-line:#d9cbb0; --sp-line-2:#b9a685;
@@ -3094,7 +3094,7 @@ body.theme-sepia .heading-tile:hover,body.theme-sepia .word-tile:hover{backgroun
    Listening has no notes drawer, note modal or vocab button, so there is no
    markup to transplant: what is shared is the vocabulary — chamber glass for
    floating surfaces, and the crimson / glass / gold-hairline pill set for
-   actions. Every literal here carries a dark-mode and a theme-sepia counterpart.
+   actions. Every literal here carries a dark-mode and a theme-sepia counterpart. ====*/
 
 /* --- the pill set: crimson (primary) / glass (ghost) / gold hairline ------- */
 :is(.ca-btn,.nm-btn,.rsm-btn,.wc-btn){
@@ -3323,7 +3323,7 @@ body.theme-sepia #sub-btn{background:var(--sp-panel);color:var(--sp-ink-2)}
    16px padding, so the card column is 700px wide at x=370; rows are 698 x 75.8
    with padding 26.4px 44px 26.4px 35.2px at 17.6px Arial. The first row is the
    red (#e31837) "Go to submission page"; Contrast and Text size open sub-pages.
-   Ported from the shipped Writing build and re-scoped to #stage-reading.
+   Ported from the shipped Writing build and re-scoped to #stage-reading. ====*/
 #stage-reading .ex-sheet{
   position:fixed;inset:0;z-index:900;display:none;flex-direction:column;
   background:#fff;color:#000;font-family:Arial,sans-serif;overflow-y:auto}
@@ -3393,7 +3393,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
    block is the CDI half of that boundary (the reference spec is no longer in this folder).
    It is the LAST block in the stylesheet on purpose — the dark-mode and sepia
    rules further up still name .start-card / .trans-card / .complete-card, and
-   the shell has to win against them.
+   the shell has to win against them. ====*/
 :root{
   --ch-ink:#f4f7ff;--ch-ink-2:#b0bdd4;--ch-ink-3:#7e8da3;--ch-ink-4:#5f6c82;
   --ch-line:rgba(152,184,236,.13);--ch-line-2:rgba(152,184,236,.24);--ch-line-3:rgba(152,184,236,.34);
@@ -5256,7 +5256,7 @@ body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype=
 /* ====
    PASSAGE IMAGES — text wraps around the picture (real-exam look)
    Appended last on purpose. CSS only: no passage text, markup,
-   question or answer logic is touched.
+   question or answer logic is touched. ====*/
 #passage-pane .passage-text{container-type:inline-size}
 
 #passage-pane .passage-text .pass-img,
@@ -5295,7 +5295,7 @@ body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype=
 /* ====
    EXAM SETTINGS panel (hamburger button) — Theme / Text Size /
    Report Issue / Leave Test. Appended last; the old full-screen
-   Options page markup is untouched but no longer opened.
+   Options page markup is untouched but no longer opened. ====*/
 .xs-overlay{
   position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
   background:rgba(15,23,42,.45);padding:16px;
@@ -5371,7 +5371,7 @@ body.theme-sepia .xs-leave{background:var(--sp-panel-2);border-color:var(--sp-li
    HIGHLIGHT POPUP — new icons / labels (markup rebuilt by
    exUpgradeHlPopup in reading.js). Appended last.
      resting      : Note | Highlight
-     on a highlight: Remove | Add Note
+     on a highlight: Remove | Add Note ====*/
 .hl-popup .tool-btn{min-width:62px;height:auto;min-height:62px;padding:8px 12px;gap:6px;color:#1b2234}
 .hl-popup .tool-btn::before{display:none !important}
 .hl-popup .tool-btn>svg.hp-ic{display:block;width:22px;height:22px;flex-shrink:0;color:#1b2234}

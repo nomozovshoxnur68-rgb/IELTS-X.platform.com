@@ -9,7 +9,7 @@
    Rules of thumb
    - Change a colour here (the tokens at the top) and every page follows.
    - Light = html (no class).  Dark = html.dark-mode  (set by theme-init.js).
-   - Page-only CSS files keep layout that is truly unique to that page.
+   - Page-only CSS files keep layout that is truly unique to that page. ====*/
 
 /* ── 1. TOKENS ─────────────────────────────────────────────────────────── */
 :root {
