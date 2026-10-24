@@ -1,4 +1,4 @@
-/* в”Ђв”Ђ CORE VARIABLES (IELTS Real-Exam skin) в”Ђв”Ђ */
+/* ── CORE VARIABLES (IELTS Real-Exam skin) ── */
 :root{
   --sans:Arial,sans-serif;
   --mono:Arial,Helvetica,sans-serif;
@@ -28,9 +28,9 @@ body.theme-sepia{
 }
 
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-   ENTRY SCREEN  (candidate name в†’ audio preload в†’ test)
-   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+/* ══════════════════════════════════════════════════════════════════════
+   ENTRY SCREEN  (candidate name → audio preload → test)
+   ══════════════════════════════════════════════════════════════════════ */
 #entry-overlay{
   position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;
   padding:24px;background:var(--bg);overflow-y:auto;
@@ -95,9 +95,9 @@ body.pre-entry #stage-listening{visibility:hidden}
 .entry-tg .tgd{font-size:11.5px;color:var(--ink-mute)}
 .entry-tg .tgj{margin-left:auto;font-size:12px;font-weight:700;color:var(--tg)}
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-   RESULTS PAGE  (score В· band В· answer key)
-   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+/* ══════════════════════════════════════════════════════════════════════
+   RESULTS PAGE  (score · band · answer key)
+   ══════════════════════════════════════════════════════════════════════ */
 #stage-results .rs-top{
   height:56px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
   gap:14px;padding:0 18px;background:var(--paper);border-bottom:1px solid var(--line-2);
@@ -200,7 +200,7 @@ body.no-select input,body.no-select textarea{user-select:text;-webkit-user-selec
 body.dark-mode ::-webkit-scrollbar-thumb{background:#555}
 .hidden{display:none !important}
 
-/* в”Ђв”Ђ TEXT ZOOM в”Ђв”Ђ */
+/* ── TEXT ZOOM ── */
 .q-text,.gap-input,.option,.subhead,.section-head h2,.section-head .instruction,
 .note-flow,.gap-line,.drag-chip,.drag-item-label,.drag-col-hdr,.drag-num-hint,.q-pill{
   font-size:calc(var(--base-size,16px) + var(--text-zoom)) !important;
@@ -220,11 +220,11 @@ body.dark-mode ::-webkit-scrollbar-thumb{background:#555}
 .drag-num-hint{--base-size:16px}
 .drag-chip{--base-size:14px}
 
-/* в”Ђв”Ђ STAGES в”Ђв”Ђ */
+/* ── STAGES ── */
 .stage{position:fixed;inset:0;display:none;flex-direction:column}
 .stage.active{display:flex;z-index:25}
 
-/* в”Ђв”Ђ HEADER в”Ђв”Ђ */
+/* ── HEADER ── */
 #hdr{height:56px;flex:0 0 auto;display:flex;align-items:stretch;justify-content:space-between;padding:0;background:var(--paper);border-bottom:0;position:relative;z-index:500;}
 /* the official header has NO box-shadow and NO border-bottom: it is header::after,
    a 1px #C1C1C1 hairline sitting on the 55px row. */
@@ -247,7 +247,7 @@ body.dark-mode .ttid-label,body.theme-sepia .ttid-label{color:var(--ink)}
 .ttid-sub-inline{display:inline-block;font-size:13.3333px;font-weight:400;color:#000;white-space:nowrap;line-height:normal}
 .ttid-sub-inline .fa-glyph{display:inline-block;color:#333;vertical-align:-2.34px}
 .ttid-sub-title{margin-left:6.66667px}
-/* PRACTICE-PRODUCT ADDITION вЂ” the official Listening player has no clock at all.
+/* PRACTICE-PRODUCT ADDITION — the official Listening player has no clock at all.
    Presented in the header in the candidate block's own type, never as an alarm. */
 #hdr-clock{padding-left:0}
 #hdr-clock .ttid-sub-title{font-variant-numeric:tabular-nums}
@@ -281,7 +281,7 @@ body.dark-mode #menu-btn span{background:#ddd}
 .notif-popup-hdr{font-size:12px;font-weight:700;color:var(--ink);padding:8px 13px;border-bottom:1px solid var(--line);background:var(--panel)}
 .notif-popup-body{font-size:13px;color:var(--ink-mute);padding:16px 13px;text-align:center}
 
-/* в”Ђв”Ђ TIMER в”Ђв”Ђ */
+/* ── TIMER ── */
 .timer{font-family:var(--mono);font-weight:700;font-size:16px;padding:5px 11px;border-radius:3px;background:var(--panel);color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-2);}
 .timer::before{content:'';width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--emerald);animation:timerLive 2.4s ease infinite}
 @keyframes timerLive{0%,100%{opacity:1}50%{opacity:.35}}
@@ -296,7 +296,7 @@ body.dark-mode .timer.crit{background:rgba(196,18,48,.22)}
 .timer .btn-icon{background:transparent;border:none;color:var(--ink-mute);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;opacity:.8;transition:opacity .2s;outline:none}
 .timer .btn-icon:hover{color:var(--ink);opacity:1}
 
-/* в”Ђв”Ђ PBAR (section info + audio player) в”Ђв”Ђ */
+/* ── PBAR (section info + audio player) ── */
 /* measured: section#sectionRubric  16, 88, 1407 x 72 ; margin 16px ; padding 12px 16px
    1px #D5D5D5 / #F1F2EC / radius 4px ; display BLOCK (no flex row, no transport strip) */
 #pbar{background:transparent;padding:0;margin:16px 1px 16px 0}
@@ -329,7 +329,7 @@ body.review-mode #audio-hdr-badge{display:none !important}
 .pp-btn:hover{background:var(--primary)}
 body.review-mode .seek-btn{display:inline-flex}
 /* Full screen is a REVIEW affordance only. The real player has no such button,
-   so it must never appear while the exam is running вЂ” the review header is
+   so it must never appear while the exam is running — the review header is
    already ours (the transport moves into it), and this sits beside the wifi
    glyph where the eye is already going. */
 #fs-btn{display:none}
@@ -350,18 +350,18 @@ body.review-mode .pp-btn{display:inline-flex}
 #ag-play-btn .ag-pi{display:inline-block;vertical-align:top;width:22.8594px;height:26.6667px;color:#fff}
 /* vertical-align:super is what lifts "Play" against the 26.67px glyph */
 #ag-play-btn .caption{display:inline-block;margin:0 0 0 10px;vertical-align:top;font:400 13.3333px/15.3333px Arial,sans-serif;color:#fff;white-space:nowrap;transform:translateY(4.56px)}
-/* в”Ђв”Ђ LISTENING EXAM AREA в”Ђв”Ђ */
+/* ── LISTENING EXAM AREA ── */
 #stage-listening{flex-direction:column;background:#fff}
 /* measured: #sectionContent 0,56,1440x791 ; padding 16px 0 48px ; overflow-y ALWAYS scroll */
 #listening-area{flex:1;overflow-y:scroll;overflow-x:auto;background:var(--paper);min-height:0;padding:16px 0 48px;position:relative}
 .listening-content{max-width:none;margin:0;padding:0 16px}
 /* 1408 - 254 = 1154 : the measured content column width, at x = 16.
    With the Notes sidebar docked the exam is 1140 wide and the measured column is
-   1012 вЂ” only the 96px flag gutter survives, so the 158px question margin goes. */
+   1012 — only the 96px flag gutter survives, so the 158px question margin goes. */
 #listening-render{margin-right:254px}
 body.notes-open #listening-render{margin-right:96px}
 
-/* в”Ђв”Ђ SECTION BLOCKS в”Ђв”Ђ */
+/* ── SECTION BLOCKS ── */
 .section-block{margin-bottom:80px}
 .section-head{margin-bottom:0;padding-bottom:0;border-bottom:none;position:relative;display:flex;flex-direction:column}
 .section-head::after{display:none}
@@ -370,7 +370,7 @@ body.notes-open #listening-render{margin-right:96px}
 .section-head .instruction{font-size:16px;color:#000;line-height:24px;font-weight:400;margin:0 0 16px;order:2}
 .section-head .instruction em{font-style:normal;background:transparent;padding:0;color:#000;font-weight:700}
 
-/* в”Ђв”Ђ QUESTION CARDS в”Ђв”Ђ */
+/* ── QUESTION CARDS ── */
 .q-card{background:var(--paper);border:none;border-radius:0;padding:0;margin-bottom:29.4px}
 body.dark-mode .q-card{border-color:#333}
 /* MCQ prompt row: measured .choiceInteraction__promptAndButtonRow 16, y, 1154 x 31 */
@@ -384,7 +384,7 @@ body.dark-mode .q-card{border-color:#333}
 /* note-block heading: measured h2 700 17.6px/21.12px, margin 0 0 14.608px, #000 */
 .subhead{display:block;font-size:17.6px;font-weight:700;line-height:21.12px;letter-spacing:0;text-transform:none;color:#000;margin:0 0 14.608px;padding-bottom:0;border-bottom:none}
 
-/* в”Ђв”Ђ GAP INPUT (exact reading test style) в”Ђв”Ђ */
+/* ── GAP INPUT (exact reading test style) ── */
 /* the whole note block is ONE inline flow: text nodes, <br> and runs of &nbsp;
    at line-height 24px. It is not a table, a grid, or a stack of rows. */
 .note-flow{display:block;font-size:16px;line-height:24px;font-weight:400;color:#000}
@@ -394,12 +394,12 @@ body.dark-mode .q-card{border-color:#333}
 .gap-input{display:inline-block;box-sizing:border-box;width:104px;min-width:104px;max-width:100%;height:1.4em;padding:0 8px;margin:0.05em 0.25em -0.1em;font-family:Arial,sans-serif;font-size:16px;font-weight:400;line-height:normal;
   color:#000;background:#fff;border:1px solid rgb(83,83,83);border-radius:3px;outline:none;text-align:start;
   vertical-align:baseline;box-shadow:none;transition:none;overflow:clip}
-/* the question number IS the placeholder: #000, 700, centred, opacity 1 вЂ” and it
+/* the question number IS the placeholder: #000, 700, centred, opacity 1 — and it
    vanishes the instant anything is typed. */
 .gap-input::placeholder{color:#000;font-weight:700;opacity:1;text-align:center}
 .gap-input::-webkit-input-placeholder{color:#000;font-weight:700;opacity:1;text-align:center}
 /* active OR filled: 1px #418EC8 + a 1px ring of the same blue. The ring PERSISTS
-   after blur once the box has a value вЂ” that is the "answered" affordance. */
+   after blur once the box has a value — that is the "answered" affordance. */
 .gap-input:focus,
 .gap-input.active,
 .gap-input:not(:placeholder-shown){border-color:rgb(65,142,200);box-shadow:rgb(65,142,200) 0 0 0 1px}
@@ -410,7 +410,7 @@ body.dark-mode .q-card{border-color:#333}
 .gap-line{display:inline;padding:0;font-size:16px;line-height:24px;color:#000;font-weight:400}
 .gap-line .q-pill{margin:0 6px 0 0}
 
-/* в”Ђв”Ђ MCQ OPTIONS в”Ђв”Ђ */
+/* ── MCQ OPTIONS ── */
 /* measured: each option row is 1154 wide, 43.2 tall, background #fff, no border,
    no radius, padding 9.6px 8px 9.6px 32px, font 16px/24px Arial. The radio sits
    inside the 32px left pad; the official rows carry no A/B/C letter. */
@@ -431,19 +431,19 @@ body.dark-mode .option.selected{background:#1d3a63}
 body.dark-mode .option.correct{background:rgba(46,125,50,.18)}
 body.dark-mode .option.wrong{background:rgba(196,18,48,.18)}
 
-/* в”Ђв”Ђ DROPDOWN в”Ђв”Ђ */
+/* ── DROPDOWN ── */
 .dropdown{-webkit-appearance:none;appearance:none;background:var(--paper) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 8px center;border:1px solid var(--line-4);border-radius:2px;padding:4px 26px 4px 8px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;outline:none;min-width:58px;transition:border-color .15s}
 .dropdown:focus{border-color:#444}
 .dropdown.correct{border-color:var(--emerald);color:var(--emerald)}
 .dropdown.incorrect{border-color:var(--crimson);color:var(--crimson)}
 
-/* в”Ђв”Ђ OPTION LIST BOX в”Ђв”Ђ */
+/* ── OPTION LIST BOX ── */
 .option-list-box{background:var(--panel);border:1px solid var(--line-3);border-left:3px solid var(--primary);border-radius:0 3px 3px 0;padding:12px 16px;margin:10px 0}
 .option-list-box ul{list-style:none;columns:2;gap:14px}
 .option-list-box li{font-size:13px;padding:3px 0;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:8px;break-inside:avoid}
 .option-list-box li .pl-letter{font-weight:700;color:var(--primary);width:18px}
 
-/* в”Ђв”Ђ DRAG MATCH в”Ђв”Ђ */
+/* ── DRAG MATCH ── */
 .drag-match-layout{display:grid;grid-template-columns:auto auto;justify-content:start;gap:16px;margin:4px 0 16px}
 .drag-col-hdr{font-size:16px;font-weight:700;line-height:19.2px;color:#000;margin:0 0 8px;padding-bottom:0;border-bottom:none}
 .drag-right .drag-col-hdr{margin-left:32px}
@@ -478,7 +478,7 @@ body.review-mode .drag-chip{pointer-events:none;cursor:default}
 .drag-drop.dm-wrong{border-color:var(--crimson) !important;background:rgba(196,18,48,.06)}
 .drag-drop.dm-wrong .drag-chip{color:var(--crimson)}
 
-/* в”Ђв”Ђ FEEDBACK PILL в”Ђв”Ђ */
+/* ── FEEDBACK PILL ── */
 .feedback-pill{display:none;margin-left:10px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:10px;align-items:center;gap:4px}
 .feedback-pill.show{display:inline-flex}
 .feedback-pill.correct{background:#e7f5e9;color:var(--emerald)}
@@ -501,7 +501,7 @@ body.review-mode .drag-chip{pointer-events:none;cursor:default}
 
 
 
-/* в”Ђв”Ђ BOTTOM NAV в”Ђв”Ђ */
+/* ── BOTTOM NAV ── */
 /* measured: .App__footerWrapper 0, 847, 1440 x 53 */
 #bnav{background:#fff;border-top:none;flex:0 0 auto;height:53px;min-height:53px;display:flex;align-items:stretch}
 #listening-nav{display:flex;align-items:stretch;width:100%;min-height:0;height:100%;overflow:visible}
@@ -525,7 +525,7 @@ body.dark-mode .bnav-part.other:hover{background:#333}
 .bnav-check{display:none}
 /* THE RAIL. 3px tall, #D7D7D7, sitting on the cell's own top edge, one segment per
    label and per number box, 1.5px inset each side. An ATTEMPTED question turns its
-   own segment #358E14 вЂ” the number box itself never changes colour. */
+   own segment #358E14 — the number box itself never changes colour. */
 .bnav-part.cur .bnav-plabel::before{content:"";position:absolute;top:-3px;left:1.5px;right:1.5px;height:3px;background:#D7D7D7}
 .bnav-pills{display:flex;align-items:stretch;gap:0}
 .qpill-wrap{position:relative;display:flex;align-items:center;justify-content:center;align-self:stretch}
@@ -555,7 +555,7 @@ body.dark-mode .bnav-prog .seg{background:#4a4a4a}
 #sub-btn.active{background:#333;color:#fff}
 body.dark-mode #sub-btn{color:#ccc}
 
-/* в”Ђв”Ђ PREV/NEXT SECTION ARROWS в”Ђв”Ђ */
+/* ── PREV/NEXT SECTION ARROWS ── */
 /* measured: #footer-nav-wrapper is position:ABSOLUTE, right 32, bottom 144, z 100 */
 #qnav-arrows{position:absolute;right:32px;bottom:144px;display:flex;gap:2.4px;z-index:100}
 .qnav-btn{width:55.88px;height:55.2px;border:none;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:none}
@@ -569,7 +569,7 @@ body.dark-mode #sub-btn{color:#ccc}
 .qnav-btn:disabled{background:#dddddd;cursor:default}
 .qnav-btn:disabled:hover{background:#dddddd}
 
-/* в”Ђв”Ђ TRANSCRIPT PANEL в”Ђв”Ђ */
+/* ── TRANSCRIPT PANEL ── */
 #transcript-panel{position:fixed;right:0;top:56px;width:416px;height:calc(100vh - 56px - 46px);background:var(--paper);border-left:1px solid var(--line);box-shadow:-12px 0 48px rgba(0,0,0,.08);display:none;flex-direction:column;z-index:26;overflow:hidden}
 body.review-mode.tp-active #transcript-panel{display:flex}
 body.review-mode.tp-active #listening-area{padding-right:420px}
@@ -601,7 +601,7 @@ mark.tp-ans-mark{background:#FFE066;color:#7a4f00;font-weight:800;border-radius:
 .q-jump-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
 .q-jump-btn-inline{margin:0;padding:3px 10px;font-size:10px}
 
-/* в”Ђв”Ђ WARNING OVERLAY + TOAST в”Ђв”Ђ */
+/* ── WARNING OVERLAY + TOAST ── */
 .warning-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
 .warning-overlay.show{display:flex}
 .warning-card{background:var(--paper);border-radius:5px;padding:36px 40px;max-width:520px;text-align:center;box-shadow:var(--shadow-lg);border-top:5px solid var(--crimson)}
@@ -613,16 +613,16 @@ mark.tp-ans-mark{background:#FFE066;color:#7a4f00;font-weight:800;border-radius:
 .warning-card .strike-counter .strike.on{background:var(--crimson);border-color:var(--crimson)}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:110;padding:10px 20px;background:#111;color:#fff;border-radius:4px;font-size:13px;font-weight:600;box-shadow:var(--shadow-md);opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(8px)}
-/* severity lives in the icon and the edge вЂ” see the COSMIC SHELL block below */
+/* severity lives in the icon and the edge — see the COSMIC SHELL block below */
 
-/* в”Ђв”Ђ REVIEW MODE в”Ђв”Ђ */
+/* ── REVIEW MODE ── */
 body.review-mode .gap-input{pointer-events:none}
 body.review-mode .dropdown{pointer-events:none}
 body.review-mode .option{pointer-events:none}
 body.review-mode .q-pill{cursor:default;opacity:.8}
 body.review-mode .timer{display:none}
 
-/* в”Ђв”Ђ GENERIC BUTTONS в”Ђв”Ђ */
+/* ── GENERIC BUTTONS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px;border-radius:2px;font-family:var(--sans);font-size:12.5px;font-weight:700;border:1px solid transparent;cursor:pointer;transition:.12s}
 .btn-primary{background:var(--primary);color:#fff}
 .btn-primary:hover{background:var(--primary-2)}
@@ -634,7 +634,7 @@ body.review-mode .timer{display:none}
 .btn-sm{padding:7px 14px;font-size:12px}
 .btn-lg{width:100%;padding:13px 24px;font-size:14px}
 
-/* в”Ђв”Ђ PREMIUM WRAPPER (registration/intro/completion/results) в”Ђв”Ђ */
+/* ── PREMIUM WRAPPER (registration/intro/completion/results) ── */
 :root{
   --pw-display:'Bricolage Grotesque',system-ui,'Segoe UI',sans-serif;
   --pw-ui:'Be Vietnam Pro',system-ui,-apple-system,Arial,sans-serif;
@@ -683,7 +683,7 @@ body.review-mode .timer{display:none}
 .trans-card{width:100%;max-width:680px;background:var(--pw-paper);border:1px solid var(--pw-line);border-radius:20px;padding:48px 52px 42px;box-shadow:var(--pw-shadow);position:relative;overflow:hidden;animation:pwRise .65s cubic-bezier(.2,.75,.2,1) both;}
 .trans-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pw-red),var(--pw-burgundy) 55%,var(--pw-gold))}
 .trans-icon{font-size:0;margin:0 auto 14px;width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,rgba(36,75,142,.14),rgba(19,49,95,.07));border:1px solid var(--pw-line)}
-#stage-listening-intro .trans-icon::after{content:"рџЋ§";font-size:30px}
+#stage-listening-intro .trans-icon::after{content:"🎧";font-size:30px}
 .trans-eyebrow{font-family:var(--pw-ui);font-weight:800;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--pw-red);margin-bottom:12px}
 .trans-title{font-size:40px;margin:6px 0 12px}
 .trans-sub{color:var(--pw-ink-2);font-size:15px;max-width:520px;line-height:1.6;margin:0 auto 28px}
@@ -691,27 +691,27 @@ body.review-mode .timer{display:none}
 .trans-rules h4{font-family:var(--pw-ui);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--pw-red);margin-bottom:14px}
 .trans-rules ul{list-style:none}
 .trans-rules li{color:var(--pw-ink-2);font-size:14px;margin:9px 0;padding-left:28px;position:relative;line-height:1.5}
-.trans-rules li::before{content:"вњ“";color:var(--pw-emerald);font-weight:800;font-size:13px;top:1px;position:absolute;left:0}
+.trans-rules li::before{content:"✓";color:var(--pw-emerald);font-weight:800;font-size:13px;top:1px;position:absolute;left:0}
 
 /* Completion */
 #stage-completion{padding:34px;align-items:center;justify-content:center;overflow-y:auto}
 .complete-card{width:100%;max-width:620px;background:var(--pw-paper);border:1px solid var(--pw-line);border-radius:20px;padding:50px 48px 42px;box-shadow:var(--pw-shadow);position:relative;overflow:hidden;animation:pwRise .65s cubic-bezier(.2,.75,.2,1) both;text-align:center;}
 .complete-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pw-red),var(--pw-burgundy) 55%,var(--pw-gold))}
 .complete-icon{font-size:0;margin:0 auto 16px;width:66px;height:66px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,rgba(193,154,75,.20),rgba(36,75,142,.10));border:1px solid var(--pw-line)}
-.complete-icon::after{content:"рџЋ“";font-size:34px}
+.complete-icon::after{content:"🎓";font-size:34px}
 .complete-title{font-size:38px;margin-bottom:12px}
 .complete-sub{color:var(--pw-ink-2);font-size:15px}
 
 /* ====
-   RESULTS вЂ” certificate  (owner: L3)
+   RESULTS — certificate  (owner: L3)
    ------------------------------------------------------------
    Ported wholesale from the Writing V3 Test Report Form so that
    the two documents come off the same press: the same paper and
-   ink, the same dark score panel, the same 0вЂ“9 ruler, the same
+   ink, the same dark score panel, the same 0–9 ruler, the same
    band-tier chrome, the same reveal.
    The one honest change is the table in the middle. Writing
    prints four examiner criteria; Listening has no examiner, so
-   it prints the four parts of the recording instead вЂ” the only
+   it prints the four parts of the recording instead — the only
    breakdown an objective 40-mark paper actually has.
    Everything is scoped to #stage-results (or to #print-report,
    built by buildPrintReport()) so nothing can reach the exam
@@ -725,11 +725,11 @@ body.review-mode .timer{display:none}
 #stage-results .topbar .btn-ghost:hover{border-color:var(--pw-red);color:var(--pw-red)}
 #stage-results .topbar .btn-gold{border-radius:10px;background:linear-gradient(165deg,#caa052,#a87e2f);border:none;font-family:var(--pw-ui)}
 
-/* в”Ђв”Ђ Document tokens + band-tier chrome в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── Document tokens + band-tier chrome ───────────────────────
    data-tier is set from the band in renderResults(). Only the
    chrome (rule, glow, accent metal) changes; the paper, the ink
    and the layout stay constant, so a 4.0 and a 9.0 are
-   recognisably the same document вЂ” just lit differently.        */
+   recognisably the same document — just lit differently.        */
 #stage-results .cert,#print-report{
   --c-paper:#fffdfa;--c-paper-2:#f9f4ea;--c-ink:#1b1610;--c-ink-2:#5a5045;--c-ink-3:#8d8173;
   --c-line:rgba(27,22,16,.10);--c-line-2:rgba(27,22,16,.17);
@@ -760,7 +760,7 @@ body.review-mode .timer{display:none}
   --glow:rgba(150,175,205,.17);
   --rule:linear-gradient(90deg,#2a3648,#47566d 58%,#8095ad)}
 
-/* в”Ђв”Ђ The document в”Ђв”Ђ */
+/* ── The document ── */
 #stage-results .cert{
   max-width:948px;margin:0 auto;background:var(--c-paper);color:var(--c-ink);font-family:var(--pw-ui);
   border:1px solid var(--c-line);border-top:none;border-radius:16px;overflow:hidden;
@@ -788,7 +788,7 @@ body.review-mode .timer{display:none}
 #stage-results .field-label{font-size:9px;font-weight:800;color:var(--c-ink-3);letter-spacing:.17em;text-transform:uppercase;margin-bottom:5px}
 #stage-results .field-value{font-size:14.5px;font-weight:700;color:var(--c-ink);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* в”Ђв”Ђ The score panel: the one thing they screenshot в”Ђв”Ђ */
+/* ── The score panel: the one thing they screenshot ── */
 #stage-results .score-section{position:relative;display:grid;grid-template-columns:266px 1fr;gap:0;padding:0;border:none;
   background:linear-gradient(150deg,var(--hero-a),var(--hero-b) 52%,var(--hero-c));color:#fff;isolation:isolate;
   animation:certPart .55s .22s both}
@@ -815,7 +815,7 @@ body.review-mode .timer{display:none}
 
 #stage-results .band-side{padding:26px 38px 28px 30px;display:flex;flex-direction:column;gap:15px;min-width:0}
 
-/* 0вЂ“9 ruler */
+/* 0–9 ruler */
 #stage-results .band-scale{position:relative}
 #stage-results .band-scale-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
 #stage-results .band-scale-cap{font-size:9px;font-weight:800;letter-spacing:.19em;text-transform:uppercase;color:rgba(255,255,255,.5)}
@@ -840,7 +840,7 @@ body.review-mode .timer{display:none}
   padding:10px 14px;border-radius:11px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11)}
 #stage-results .band-verdict b{color:#fff;font-weight:700}
 
-/* the three tallies вЂ” the old "Score Breakdown" strip, re-cut as
+/* the three tallies — the old "Score Breakdown" strip, re-cut as
    cards so it carries the same weight as Writing's two task cards */
 #stage-results .tally-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 #stage-results .tally{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:13px;
@@ -856,7 +856,7 @@ body.review-mode .timer{display:none}
 #stage-results .tally-note{font-size:10.5px;color:rgba(255,255,255,.52);margin-top:9px;letter-spacing:.005em}
 #stage-results .tally-note b{color:rgba(255,255,255,.8);font-weight:700}
 
-/* в”Ђв”Ђ Section breakdown (Writing's criteria table, re-cut) в”Ђв”Ђ */
+/* ── Section breakdown (Writing's criteria table, re-cut) ── */
 #stage-results .section-heading{display:flex;align-items:center;gap:12px;margin:26px 38px 15px;animation:certPart .5s .3s both}
 #stage-results .section-heading::before,#stage-results .section-heading::after{content:'';flex:1;height:1px;background:var(--c-line)}
 #stage-results .section-heading span{font-size:9.5px;font-weight:800;color:var(--acc-ink);letter-spacing:.2em;text-transform:uppercase}
@@ -896,12 +896,12 @@ body.review-mode .timer{display:none}
 #stage-results .cc-legend .key{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 #stage-results .cc-legend .key i{width:9px;height:9px;border-radius:3px;display:inline-block}
 
-/* what the band officially means вЂ” public descriptor, changes with the score */
+/* what the band officially means — public descriptor, changes with the score */
 #stage-results .band-desc{margin:18px 38px 0;padding:2px 0 2px 16px;border-left:3px solid var(--acc-ink);
   background:none;border-radius:0;animation:certPart .5s .43s both}
 #stage-results .band-desc-h{font-family:var(--pw-display);font-size:14px;font-weight:600;letter-spacing:-.012em;color:var(--c-ink)}
 
-/* в”Ђв”Ђ Where the marks went в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── Where the marks went ──────────────────────────────────────
    The same diagnosis the Reading report makes, and for the same reason: a
    mark lost to a plural or a spelling is an evening's work, a mark lost to
    comprehension is months of it, and a blank is neither. Reading also prints
@@ -925,10 +925,10 @@ body.review-mode .timer{display:none}
 #stage-results .ins-note + .ins-note{margin-top:8px;padding-top:8px;border-top:none}
 #stage-results .band-desc p{margin:5px 0 0;font-size:12.5px;line-height:1.6;color:var(--c-ink-2);max-width:78ch}
 
-/* в”Ђв”Ђ The answer record в”Ђв”Ђ
+/* ── The answer record ──
    Every mark the grader produced, printed. The bubble grid is the
    map; the two tables are the record. "Heard at" is the second in
-   the recording where the answer was spoken вЂ” the one thing a
+   the recording where the answer was spoken — the one thing a
    Listening report can give that a Writing report cannot.        */
 #stage-results .answer-section{padding:0 38px;animation:certPart .5s .5s both}
 #stage-results .q-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:15px}
@@ -961,7 +961,7 @@ body.review-mode .timer{display:none}
 #stage-results .answer-note{margin:12px 0 0;font-size:11px;color:var(--c-ink-3);line-height:1.6}
 #stage-results .answer-note b{color:var(--c-ink-2);font-weight:700}
 
-/* в”Ђв”Ђ Closing CTA + footer в”Ђв”Ђ */
+/* ── Closing CTA + footer ── */
 #stage-results .review-cta{margin:26px 38px 0;padding:18px 22px;border:1px solid rgba(44,95,168,.16);border-radius:14px;text-align:left;
   background:linear-gradient(180deg,rgba(44,95,168,.055),rgba(44,95,168,.09));display:flex;align-items:center;justify-content:space-between;
   gap:20px;flex-wrap:wrap;animation:certPart .5s .54s both}
@@ -976,7 +976,7 @@ body.review-mode .timer{display:none}
 #stage-results .cert-footer span:first-child{font-family:var(--pw-display);font-weight:600;letter-spacing:.02em;color:var(--c-ink-2);font-size:11px}
 #stage-results .cert-footer .cert-id{font-variant-numeric:tabular-nums;letter-spacing:.09em}
 
-/* в”Ђв”Ђ Motion в”Ђв”Ђ */
+/* ── Motion ── */
 @keyframes certRise{from{opacity:0;transform:translateY(26px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes certPart{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
@@ -984,7 +984,7 @@ body.review-mode .timer{display:none}
   #stage-results .band-scale-dot{opacity:1}
 }
 
-/* в”Ђв”Ђ Responsive в”Ђв”Ђ */
+/* ── Responsive ── */
 @media (max-width:1000px){
   #stage-results .results-content{padding:28px 16px 60px}
   #stage-results .cert-header,#stage-results .band-side{padding-left:26px;padding-right:26px}
@@ -1030,7 +1030,7 @@ body.review-mode .timer{display:none}
   #stage-results .cc-legend{gap:8px 14px}
 }
 
-/* в”Ђв”Ђ The printable report в”Ђв”Ђ
+/* ── The printable report ──
    Hidden on screen; typeset for A4 in ink by buildPrintReport().
    Its @media print rules ship inside the block itself (see
    printStylesheet()) so that the sheet never inherits the dark
@@ -1049,16 +1049,16 @@ body.review-mode .timer{display:none}
 
 @keyframes pwRise{from{opacity:0;transform:translateY(16px) scale(.992)}to{opacity:1;transform:none}}
 
-/* в”Ђв”Ђ DARK MODE PREMIUM WRAPPER в”Ђв”Ђ */
+/* ── DARK MODE PREMIUM WRAPPER ── */
 body.dark-mode :is(#stage-registration,#stage-listening-intro,#stage-completion,#stage-results){
   background:radial-gradient(1100px 560px at 50% -12%,rgba(90,140,210,.14),transparent 60%),radial-gradient(820px 520px at 108% 116%,rgba(19,49,95,.30),transparent 55%),linear-gradient(180deg,#15171c,#101218);color:#ece6df
 }
 body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-card,body.dark-mode #stage-results .cert{background:#201b17;border-color:rgba(255,255,255,.08)}
 
-/* в”Ђв”Ђ PRINT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-   ONE @page rule for the whole document.  There used to be two вЂ” `10mm` all
+/* ── PRINT ───────────────────────────────────────────────────────────────
+   ONE @page rule for the whole document.  There used to be two — `10mm` all
    round, left over from the old "print the on-screen certificate" path, and
-   `14mm 15mm 12mm` from the typeset report that replaced it вЂ” and which one
+   `14mm 15mm 12mm` from the typeset report that replaced it — and which one
    won depended on whether #print-report had been built into the DOM yet, so
    the sheet changed size between one print and the next.  The report is
    typeset to a 180mm column inside 15mm side margins, so that is the rule
@@ -1080,33 +1080,33 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
   #print-report{display:block !important;background:#fff !important}
 }
 
-/* в”Ђв”Ђ RESPONSIVE в”Ђв”Ђ */
+/* ── RESPONSIVE ── */
 @media(max-width:880px){
   #pbar-tabs{display:none}
   .listening-content{padding:0 16px 80px}
   #listening-render{margin-right:0}
   /* .tp-active is on the rule that reserves the gutter, so it has to be on the
-     rule that gives it back вЂ” otherwise the panel hides and leaves 420px of
+     rule that gives it back — otherwise the panel hides and leaves 420px of
      dead space behind it. */
   body.review-mode.tp-active #listening-area{padding-right:0}
   #transcript-panel{display:none !important}
 }
 
-/* в”Ђв”Ђ ADDED: tables, multi-select, legend в”Ђв”Ђ */
+/* ── ADDED: tables, multi-select, legend ── */
 .legend-box{border:1px solid var(--line-2);background:var(--bg-elev);border-radius:var(--radius);padding:12px 14px;margin:6px 0 16px;max-width:680px}
 .legend-row{display:flex;gap:10px;padding:3px 0;font-size:14px}
 .legend-key{font-weight:800;color:var(--primary);min-width:18px}
 .ms-hint{font-size:12px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 8px}
 .ms-options .option{cursor:pointer}
 .ms-box{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
-/* a 'choose TWO' row is the measured .option row with a square marker вЂ” the flex/padding
+/* a 'choose TWO' row is the measured .option row with a square marker — the flex/padding
    override that used to live here put the marker on top of the text */
 .ms-option .opt-letter{border-radius:2px}
-/* в”Ђв”Ђ CATALOGUE WIDGETS В· measured on the official demo player (demo-ielts.inspera.com) 2026-09-02 в”Ђв”Ђ
+/* ── CATALOGUE WIDGETS · measured on the official demo player (demo-ielts.inspera.com) 2026-09-02 ──
    Table: 1px #000 grid, cells 4.8px 8px, 16px/24px. Flow-chart: Cambridge ships it as a picture
    (boxes 1px #000, 13.6px/19px text, solid black arrows); this is that picture in CSS. Drop
-   zones: 124Г—27 in a matching row, 104Г—27 inside a flow box, 98Г—27 on a plan. Chips: 27px,
-   1px #919191, 14px text вЂ” already the engine's .drag-chip. "вЊЁ Help": 27px, rgb(27,77,107). */
+   zones: 124×27 in a matching row, 104×27 inside a flow box, 98×27 on a plan. Chips: 27px,
+   1px #919191, 14px text — already the engine's .drag-chip. "⌨ Help": 27px, rgb(27,77,107). */
 .ielts-table{width:100%;border-collapse:collapse;font-size:16px;line-height:24px;margin:16px 0;border:1px solid #000;color:#000}
 .ielts-table th,.ielts-table td{border:1px solid #000;padding:4.8px 8px;text-align:left;vertical-align:top;background:#fff;color:#000}
 .ielts-table th{font-weight:700}
@@ -1154,11 +1154,11 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
 
 
 /* ======
-   CDI V3 COSMIC SHELL вЂ” the CDI-branded wrapper that surrounds the live exam.
+   CDI V3 COSMIC SHELL — the CDI-branded wrapper that surrounds the live exam.
    Owns #stage-registration, #stage-listening-intro, #stage-completion, the
    integrity overlay, the toast and the resume sheet. Nothing in here may leak
    into #stage-listening or #audio-gate: those stay pixel-identical to the real
-   Inspera player. #stage-results is excluded too вЂ” the certificate is a
+   Inspera player. #stage-results is excluded too — the certificate is a
    document and is meant to read as paper.
 :root{
   --ch-ink:#f4f7ff;--ch-ink-2:#b0bdd4;--ch-ink-3:#7e8da3;--ch-ink-4:#5f6c82;
@@ -1172,7 +1172,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
   --ch-shadow:0 2px 8px rgba(0,0,0,.42),0 30px 70px -22px rgba(0,0,0,.72),0 90px 160px -60px rgba(18,48,108,.85);
 }
 
-/* в”Ђв”Ђ stage shell в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── stage shell ─────────────────────────────────────────────────────────── */
 :is(#stage-registration,#stage-listening-intro,#stage-completion){
   font-family:var(--ch-ui);color:var(--ch-ink-2);
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
@@ -1189,14 +1189,14 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
 }
 /* the paper-grain multiply overlay is wrong on a dark ground */
 :is(#stage-registration,#stage-listening-intro,#stage-completion)::before{display:none}
-/* vignette вЂ” replaces the old decorative ring */
+/* vignette — replaces the old decorative ring */
 :is(#stage-registration,#stage-listening-intro,#stage-completion)::after{
   content:"";position:absolute;left:0;top:0;width:auto;height:auto;inset:0;z-index:0;pointer-events:none;
   border:0;border-radius:0;transform:none;box-shadow:none;
   background:radial-gradient(76% 60% at 50% 44%,transparent 38%,rgba(2,4,10,.30) 74%,rgba(1,2,6,.72) 100%)}
 :is(#stage-registration,#stage-listening-intro,#stage-completion) > *{position:relative;z-index:2}
 
-/* в”Ђв”Ђ the glass card в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── the glass card ──────────────────────────────────────────────────────── */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) :is(.start-card,.trans-card,.complete-card){
   position:relative;z-index:2;overflow:hidden;
   background:var(--ch-glass);
@@ -1215,7 +1215,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
   background:radial-gradient(120% 76% at 8% -6%,rgba(143,184,255,.10),transparent 58%),
              radial-gradient(90% 60% at 104% 108%,rgba(225,29,60,.07),transparent 62%)}
 
-/* в”Ђв”Ђ shared type в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── shared type ─────────────────────────────────────────────────────────── */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) :is(.start-title,.trans-title,.complete-title){
   font-family:var(--ch-display);font-weight:600;letter-spacing:-.024em;color:var(--ch-ink);
   font-optical-sizing:auto;text-wrap:balance}
@@ -1233,7 +1233,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
   font-family:var(--ch-ui);font-size:10.5px;font-weight:700;color:var(--ch-ink-3);
   border:1px solid var(--ch-line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;margin:0 1px}
 
-/* в”Ђв”Ђ buttons в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── buttons ─────────────────────────────────────────────────────────────── */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn{
   font-family:var(--ch-ui);position:relative;overflow:hidden;isolation:isolate}
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary{
@@ -1256,7 +1256,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary:focus-visible{
   outline:2px solid rgba(180,208,255,.9);outline-offset:3px}
 /* Dormant = "not yet", never "danger". Neutral glass that ignites into the
-   full red the instant the name is valid вЂ” the button itself is the reward. */
+   full red the instant the name is valid — the button itself is the reward. */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary:disabled,
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary.is-dormant{
   background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.028));
@@ -1281,7 +1281,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn:hover .ch-arrow{transform:translateX(4px)}
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn.is-dormant .ch-arrow{opacity:.55}
 
-/* в”Ђв”Ђ telegram strip в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── telegram strip ──────────────────────────────────────────────────────── */
 :is(#stage-registration,#stage-completion) .channel-promo{
   display:flex;align-items:center;gap:14px;margin:0;border-radius:0;
   padding:14px clamp(20px,3.2vw,38px);
@@ -1304,7 +1304,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
 :is(#stage-registration,#stage-completion) .channel-promo:hover .channel-cta{
   background:rgba(255,255,255,.13);color:var(--ch-ink);border-color:var(--ch-line-3)}
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ REGISTRATION в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+/* ══════════════════ REGISTRATION ══════════════════ */
 #stage-registration{padding:clamp(14px,3.4vh,36px) clamp(12px,3.2vw,40px);align-items:center;justify-content:center;overflow-y:auto}
 #stage-registration .start-card{width:100%;max-width:940px;padding:0;margin:auto}
 .ch-grid{display:grid;grid-template-columns:minmax(0,.84fr) minmax(0,1fr);position:relative;z-index:1}
@@ -1342,7 +1342,7 @@ body.theme-sepia .drag-item-label,body.theme-sepia .drag-col-hdr,body.theme-sepi
 #ch-strike{position:absolute;left:0;right:0;top:50%;height:0;z-index:1;pointer-events:none;
   display:flex;align-items:center;justify-content:center;opacity:0}
 /* Width is derived, not guessed. The WebGL filament is 12.7 world units long,
-   seen by a 50В° camera at z=19.5 вЂ” which works out to exactly 0.699 Г— the
+   seen by a 50° camera at z=19.5 — which works out to exactly 0.699 × the
    viewport HEIGHT on screen, at any aspect ratio. Matching that here means the
    CSS stroke and the particle stroke are the same object, and the hand-off
    between them is invisible on a phone as well as on a 5K display. */
@@ -1358,7 +1358,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 @keyframes chStrikeDraw{from{transform:scaleX(.02)}to{transform:scaleX(1)}}
 
 /* The boot's climax: the imploding core detonates and the light washes ACROSS
-   the card that is materialising out of it вЂ” screen-blended, above everything,
+   the card that is materialising out of it — screen-blended, above everything,
    inert to the pointer. This is the single frame the whole prelude aims at. */
 #ch-bloom{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:6;
   mix-blend-mode:screen;will-change:opacity,transform;
@@ -1429,7 +1429,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}100%{transform:none}}
 #stage-registration #start-btn{margin:18px 0 0;width:100%}
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ INSTRUCTIONS в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+/* ══════════════════ INSTRUCTIONS ══════════════════ */
 #stage-listening-intro{padding:clamp(14px,3.4vh,36px) clamp(12px,3.2vw,40px);align-items:center;justify-content:center;overflow-y:auto}
 #stage-listening-intro .trans-card{width:100%;max-width:880px;margin:auto;text-align:left;
   padding:clamp(24px,2.8vw,34px) clamp(22px,3.4vw,44px) clamp(20px,2.4vw,28px)}
@@ -1451,7 +1451,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
    In Reading and Writing every rule is a rule of conduct. Here one of them is a
    property of the medium: the tape runs once and does not come back. A student
    who learns that from a bullet learns it too late, so it is given the weight of
-   a warning вЂ” the same red-edged plate the integrity overlay uses вЂ” and it sits
+   a warning — the same red-edged plate the integrity overlay uses — and it sits
    above the parts, before anything else can be read. */
 .ch-once{display:flex;gap:13px;align-items:flex-start;padding:12px 15px;border-radius:14px;
   background:linear-gradient(180deg,rgba(225,29,60,.09),rgba(225,29,60,.045));
@@ -1482,7 +1482,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   background:rgba(143,184,255,.5);box-shadow:0 0 8px rgba(143,184,255,.5)}
 #stage-listening-intro .btn-lg{margin-top:clamp(15px,2vw,20px)}
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ COMPLETION в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+/* ══════════════════ COMPLETION ══════════════════ */
 #stage-completion{padding:clamp(14px,3.4vh,36px) clamp(12px,3.2vw,40px);align-items:center;justify-content:center;overflow-y:auto}
 #stage-completion .complete-card{width:100%;max-width:680px;margin:auto;padding:0;text-align:left}
 .ch-comp-body{padding:clamp(26px,3.4vw,42px) clamp(22px,3.4vw,44px) clamp(22px,2.8vw,32px);position:relative;z-index:1}
@@ -1542,8 +1542,8 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 #stage-completion .ch-sign{margin-top:13px!important;padding-top:12px;border-top:1px solid var(--ch-line);
   font-size:11.5px;color:var(--ch-ink-4);letter-spacing:.01em}
 #stage-completion .ch-sign strong{color:var(--ch-ink-2);font-weight:700}
-/* The button's slot is reserved from the first frame вЂ” the card must not jump
-   when the seal finishes вЂ” and the space is *used* while it waits, rather than
+/* The button's slot is reserved from the first frame — the card must not jump
+   when the seal finishes — and the space is *used* while it waits, rather than
    sitting there as a hole under the copy. */
 .ch-cta-slot{position:relative;margin-top:20px;min-height:50px;display:flex;align-items:center}
 .ch-wait{position:absolute;inset:0;margin:0;display:flex;align-items:center;justify-content:center;
@@ -1621,7 +1621,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   #warning-overlay .warning-card h2{font-size:20px}
 }
 
-/* в”Ђв”Ђ toast в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── toast ──────────────────────────────────────────────────── */
 .toast{position:fixed;top:80px;left:50%;z-index:110;display:flex;align-items:center;gap:10px;
   padding:11px 17px 11px 12px;max-width:min(520px,calc(100vw - 32px));
   background:linear-gradient(180deg,rgba(30,38,56,.97),rgba(12,17,29,.98));
@@ -1642,10 +1642,10 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 .toast.warn .t-ic{background:rgba(193,154,75,.24);color:#e8c88b}
 .toast.warn{border-color:rgba(193,154,75,.42)}
 
-/* в”Ђв”Ђ resume sheet в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── resume sheet ────────────────────────────────────────────
    A native confirm() is the one piece of chrome the candidate cannot be
    protected from, and it arrives before the shell has drawn a single frame.
-   This replaces it with the same glass the rest of the entrance is made of вЂ”
+   This replaces it with the same glass the rest of the entrance is made of —
    and, unlike the confirm(), it states plainly what "start fresh" destroys. */
 #ch-resume{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:24px;
   background:radial-gradient(900px 600px at 50% 36%,rgba(10,18,34,.72),rgba(3,5,11,.92));
@@ -1675,7 +1675,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 #ch-resume .ch-go:hover{filter:brightness(1.07);transform:translateY(-1px)}
 #ch-resume .btn:focus-visible{outline:2px solid rgba(180,208,255,.9);outline-offset:3px}
 
-/* в”Ђв”Ђ responsive в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── responsive ──────────────────────────────────────────────────────────── */
 @media (max-width:900px){
   .ch-grid{grid-template-columns:1fr}
   #stage-registration .start-card{max-width:540px}
@@ -1685,8 +1685,8 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   .ch-field{margin-top:20px}
   .ch-tasks{grid-template-columns:1fr}
 }
-/* Phones. The single thing that matters here is that the *action* вЂ” the name
-   field and the button, or Start listening вЂ” is not pushed below the fold by
+/* Phones. The single thing that matters here is that the *action* — the name
+   field and the button, or Start listening — is not pushed below the fold by
    the editorial half of the card. Everything above it gets compressed hard. */
 @media (max-width:600px){
   #stage-registration{padding:10px}
@@ -1739,7 +1739,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   .ch-credit{display:none}
   .ch-comp-head{flex-direction:column;align-items:flex-start;gap:12px}
 }
-/* Short laptops вЂ” 1280Г—720 and the like. */
+/* Short laptops — 1280×720 and the like. */
 @media (max-height:640px) and (min-width:601px){
   #stage-registration .ch-lede{display:none}
   #stage-listening-intro .trans-card{padding-top:24px;padding-bottom:22px}
@@ -1751,7 +1751,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   #stage-completion .complete-card{max-width:740px}
 }
 /* Ultra-wide / 5K. Almost every size in this shell is authored in px so it
-   holds its proportions against the exam's fixed Arial metrics вЂ” which means
+   holds its proportions against the exam's fixed Arial metrics — which means
    nothing grows on a 3440px display unless it is told to. Rather than let the
    card sit marooned in the middle of the screen, the whole scale steps up one
    notch. Widths still stop well short of the viewport: this is a dialogue,
@@ -1815,7 +1815,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 
 
 /* ======
-   DARK MODE вЂ” the exam screen
+   DARK MODE — the exam screen
    ----------------------------------------------------------------------------
    The Inspera-fidelity work hard-codes literal colours (#fff, #000,
    rgb(241,242,236) ...) which a variable flip cannot reach. This is the
@@ -1907,12 +1907,12 @@ body.dark-mode #sub-btn{background:var(--ex-panel-2);color:var(--ex-ink-2)}
 /* --- audio gate ---------------------------------------------------------- */
 body.dark-mode #ag-play-btn{background:var(--ex-panel-2)}
 
-/* the question body is flat in the real exam вЂ” no panel edge */
+/* the question body is flat in the real exam — no panel edge */
 body.dark-mode .q-card{background:transparent;border-color:var(--ex-line)}
 body.dark-mode .listening-content{background:transparent}
 
 /* ======
-   SEPIA вЂ” same root cause as dark mode.
+   SEPIA — same root cause as dark mode.
    It is one click away in the same Options menu, so it needs the same layer for
    the hard-coded Inspera literals, in a warm palette.
 body.theme-sepia{
@@ -1982,7 +1982,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 }
 
 /* ======
-   OPTIONS вЂ” the official full-screen replacement page, not a dropdown.
+   OPTIONS — the official full-screen replacement page, not a dropdown.
    Measured: div.options__candidateOptions 0,0,1440x900; the header and footer are
    removed from the layout; topbar 0,0,1440x80; h1 673.13,21,93.75x32 at 27.2px/400;
    #exitOptionsMenuButton 1360.02,0,66.66x66.66; content column 700px wide at x=370.
@@ -2020,7 +2020,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 #opt-page[data-view="root"] .opt-back{display:none}
 
 /* ======
-   SUBMISSION PAGE вЂ” reached from the deliver tick. Measured: the header grows to
+   SUBMISSION PAGE — reached from the deliver tick. Measured: the header grows to
    208 with an 88px TOC bar, the content area empties, the four-part footer stays,
    the deliver button turns #333/white, previous is enabled and next disabled.
 #hdr-toc{display:none;flex:0 0 auto;height:152px;box-sizing:border-box;background:#fff;
@@ -2037,7 +2037,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
 #toc-next:hover{background:#262626}
 
 /* ======
-   TIME-UP NOTICE вЂ” the practice product's own. The official Listening player has
+   TIME-UP NOTICE — the practice product's own. The official Listening player has
    no timer, and the file used to auto-submit silently at 40:00; it now warns.
 #time-up{position:absolute;inset:0;z-index:800;background:rgba(0,0,0,.7);display:none;
   align-items:center;justify-content:center}
@@ -2098,7 +2098,7 @@ body.review-mode .q-jump-btn:hover{background:#1c5c96;border-color:#1c5c96;color
 body.dark-mode.review-mode .q-jump-btn{color:#84b4ff;border-color:rgba(132,180,255,.35)}
 
 
-/* в”Ђв”Ђ ANSWER FEEDBACK CHIP в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── ANSWER FEEDBACK CHIP ──────────────────────────────────────────────────
    The badge states the verdict; the field beside it is green because it holds
    the CORRECT answer. Previously a loose glyph plus green text, which never
    said whether the green word was the learner's or the right one. */
@@ -2137,9 +2137,9 @@ body.dark-mode .feedback-pill .fb-no{background:#e1344f}
 body.theme-sepia .feedback-pill .fb-ans{color:#1f7a43}
 
 
-/* в”Ђв”Ђ NOTES SIDEBAR в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── NOTES SIDEBAR ───────────────────────────────────────────────────────── */
 /* measured: #annotations-sidebar 1140, 0, 300 x 900, background #E8E8E8. It DOCKS
-   and squeezes the exam to 1140px вЂ” it does not float. */
+   and squeezes the exam to 1140px — it does not float. */
 #notes-panel{
   position:fixed;right:0;top:0;width:300px;height:100%;
   display:none;flex-direction:column;z-index:55;
@@ -2190,7 +2190,7 @@ body.theme-sepia #notes-panel .np-close{background:var(--sp-panel);color:var(--s
 
 
 
-/* в”Ђв”Ђ MAP LETTER POOL: one vertical column в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── MAP LETTER POOL: one vertical column ────────────────────────────────── */
 .drag-pool-letters{
   display:flex !important;
   flex-direction:column;
@@ -2198,10 +2198,10 @@ body.theme-sepia #notes-panel .np-close{background:var(--sp-panel);color:var(--s
   gap:6px;
 }
 
-/* в”Ђв”Ђ RESULTS TOPBAR вЂ” chamber glass в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── RESULTS TOPBAR — chamber glass ──────────────────────────────────────
    The certificate below stays paper on purpose; only the bar is re-skinned. */
 #stage-results .topbar{
-  /* the brand span pins `color:var(--ink)` INLINE, which beats any rule here вЂ”
+  /* the brand span pins `color:var(--ink)` INLINE, which beats any rule here —
      so re-point the token instead of trying to out-specify the attribute */
   --ink:var(--ch-ink);
   background:linear-gradient(180deg,rgba(20,32,56,.88),rgba(11,19,36,.92));
@@ -2258,11 +2258,11 @@ body.theme-sepia #notes-panel .np-close{background:var(--sp-panel);color:var(--s
 }
 
 
-/* в”Ђв”Ђ RESULTS CERTIFICATE вЂ” DARK / SEPIA в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── RESULTS CERTIFICATE — DARK / SEPIA ─────────────────────────────────
    The certificate is a document, and a document is paper. REFERENCE_SPEC
-   В§9 is explicit: these CDI screens read as paper, with the dark chamber
+   §9 is explicit: these CDI screens read as paper, with the dark chamber
    behind them. The Writing Test Report Form never re-skins itself either,
-   so the two reports stay the same object under every theme вЂ” which also
+   so the two reports stay the same object under every theme — which also
    keeps the dark score panel reading against real paper instead of
    fighting a second dark surface.
    What the themes change is the ground and the topbar, and both are dark
@@ -2270,14 +2270,14 @@ body.theme-sepia #notes-panel .np-close{background:var(--sp-panel);color:var(--s
    still lifts off the chamber, and a warmer stock in sepia.             */
 body.dark-mode #stage-results .cert{
   /* the wrapper-theme rule further up paints every card #201b17; the
-     certificate opts out of it вЂ” it is paper in every theme */
+     certificate opts out of it — it is paper in every theme */
   background:var(--c-paper);border-color:var(--c-line);
   box-shadow:0 2px 6px rgba(0,0,0,.34),0 22px 52px -20px rgba(0,0,0,.62),0 62px 120px -50px rgba(0,0,0,.85);
 }
 body.dark-mode #stage-results .cert-logo .logo-mark,
 body.dark-mode #stage-results .topbar .logo-mark{box-shadow:0 6px 16px -6px rgba(0,0,0,.85)}
 
-/* sepia keeps the paper certificate вЂ” only the stock shifts warm */
+/* sepia keeps the paper certificate — only the stock shifts warm */
 body.theme-sepia #stage-results .cert,body.theme-sepia #print-report{
   --c-paper:#fffbef;--c-paper-2:#f5ecd6;
   --c-ink:#241c10;--c-ink-2:#5b4f3c;--c-ink-3:#8d8069;
@@ -2291,7 +2291,7 @@ body.theme-sepia #stage-results .cert-footer{background:linear-gradient(180deg,#
 body.theme-sepia #stage-results .answer-table tr.alt td{background:rgba(58,44,26,.028)}
 
 /* ======
-   CDI Materials вЂ” wrapper-stage visual layer (CSS)
+   CDI Materials — wrapper-stage visual layer (CSS)
    The canvas host, the boot hold-back and the stage-entrance choreography.
    Everything that depends on WebGL is scoped to `body.cdi-3d-on`, which the
    atmosphere module only adds after a context is successfully created; without
@@ -2320,7 +2320,7 @@ body.theme-sepia #stage-results .answer-table tr.alt td{background:rgba(58,44,26
    The stage is a stacking context here (`.stage.active{z-index:25}`), so an
    opaque stage background would bury the canvas at z-index 2. The stages go
    transparent and the identical gradient moves to the body, one layer below
-   the canvas вЂ” the exam screen is opaque and never sees it. */
+   the canvas — the exam screen is opaque and never sees it. */
 body.cdi-3d-on{
   background:
     transparent;
@@ -2328,13 +2328,13 @@ body.cdi-3d-on{
 body.cdi-3d-on :is(#stage-registration,#stage-listening-intro,#stage-completion,#stage-results){
   background:transparent;
 }
-/* the shader supplies its own grain вЂ” drop the paper-noise multiply overlay */
+/* the shader supplies its own grain — drop the paper-noise multiply overlay */
 body.cdi-3d-on :is(#stage-registration,#stage-listening-intro,#stage-completion,#stage-results)::before{
   display:none !important;
 }
 /* The vignette belongs UNDER the particle field. `.stage.active` is a stacking
    context in this file (z-index:25), so a ::after on the stage would paint over
-   the canvas and grey the whole field down вЂ” it moves to the body, one layer
+   the canvas and grey the whole field down — it moves to the body, one layer
    below the canvas, exactly where the Writing shell has it. */
 body.cdi-3d-on :is(#stage-registration,#stage-listening-intro,#stage-completion,#stage-results)::after{display:none}
 body.cdi-3d-on::after{
@@ -2433,8 +2433,8 @@ body.cdi-reduced .ch-cta{opacity:1;transform:none;pointer-events:auto}
    The ORIGINAL review architecture, kept exactly: the exam sheet stays where
    it is with its answers revealed, a transcript panel is docked to the right,
    and the transport that the exam withholds appears in the header.  Clicking a
-   timecode вЂ” the "в–¶ m:ss" beside a question, or the figure in the transcript
-   gutter вЂ” seeks the recording and pulls the transcript to that moment.
+   timecode — the "▶ m:ss" beside a question, or the figure in the transcript
+   gutter — seeks the recording and pulls the transcript to that moment.
    Nothing here moves; only the dressing changed, from the old blue-grey
    chamber to the warm paper, navy and gold the certificate is printed in.
 
@@ -2475,7 +2475,7 @@ body.theme-sepia.review-mode{
   --rv-panel-shadow:-18px 0 52px -26px rgba(80,60,30,.35);
 }
 
-/* в”Ђв”Ђ the docked transcript panel в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the docked transcript panel ─────────────────────────────────────────
    Same place, same width, same fixed dock as the original; new stock. */
 body.review-mode #transcript-panel{
   top:56px;
@@ -2486,7 +2486,7 @@ body.review-mode #transcript-panel{
   font-family:var(--pw-ui);
 }
 /* The scratch-notes rail docks by shifting #stage-listening 300px left, but the
-   panel is a body child pinned to the viewport, so it has to follow by hand вЂ”
+   panel is a body child pinned to the viewport, so it has to follow by hand —
    otherwise the notes cover 300px of transcript. */
 body.review-mode.notes-open #transcript-panel{right:300px}
 body.review-mode .tp-hdr{
@@ -2497,7 +2497,7 @@ body.review-mode .tp-hdr{
   border-bottom:1px solid var(--rv-line);
   position:relative;
 }
-/* the same navyв†’gold hairline that heads the certificate */
+/* the same navy→gold hairline that heads the certificate */
 body.review-mode .tp-hdr::after{
   content:"";position:absolute;left:0;right:0;top:0;height:2px;
   background:linear-gradient(90deg,var(--rv-navy),var(--rv-gold));
@@ -2535,7 +2535,7 @@ body.review-mode.audio-down .q-jump-btn{opacity:.5}
 body.review-mode .tp-fade-top{background:linear-gradient(to bottom,var(--rv-paper) 16%,transparent);height:56px}
 body.review-mode .tp-fade-bot{background:linear-gradient(to top,var(--rv-paper-2) 16%,transparent);height:64px}
 
-/* в”Ђв”Ђ one transcript line в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── one transcript line ─────────────────────────────────────────────── */
 body.review-mode .tp-item{
   padding:9px 18px 9px 15px;
   border-left:3px solid transparent;
@@ -2568,7 +2568,7 @@ body.review-mode .tp-t{
   padding:1px 6px;border-radius:999px;border:1px solid transparent;
   transition:color .14s,border-color .14s,background .14s;
 }
-body.review-mode .tp-t::before{content:"в–¶";font-size:6.5px;line-height:1;opacity:.7}
+body.review-mode .tp-t::before{content:"▶";font-size:6.5px;line-height:1;opacity:.7}
 body.review-mode .tp-item:hover .tp-t,
 body.review-mode .tp-item.tp-cur .tp-t{
   color:var(--rv-navy);border-color:color-mix(in srgb,var(--rv-navy) 34%,transparent);
@@ -2609,7 +2609,7 @@ body.review-mode .tp-br-lbl{
   color:var(--rv-ink-3);
 }
 
-/* в”Ђв”Ђ the review transport, in the header в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the review transport, in the header ──────────────────────────────────
    One control group, exactly where the original put it. Never shown in the
    exam: #pbar-audio is display:none unless body.review-mode is set. */
 body.review-mode #pbar-audio{
@@ -2669,7 +2669,7 @@ body.review-mode .speed-select:hover{border-color:var(--rv-navy)}
 body.review-mode #vol-slider::-webkit-slider-runnable-track{background:var(--rv-track)}
 body.review-mode #vol-slider::-webkit-slider-thumb{background:var(--rv-navy)}
 
-/* в”Ђв”Ђ the timecode beside each question вЂ” the jump в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the timecode beside each question — the jump ────────────────────────
    The single most valuable control on the screen, so it is a real button:
    a play glyph, the minute and second, and the verdict in its colour. */
 body.review-mode .q-jump-btn{
@@ -2684,7 +2684,7 @@ body.review-mode .q-jump-btn{
   cursor:pointer;vertical-align:middle;white-space:nowrap;
   transition:background .14s,border-color .14s,color .14s,box-shadow .14s;
 }
-body.review-mode .q-jump-btn::before{content:"в–¶";font-size:7.5px;line-height:1;opacity:.8}
+body.review-mode .q-jump-btn::before{content:"▶";font-size:7.5px;line-height:1;opacity:.8}
 body.review-mode .q-jump-btn:hover{
   background:var(--rv-navy);border-color:var(--rv-navy);color:var(--rv-navy-ink);
   box-shadow:0 3px 10px -5px color-mix(in srgb,var(--rv-navy) 80%,transparent);
@@ -2700,14 +2700,14 @@ body.review-mode .q-jump-btn.is-skipped:hover{background:var(--rv-ink-3);border-
 /* the moment the jump lands on, so the click is visibly answered */
 body.review-mode .q-jump-btn.is-jumping{box-shadow:0 0 0 3px color-mix(in srgb,var(--rv-navy) 22%,transparent)}
 
-/* Review borrows the exam sheet exactly as the exam leaves it вЂ” the text
+/* Review borrows the exam sheet exactly as the exam leaves it — the text
    column keeps its measured right margin, so nothing on it moves.
-   The "в†ђ Results" button the footer swaps in for Submit: */
+   The "← Results" button the footer swaps in for Submit: */
 body.review-mode #sub-btn{
   font-family:var(--pw-ui);font-weight:700;letter-spacing:-.005em;
 }
 
-/* в”Ђв”Ђ ported annotation UI в”Ђв”Ђ */
+/* ── ported annotation UI ── */
 .note-modal{
   position:absolute;z-index:10000;width:290px;background:var(--paper);
   border:1px solid var(--line-2);border-radius:10px;
@@ -2743,7 +2743,7 @@ body.review-mode #sub-btn{
 .note-modal .nm-btn.solid{background:var(--primary);border:1px solid var(--primary);color:#fff}
 .note-modal .nm-btn.solid:hover{background:var(--primary-2)}
 
-/* в”Ђв”Ђ pacing marker в”Ђв”Ђ */
+/* ── pacing marker ── */
 .pace-note{
   position:fixed;right:18px;bottom:78px;z-index:9998;display:flex;align-items:stretch;gap:0;
   max-width:330px;background:var(--paper);border:1px solid var(--line-2);border-radius:9px;
@@ -2760,7 +2760,7 @@ body.review-mode #sub-btn{
   padding:0 10px 0 6px;transition:color .12s}
 .pace-note .pn-x:hover{color:var(--ink)}
 
-/* в”Ђв”Ђ results: mark-loss analysis + attempt history в”Ђв”Ђ */
+/* ── results: mark-loss analysis + attempt history ── */
 #stage-results .v3-insight{
   border:1px solid var(--pw-line);border-radius:12px;padding:15px 17px 16px;margin:0 0 18px;
   background:linear-gradient(180deg,rgba(36,75,142,.035),transparent)}
@@ -2804,14 +2804,14 @@ body.review-mode #sub-btn{
 #stage-results .cause-tag.spelling{background:#e0f0fb;color:#1c5e8a}
 #stage-results .cause-tag.limit{background:#fde8d6;color:#8a4a1e}
 
-/* в”Ђв”Ђ stage transitions в”Ђв”Ђ */
+/* ── stage transitions ── */
 @keyframes pwStageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes pwStageOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-6px)}}
 @keyframes pwSoftIn{from{opacity:0}to{opacity:1}}
 #stage-registration.active,#stage-reading-intro.active,
 #stage-completion.active,#stage-results.active{
   animation:pwStageIn .44s cubic-bezier(.2,.75,.2,1) both}
-/* the exam screen fades only вЂ” no movement, nothing to distract */
+/* the exam screen fades only — no movement, nothing to distract */
 #stage-reading.active{animation:pwSoftIn .22s ease both}
 .stage.stage-leaving{
   display:flex!important;animation:pwStageOut .24s cubic-bezier(.4,0,1,1) both;pointer-events:none}
@@ -2826,7 +2826,7 @@ body.review-mode #sub-btn{
   #stage-results .v3-hbar i{transition:none!important}
 }
 
-/* в”Ђв”Ђ V3 pass 2: filters, timing, trap notes в”Ђв”Ђ */
+/* ── V3 pass 2: filters, timing, trap notes ── */
 #stage-results .v3-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
 #stage-results .v3-fchip{
   border:1px solid var(--pw-line);background:var(--pw-paper);border-radius:8px;
@@ -2848,21 +2848,21 @@ body.review-mode #sub-btn{
 
 #stage-results .q-bubble{transition:transform .12s,opacity .2s}
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-   V3 вЂ” POLISH ON THE REPLICA
+/* ═══════════════════════════════════════════════════════════════════
+   V3 — POLISH ON THE REPLICA
    Everything here is additive: motion, focus and feedback. No colour,
    size, position or wording that a student meets on exam day changes.
    The rule for anything in this block: if it would make someone
    surprised on the day, it does not belong here.
-   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+   ═══════════════════════════════════════════════════════════════════ */
 
 /* Options gain a hover and a press, which the real player lacks and which
-   nobody could be surprised by вЂ” it only ever confirms where the cursor is. */
+   nobody could be surprised by — it only ever confirms where the cursor is. */
 .option{transition:background .13s ease, box-shadow .13s ease}
 .option:hover{background:rgba(65,142,200,.07)}
 .option:active{background:rgba(65,142,200,.13)}
 
-/* Keyboard focus. Invisible to mouse users, essential for everyone else вЂ”
+/* Keyboard focus. Invisible to mouse users, essential for everyone else —
    the real player's focus states are close to unusable. */
 .option:focus-within{box-shadow:inset 0 0 0 2px rgba(65,142,200,.55);border-radius:3px}
 .gap-input:focus-visible,.dropdown:focus-visible,.q-pill:focus-visible,
@@ -2886,7 +2886,7 @@ body.review-mode #sub-btn{
   #passage-pane,#questions-pane{scroll-behavior:auto}
 }
 
-/* в”Ђв”Ђ notes drawer (mirrors the real player's Notes panel) в”Ђв”Ђ */.anno-drawer{
+/* ── notes drawer (mirrors the real player's Notes panel) ── */.anno-drawer{
   position:fixed;top:0;right:0;bottom:0;width:300px;max-width:86vw;z-index:9997;
   background:var(--panel);border-left:1px solid var(--line-2);
   display:flex;flex-direction:column;
@@ -2934,7 +2934,7 @@ body.anno-open #stage-listening{padding-right:300px;transition:padding-right .28
 @keyframes noteFlash{0%,100%{box-shadow:0 0 0 0 rgba(65,142,200,0)}25%{box-shadow:0 0 0 6px rgba(65,142,200,.32)}}
 @media (prefers-reduced-motion:reduce){.anno-drawer{transition:none!important}.hl.note-flash{animation:none!important}}
 
-/* в”Ђв”Ђ selection toolbar, identical to Reading's в”Ђв”Ђ */
+/* ── selection toolbar, identical to Reading's ── */
 /* ====
    HIGHLIGHTER + DICTIONARY POPUPS
 /* Real player's adder: white card, 1px #737373, 4px radius, icon-above-label
@@ -2949,7 +2949,7 @@ body.anno-open #stage-listening{padding-right:300px;transition:padding-right .28
   border:6px solid transparent;border-bottom-color:#fff;margin-bottom:-1px}
 .hl-popup::before{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
   border:7px solid transparent;border-bottom-color:#737373}
-/* Measured: the adder is 114.1 x 55 with just two buttons вЂ” Note 45.4 x 53 and
+/* Measured: the adder is 114.1 x 55 with just two buttons — Note 45.4 x 53 and
    Highlight 66.7 x 53. Clear is ours, and it only appears when the selection
    already sits on a highlight, so the resting toolbar matches the official one. */
 .hl-popup .tool-btn{min-width:45.4px;height:53px;border:none;background:transparent;cursor:pointer;
@@ -2980,7 +2980,7 @@ body.anno-open #stage-listening{padding-right:300px;transition:padding-right .28
   z-index:25;
 }
 
-/* в”Ђв”Ђ highlight + note colour, matched to Reading в”Ђв”Ђ */
+/* ── highlight + note colour, matched to Reading ── */
 .hl-y,.hl-g,.hl-p{background:#7D4A5A;color:#fff}
 body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6a;color:#fff}
 .hl-note{background:#7D4A5A;color:#fff;border-bottom:2px dashed #d4a017;cursor:pointer}
@@ -2989,9 +2989,9 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
   content:"";position:absolute;top:-3px;right:-3px;width:6px;height:6px;
   border-radius:50%;background:#d4a017;box-shadow:0 0 0 1.5px var(--paper)}
 
-/* в”Ђв”Ђ COSMIC DUST в†’ DEEP FIELD в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── COSMIC DUST → DEEP FIELD ─────────────────────────────────────────────
    The sky's own host, first child of body, under every wrapper stage. Shown
-   only while a wrapper stage is .active вЂ” the exam never carries it. The
+   only while a wrapper stage is .active — the exam never carries it. The
    CSS ground here is painted before the WebGL canvas fades up (and is the
    whole sky if WebGL is missing), so there is never a black frame. Colours
    are literal: html2canvas cannot read color-mix(). */
@@ -3008,18 +3008,18 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 @media print{#cdi-stars-host{display:none!important}}
 /* The particle prelude is retired: the field is the atmosphere now. */
 #ch-strike,#ch-bloom{display:none!important}
-/* в”Ђв”Ђ COSMOS В· the compact registration console в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-   DEEP FIELD В· the cards. Four glass panels floating over a photographic sky.
+/* ── COSMOS · the compact registration console ──────────────────────────────
+   DEEP FIELD · the cards. Four glass panels floating over a photographic sky.
    Nothing here touches the DOM: every id, class, label and handler on the
    registration, briefing and completion stages is untouched; this sheet only
    restyles and re-spaces them. Deleting this block restores the wide chamber
    card exactly.
 
    Rules of this sheet
-   В· literal rgba()/hex only вЂ” color-mix() breaks html2canvas 1.4.1 (the PDF)
-   В· every selector is scoped to a wrapper stage id; .btn/.btn-primary are
+   · literal rgba()/hex only — color-mix() breaks html2canvas 1.4.1 (the PDF)
+   · every selector is scoped to a wrapper stage id; .btn/.btn-primary are
      shared with the exam and must never be restyled bare
-   В· the glass recipe, the type scale and the button family are defined ONCE
+   · the glass recipe, the type scale and the button family are defined ONCE
      as custom properties on the three stages and read everywhere below, so
      the three cards cannot drift apart
 
@@ -3041,12 +3041,12 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
               0 12px 28px -12px rgba(0,0,0,.7),
               0 40px 90px -24px rgba(0,0,0,.85),
               0 110px 200px -60px rgba(0,0,0,.75);
-  /* ink вЂ” warm-neutral, tuned for в‰Ґ 7:1 on the glass */
+  /* ink — warm-neutral, tuned for ≥ 7:1 on the glass */
   --cx-ink:#f6f4ef;
   --cx-ink-2:#c6ccd8;
   --cx-ink-3:#aab4c4;
   --cx-ink-4:#7c889b;
-  /* the sun вЂ” the one accent every hover borrows */
+  /* the sun — the one accent every hover borrows */
   --cx-sun:#ffcf8a;
   --cx-sun-glow:0 0 0 1px rgba(255,200,120,.25),0 8px 30px rgba(255,170,80,.25);
   /* the one primary family: the blue the registration card already used */
@@ -3069,7 +3069,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 :is(#stage-registration,#stage-listening-intro,#stage-completion)::after{
   background:radial-gradient(80% 64% at 50% 42%,transparent 44%,rgba(2,3,8,.22) 78%,rgba(1,2,6,.58) 100%)}
 
-/* в”Ђв”Ђ the glass, once в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── the glass, once ─────────────────────────────────────────────────────── */
 #stage-registration .start-card,
 #stage-listening-intro .trans-card,
 #stage-completion .complete-card{
@@ -3079,7 +3079,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
   box-shadow:var(--cx-shadow);
   -webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
 
-/* the hairline of starlight along the top edge вЂ” warm, brightest just left of
+/* the hairline of starlight along the top edge — warm, brightest just left of
    centre, the way a panel catches a light source sitting upper-left */
 #stage-registration .start-card::before,
 #stage-listening-intro .trans-card::before,
@@ -3088,7 +3088,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
     rgba(255,250,240,.86) 44%,rgba(255,236,208,.44) 62%,rgba(255,244,228,.10) 90%,transparent)}
 
 /* the nebula bleeding through: rust from the top-left (where the sun sits),
-   oxygen-teal from the lower right. Painted UNDER the content вЂ” the base rule
+   oxygen-teal from the lower right. Painted UNDER the content — the base rule
    put it at z-index:0, which in the card's own stacking context is above the
    in-flow text. -1 paints it between the card background and the copy. */
 #stage-registration .start-card::after,
@@ -3101,7 +3101,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
              linear-gradient(115deg,rgba(255,255,255,.04),transparent 38%),
              linear-gradient(180deg,rgba(255,255,255,.025),transparent 26%)}
 
-/* в”Ђв”Ђ shared type в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── shared type ─────────────────────────────────────────────────────────── */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) :is(.start-title,.trans-title,.complete-title){
   font-family:var(--ch-display);font-weight:600;letter-spacing:-.026em;color:var(--cx-ink);line-height:1.06}
 
@@ -3120,7 +3120,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 :is(#stage-registration,#stage-listening-intro,#stage-completion) kbd{
   color:var(--cx-ink-2);border-color:rgba(255,240,220,.20);background:rgba(255,255,255,.04)}
 
-/* в”Ђв”Ђ the one button family в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── the one button family ───────────────────────────────────────────────── */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary{
   background:var(--cx-btn);
   border-radius:12px;
@@ -3141,7 +3141,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary:focus-visible{
   outline:2px solid rgba(255,214,160,.9);outline-offset:3px}
 
-/* dormant (name not yet valid): the SAME blue, at 55% and desaturated вЂ” clearly
+/* dormant (name not yet valid): the SAME blue, at 55% and desaturated — clearly
    not yet live, still unmistakably the primary action. No glow, no lift. */
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary:disabled,
 :is(#stage-registration,#stage-listening-intro,#stage-completion) .btn-primary.is-dormant{
@@ -3174,19 +3174,19 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
   height:48px;padding:0 22px;font-size:13.5px;font-weight:700;letter-spacing:.01em;
   border-radius:12px;margin-top:0}
 
-/* в”Ђв”Ђ the card's entrance (briefing / completion) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the card's entrance (briefing / completion) ─────────────────────────────
    goToStage re-adds .cdi-enter on every visit. The chamber's entrance only ran
    under body.cdi-3d-on, which no longer exists, so the cards simply popped. */
 @keyframes cxCardIn{from{opacity:0;transform:translate3d(0,16px,0) scale(.985)}to{opacity:1;transform:none}}
 #stage-listening-intro.cdi-enter .trans-card,
 #stage-completion.cdi-enter .complete-card{animation:cxCardIn .7s var(--ch-e) both}
 
-/* в”Ђв”Ђ REGISTRATION В· the console в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── REGISTRATION · the console ──────────────────────────────────────────────
    Two columns of copy became one small console, low on the frame, carrying
    only what a candidate needs in the ten seconds before they type their name.
    `margin:auto auto <n>`: the stage centres the card with auto margins, so
    leaving the top auto and pinning the bottom drops it without touching the
-   stage's own flex layout вЂ” and keeps it clear of the solar system, which the
+   stage's own flex layout — and keeps it clear of the solar system, which the
    sky places upper-left. */
 #stage-registration .start-card{
   max-width:600px;
@@ -3206,7 +3206,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 #stage-registration :is(.brand-tagline,.ch-lede,.start-rules,.ch-label,.input-label,
   .ch-credit,.channel-promo .channel-desc,.channel-promo .channel-cta){display:none}
 
-/* the hint is the field's error channel вЂ” hidden until it has something to say */
+/* the hint is the field's error channel — hidden until it has something to say */
 #stage-registration .ch-hint{display:none;margin:8px 2px 0}
 
 #stage-registration .ch-field.is-invalid .ch-hint{display:flex}
@@ -3223,7 +3223,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 
 #stage-registration .start-title{font-size:clamp(22px,2vw,28px);margin:7px 0 0!important;max-width:none}
 
-/* 40 В· 40 В· 4 as one line of reading, not a scoreboard */
+/* 40 · 40 · 4 as one line of reading, not a scoreboard */
 #stage-registration .start-meta{
   display:flex;flex-wrap:wrap;align-items:baseline;justify-content:flex-start;gap:5px 16px;
   margin:10px 0 0;padding:0;border:0;background:none;box-shadow:none}
@@ -3264,7 +3264,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
 #stage-registration .ch-fineprint{grid-column:1/-1;grid-row:2;text-align:left;
   margin:12px 2px 0;font-size:11px;line-height:1.5}
 
-/* в”Ђв”Ђ the Telegram strip: the same glass, a darker foot в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the Telegram strip: the same glass, a darker foot ───────────────────────
    A hairline above, a slightly deeper tint below it, the brand blue kept only
    on the icon. Registration and completion share it. */
 :is(#stage-registration,#stage-completion) .channel-promo{
@@ -3295,12 +3295,12 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#8f5a6
   #stage-registration .start-card{margin-bottom:16px}
 }
 
-/* в”Ђв”Ђ the briefing's vignette must still leave with it в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── the briefing's vignette must still leave with it ─────────────────────── */
 #stage-listening-intro::after{transition:opacity .24s ease}
 
 body.cdi-exit #stage-listening-intro::after{opacity:0}
 
-/* в”Ђв”Ђ BRIEFING в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── BRIEFING ────────────────────────────────────────────────────────────────
    Same width, same place on the frame as the registration console, so moving
    between the two screens the card stays put and only its contents change. */
 #stage-listening-intro .trans-card{
@@ -3351,7 +3351,7 @@ body.cdi-exit #stage-listening-intro::after{opacity:0}
   #stage-listening-intro .trans-card{margin-bottom:16px}
 }
 
-/* в”Ђв”Ђ COMPLETION в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── COMPLETION ──────────────────────────────────────────────────────────────
    The third screen in the same frame. The three marking steps stay: they tick
    as the paper is marked. The pep talk and the credit go. */
 #stage-completion .complete-card{
@@ -3370,11 +3370,11 @@ body.cdi-exit #stage-listening-intro::after{opacity:0}
 
 #stage-completion .ch-seal-pct{font-size:10.5px}
 
-/* the ring ran blue в†’ blue в†’ chamber red; the last stop goes to starlight */
+/* the ring ran blue → blue → chamber red; the last stop goes to starlight */
 #stage-completion #chSealGrad stop:last-child{stop-color:#cfe6ff}
 
 /* the moment: when the seal closes, a soft emerald ring blooms once around it
-   and settles to a faint halo. Pure CSS on a pseudo-element вЂ” the seal's own
+   and settles to a faint halo. Pure CSS on a pseudo-element — the seal's own
    JS (arc offset, percentage, .is-sealed) is untouched. */
 #stage-completion .ch-seal::after{
   content:"";position:absolute;inset:-7px;border-radius:50%;pointer-events:none;
@@ -3414,7 +3414,7 @@ body.cdi-exit #stage-listening-intro::after{opacity:0}
 
 #stage-completion .ch-wait{font-size:11.5px;color:var(--cx-ink-3)}
 
-/* в”Ђв”Ђ wide frames: the console steps up one notch, never towards the hero в”Ђв”Ђв”Ђв”Ђ */
+/* ── wide frames: the console steps up one notch, never towards the hero ──── */
 @media (min-width:1700px){
   #stage-registration .start-card,
   #stage-listening-intro .trans-card,
@@ -3427,7 +3427,7 @@ body.cdi-exit #stage-listening-intro::after{opacity:0}
   #stage-completion .ch-steps li{font-size:13px}
 }
 
-/* в”Ђв”Ђ short viewports (1280Г—640 and the like) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── short viewports (1280×640 and the like) ─────────────────────────────── */
 @media (max-height:700px){
   #stage-registration .start-card,
   #stage-listening-intro .trans-card,
@@ -3445,7 +3445,7 @@ body.cdi-exit #stage-listening-intro::after{opacity:0}
   #stage-completion .ch-steps li{margin-bottom:5px}
 }
 
-/* в”Ђв”Ђ reduced motion: nothing on the cards moves в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── reduced motion: nothing on the cards moves ────────────────────────────── */
 body.cdi-reduced :is(#stage-registration,#stage-listening-intro,#stage-completion) *,
 body.cdi-reduced :is(#stage-registration,#stage-listening-intro,#stage-completion) *::before,
 body.cdi-reduced :is(#stage-registration,#stage-listening-intro,#stage-completion) *::after,
@@ -3455,9 +3455,9 @@ body.cdi-reduced :is(#stage-registration,#stage-listening-intro,#stage-completio
 body.cdi-reduced #stage-completion .ch-seal::after{opacity:0}
 body.cdi-reduced #stage-completion.is-sealed .ch-seal::after{opacity:.75;transform:scale(1)}
 
-/* в”Ђв”Ђ the revealed answer wraps (review mode) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the revealed answer wraps (review mode) ────────────────────────────────
    .fb-ans inherits white-space:nowrap from the exam pill, and Listening never
-   overrode it for review the way Reading does вЂ” so a long accepted answer was
+   overrode it for review the way Reading does — so a long accepted answer was
    pinned to one line and ran past the pill instead of breaking. */
 body.review-mode .feedback-pill .fb-ans{
   font-family:inherit;
@@ -3470,10 +3470,10 @@ body.review-mode .feedback-pill .fb-ans{
 }
 body.review-mode .feedback-pill{align-items:center}
 
-/* в”Ђв”Ђ the timecode, in Cosmos в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-   The jump button keeps its shape, its play glyph and its tabular figures вЂ”
+/* ── the timecode, in Cosmos ────────────────────────────────────────────────
+   The jump button keeps its shape, its play glyph and its tabular figures —
    only the colour changes to the azure the rest of the Cosmos chrome uses.
-   Plain values, never color-mix(): html2canvas cannot parse color(srgb вЂ¦). */
+   Plain values, never color-mix(): html2canvas cannot parse color(srgb …). */
 body.review-mode .q-jump-btn{
   border:1px solid #c9d6ea;
   background:#fff;
@@ -3498,7 +3498,7 @@ body.review-mode .q-jump-btn.is-skipped{
 body.review-mode .q-jump-btn.is-skipped:hover{
   background:#44506a;border-color:#44506a;color:#fff}
 
-/* в”Ђв”Ђ the transcript panel, in Cosmos в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the transcript panel, in Cosmos ────────────────────────────────────────
    Built on --rv-* tokens, so re-pointing them inside its own scope re-skins
    the whole thing without touching one tp-* rule. Scoped to #transcript-panel
    on purpose: --rv-navy is also read by controls outside the panel. */
@@ -3523,7 +3523,7 @@ body.review-mode #transcript-panel{
  background:linear-gradient(180deg,transparent 40%,rgba(0,2,8,.06) 64%,rgba(0,2,8,.06));}
 @media print {#cdi-stars-host{display:none!important}}
 
-/* ASTRA В· coordinated wrapper palette. Never selects #stage-listening. */
+/* ASTRA · coordinated wrapper palette. Never selects #stage-listening. */
 body :is(#stage-registration,#stage-listening-intro,#stage-completion){
  --cx-glass:linear-gradient(145deg,rgba(12,25,45,.86),rgba(4,10,23,.92));
  --cx-edge:rgba(166,207,241,.30);--cx-edge-2:rgba(166,207,241,.23);
@@ -3593,9 +3593,9 @@ body #stage-results .topbar .btn:focus-visible{outline-color:#b4e3ff}
 /* The sky now owns its darkness; avoid dimming its blue dust and stars twice. */
 body :is(#stage-registration,#stage-listening-intro,#stage-completion)::after{background:none;}
 
-/* в”Ђв”Ђ the hand-off into the exam в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-   beginTest() already raises a curtain вЂ” body.cdi-exit, held before the stage
-   swap вЂ” but it was written for the three.js layer this build retires, so
+/* ── the hand-off into the exam ──────────────────────────────────────────────
+   beginTest() already raises a curtain — body.cdi-exit, held before the stage
+   swap — but it was written for the three.js layer this build retires, so
    CDIAtmosphere.dim() fades nothing and the field stayed lit until the frame
    the exam replaced it. These hang the curtain on the field instead. */
 #cdi-stars-host{transition:opacity .24s ease}
@@ -3612,8 +3612,8 @@ body.cdi-exit{background:#fff}
 body.cdi-exit [id$="-intro"]::after{opacity:0}
 
 /* the exam then fades up over that ground rather than appearing between two
-   frames. Opacity only вЂ” nothing that moves type a candidate is about to
-   read вЂ” and it ends at 1, so the exam looks exactly as it always did. */
+   frames. Opacity only — nothing that moves type a candidate is about to
+   read — and it ends at 1, so the exam looks exactly as it always did. */
 @keyframes cdiExamIn{from{opacity:0}to{opacity:1}}
 #stage-listening.active{animation:cdiExamIn .2s ease both}
 
@@ -3626,18 +3626,18 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
    handler stays bound so Cmd/Ctrl+P still works. */
 #stage-results .topbar #results-print-btn,
 #results-print-btn{display:none!important}
-/* Writing carries a second one with no id вЂ” "Print them instead", in the
+/* Writing carries a second one with no id — "Print them instead", in the
    grading-error fallback beside "Download my answers as PDF". Matching on the
    handler rather than an id catches that one and any future sibling. */
 #stage-results button[onclick*="printReport"]{display:none!important}
 
 /* The results floor. This file only makes it transparent under body.cdi-3d-on,
-   a class the three.js layer sets вЂ” and this build retires that layer, so the
+   a class the three.js layer sets — and this build retires that layer, so the
    floor stayed opaque and the certificate sat on a grey slab instead of on the
    star field the way Reading's does. */
 #stage-results{background:transparent}
 
-/* в”Ђв”Ђ the certificate, in Cosmos в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the certificate, in Cosmos ──────────────────────────────────────────────
    Paper, not a black rectangle. What ties it to the field is temperature and
    light: the cream goes cool, the brown ink goes navy, and the sheet carries a
    deep wide shadow so it reads as lit paper held in front of the stars.
@@ -3652,7 +3652,7 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
   background:#fbfcff;
   border:1px solid rgba(255,255,255,.16);
   /* lit paper floating over the sky: a tight contact shadow, then a long,
-     wide, very soft one вЂ” the same family of shadow the glass cards carry */
+     wide, very soft one — the same family of shadow the glass cards carry */
   box-shadow:0 1px 3px rgba(2,6,20,.55),
              0 14px 30px -14px rgba(2,6,20,.7),
              0 0 90px -6px rgba(0,0,0,.55),
@@ -3660,14 +3660,14 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
              0 140px 240px -70px rgba(0,0,0,.8);
 }
 
-/* в”Ђв”Ђ the certificate, staged for export в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the certificate, staged for export ─────────────────────────────────────
    PDFX moves #results-content off-screen at the printed column width and reads
    computed styles off it. Two things must be true at that moment.
 
-   1 В· Nothing may still be animating. The sheet arrives in parts on a certPart
+   1 · Nothing may still be animating. The sheet arrives in parts on a certPart
        keyframe with `both` fill, so a section caught before its delay elapses
        is read at opacity 0 and exports blank.
-   2 В· The answer summary must keep its two columns. 180mm is narrow enough to
+   2 · The answer summary must keep its two columns. 180mm is narrow enough to
        trip the stacked rule, which doubles the sheet's height and forces the
        fit-to-page backstop to shrink the whole certificate. */
 #results-content.pdfx-stage *,
@@ -3679,7 +3679,7 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
    button, and nobody can press it there */
 #results-content.pdfx-stage .review-cta{display:none!important}
 
-/* в”Ђв”Ђ the answer record, two columns в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ── the answer record, two columns ─────────────────────────────────────────
    The card stays one card; the two tables sit inside it side by side. Twenty
    rows a column instead of forty in a line, which is most of what stops the
    certificate needing to be shrunk to fit a page. */
@@ -3691,7 +3691,7 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
   grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 #stage-results .answer-cols .answer-table{table-layout:fixed;width:100%}
 /* With table-layout:fixed and no widths declared, the five columns split the
-   track evenly вЂ” so "Accepted", which carries every permitted variant and is
+   track evenly — so "Accepted", which carries every permitted variant and is
    the only long text here, got the same room as "#". These proportions give it
    the space instead, which is what actually shortens the sheet: the wrapping
    was costing more height than the extra rows ever did. */
@@ -3708,14 +3708,14 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
 #results-content.pdfx-stage .answer-table th:nth-child(5),
 #results-content.pdfx-stage .answer-table td:nth-child(5){display:none}
 /* the second column opens on question 21, which the generator marks as a part
-   break вЂ” a rule across the top of a column is just a stray line */
+   break — a rule across the top of a column is just a stray line */
 #stage-results .answer-cols .answer-table tbody tr:first-child.pbreak{
   border-top:0;box-shadow:none}
 @media (max-width:820px){
   #stage-results .answer-cols{grid-template-columns:1fr}
 }
-/* в”Ђв”Ђ the results topbar: glass over the field в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-   56px, the same recipe as the three cards вЂ” an 18px blur that lets the star
+/* ── the results topbar: glass over the field ───────────────────────────────
+   56px, the same recipe as the three cards — an 18px blur that lets the star
    field bleed through, a starlight hairline underneath, a warm highlight along
    the top edge. The brand span pins `color:var(--ink)` inline, so the token is
    re-pointed rather than out-specified. */
@@ -3777,15 +3777,15 @@ body.cdi-exit [id$="-intro"]::after{opacity:0}
 /* reduced motion: the pills do not move */
 body.cdi-reduced #stage-results .topbar .btn{transition:none!important;transform:none!important}
 
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-   REVIEW MODE, RE-SKINNED вЂ” READING_CDI
+/* ══════════════════════════════════════════════════════════════════════
+   REVIEW MODE, RE-SKINNED — READING_CDI
    The transcript panel and the transport strip were drawn in the retired
    certificate palette: cream paper, navy and gold, a display serif. They now
-   read from the same skin as the exam itself вЂ” white paper, grey rules, Arial,
+   read from the same skin as the exam itself — white paper, grey rules, Arial,
    and IELTS red as the single accent. Nothing structural changes; every rule
    below only re-points a token the original review CSS already uses, so the
    layout, the sync and the timecodes are untouched.
-   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+   ══════════════════════════════════════════════════════════════════════ */
 body.review-mode{
   --pw-ui:var(--sans); --pw-display:var(--sans);
   --rv-ink:#0d0d0d; --rv-ink-2:#1f1f1f; --rv-ink-3:#666666; --rv-ink-4:#999999;
@@ -3834,7 +3834,7 @@ body.review-mode .tp-item.tp-cur{border-left-color:var(--rv-navy)}
 body.review-mode .tp-item:not(.tp-break):hover{background:color-mix(in srgb,var(--rv-navy) 6%,transparent)}
 body.review-mode .tp-item:not(.tp-break):focus-visible{outline-color:var(--rv-navy)}
 
-/* в”Ђв”Ђ the transport strip в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── the transport strip ─────────────────────────────────────────────── */
 body.review-mode .seek-btn{
   border-radius:var(--radius);border:1px solid var(--rv-line-2);
   background:var(--rv-paper);color:var(--rv-ink-2);font-weight:700}

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" data-test="m13">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Listening &mdash; Full Mock</title>
+<!-- No script is loaded from a CDN. html2canvas and jsPDF used to be pulled in
+     here and were never called by anything; offline they only delayed the boot.
+     The score report is produced by the browser's own print engine instead
+     (see printStylesheet / saveReportPDF), which is vector, selectable and
+     exactly A4 — and works with no network at all. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add("mock-embed");</script>
+<link rel="stylesheet" href="css/listening.css">
+
+</head>
+<body class="pre-entry">
+
+<!-- ============================================================
+     ENTRY — the recording is preloaded on Start
+     ============================================================ -->
+<div id="entry-overlay">
+  <div class="entry-top">
+    <svg class="hdr-logo" viewBox="0 0 100 100" role="img" aria-label="Logo" focusable="false"><rect width="100" height="100" fill="#b80000"/><polygon points="16,17.5 71,17.5 16,71" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="miter"/><polygon points="84,29 84,81 30,81" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="miter"/></svg>
+    <span class="entry-top-title">Listening &mdash; Listening Test</span>
+  </div>
+  <div class="entry-card">
+    <div class="entry-inner" id="entry-form">
+      <div class="st-label">Instructions</div>
+      <ul class="st-list">
+        <li>Practice first without dictionaries</li>
+        <li>After completing exam, review your mistakes</li>
+        <li>You can use answer location and explanations to understand why is this</li>
+        <li>You can use vocabularies section to learn new words</li>
+      </ul>
+      <div class="st-label">Note</div>
+      <ul class="st-list">
+        <li>We strongly recommend completing the exam without ChatGPT or other third-party tools.</li>
+        <li>If you use a study tool, copy only the specific sentence or short excerpt you need.</li>
+        <li>Do not copy entire passages or question sets, or take repeated screenshots of test content.</li>
+        <li>Normal note-taking and copying a small excerpt for review are allowed.</li>
+      </ul>
+      <hr class="st-hr">
+      <button class="entry-btn" id="entry-start" type="button">Start Test</button>
+    </div>
+    <div class="entry-inner" id="entry-loading" hidden>
+      <h1 class="entry-title">Preparing your test&hellip;</h1>
+      <div class="entry-sub" id="entry-loading-sub">Loading the recording for Listening Test</div>
+      <div class="entry-progress-track"><div class="entry-progress-fill" id="entry-progress-fill"></div></div>
+      <div class="entry-progress-label" id="entry-progress-label">0%</div>
+    </div>
+  </div>
+  </div>
+
+
+<div class="stage active" id="stage-listening">
+  <div id="hdr">
+    <div id="hdr-left">
+      <svg class="hdr-logo" viewBox="0 0 100 100" role="img" aria-label="Logo" focusable="false"><rect width="100" height="100" fill="#b80000"/><polygon points="16,17.5 71,17.5 16,71" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="miter"/><polygon points="84,29 84,81 30,81" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="miter"/></svg>
+      <div class="hdr-titleblock">
+        <div class="hdr-title" id="hdr-name">Listening &mdash; Listening Test</div>
+        <div class="hdr-subline">
+          <span id="hdr-clock"><span id="timer-listening">40 minutes remaining</span></span>
+          <span class="ttid-sub-inline" id="audio-hdr-badge"></span>
+        </div>
+      </div>
+    </div>
+    <div id="hdr-right">
+      <button class="hdr-icon-btn" id="wifi-btn" aria-label="Connected">
+        <span class="hdr-conn-status" id="hdr-conn-status"></span>
+        <span class="hdr-icon"><svg class="fa-glyph" width="27.4297" height="24" viewBox="0 0 2048 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75zM1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z"/></g></svg></span>
+      </button>
+      <button class="hdr-icon-btn" id="fs-btn" type="button" title="Full screen" aria-label="Toggle full screen" onclick="ExamApp.toggleFullscreen()">
+        <span class="hdr-icon"><svg class="fs-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5h6v6M9.5 20.5h-6v-6M20.5 3.5 13.2 10.8M3.5 20.5l7.3-7.3"/></svg><svg class="fs-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 9.5h-6v-6M3.5 14.5h6v6M14.5 9.5l7-7M2.5 21.5l7-7"/></svg></span>
+      </button>
+      <button class="hdr-icon-btn" id="vol-btn" type="button" title="Volume" aria-label="Volume" aria-expanded="false">
+        <span class="hdr-icon"><svg viewBox="0 0 26 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 9h4.2L13 4.2v15.6L7.2 15H3z"/><path d="M17.2 8.4a5.2 5.2 0 0 1 0 7.2"/></svg></span>
+      </button>
+      <div id="vol-pop" role="dialog" aria-label="Volume"><input type="range" id="vol-slider-hdr" min="0" max="1" step="0.05" value="1" aria-label="Volume"></div>
+      <div id="menu-wrap">
+        <button class="hdr-icon-btn" id="menu-btn" onclick="LSN.openOptions()" aria-label="Options"><span class="hdr-icon"><svg class="fa-glyph" width="20.5781" height="24" viewBox="0 0 1536 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z"/></g></svg></span></button>
+      </div>
+      <button class="hdr-icon-btn" id="notes-btn" onclick="LSN.toggleNotes()" aria-label="Show notes">
+        <span class="hdr-icon"><svg class="fa-glyph" width="24" height="24" viewBox="0 0 1792 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M888 352l116 116l-152 152l-116 -116v-56h96v-96h56zM1328 1072q-16 16 -33 -1l-350 -350q-17 -17 -1 -33t33 1l350 350q17 17 1 33zM1408 478v-190q0 -119 -84.5 -203.5t-203.5 -84.5h-832q-119 0 -203.5 84.5t-84.5 203.5v832q0 119 84.5 203.5t203.5 84.5h832q63 0 117 -25q15 -7 18 -23q3 -17 -9 -29l-49 -49q-14 -14 -32 -8q-23 6 -45 6h-832q-66 0 -113 -47t-47 -113v-832q0 -66 47 -113t113 -47h832q66 0 113 47t47 113v126q0 13 9 22l64 64q15 15 35 7t20 -29zM1312 1216l288 -288l-672 -672h-288v288zM1756 1084l-92 -92l-288 288l92 92q28 28 68 28t68 -28l152 -152q28 -28 28 -68t-28 -68z"/></g></svg></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- submission page: the header grows by an 88px table-of-contents bar -->
+  <div id="hdr-toc">
+    <div class="toc-row">
+      <span class="toc-msg">Click next to continue</span>
+      <button type="button" id="toc-next" onclick="LSN.submitConfirm()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 2 2 10l7.2 2.8L12 20l10-18z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M22 2 9.2 12.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Next</button>
+    </div>
+  </div>
+
+  <div id="listening-area">
+    <div class="listening-content">
+
+      <div id="pbar">
+        <div id="pbar-inner">
+          <div id="pbar-info">
+            <h2 id="pbar-title">Part 1</h2>
+            <p id="pbar-desc">Listen and answer questions 1–40.</p>
+          </div>
+        </div>
+        <!-- REVIEW-MODE ONLY. Every control below is one the official player
+             deliberately withholds during the exam (§3): it lives outside
+             #pbar-inner so it cannot touch the rubric block's geometry, and it is
+             display:none unless body.review-mode is set. -->
+        <div id="pbar-audio">
+            <span id="audio-state-badge">◌ LOADING</span>
+            <button class="seek-btn" onclick="ExamApp.seekAudio(-10)" title="Rewind 10s">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>10s
+            </button>
+            <button class="pp-btn" id="pp-btn" onclick="ExamApp.togglePlayPause()" title="Play / Pause">▶</button>
+            <button class="seek-btn" onclick="ExamApp.seekAudio(10)" title="Skip 10s">
+              10s<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            </button>
+            <div id="audio-progress-track">
+              <div id="audio-click-overlay"></div>
+              <div id="audio-buffered"></div>
+              <div id="audio-progress-fill"></div>
+            </div>
+            <span id="audio-time-display">00:00 / 00:00</span>
+            <span style="font-size:13px;opacity:.5;flex-shrink:0">🔊</span>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="1" oninput="ExamApp.setVolume(this.value)" title="Volume">
+            <select id="speed-select" class="speed-select" onchange="ExamApp.setPlaybackRate(this.value)" title="Speed">
+              <option value="0.5">0.5×</option>
+              <option value="0.75">0.75×</option>
+              <option value="1" selected>1×</option>
+              <option value="1.25">1.25×</option>
+              <option value="1.5">1.5×</option>
+          </select>
+        </div>
+        <!-- ===== EDIT PER TEST · AUDIO (BUILD_INSTRUCTIONS.md §3): replace the src URL below with the new MP3 ===== -->
+        <audio id="exam-audio" preload="auto" style="display:none">
+          <source src="https://raw.githubusercontent.com/Shaxxriyor/new-listening-tests/main/test%2B22.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div id="listening-render"></div>
+    </div>
+  </div>
+
+  <div id="bnav">
+    <div id="listening-nav"></div>
+  </div>
+
+  <div id="qnav-arrows">
+    <button class="qnav-btn prev" onclick="ExamApp.prevSection()" title="Previous section" aria-label="Previous section">
+      <svg viewBox="0 0 448 512"><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8 .4 34.3z"></path></svg>
+    </button>
+    <button class="qnav-btn next" onclick="ExamApp.nextSection()" title="Next section" aria-label="Next section">
+      <svg viewBox="0 0 448 512"><path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path></svg>
+    </button>
+  </div>
+
+  <!-- ============================================================
+       EXAM SETTINGS — a centred dialog: Theme / Text Size / Audio Speed,
+       Report Issue, Leave Test Without Saving.
+       ============================================================ -->
+  <div id="set-overlay" aria-hidden="true">
+    <div id="set-modal" role="dialog" aria-modal="true" aria-labelledby="set-title">
+      <button type="button" class="set-x" onclick="LSN.closeOptions()" aria-label="Close settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <h2 id="set-title" class="set-h"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Exam Settings</span></h2>
+
+      <div class="set-sec">
+        <div class="set-lbl"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><span>Theme</span></div>
+        <div class="set-stack" role="radiogroup" aria-label="Theme">
+          <button type="button" class="set-opt" role="radio" data-theme-opt="light" onclick="LSN.setContrast('light')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><span>Light</span></button>
+          <button type="button" class="set-opt" role="radio" data-theme-opt="dark" onclick="LSN.setContrast('dark')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span>Dark</span></button>
+          <button type="button" class="set-opt" role="radio" data-theme-opt="system" onclick="LSN.setContrast('system')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>System</span></button>
+        </div>
+      </div>
+
+      <div class="set-sec">
+        <div class="set-lbl"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg><span>Text Size</span></div>
+        <div class="set-stack" role="radiogroup" aria-label="Text size">
+          <button type="button" class="set-opt size-regular" role="radio" data-size-opt="regular" onclick="LSN.setTextSize('regular')"><span>Default</span></button>
+          <button type="button" class="set-opt size-large" role="radio" data-size-opt="large" onclick="LSN.setTextSize('large')"><span>Large</span></button>
+          <button type="button" class="set-opt size-xlarge" role="radio" data-size-opt="xlarge" onclick="LSN.setTextSize('xlarge')"><span>Extra Large</span></button>
+        </div>
+      </div>
+
+      <div class="set-sec">
+        <div class="set-lbl"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg><span>Audio Speed</span></div>
+        <div class="set-row" role="radiogroup" aria-label="Audio speed">
+          <button type="button" class="set-opt" role="radio" data-rate-opt="0.75" onclick="LSN.setRate(0.75)"><span>0.75x</span></button>
+          <button type="button" class="set-opt" role="radio" data-rate-opt="1" onclick="LSN.setRate(1)"><span>Normal</span></button>
+          <button type="button" class="set-opt" role="radio" data-rate-opt="1.25" onclick="LSN.setRate(1.25)"><span>1.25x</span></button>
+          <button type="button" class="set-opt" role="radio" data-rate-opt="1.5" onclick="LSN.setRate(1.5)"><span>1.5x</span></button>
+          <button type="button" class="set-opt" role="radio" data-rate-opt="2" onclick="LSN.setRate(2)"><span>2x</span></button>
+        </div>
+        <p class="set-note">Playback speed only affects practice audio.</p>
+      </div>
+
+      <button type="button" class="set-card set-report" onclick="LSN.reportIssue()">
+        <span class="set-card-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4M12 17h.01"/></svg><b>Report Issue</b></span>
+        <span class="set-card-s">Tell us if something is missing, broken, or incorrect.</span>
+      </button>
+      <button type="button" class="set-card set-leave" onclick="LSN.leaveTest()">
+        <span class="set-card-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><b>Leave Test Without Saving</b></span>
+        <span class="set-card-s">Return to the tests page.</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages: an empty white full-screen page with the standard chrome. -->
+  <div id="msg-page" class="opt-page-like" role="dialog" aria-label="Messages">
+    <div class="opt-topbar">
+      <h1>Messages</h1>
+      <button type="button" class="opt-close" onclick="LSN.closeMessages()" aria-label="Close messages">&#10005;</button>
+    </div>
+  </div>
+
+  <div id="time-up" role="dialog" aria-modal="true" aria-label="Time is up">
+    <div class="tu-card">
+      <h2>Time is up</h2>
+      <p id="tu-msg">Your practice test time has run out. Your answers will now be submitted.</p>
+      <button type="button" onclick="LSN.timeUpAck()">Submit my answers</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ============================================================
+     RESULTS — score, band and the full answer key
+     ============================================================ -->
+<div class="stage" id="stage-results">
+  <div class="xr-hdr">
+    <svg class="xr-logo" viewBox="0 0 100 100" role="img" aria-label="Logo" focusable="false"><rect width="100" height="100" fill="#b80000"/><polygon points="16,17.5 71,17.5 16,71" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="miter"/><polygon points="84,29 84,81 30,81" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="miter"/></svg>
+    <span class="xr-title">Listening &mdash; Listening Test</span>
+    <span class="xr-rem" id="xr-rem">0 seconds remaining</span>
+  </div>
+  <div class="xr-bar">Exam Results</div>
+  <div class="results-content" id="results-content"></div>
+</div>
+
+<!-- ============================================================
+     OVERLAYS
+     ============================================================ -->
+<!-- integrity overlay removed -->
+</div>
+
+<!-- RESUME SHEET — replaces the browser confirm() -->
+<!-- ch-resume removed: a reload restarts the paper -->
+
+<div id="hl-popup" class="hl-popup">
+  <button type="button" class="tool-btn note" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Note">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 3h14a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-7l-5.2 3.9a.6.6 0 0 1-1-.5V18H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"/><circle cx="7.6" cy="10.5" r="1.35" fill="#fff"/><circle cx="12" cy="10.5" r="1.35" fill="#fff"/><circle cx="16.4" cy="10.5" r="1.35" fill="#fff"/></svg>
+    <span>Note</span>
+  </button>
+  <button type="button" class="tool-btn hilite" onmousedown="event.preventDefault(); ExamApp.applyHighlight('hl-y')" title="Highlight">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.6 2.8l6.6 6.6a1 1 0 0 1 0 1.4l-7.4 7.4a1 1 0 0 1-1.4 0l-1-1-3.4 3.4H3.6l-.6-.6 1.2-3.4-.6-.6a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0z"/><rect x="2" y="21" width="20" height="2" fill="currentColor"/></svg>
+    <span>Highlight</span>
+  </button>
+  <button type="button" class="tool-btn remove" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Remove">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5h17"/><path d="M9 6.5V4.2c0-.4.3-.7.7-.7h4.6c.4 0 .7.3.7.7v2.3"/><path d="M5.8 6.5l.9 13.1c.1.5.5.9 1 .9h8.6c.5 0 .9-.4 1-.9l.9-13.1"/><path d="M10 10.5v6.2M14 10.5v6.2"/></svg>
+    <span>Remove</span>
+  </button>
+  <button type="button" class="tool-btn addnote" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Add Note">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="3" width="13" height="18" rx="2"/><path d="M10.5 3v18"/><path d="M3 7.5h3.5M3 12h3.5M3 16.5h3.5"/></svg>
+    <span>Add Note</span>
+  </button>
+</div>
+
+<!-- ============================================================
+     AUDIO GATE - pre-play overlay (real exam parity)
+     ============================================================ -->
+<div id="audio-gate" role="dialog" aria-modal="true" aria-label="Audio"><div id="audio-gate-inner"><svg class="ag-hp" width="104" height="112" viewBox="0 0 1664 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1664 650q0 -166 -60 -314l-20 -49l-185 -33q-22 -83 -90.5 -136.5t-156.5 -53.5v-32q0 -14 -9 -23t-23 -9h-64q-14 0 -23 9t-9 23v576q0 14 9 23t23 9h64q14 0 23 -9t9 -23v-32q71 0 130 -35.5t93 -95.5l68 12q29 95 29 193q0 148 -88 279t-236.5 209t-315.5 78t-315.5 -78t-236.5 -209t-88 -279q0 -98 29 -193l68 -12q34 60 93 95.5t130 35.5v32q0 14 9 23t23 9h64q14 0 23 -9t9 -23v-576q0 -14 -9 -23t-23 -9h-64q-14 0 -23 9t-9 23v32q-88 0 -156.5 53.5t-90.5 136.5l-185 33l-20 49q-60 148 -60 314q0 151 67 291t179 242.5t266 163.5t320 61t320 -61t266 -163.5t179 -242.5t67 -291z"/></g></svg><p>You will be listening to an audio clip during this test. You will not be permitted to pause or rewind the audio while answering the questions.</p><p>To continue, click Play.</p><button type="button" id="ag-play-btn" onclick="ExamApp.startGatedAudio()"><svg class="ag-pi" width="22.8594" height="26.6667" viewBox="0 0 1536 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M768 1408q209 0 385.5 -103t279.5 -279.5t103 -385.5t-103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103zM1152 585q32 18 32 55t-32 55l-544 320q-31 19 -64 1q-32 -19 -32 -56v-640q0 -37 32 -56q16 -8 32 -8q17 0 32 9z"/></g></svg><span class="caption">Play</span></button></div></div>
+<div id="note-modal" class="note-modal">
+  <div class="nm-head"><span class="nm-title">Note</span>
+    <button class="nm-x" onclick="ExamApp.closeNote()" title="Close">&times;</button></div>
+  <textarea id="note-textarea" class="nm-text" rows="4" placeholder="Write your note&hellip;"
+    onkeydown="if(event.key==='Escape'){ExamApp.closeNote();}if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){ExamApp.saveNote();}"></textarea>
+  <div class="nm-foot"><span class="nm-hint">&#8984;/Ctrl + Enter to save</span>
+    <div class="nm-actions"><button class="nm-btn ghost" onclick="ExamApp.deleteNote()">Delete</button>
+      <button class="nm-btn solid" onclick="ExamApp.saveNote()">Save</button></div></div>
+</div>
+<aside id="anno-drawer" class="anno-drawer" aria-label="Notes" aria-hidden="true">
+  <div class="nd-head"><span class="nd-title">Notes</span>
+    <button class="nd-x" onclick="ExamApp.toggleAnnoDrawer(false)" aria-label="Close notes">&times;</button></div>
+  <div class="nd-body" id="anno-drawer-body"></div>
+</aside>
+<div class="toast" id="toast"></div>
+
+
+
+<!-- ============================================================
+     NOTES  (header pencil).  Body-level so it is never trapped in the
+     stage's stacking context — same reason as the popups below.
+     ============================================================ -->
+<div id="notes-panel" role="dialog" aria-label="Notes">
+  <div class="np-hdr">
+    <span class="np-title">Notes</span>
+    <button type="button" class="np-close" onclick="toggleNotesPanel()" aria-label="Close notes">&times;</button>
+  </div>
+  <textarea id="notes-area" spellcheck="false" placeholder="Jot down names, numbers, spellings&#8230;"></textarea>
+  <div class="np-foot">Saved automatically &middot; not marked</div>
+</div>
+<!-- Header popups, lifted out of #stage-listening so they can sit above the
+     transcript panel. Both are position:fixed, so this does not move them. -->
+        <div id="menu-dropdown">
+          <div class="md-title">Text size</div>
+          <div class="md-row">
+            <span class="md-lbl">Smaller</span>
+            <button class="fsz-btn" onclick="ExamApp.zoomText(-1)">A−</button>
+            <button class="fsz-btn" onclick="ExamApp.zoomText(1)">A+</button>
+            <span class="md-lbl" style="min-width:0">Larger</span>
+          </div>
+          <div class="md-title">Volume</div>
+          <div class="md-row" style="gap:8px">
+            <button class="fsz-btn" onclick="ExamApp.setVolume(Math.max(0,(document.getElementById('exam-audio').volume||1)-.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Decrease volume">−</button>
+            <input type="range" id="menu-vol-slider" min="0" max="1" step="0.1" value="1" oninput="ExamApp.setVolume(this.value)" style="flex:1;cursor:pointer;accent-color:var(--primary);height:4px">
+            <button class="fsz-btn" onclick="ExamApp.setVolume(Math.min(1,(document.getElementById('exam-audio').volume||0)+.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Increase volume">+</button>
+          </div>
+          <div class="md-title">Theme</div>
+          <div class="md-row md-dots">
+            <div class="theme-dot active" data-theme="light" style="background:#ffffff" onclick="ExamApp.setTheme('light')" title="Light"></div>
+            <div class="theme-dot" data-theme="dark" style="background:#1c1c1c" onclick="ExamApp.setTheme('dark')" title="Dark"></div>
+            <div class="theme-dot" data-theme="sepia" style="background:#f5f0e8" onclick="ExamApp.setTheme('sepia')" title="Sepia"></div>
+          </div>
+          <button class="md-fs" onclick="ExamApp.toggleFullscreen()">⛶ Toggle full-screen</button>
+        </div>
+        <div id="notif-popup" class="notif-popup">
+          <div class="notif-popup-hdr">Messages</div>
+          <div class="notif-popup-body">No messages</div>
+        </div>
+<div id="transcript-panel"></div>
+
+
+<!-- The procedural galaxy that used to sit behind every stage was removed:
+     this is an exam paper, not a backdrop. -->
+
+
+
+
+
+
+
+
+<script src="js/bridge.js"></script>
+<script src="js/listening.js"></script>
+</body>
+</html>

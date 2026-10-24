@@ -1,5 +1,5 @@
 /*
- * IELTS X вЂ” buying a plan (assets/js/pricing.js, used by Price.html).
+ * IELTS X — buying a plan (assets/js/pricing.js, used by Price.html).
  * "Lock in ..." / "Get Tier 3 Access" open a small dialog: choose plan + months, we create an order
  * with a code, you pay (Uzcard / Humo / ...) and message the code on Telegram; an admin confirms and
  * your plan switches on automatically (or a payment provider's signed webhook does it).
@@ -44,7 +44,7 @@
     function onKey(e) { if (e.key === 'Escape') close(); }
     document.addEventListener('keydown', onKey);
     overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
-    box.textContent = 'LoadingвЂ¦';
+    box.textContent = 'Loading…';
 
     Promise.all([loadPlans(), loadUser()]).then(function (res) {
       var data = res[0], user = res[1];
@@ -53,7 +53,7 @@
 
       function render() {
         box.textContent = '';
-        var x = el('button', 'ixp-x', 'Г—'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = close;
+        var x = el('button', 'ixp-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = close;
         box.appendChild(x);
         box.appendChild(el('h2', null, 'Choose your plan'));
         box.appendChild(el('p', null, 'One-time payment, no auto-renewal.'));
@@ -86,9 +86,9 @@
 
       function showOrder(order, payment, who) {
         box.textContent = '';
-        var x = el('button', 'ixp-x', 'Г—'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = close; box.appendChild(x);
+        var x = el('button', 'ixp-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = close; box.appendChild(x);
         box.appendChild(el('h2', null, 'Your order'));
-        box.appendChild(el('p', null, order.planName + ' В· ' + order.months + (order.months === 1 ? ' month' : ' months') + ' В· ' + money(order.amount, order.currency)));
+        box.appendChild(el('p', null, order.planName + ' · ' + order.months + (order.months === 1 ? ' month' : ' months') + ' · ' + money(order.amount, order.currency)));
         box.appendChild(el('div', 'ixp-code', order.ref));
         box.appendChild(el('p', null, payment.instructions));
         var text = 'IELTSX order ' + order.ref + ' - ' + order.planName + ' ' + order.months + 'm - ' + who.email;
@@ -113,7 +113,9 @@
   }, true);
 
   if (new URLSearchParams(location.search).get('premium') === 'required') {
-    var bar = el('div', 'ixp-bar', 'That content is for Premium members. Pick a plan below to unlock it.');
+    var need = new URLSearchParams(location.search).get('plan');
+    var bar = el('div', 'ixp-bar', need === 'max' ? 'That content needs the Max plan. Pick Max below to unlock it.'
+      : 'That content is for Premium members. Pick a plan below to unlock it.');
     document.addEventListener('DOMContentLoaded', function () { document.body.prepend(bar); });
   }
 })();

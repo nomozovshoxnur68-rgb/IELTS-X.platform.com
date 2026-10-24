@@ -8,24 +8,24 @@
      here and were never called by anything; offline they only delayed the boot.
      The score report is produced by the browser's own print engine instead
      (see printStylesheet / saveReportPDF), which is vector, selectable and
-     exactly A4 вЂ” and works with no network at all. -->
+     exactly A4 — and works with no network at all. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/listening/css/style.css">
 
-<!-- vendored: html2canvas.min.js вЂ” embedded rather than linked, so the
+<!-- vendored: html2canvas.min.js — embedded rather than linked, so the
      download needs no connection -->
 <script src="/listening/js/vendor/html2canvas.min.js"></script>
 
-<!-- vendored: jspdf.umd.min.js вЂ” embedded rather than linked, so the
+<!-- vendored: jspdf.umd.min.js — embedded rather than linked, so the
      download needs no connection -->
 <script src="/listening/js/vendor/jspdf.umd.min.js"></script>
 </head>
 <body class="pre-entry">
 
 <!-- ====
-     ENTRY вЂ” candidate name, then the recording is preloaded
+     ENTRY — candidate name, then the recording is preloaded
 <div id="entry-overlay">
   <div class="entry-card">
     <div class="entry-inner" id="entry-form">
@@ -119,19 +119,19 @@
         <div id="pbar-inner">
           <div id="pbar-info">
             <h2 id="pbar-title">Part 1</h2>
-            <p id="pbar-desc">Listen and answer questions 1вЂ“10.</p>
+            <p id="pbar-desc">Listen and answer questions 1–10.</p>
           </div>
         </div>
         <!-- REVIEW-MODE ONLY. Every control below is one the official player
-             deliberately withholds during the exam (В§3): it lives outside
+             deliberately withholds during the exam (§3): it lives outside
              #pbar-inner so it cannot touch the rubric block's geometry, and it is
              display:none unless body.review-mode is set. -->
         <div id="pbar-audio">
-            <span id="audio-state-badge">в—Њ LOADING</span>
+            <span id="audio-state-badge">◌ LOADING</span>
             <button class="seek-btn" onclick="ExamApp.seekAudio(-10)" title="Rewind 10s">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>10s
             </button>
-            <button class="pp-btn" id="pp-btn" onclick="ExamApp.togglePlayPause()" title="Play / Pause">в–¶</button>
+            <button class="pp-btn" id="pp-btn" onclick="ExamApp.togglePlayPause()" title="Play / Pause">▶</button>
             <button class="seek-btn" onclick="ExamApp.seekAudio(10)" title="Skip 10s">
               10s<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
             </button>
@@ -141,17 +141,17 @@
               <div id="audio-progress-fill"></div>
             </div>
             <span id="audio-time-display">00:00 / 00:00</span>
-            <span style="font-size:13px;opacity:.5;flex-shrink:0">рџ”Љ</span>
+            <span style="font-size:13px;opacity:.5;flex-shrink:0">🔊</span>
             <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="1" oninput="ExamApp.setVolume(this.value)" title="Volume">
             <select id="speed-select" class="speed-select" onchange="ExamApp.setPlaybackRate(this.value)" title="Speed">
-              <option value="0.5">0.5Г—</option>
-              <option value="0.75">0.75Г—</option>
-              <option value="1" selected>1Г—</option>
-              <option value="1.25">1.25Г—</option>
-              <option value="1.5">1.5Г—</option>
+              <option value="0.5">0.5×</option>
+              <option value="0.75">0.75×</option>
+              <option value="1" selected>1×</option>
+              <option value="1.25">1.25×</option>
+              <option value="1.5">1.5×</option>
           </select>
         </div>
-        <!-- ===== EDIT PER TEST В· AUDIO (BUILD_INSTRUCTIONS.md В§3): replace the src URL below with the new MP3 ===== -->
+        <!-- ===== EDIT PER TEST · AUDIO (BUILD_INSTRUCTIONS.md §3): replace the src URL below with the new MP3 ===== -->
         <audio id="exam-audio" preload="auto" style="display:none">
           <source src="https://raw.githubusercontent.com/Shaxxriyor/premium-listening/main/TEST%207.mp3" type="audio/mpeg">
         </audio>
@@ -174,7 +174,7 @@
   </div>
 
   <!-- ====
-       OPTIONS вЂ” a full-screen replacement page. Three rows only:
+       OPTIONS — a full-screen replacement page. Three rows only:
        Go to submission page / Contrast / Text size, plus Close options.
        No volume, no playback speed, no theme picker, no full-screen toggle.
   <div id="opt-page" data-view="root" role="dialog" aria-label="Options">
@@ -242,7 +242,7 @@
 
 
 <!-- ====
-     RESULTS вЂ” score, band and the full answer key
+     RESULTS — score, band and the full answer key
 <div class="stage" id="stage-results">
   <div class="rs-top">
     <div class="rs-top-l">
@@ -290,7 +290,7 @@
   </div>
 </div>
 
-<!-- RESUME SHEET вЂ” replaces the browser confirm() -->
+<!-- RESUME SHEET — replaces the browser confirm() -->
 <!-- ch-resume removed: a reload restarts the paper -->
 
 <div id="hl-popup" class="hl-popup">
@@ -307,7 +307,7 @@
     <span>Clear</span>
   </button>
 </div>
-  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Erase">вЊ«</button>
+  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Erase">⌫</button>
 </div>
 
 <!-- ====
@@ -331,10 +331,10 @@
 
 <script src="/listening/js/ui.js"></script>
 
-<!-- в•ђв•ђ PDFX в•ђв•ђ the one-click PDF exporter, shared verbatim by the Writing,
+<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
      Listening and Reading tests. Inlined, so it works from a memory stick
      with the network off. See the header comment inside for what it does and
-     why it is not jsPDF + html2canvas. в•ђв•ђ -->
+     why it is not jsPDF + html2canvas. ══ -->
 
 <script src="/listening/js/exam-app.js"></script>
 <!-- ====
@@ -348,7 +348,7 @@
 <script src="/listening/js/shell.js"></script>
 <!-- ====
      NOTES  (header pencil).  Body-level so it is never trapped in the
-     stage's stacking context вЂ” same reason as the popups below.
+     stage's stacking context — same reason as the popups below.
 <div id="notes-panel" role="dialog" aria-label="Notes">
   <div class="np-hdr">
     <span class="np-title">Notes</span>
@@ -363,13 +363,13 @@
           <div class="md-title">Text size</div>
           <div class="md-row">
             <span class="md-lbl">Smaller</span>
-            <button class="fsz-btn" onclick="ExamApp.zoomText(-1)">Aв€’</button>
+            <button class="fsz-btn" onclick="ExamApp.zoomText(-1)">A−</button>
             <button class="fsz-btn" onclick="ExamApp.zoomText(1)">A+</button>
             <span class="md-lbl" style="min-width:0">Larger</span>
           </div>
           <div class="md-title">Volume</div>
           <div class="md-row" style="gap:8px">
-            <button class="fsz-btn" onclick="ExamApp.setVolume(Math.max(0,(document.getElementById('exam-audio').volume||1)-.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Decrease volume">в€’</button>
+            <button class="fsz-btn" onclick="ExamApp.setVolume(Math.max(0,(document.getElementById('exam-audio').volume||1)-.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Decrease volume">−</button>
             <input type="range" id="menu-vol-slider" min="0" max="1" step="0.1" value="1" oninput="ExamApp.setVolume(this.value)" style="flex:1;cursor:pointer;accent-color:var(--primary);height:4px">
             <button class="fsz-btn" onclick="ExamApp.setVolume(Math.min(1,(document.getElementById('exam-audio').volume||0)+.1).toFixed(1));document.getElementById('menu-vol-slider').value=document.getElementById('exam-audio').volume" title="Increase volume">+</button>
           </div>
@@ -379,7 +379,7 @@
             <div class="theme-dot" data-theme="dark" style="background:#1c1c1c" onclick="ExamApp.setTheme('dark')" title="Dark"></div>
             <div class="theme-dot" data-theme="sepia" style="background:#f5f0e8" onclick="ExamApp.setTheme('sepia')" title="Sepia"></div>
           </div>
-          <button class="md-fs" onclick="ExamApp.toggleFullscreen()">в›¶ Toggle full-screen</button>
+          <button class="md-fs" onclick="ExamApp.toggleFullscreen()">⛶ Toggle full-screen</button>
         </div>
         <div id="notif-popup" class="notif-popup">
           <div class="notif-popup-hdr">Messages</div>

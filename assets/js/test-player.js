@@ -1,4 +1,4 @@
-/* IELTSX — plays tests made in the admin panel: reading, listening (graded on the server) and writing. */
+/* IELTSX — plays what was made in the admin panel: reading, listening (graded on the server), writing, speaking and articles. */
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -22,11 +22,13 @@
     try { r = await fetch('/api/materials/' + encodeURIComponent(id), { credentials: 'same-origin' }); d = await r.json().catch(() => ({})); }
     catch (e) { return state('Cannot reach the server. Check your connection and <a href="">try again</a>.'); }
     if (r.status === 401) return state(`<h2>Please sign in</h2><p>Sign in to open this test.</p><a class="tp-btn" href="/login?next=${encodeURIComponent(location.pathname + location.search)}">Sign in</a>`);
-    if (r.status === 403) return state('<h2>★ Premium test</h2><p>This test is for Premium members.</p><a class="tp-btn" href="/Price">See plans</a>');
+    if (r.status === 403) return state(`<h2>🔒 Locked</h2><p>${esc(d.error || 'This content is for paid members.')}</p><a class="tp-btn" href="/Price?premium=required&next=${encodeURIComponent(location.pathname + location.search)}">Get Access</a>`);
     if (!r.ok) return state(`<h2>Test not found</h2><p>${esc(d.error || 'It may have been removed.')}</p><a class="tp-btn" href="/part/practice/reading">Browse tests</a>`);
     item = d.item; document.title = item.title + ' — IELTSX';
-    $('#tp-title').textContent = item.title; $('#tp-back').href = '/part/practice/' + item.type; $('#tp-back').textContent = '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
-    if (item.type === 'writing') renderWriting(); else renderExam();
+    $('#tp-title').textContent = item.title; const isArticle = item.type === 'article';
+    $('#tp-back').href = isArticle ? '/study/Tools/Articles' : '/part/practice/' + item.type;
+    $('#tp-back').textContent = isArticle ? '← Articles' : '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
+    if (item.type === 'writing') renderWriting(); else if (item.type === 'speaking') renderSpeaking(); else if (isArticle) renderArticle(); else renderExam();
   }
 
   /* ───────── timer ───────── */
@@ -139,6 +141,69 @@
     };
     document.querySelectorAll('.tp-tab').forEach((b) => b.addEventListener('click', () => { cur = Number(b.dataset.t); paint(); }));
     paint();
+  }
+
+  /* ───────── safe picture / text helpers ───────── */
+  const safeUrl = (u) => { u = String(u || '').trim(); return (/^\/(uploads|assets)\//.test(u) && !u.includes('..')) || /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : ''; };
+  // article text: blank line = new paragraph, "## Heading", "![caption](picture url)", "- item" lists
+  function richText(text) {
+    return String(text || '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean).map((b) => {
+      const img = /^!\[([^\]]*)\]\(([^)\s]+)\)$/.exec(b);
+      if (img && safeUrl(img[2])) return `<figure class="tp-fig"><img src="${esc(safeUrl(img[2]))}" alt="${esc(img[1])}" loading="lazy">${img[1] ? `<figcaption>${esc(img[1])}</figcaption>` : ''}</figure>`;
+      if (/^#{1,3}\s+/.test(b)) return `<h3 class="tp-group">${esc(b.replace(/^#{1,3}\s+/, ''))}</h3>`;
+      if (/^[-*]\s+/.test(b)) return '<ul>' + b.split('\n').map((l) => `<li>${esc(l.replace(/^[-*]\s+/, ''))}</li>`).join('') + '</ul>';
+      return `<p>${esc(b).replace(/\n/g, '<br>')}</p>`;
+    }).join('');
+  }
+
+  /* ───────── article ───────── */
+  function renderArticle() {
+    const d = item.data, cover = safeUrl(d.coverUrl);
+    main.innerHTML = `<article class="tp-article">${cover ? `<img class="tp-cover" src="${esc(cover)}" alt="" onerror="this.remove()">` : ''}
+      <div class="tp-chips"><span>${esc(d.passageLabel || 'Passage 1')}</span><span>${esc(d.topic || 'General')}</span>${d.source ? `<span>${esc(d.source)}</span>` : ''}${d.readMinutes ? `<span>${d.readMinutes} min read</span>` : ''}</div>
+      <h1>${esc(item.title)}</h1>${item.description ? `<p class="tp-lead">${esc(item.description)}</p>` : ''}
+      <div class="tp-body">${richText(d.body)}${(d.images || []).map((im) => safeUrl(im.url) ? `<figure class="tp-fig"><img src="${esc(safeUrl(im.url))}" alt="${esc(im.caption || '')}" loading="lazy">${im.caption ? `<figcaption>${esc(im.caption)}</figcaption>` : ''}</figure>` : '').join('')}</div>
+      <div class="tp-actions"><a class="tp-btn ghost" href="/study/Tools/Articles">← More articles</a></div></article>`;
+  }
+
+  /* ───────── speaking ───────── */
+  function renderSpeaking() {
+    const parts = item.data.parts || []; let cur = 0, rec = null, chunks = [], stream = null, cd = null;
+    main.innerHTML = `<div class="tp-tabs" role="tablist">${parts.map((t, i) => `<button class="tp-tab" role="tab" data-t="${i}" type="button">${esc(t.title)}</button>`).join('')}</div><div id="tp-s"></div>`;
+    const stopAll = () => { clearInterval(cd); cd = null; if (rec && rec.state !== 'inactive') rec.stop(); if (stream) stream.getTracks().forEach((x) => x.stop()); rec = null; stream = null; };
+    const paint = () => {
+      stopAll(); const t = parts[cur];
+      document.querySelectorAll('.tp-tab').forEach((b) => b.classList.toggle('active', Number(b.dataset.t) === cur));
+      const timers = (t.prepSeconds || t.speakSeconds) ? `<div class="tp-stimer"><div id="tp-cd" class="tp-cd">${clock(t.prepSeconds || t.speakSeconds)}</div><div class="btn-row">${t.prepSeconds ? `<button class="tp-btn ghost" data-sc="prep" type="button">Start ${Math.round(t.prepSeconds / 60) || 1}-min preparation</button>` : ''}${t.speakSeconds ? `<button class="tp-btn ghost" data-sc="speak" type="button">Start speaking (${Math.round(t.speakSeconds / 60) || 1} min)</button>` : ''}</div></div>` : '';
+      $('#tp-s').innerHTML = `<div class="tp-exam split"><section class="tp-pane"><h2>${esc(t.title)}</h2>
+        ${t.prompt ? `<div class="tp-cue">${esc(t.prompt).replace(/\n/g, '<br>')}</div>` : ''}
+        ${safeUrl(t.imageUrl) ? `<figure class="tp-fig"><img src="${esc(safeUrl(t.imageUrl))}" alt="" loading="lazy"></figure>` : ''}
+        ${(t.questions || []).length ? `<ol class="tp-sq">${t.questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>` : ''}${timers}</section>
+        <section class="tp-pane"><h3 class="tp-group">Practise out loud</h3><p class="tp-hint">Record yourself, then listen back. The recording stays on your device and is never uploaded.</p>
+        <div class="tp-actions"><button class="tp-btn" id="tp-rec" type="button">● Record</button><button class="tp-btn ghost" id="tp-stop" type="button" disabled>■ Stop</button></div>
+        <audio id="tp-play" controls hidden></audio><div id="tp-recmsg" class="tp-hint"></div>
+        ${safeUrl(t.audioUrl) ? `<details class="tp-trans"><summary>Listen to a model answer</summary><audio controls preload="none" src="${esc(safeUrl(t.audioUrl))}"></audio></details>` : ''}
+        ${t.hasSample ? '<div class="tp-actions"><button class="tp-btn ghost" id="tp-sample" type="button">Show model answer (text)</button></div><div id="tp-sample-box" class="tp-trans" hidden></div>' : ''}</section></div>`;
+      const msg = $('#tp-recmsg');
+      $('#tp-rec').onclick = async () => {
+        if (!navigator.mediaDevices || !window.MediaRecorder) { msg.textContent = 'Recording is not supported in this browser.'; return; }
+        try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { msg.textContent = 'Microphone access was blocked. Allow it in the browser address bar and try again.'; return; }
+        chunks = []; rec = new MediaRecorder(stream); rec.ondataavailable = (e) => chunks.push(e.data);
+        rec.onstop = () => { const a = $('#tp-play'); if (a && chunks.length) { a.src = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' })); a.hidden = false; } const st = $('#tp-stop'), rc = $('#tp-rec'); if (st) st.disabled = true; if (rc) rc.disabled = false; msg.textContent = ''; };
+        rec.start(); $('#tp-rec').disabled = true; $('#tp-stop').disabled = false; msg.textContent = 'Recording…';
+      };
+      $('#tp-stop').onclick = () => { if (rec && rec.state !== 'inactive') rec.stop(); if (stream) stream.getTracks().forEach((x) => x.stop()); };
+      document.querySelectorAll('[data-sc]').forEach((b) => b.addEventListener('click', () => {
+        let left = b.dataset.sc === 'prep' ? t.prepSeconds : t.speakSeconds; clearInterval(cd); const el = $('#tp-cd'); el.textContent = clock(left);
+        cd = setInterval(() => { left--; el.textContent = clock(Math.max(0, left)); if (left <= 0) { clearInterval(cd); try { new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=').play(); } catch (e) { /* silent */ } } }, 1000);
+      }));
+      const sb = $('#tp-sample'); if (sb) sb.onclick = async () => {
+        const box = $('#tp-sample-box'); if (!box.hidden) { box.hidden = true; return; }
+        try { const r = await fetch('/api/materials/' + encodeURIComponent(id) + '/sample', { credentials: 'same-origin' }); const d = await r.json(); const x = (d.samples || []).find((y) => y.id === t.id); box.innerHTML = '<strong>Model answer</strong><div>' + esc(x ? x.sample : '').replace(/\n/g, '<br>') + '</div>'; box.hidden = false; } catch (e) { alert('Could not load the model answer.'); }
+      };
+    };
+    document.querySelectorAll('.tp-tab').forEach((b) => b.addEventListener('click', () => { cur = Number(b.dataset.t); paint(); }));
+    window.addEventListener('pagehide', stopAll); paint();
   }
   load();
 })();

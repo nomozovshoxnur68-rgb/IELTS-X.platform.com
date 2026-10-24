@@ -1,5 +1,5 @@
 /*
- * IELTSX вЂ” Full Tests pages (assets/js/full-tests.js)
+ * IELTSX — Full Tests pages (assets/js/full-tests.js)
  *
  * One controller for all of:
  *   /full-tests/listening/   /full-tests/reading/   /full-tests/writing/   /full-tests/speaking/     (list of packs)
@@ -13,7 +13,8 @@
 
     var DATA = window.IELTSX_FULL_TESTS;
     var root = document.getElementById('ft-root');
-    if (!DATA || !root) return;
+    var A = window.IELTSXAccess;
+    if (!DATA || !root || !A) return;
 
     var SKILL = root.getAttribute('data-skill') || '';
     var VIEW = root.getAttribute('data-view') || 'list';
@@ -33,7 +34,7 @@
     if (!info) { root.innerHTML = notFound('We could not find that section.', '/'); return; }
     var packSlug = VIEW === 'pack' ? decodeURIComponent(pathParts[2] || '').toLowerCase() : '';
 
-    /* в”Ђв”Ђ tiny helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+    /* ── tiny helpers ─────────────────────────────────────────────────────── */
     function esc(s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -68,19 +69,21 @@
         return '<div class="ft-empty"><p class="ft-empty-title">' + esc(message) + '</p><a class="ft-btn ft-btn-outline" href="' + esc(back) + '">Back</a></div>';
     }
 
-    /* в”Ђв”Ђ catalog + admin tests в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+    /* ── catalog + admin tests ────────────────────────────────────────────── */
     function buildPacks() {
         var packs = (DATA.packs[SKILL] || []).map(function (p) {
             return {
                 slug: p.slug, title: p.title, tier: p.tier || '', plan: p.plan || '', description: p.description || DATA.description,
-                tests: (p.tests || []).map(function (t) {
+                defLocked: !!p.premium, defPlan: A.planOf(p.minPlan) || 'standard',
+                tests: (p.tests || []).map(function (t, i) {
                     var c = Object.assign({}, t);
+                    c._i = i;
                     if (c.plan === undefined) c.plan = p.plan || '';
                     if (c.tier === undefined) c.tier = p.tier || '';
                     return c;
-                }).sort(function (a, b) { return (a.number || 0) - (b.number || 0); })
+                }).sort(function (a, b) { return ((a.number || 0) - (b.number || 0)) || (a._i - b._i); })
             };
-        });
+        }).map(function (p) { return A.assignKeys(SKILL, p); });
         return packs;
     }
 
@@ -90,15 +93,32 @@
             var slug = slugify(name);
             var pack = packs.filter(function (p) { return p.slug === slug || slugify(p.title) === slug; })[0];
             if (!pack) {
-                pack = { slug: slug, title: name, tier: '', plan: '', description: DATA.description, tests: [], extra: true };
+                pack = { slug: slug, title: name, tier: '', plan: '', description: DATA.description, defLocked: false, defPlan: 'standard', tests: [], extra: true };
+                A.assignKeys(SKILL, pack);
                 packs.push(pack);
             }
             pack.tests.push({
                 source: m.description || 'Added by IELTSX',
-                tags: [], href: '/test?id=' + encodeURIComponent(m.id), premium: !!m.premium, plan: m.premium ? 'MAX' : '',
-                adminTitle: m.title
+                tags: [], href: '/test?id=' + encodeURIComponent(m.id), premium: !!m.premium, plan: '',
+                adminTitle: m.title, material: true, key: 'mat:' + m.id,
+                rule: { locked: !!m.premium, plan: A.planOf(m.plan) || 'standard' }, allowed: !m.locked
             });
-            if (m.premium && !pack.plan) pack.plan = 'MAX';
+        });
+        return packs;
+    }
+
+    /* decide, for this visitor, what is free / locked (rules from the admin panel + catalog defaults + the visitor's plan) */
+    function applyAccess(packs, st) {
+        var rules = st.rules || {};
+        packs.forEach(function (p) {
+            p.rule = A.rule(rules[p.key], null, { locked: p.defLocked, plan: p.defPlan });
+            p.tests.forEach(function (t) {
+                if (t.material) return;                      // admin-made tests were decided by the server
+                t.rule = A.rule(rules[t.key], rules[p.key], { locked: t.premium === undefined ? p.defLocked : !!t.premium, plan: A.planOf(t.minPlan) || p.defPlan });
+                t.allowed = A.allows(t.rule, st.level);
+            });
+            // a pack opens when the pack itself is open to this visitor or at least one of its tests is
+            p.open = A.allows(p.rule, st.level) || p.tests.some(function (t) { return t.allowed; });
         });
         return packs;
     }
@@ -131,7 +151,7 @@
             .then(function (x) { clearTimeout(timer); return x; });
     }
 
-    /* в”Ђв”Ђ page shell bits: header breadcrumb, sidebar highlight, page title в”Ђв”Ђв”Ђ */
+    /* ── page shell bits: header breadcrumb, sidebar highlight, page title ─── */
     function setCrumbs(parts) {
         var nav = document.getElementById('ft-crumbs');
         if (!nav) return;
@@ -148,20 +168,26 @@
         if (a) { a.setAttribute('data-active', 'true'); a.setAttribute('aria-current', 'page'); }
     }
 
-    /* в”Ђв”Ђ badges в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+    /* ── badges ───────────────────────────────────────────────────────────── */
     function planBadge(plan) { return '<span class="ft-badge ft-badge-plan">' + ICON.crown + esc(plan) + '</span>'; }
     function tierBadge(tier) { return '<span class="ft-badge ft-badge-tier">' + esc(tier) + '</span>'; }
-    function levelBadge(plan, tier) { return tier ? tierBadge(tier) : (plan ? planBadge(plan) : ''); }
+    function freeBadge() { return '<span class="ft-badge ft-badge-free">Free</span>'; }
+    function accessBadge(rule) { return rule && rule.locked ? planBadge(A.label(rule.plan).toUpperCase()) : freeBadge(); }
+    function levelBadge(rule, tier) { return (tier ? tierBadge(tier) : '') + accessBadge(rule); }
+    function getAccess(href, cls) {
+        return '<a class="ft-btn ft-btn-access ' + (cls || '') + '" href="' + esc(href) + '" data-get-access>' + ICON.crown + 'Get Access</a>';
+    }
 
-    /* в”Ђв”Ђ LIST OF PACKS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+    /* ── LIST OF PACKS ────────────────────────────────────────────────────── */
     function packCard(p) {
         var n = p.tests.length;
         return '<article class="ft-card ft-pack">' +
             '<div class="ft-pack-top"><div class="ft-pack-name"><h3>' + esc(p.title) + '</h3><p>' + esc(info.word) + '</p></div>' +
-            (p.plan ? planBadge(p.plan) : '') + '</div>' +
+            accessBadge(p.rule) + '</div>' +
             '<p class="ft-pack-desc">' + esc(p.description) + '</p>' +
             '<div class="ft-pack-foot"><span class="ft-count">' + ICON.list + plural(n, 'test') + '</span>' +
-            '<a class="ft-btn ft-btn-outline" href="/full-tests/' + esc(SKILL) + '/' + esc(p.slug) + '">View Tests ' + ICON.right + '</a></div>' +
+            (p.open ? '<a class="ft-btn ft-btn-outline" href="/full-tests/' + esc(SKILL) + '/' + esc(p.slug) + '">View Tests ' + ICON.right + '</a>'
+                : getAccess(A.priceUrl(p.rule, '/full-tests/' + SKILL + '/' + p.slug))) + '</div>' +
             '</article>';
     }
 
@@ -181,7 +207,7 @@
             '</div>';
     }
 
-    /* в”Ђв”Ђ ONE PACK в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+    /* ── ONE PACK ─────────────────────────────────────────────────────────── */
     function doneSet() {
         var set = [];
         try {
@@ -203,9 +229,11 @@
         var more = tags.length > maxTags ? '<span class="ft-tag ft-tag-more">+' + (tags.length - maxTags) + ' more</span>' : '';
         var title = t.adminTitle || ('Test ' + (i + 1));
         var source = (info.sourcePrefix || '') + (t.source || '');
-        var badge = list ? levelBadge(t.plan || '', t.tier) : levelBadge(t.plan || '', t.tier);
+        var badge = levelBadge(t.rule, t.tier);
         var finished = t.done ? '<span class="ft-badge ft-badge-done">' + ICON.check + 'Completed</span>' : '';
-        var start = '<a class="ft-btn ft-btn-dark ft-start" href="' + esc(t.href || '#') + '"' + (t.premium ? ' data-premium="1"' : '') + '>' + ICON.play + (t.done ? 'Retake' : 'Start') + '</a>';
+        var start = t.allowed
+            ? '<a class="ft-btn ft-btn-dark ft-start" href="' + esc(t.href || '#') + '">' + ICON.play + (t.done ? 'Retake' : 'Start') + '</a>'
+            : getAccess(A.priceUrl(t.rule, location.pathname), 'ft-start');
         if (list) {
             return '<article class="ft-card ft-test ft-test-row"><div class="ft-test-main">' +
                 '<div class="ft-test-head"><h3>' + esc(title) + '</h3>' + badge + finished + '</div>' +
@@ -224,7 +252,7 @@
             root.innerHTML = '<div class="ft-wrap">' + notFound('This pack does not exist.', '/full-tests/' + SKILL + '/') + '</div>';
             return;
         }
-        document.title = 'IELTSX вЂ” ' + pack.title + ' В· ' + info.crumb;
+        document.title = 'IELTSX — ' + pack.title + ' · ' + info.crumb;
         setCrumbs([{ label: 'Home', href: '/' }, { label: info.crumb, href: '/full-tests/' + SKILL + '/' }, { label: pack.title }]);
 
         var done = doneSet();
@@ -235,7 +263,7 @@
         root.innerHTML =
             '<div class="ft-wrap">' +
             '<div class="ft-title ft-title-pack"><span class="ft-skill-icon ft-' + (SKILL === 'listening' ? 'blue' : info.color) + '">' + ICON.skill(30) + '</span><h1>' + esc(pack.title) + '</h1></div>' +
-            '<div class="ft-chips"><span class="ft-badge ft-badge-soft">' + esc(info.word) + '</span>' + levelBadge(pack.plan, pack.tier) + '</div>' +
+            '<div class="ft-chips"><span class="ft-badge ft-badge-soft">' + esc(info.word) + '</span>' + levelBadge(pack.rule, pack.tier) + '</div>' +
             '<div class="ft-toolbar">' +
             '<label class="ft-search"><span class="sr-only">Search tests</span>' + ICON.search + '<input id="ft-q" type="search" placeholder="Search tests..." autocomplete="off"></label>' +
             '<div class="ft-seg" role="group" aria-label="Filter"><button type="button" data-filter="all" aria-pressed="true">All Tests</button><button type="button" data-filter="completed" aria-pressed="false">Completed</button></div>' +
@@ -274,13 +302,17 @@
         root.addEventListener('click', function (e) {
             var v = e.target.closest('[data-view]'); if (v) { state.view = v.getAttribute('data-view'); store('ixft-view', state.view); draw(); return; }
             var f = e.target.closest('[data-filter]'); if (f) { state.filter = f.getAttribute('data-filter'); draw(); return; }
-            var s = e.target.closest('a.ft-start[data-premium]');
-            if (s && window.IELTSXPremium && !(e.metaKey || e.ctrlKey || e.shiftKey)) {
-                e.preventDefault();
-                window.IELTSXPremium.requirePremium(s.getAttribute('href'));
-            }
+        });
+        draw();
+    }
+
+    /* ── go ───────────────────────────────────────────────────────────────── */
+    markSidebar();
+    document.title = 'IELTSX — ' + info.title;
+    root.innerHTML = '<div class="ft-wrap"><div class="ft-skeleton" aria-busy="true"><span></span><span></span><span></span></div></div>';
+
+    Promise.all([loadAdmin(), A.load()]).then(function (res) {
+        var packs = applyAccess(mergeAdminTests(buildPacks(), res[0]), res[1]);
         if (VIEW === 'pack') renderPack(packs); else renderList(packs);
     });
 })();
-
-

@@ -1,6 +1,6 @@
 'use strict';
 /*
- * IELTSX server вЂ” static site + JSON API (no npm dependencies, Node 18+).
+ * IELTSX server — static site + JSON API (no npm dependencies, Node 18+).
  *
  *   npm start                      run locally on http://localhost:3000
  *   node scripts/make-admin.js you@mail.com     make an existing account an admin
@@ -18,7 +18,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { URL } = require('url');
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ configuration в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── configuration ───────────────────────── */
 const ROOT = __dirname;
 
 // Load .env (KEY=value per line) without any package; real environment variables win.
@@ -58,7 +58,8 @@ const ADMIN_EMAILS = new Set(
 );
 // pages that need an active Premium plan (lower-case paths); extend with PREMIUM_PATHS=/a.html,/b.html
 // (a * matches anything; put premium-only audio / files under /premium-audio/ to protect them too)
-const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/full-tests/reading/test-*.html', '/full-tests/listening/test-*.html', '/listening/index.html', '/premium-audio/*']
+// (the full test pages /full-tests/<skill>/test-N.html are decided by the Access rules below: admin panel -> Access)
+const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/listening/index.html', '/premium-audio/*']
   .concat(String(process.env.PREMIUM_PATHS || '').split(',').map((p) => p.trim().toLowerCase()).filter(Boolean))
   .map((p) => new RegExp('^' + p.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'));
 const isPremiumPath = (p) => PREMIUM_PATHS.some((re) => re.test(p));
@@ -79,7 +80,7 @@ if (!SESSION_SECRET && !IS_VERCEL) {
   } catch (e) { SESSION_SECRET = crypto.randomBytes(48).toString('hex'); }
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ storage (local JSON or Supabase) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── storage (local JSON or Supabase) ───────────────────────── */
 function newId() { return crypto.randomUUID(); }
 
 function loadDb() {
@@ -87,8 +88,9 @@ function loadDb() {
     const db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     db.users = Array.isArray(db.users) ? db.users : [];
     for (const k of ['materials', 'results', 'orders', 'audit']) db[k] = Array.isArray(db[k]) ? db[k] : [];
+    db.settings = db.settings && typeof db.settings === 'object' && !Array.isArray(db.settings) ? db.settings : {};
     return db;
-  } catch (e) { return { users: [], materials: [], results: [], orders: [], audit: [] }; }
+  } catch (e) { return { users: [], materials: [], results: [], orders: [], audit: [], settings: {} }; }
 }
 function saveDb(db) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -225,7 +227,7 @@ const store = {
   }
 };
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ passwords, sessions в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── passwords, sessions ───────────────────────── */
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
   return { salt, hash: crypto.scryptSync(String(password), salt, 64).toString('hex') };
 }
@@ -286,7 +288,7 @@ async function currentUser(req) {
   return syncAdminRole(u);
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ users, roles, premium в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── users, roles, premium ───────────────────────── */
 function isAdmin(u) { return !!u && (u.role === 'admin' || ADMIN_EMAILS.has(u.email)); }
 function isPremium(u) {
   if (!u) return false;
@@ -354,7 +356,7 @@ async function createUser({ name, email, passwordHash = '', passwordSalt = '', e
   return store.insertUser(u);
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ mail, audit, premium grants в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── mail, audit, premium grants ───────────────────────── */
 function siteUrl(req) {
   if (PUBLIC_URL) return PUBLIC_URL;
   return `${isHttps(req) ? 'https' : 'http'}://${req.headers.host || 'localhost:' + PORT}`;
@@ -388,7 +390,7 @@ async function sendVerification(req, user) {
 }
 const planById = (id) => (PLANS.plans || []).find((x) => x.id === id);
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ helpers: http в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── helpers: http ───────────────────────── */
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',
@@ -425,8 +427,8 @@ function readBody(req, limit = 100 * 1024) {
     req.on('error', reject);
   });
 }
-async function readJson(req) {
-  const buf = await readBody(req);
+async function readJson(req, limit) {
+  const buf = await readBody(req, limit);
   if (!buf.length) return {};
   try { return JSON.parse(buf.toString('utf8')); } catch (e) { throw new HttpError(400, 'Invalid JSON.'); }
 }
@@ -446,7 +448,7 @@ function rateBlocked(key, max) { const a = attempts.get(key); return !!a && a.re
 function rateHit(key, windowMs) { const now = Date.now(); let a = attempts.get(key); if (!a || a.reset < now) a = { count: 0, reset: now + windowMs }; a.count += 1; attempts.set(key, a); }
 setInterval(() => { const n = Date.now(); for (const [k, v] of attempts) if (v.reset < n) attempts.delete(k); }, 60000).unref();
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ multipart upload (admin) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── multipart upload (admin) ───────────────────────── */
 const AUDIO_EXT = ['.mp3', '.wav', '.m4a', '.ogg', '.aac'];
 const IMAGE_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif'];
 const UPLOAD_TYPES = {
@@ -467,8 +469,8 @@ async function ensureBucket() {
   throw new HttpError(503, 'Supabase Storage refused to create the media bucket (use the service_role key).');
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ tests created in the admin panel в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
-const MATERIAL_TYPES = ['reading', 'listening', 'writing'];
+/* ───────────────────────── tests created in the admin panel ───────────────────────── */
+const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab'];
 const Q_TYPES = ['short', 'tfng', 'ynng', 'mcq'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 function cleanUrl(v) {
@@ -505,6 +507,20 @@ function cleanMaterialData(type, d) {
     }).filter((w) => { const k = w.word.toLowerCase(); if (!w.word || !w.definition || seen.has(k)) return false; seen.add(k); return true; });
     delete out.images; delete out.instructions; delete out.durationMin;
   }
+  if (type === 'speaking') {
+    // Speaking: Part 1 (questions), Part 2 (cue card), Part 3 (discussion). Optional model-answer audio / text.
+    out.parts = (Array.isArray(d.parts) ? d.parts : []).slice(0, 3).map((t, i) => { t = t || {};
+      const qs = (Array.isArray(t.questions) ? t.questions : String(t.questions || '').split('\n')).slice(0, 40).map((x) => cut(x, 400).trim()).filter(Boolean);
+      return { id: 'p' + (i + 1), title: cut(t.title, 120) || 'Part ' + (i + 1), prompt: cut(t.prompt, 2000), questions: qs, imageUrl: cleanUrl(t.imageUrl), audioUrl: cleanUrl(t.audioUrl),
+        prepSeconds: Math.max(0, Math.min(600, Math.floor(Number(t.prepSeconds) || 0))), speakSeconds: Math.max(0, Math.min(1200, Math.floor(Number(t.speakSeconds) || 0))), sample: cut(t.sample, 8000) };
+    }).filter((t) => t.prompt || t.questions.length || t.imageUrl);
+  }
+  if (type === 'article') {
+    // Article: a reading article (cover picture, text, pictures inside it). Shown on the Articles page.
+    out.topic = cut(d.topic, 40).trim() || 'General'; out.passageLabel = cut(d.passageLabel, 30).trim() || 'Passage 1'; out.source = cut(d.source, 120);
+    out.readMinutes = Math.max(0, Math.min(120, Math.floor(Number(d.readMinutes) || 0))); out.coverUrl = cleanUrl(d.coverUrl); out.body = cut(d.body, 80000);
+    delete out.durationMin; delete out.instructions;
+  }
   if (type === 'writing') {
     out.tasks = (Array.isArray(d.tasks) ? d.tasks : []).slice(0, 4).map((t, i) => { t = t || {};
       return { id: 't' + (i + 1), title: cut(t.title, 120) || 'Task ' + (i + 1), prompt: cut(t.prompt, 4000), imageUrl: cleanUrl(t.imageUrl),
@@ -533,9 +549,15 @@ function isCorrect(q, given) {
 const publicMaterial = (m, withData) => {
   const d = m.data || {};
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
-    questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length };
+    questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
+  if (m.type === 'article') Object.assign(base, { topic: d.topic || 'General', passageLabel: d.passageLabel || 'Passage 1', source: d.source || '', readMinutes: d.readMinutes || 0, coverUrl: d.coverUrl || '' });
+  if (m.type === 'vocab') {   // the list never carries the cards; they are sent only by the single-item call, after the Premium check
+    base.wordCount = (d.words || []).length; base.kind = d.kind || 'collection'; base.level = d.level || 'Intermediate'; base.source = d.source || ''; base.icon = d.icon || 'reading';
+    return withData ? { ...base, data: { kind: base.kind, level: base.level, source: base.source, icon: base.icon, words: d.words || [] } } : base;
+  }
   if (!withData) return base;
-  return { ...base, data: { ...d, questions: (d.questions || []).map(({ answer, explanation, ...q }) => q), transcript: undefined, tasks: (d.tasks || []).map(({ sample, ...t }) => ({ ...t, hasSample: !!sample })) } };
+  return { ...base, data: { ...d, questions: (d.questions || []).map(({ answer, explanation, ...q }) => q), transcript: undefined,
+    tasks: (d.tasks || []).map(({ sample, ...t }) => ({ ...t, hasSample: !!sample })), parts: (d.parts || []).map(({ sample, ...t }) => ({ ...t, hasSample: !!sample })) } };
 };
 function parseMultipart(buf, contentType) {
   const m = /boundary=(?:"([^"]+)"|([^;]+))/i.exec(contentType || '');
@@ -560,7 +582,7 @@ function parseMultipart(buf, contentType) {
   return { fields, file };
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ API в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── API ───────────────────────── */
 async function requireUser(req) {
   const u = await currentUser(req);
   if (!u) throw new HttpError(401, 'Please sign in.');
@@ -590,7 +612,8 @@ async function verifyGoogleToken(idToken) {
   if (String(d.email_verified) !== 'true' || !d.email) throw new HttpError(401, 'This Google account has no verified email address.');
   return { email: normEmail(d.email), name: cleanName(d.name || d.given_name || d.email.split('@')[0]) };
 }
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ access rules: free / locked + plan for every pack and test в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+/* ───────────────────────── access rules: free / locked + plan for every pack and test ─────────────────────────
  * The catalog (assets/js/full-tests-data.js) says what is locked by default. The admin panel (Access) stores overrides:
  *   rules['pack:<skill>/<slug>']            a whole pack (its tests inherit it unless they have their own rule)
  *   rules['test:<skill>/<slug>/<id>']       one test of the catalog
@@ -600,7 +623,7 @@ async function verifyGoogleToken(idToken) {
  */
 const vm = require('vm');
 const PLAN_ORDER = { standard: 1, max: 2, ultra: 3 };
-const SKILL_LIST = ['reading', 'listening', 'writing', 'speaking'];
+const SKILL_LIST = ['reading', 'listening', 'writing', 'speaking', 'article'];
 const planOf = (v) => { const s = String(v || '').toLowerCase(); return s.includes('ultra') ? 'ultra' : s.includes('max') ? 'max' : (s.includes('standard') ? 'standard' : ''); };
 const slugOf = (s) => String(s || '').toLowerCase().trim().replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, '');
 const hrefPath = (h) => String(h || '').split(/[?#]/)[0].replace(/\/+$/, '').replace(/\.html$/i, '').toLowerCase();
@@ -655,7 +678,7 @@ function loadCatalog() {
         packs.push({ key: `pack:${skill}/practice-cards`, slug: 'practice-cards', title: 'Practice cards - ' + pc.title, tier: '', practice: true, def,
           tests: pc.cards.map((c, n) => ({ key: `test:${skill}/practice-cards/${c.id}`, id: c.id, title: c.title, source: 'Practice page card ' + (n + 1), href: c.href || pc.page, practiceHref: c.href || '', tags: [], def: { locked: !c.free, plan: 'standard' } })) });
       }
-      skills.push({ skill, title: ((D.skills || {})[skill] || {}).title || skill, packs });
+      skills.push({ skill, title: ((D.skills || {})[skill] || {}).title || (skill === 'article' ? 'Articles' : skill), packs });
     }
   } catch (e) { console.warn('full-tests-data.js could not be read:', e.message); }
   return (CATALOG = { skills });
@@ -726,6 +749,8 @@ async function adminAccessView() {
   }
   return { skills, plans: ['standard', 'max', 'ultra'] };
 }
+
+
 async function api(req, res, url) {
   const p = url.pathname.replace(/\/+$/, '') || '/';
   const method = req.method;
@@ -937,29 +962,52 @@ async function api(req, res, url) {
   /* ---- premium ---- */
   if (method === 'GET' && p === '/api/premium/status') {
     const u = await currentUser(req);
-    return send(res, 200, { authenticated: !!u, premium: isPremium(u), admin: isAdmin(u), expiresAt: u ? u.premiumExpiresAt || null : null, plan: u ? publicUser(u).plan : 'Free' });
+    return send(res, 200, { authenticated: !!u, premium: isPremium(u), admin: isAdmin(u), level: userLevel(u), planKey: levelName(userLevel(u)), expiresAt: u ? u.premiumExpiresAt || null : null, plan: u ? publicUser(u).plan : 'Free' });
+  }
+
+  /* ---- access rules (which packs / tests are free, locked, and for which plan) ---- */
+  if (method === 'GET' && p === '/api/access') {
+    const u = await currentUser(req); const level = userLevel(u);
+    return send(res, 200, { rules: await accessRules(), level, planKey: levelName(level), authenticated: !!u, admin: isAdmin(u) }, { 'Cache-Control': 'no-store, private' });
+  }
+  if (method === 'GET' && p === '/api/access/check') {      // used by the test pages themselves (assets/js/access-gate.js)
+    const u = await currentUser(req); const level = userLevel(u);
+    let want = String(url.searchParams.get('path') || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
+    const gate = await gateForPath(hrefPath(want) + '.html') || { locked: false, plan: 'standard' };
+    const allowed = allowsLevel(gate, level);
+    return send(res, 200, { allowed, locked: gate.locked, plan: gate.plan, authenticated: !!u, price: allowed ? null : priceUrl(gate.plan, want) }, { 'Cache-Control': 'no-store, private' });
   }
 
   /* ---- public materials (tests the admins added) ---- */
   if (method === 'GET' && p === '/api/materials') {
     const type = MATERIAL_TYPES.includes(url.searchParams.get('type')) ? url.searchParams.get('type') : '';
-    const u = await currentUser(req); const prem = isPremium(u);
-    const items = (await store.listMaterials(type)).filter((m) => m.published !== false).map((m) => ({ ...publicMaterial(m, false), locked: !!m.premium && !prem }));
-    return send(res, 200, { items });
+    const u = await currentUser(req); const level = userLevel(u); const rules = await accessRules();
+    const items = (await store.listMaterials(type)).filter((m) => m.published !== false).map((m) => {
+      const r = materialRule(m, rules);
+      return { ...publicMaterial(m, false), premium: r.locked, plan: r.plan, locked: !allowsLevel(r, level) };
+    });
+    return send(res, 200, { items }, { 'Cache-Control': 'no-store, private' });
   }
   let mm = p.match(/^\/api\/materials\/([^/]+)(\/grade|\/sample)?$/);
   if (mm) {
     const m = await store.getMaterial(decodeURIComponent(mm[1]));
     const u = await currentUser(req);
     if (!m || (m.published === false && !isAdmin(u))) throw new HttpError(404, 'Test not found.');
-    if (m.premium && !isPremium(u)) throw new HttpError(u ? 403 : 401, u ? 'This test is for Premium members.' : 'Please sign in to open this test.');
+    const rule = materialRule(m, await accessRules());
+    if (!allowsLevel(rule, userLevel(u))) throw new HttpError(u ? 403 : 401, u ? (rule.plan === 'max' ? 'This test is for Max members.' : 'This test is for Premium members.') : 'Please sign in to open this test.');
     const d = m.data || {};
-    if (method === 'GET' && !mm[2]) return send(res, 200, { item: publicMaterial(m, true), signedIn: !!u });
+    if (method === 'GET' && !mm[2]) {
+      if (m.type === 'vocab') {   // cards are only handed to people who may see them, never cached, and not to scrapers
+        rateLimit('vocab:' + (u ? u.id : clientIp(req)), 240, 60 * 60000);
+        return send(res, 200, { item: publicMaterial(m, true), signedIn: !!u }, { 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex' });
+      }
+      return send(res, 200, { item: publicMaterial(m, true), signedIn: !!u });
+    }
     if (method === 'GET' && mm[2] === '/sample') {
-      return send(res, 200, { samples: (d.tasks || []).map((t) => ({ id: t.id, sample: t.sample || '' })) });
+      return send(res, 200, { samples: (d.tasks || d.parts || []).map((t) => ({ id: t.id, sample: t.sample || '' })) });
     }
     if (method === 'POST' && mm[2] === '/grade') {
-      if (m.type === 'writing') throw new HttpError(400, 'Writing tasks are not auto-graded.');
+      if (m.type === 'writing' || m.type === 'speaking' || m.type === 'article') throw new HttpError(400, 'This content is not auto-graded.');
       rateLimit('grade:' + (u ? u.id : clientIp(req)), 200, 60 * 60000);
       const b = await readJson(req); const given = b.answers && typeof b.answers === 'object' ? b.answers : {};
       const qs = d.questions || []; if (!qs.length) throw new HttpError(400, 'This test has no questions yet.');
@@ -1111,9 +1159,30 @@ async function api(req, res, url) {
       await audit(admin, 'user.delete', u.email);
       return send(res, 200, { ok: true });
     }
+    if (method === 'GET' && p === '/api/admin/access') return send(res, 200, await adminAccessView(), { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/access') {
+      const b = await readJson(req, 512 * 1024);
+      const list = Array.isArray(b.changes) ? b.changes : [];
+      if (!list.length) throw new HttpError(400, 'Nothing to change.');
+      if (list.length > 800) throw new HttpError(400, 'Too many changes at once (800 max).');
+      const rules = { ...(await accessRules(true)) }; const matIds = [];
+      for (const c of list) {
+        const key = String(c && c.key || '');
+        if (!KEY_RE.test(key)) throw new HttpError(400, 'Unknown item: ' + cut(key, 60));
+        const mode = String(c.mode || '');
+        if (mode !== 'default' && !ruleFromMode(mode)) throw new HttpError(400, 'Mode must be default, free, standard or max.');
+        if (mode === 'default') delete rules[key]; else rules[key] = ruleFromMode(mode);
+        if (key.startsWith('mat:') && mode !== 'default') matIds.push([key.slice(4), mode !== 'free']);
+      }
+      await store.setSetting('access-rules', { rules: cleanRules(rules), updatedAt: new Date().toISOString() });
+      rulesCache = { t: 0, v: {} };
+      for (const [id, locked] of matIds) { try { await store.updateMaterial(id, { premium: locked, updatedAt: new Date().toISOString() }); } catch (e) { /* the rule still applies */ } }   // keeps the old Free / Premium flag in step
+      await audit(admin, 'access.set', list.length === 1 ? list[0].key : list.length + ' items', { mode: list.length === 1 ? list[0].mode : 'bulk' });
+      return send(res, 200, { ok: true, ...(await adminAccessView()) });
+    }
     if (method === 'GET' && p === '/api/admin/materials') return send(res, 200, { items: await store.listMaterials(url.searchParams.get('type') || '') });
     if (method === 'POST' && p === '/api/admin/materials') {
-      const b = await readJson(req); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
+      const b = await readJson(req, 2 * 1024 * 1024); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
       const title = cleanName(b.title); if (!title) throw new HttpError(400, 'Title is required.');
       const now = new Date().toISOString();
       const item = await store.insertMaterial({ id: newId(), type, title, pack: cleanName(b.pack), description: cut(b.description, 2000), content: '', premium: !!b.premium,
@@ -1128,11 +1197,11 @@ async function api(req, res, url) {
     }
     if (m && method === 'PATCH') {
       const id = decodeURIComponent(m[1]); const cur = await store.getMaterial(id); if (!cur) throw new HttpError(404, 'Material not found.');
-      const b = await readJson(req); const patch = { updatedAt: new Date().toISOString() };
+      const b = await readJson(req, 2 * 1024 * 1024); const patch = { updatedAt: new Date().toISOString() };
       if (b.title !== undefined) { patch.title = cleanName(b.title); if (!patch.title) throw new HttpError(400, 'Title is required.'); }
       if (b.pack !== undefined) patch.pack = cleanName(b.pack);
       if (b.description !== undefined) patch.description = cut(b.description, 2000);
-      if (b.premium !== undefined) patch.premium = !!b.premium;
+      if (b.premium !== undefined) { patch.premium = !!b.premium; try { const r0 = { ...(await accessRules(true)) }; if (r0['mat:' + id]) { delete r0['mat:' + id]; await store.setSetting('access-rules', { rules: cleanRules(r0), updatedAt: new Date().toISOString() }); rulesCache = { t: 0, v: {} }; } } catch (e) { /* the flag still applies */ } }
       if (b.published !== undefined) patch.published = !!b.published;
       if (b.data !== undefined) patch.data = cleanMaterialData(cur.type, b.data);
       const item = await store.updateMaterial(id, patch); if (!item) throw new HttpError(404, 'Material not found.');
@@ -1174,7 +1243,7 @@ async function api(req, res, url) {
   throw new HttpError(404, 'API endpoint not found.');
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ static files в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── static files ───────────────────────── */
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.htm': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
@@ -1195,7 +1264,7 @@ function isBlocked(rel) {
 }
 // old links that still exist in saved pages -> the real file
 const ALIASES = {
-  '/home': '/index.html', '/features': '/index.html', '/teachers': '/index.html', '/vocabulary': '/index.html', '/support': '/index.html',
+  '/home': '/index.html', '/features': '/index.html', '/teachers': '/index.html', '/support': '/index.html',
   '/privacy-policy': '/index.html', '/terms-of-service': '/index.html', '/feedback': '/index.html',
   '/login': '/login.html', '/account': '/account.html', '/pricing': '/Price.html', '/practice/mock': '/Mock tests.html',
   '/listening.html': '/part/practice/listening.html', '/reading.html': '/part/practice/reading.html', '/writing.html': '/part/practice/writing.html', '/speaking.html': '/part/practice/speaking.html',
@@ -1289,24 +1358,27 @@ async function staticFile(req, res, pathname) {
   const tl = target.toLowerCase();
   const isHtml = tl.endsWith('.html');
   const needsAdmin = isHtml && (tl === '/admin.html' || tl.startsWith('/admin/'));
-  const needsPremium = isPremiumPath(tl);
+  const gate = isHtml ? await gateForPath(tl) : null;                // full test pages: free / Standard / Max, set in the admin panel
+  const gateLocked = !!(gate && gate.locked);
+  const needsPremium = isPremiumPath(tl) || gateLocked;
+  const needLevel = gateLocked ? levelNeeded(gate) : 1;
   if (needsAdmin || needsPremium) {
     const u = await currentUser(req);
     const next = encodeURIComponent(pathname);
     if (!isHtml) { // audio, files: no page to redirect to
       if (!u) return send(res, 401, { error: 'Please sign in.' });
-      if (needsPremium && !isPremium(u)) return send(res, 403, { error: 'Premium required.' });
+      if (needsPremium && userLevel(u) < needLevel) return send(res, 403, { error: 'Premium required.' });
     }
     if (!u) return redirect(res, `/login?next=${next}`);
     if (needsAdmin && !isAdmin(u)) return redirect(res, '/?admin=denied');
-    if (needsPremium && !isPremium(u)) return redirect(res, `/Price?premium=required&next=${next}`);
+    if (needsPremium && userLevel(u) < needLevel) return redirect(res, priceUrl(gateLocked ? gate.plan : 'standard', pathname));
   }
   const extra = needsAdmin ? { 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY', 'X-Robots-Tag': 'noindex, nofollow', 'Content-Security-Policy': ADMIN_CSP }
     : needsPremium ? { 'Cache-Control': 'no-store' } : {};
   return serveFile(req, res, file, extra);
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ sitemap (public pages only) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── sitemap (public pages only) ───────────────────────── */
 function sitemap(origin) {
   const urls = new Set(['/', '/Price', '/Predictions', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
     '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/']);
@@ -1329,7 +1401,7 @@ function sitemap(origin) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
 }
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ server в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ───────────────────────── server ───────────────────────── */
 const requestHandler = async (req, res) => {
   try {
     if (isHttps(req)) res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -1362,7 +1434,7 @@ const requestHandler = async (req, res) => {
 };
 
 if (require.main === module) {
-  if (!USE_SUPABASE) { try { fs.mkdirSync(DATA_DIR, { recursive: true }); if (!fs.existsSync(DB_FILE)) saveDb({ users: [], materials: [], results: [], orders: [], audit: [] }); } catch (e) { /* read-only disk */ } }
+  if (!USE_SUPABASE) { try { fs.mkdirSync(DATA_DIR, { recursive: true }); if (!fs.existsSync(DB_FILE)) saveDb({ users: [], materials: [], results: [], orders: [], audit: [], settings: {} }); } catch (e) { /* read-only disk */ } }
   http.createServer(requestHandler).listen(PORT, () => {
     console.log(`IELTSX server running at http://localhost:${PORT}`);
     console.log(ADMIN_EMAILS.size ? `Admins: ${[...ADMIN_EMAILS].join(', ')}` : 'No ADMIN_EMAILS set: register an account, then run  node scripts/make-admin.js <email>');
@@ -1372,5 +1444,3 @@ if (require.main === module) {
 module.exports = requestHandler;
 module.exports.store = store;
 module.exports.hashPassword = hashPassword;
-
-

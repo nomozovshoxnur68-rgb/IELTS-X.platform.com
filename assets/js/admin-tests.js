@@ -1,7 +1,7 @@
 /* IELTSX — shows the tests added in the admin panel on the Reading / Listening / Writing practice pages. */
 (function () {
     'use strict';
-    var m = /\/part\/practice\/(reading|listening|writing)/i.exec(location.pathname);
+    var m = /\/part\/practice\/(reading|listening|writing|speaking)/i.exec(location.pathname);
     if (!m) return;
     var type = m[1].toLowerCase();
     var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
@@ -19,6 +19,7 @@
         fetch('/api/materials?type=' + type, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
             var items = d.items || []; if (!items.length) return;
             var meta = function (i) {
+                if (type === 'speaking') return (i.parts || 0) + ' part' + (i.parts === 1 ? '' : 's');
                 if (type === 'writing') return (i.tasks || 0) + ' task' + (i.tasks === 1 ? '' : 's');
                 return i.questionCount + ' questions' + (i.durationMin ? ' · ' + i.durationMin + ' min' : '');
             };

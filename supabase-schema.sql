@@ -114,3 +114,40 @@ create table if not exists public.ieltsx_settings (
   "updatedAt" timestamptz not null default now()
 );
 alter table public.ieltsx_settings enable row level security;
+
+-- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
+-- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
+-- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
+alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab'));
+
+-- ───────────── added in v6: Access rules (admin panel -> Access: free / locked + plan for every pack and test) ─────────────
+-- Run this once on an existing database (safe to run again). Without it the site keeps working with the default locks,
+-- but the choices made in the panel cannot be saved.
+create table if not exists public.ieltsx_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  "updatedAt" timestamptz not null default now()
+);
+alter table public.ieltsx_settings enable row level security;
+
+-- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
+-- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
+-- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
+alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab'));
+
+-- ───────────── added in v6: Access rules (admin panel -> Access: free / locked + plan for every pack and test) ─────────────
+-- Run this once on an existing database (safe to run again). Without it the site keeps working with the default locks,
+-- but the choices made in the panel cannot be saved.
+create table if not exists public.ieltsx_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  "updatedAt" timestamptz not null default now()
+);
+alter table public.ieltsx_settings enable row level security;
+
+
+-- ───────────── added in v7: Speaking tests and Articles made in the admin panel (run once) ─────────────
+alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab','speaking','article'));

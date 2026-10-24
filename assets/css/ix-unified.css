@@ -1,5 +1,5 @@
 /* ====
-   IELTSX вЂ” UNIFIED DESIGN SYSTEM  (assets/css/ix-unified.css)
+   IELTSX — UNIFIED DESIGN SYSTEM  (assets/css/ix-unified.css)
 
    Loaded LAST on every page, so one set of tokens decides how the whole
    site looks. Before this file each page carried its own colours, fonts and
@@ -11,7 +11,7 @@
    - Light = html (no class).  Dark = html.dark-mode  (set by theme-init.js).
    - Page-only CSS files keep layout that is truly unique to that page.
 
-/* в”Ђв”Ђ 1. TOKENS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 1. TOKENS ─────────────────────────────────────────────────────────── */
 :root {
     color-scheme: light;
 
@@ -132,7 +132,7 @@ html.dark-mode {
 }
 html.dark-mode { --text-secondary: hsl(210 10% 68%); --shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
 
-/* в”Ђв”Ђ 2. BASE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 2. BASE ───────────────────────────────────────────────────────────── */
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 html, body { background: hsl(var(--background)); }
 body {
@@ -158,7 +158,7 @@ img { max-width: 100%; }
 * { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
 html.dark-mode * { scrollbar-color: hsl(0 0% 32%) transparent; }
 
-/* в”Ђв”Ђ 3. SHELL: sidebar + header + content area (same on every page) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 3. SHELL: sidebar + header + content area (same on every page) ─────── */
 .bg-background { background-color: hsl(var(--background)); }
 .bg-sidebar { background-color: hsl(var(--sidebar)); }
 .text-sidebar-foreground { color: hsl(var(--sidebar-foreground)); }
@@ -229,7 +229,7 @@ main h1.text-2xl, main h1.text-3xl { letter-spacing: -0.01em; color: hsl(var(--f
 .text-foreground { color: hsl(var(--foreground)); }
 .text-muted-foreground { color: hsl(var(--muted-foreground)); }
 
-/* в”Ђв”Ђ 4. SURFACES: cards, search panel, inputs, buttons, badges в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 4. SURFACES: cards, search panel, inputs, buttons, badges ─────────── */
 .bg-card, .rounded-xl.border, .rounded-lg.border.bg-card {
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
@@ -272,13 +272,13 @@ html.dark-mode .border-gray-200, html.dark-mode .border-gray-300, html.dark-mode
 html.dark-mode .hover\:bg-gray-100:hover, html.dark-mode .hover\:bg-gray-50:hover { background-color: hsl(var(--accent)); }
 html.dark-mode .shadow, html.dark-mode .shadow-sm, html.dark-mode .shadow-md { --tw-shadow-color: rgba(0, 0, 0, 0.5); }
 
-/* plan label (DEMO / PREMIUM / ADMIN) вЂ” readable in both themes */
+/* plan label (DEMO / PREMIUM / ADMIN) — readable in both themes */
 [data-plan-label].rounded-full, .plan-badge, .inline-flex.rounded-full[data-plan-label] {
     background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: 1px solid hsl(var(--border));
 }
 html.dark-mode [data-plan-label].rounded-full { background-color: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
 
-/* в”Ђв”Ђ 5. CARD IMAGES: a nice placeholder instead of a grey / broken box в”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 5. CARD IMAGES: a nice placeholder instead of a grey / broken box ───── */
 .ix-thumb-fallback, img.ix-img-failed {
     background: linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.05) 55%, hsl(var(--muted)));
 }
@@ -306,7 +306,7 @@ html.dark-mode [class*="to-white"], html.dark-mode [class*="from-white"] { --tw-
 .to-blue-600{--tw-gradient-to:#2563eb var(--tw-gradient-to-position)}
 .hover\:to-blue-700:hover{--tw-gradient-to:#1d4ed8 var(--tw-gradient-to-position)}
 
-/* в”Ђв”Ђ 6. TOP-OF-PAGE BARS: verify-email + promo в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 6. TOP-OF-PAGE BARS: verify-email + promo ───────────────────────────── */
 /* verify bar is a floating pill now: it no longer pushes the layout or hides the sidebar logo */
 #ix-verify-banner {
     position: fixed !important;
@@ -333,7 +333,7 @@ html.dark-mode [class*="to-white"], html.dark-mode [class*="from-white"] { --tw-
 /* the purple "promo" strip stays inside the content column and never over the sidebar */
 main [class*="from-purple"][class*="to-blue"], main [class*="from-violet"][class*="to-blue"] { position: relative; z-index: 1; }
 
-/* в”Ђв”Ђ 7. TABLES / TABS / MISC used by Performance + Account в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 7. TABLES / TABS / MISC used by Performance + Account ──────────────── */
 table { border-color: hsl(var(--border)); }
 th, td { border-color: hsl(var(--border)); }
 html.dark-mode .tab-btn[data-active="true"], html.dark-mode [role="tab"][data-state="active"] {
@@ -361,7 +361,7 @@ html.dark-mode .react-activity-calendar text { fill: hsl(var(--muted-foreground)
     #passagesPanel > div > div > div:last-child { display: flex; flex-wrap: nowrap; gap: 0.5rem; width: auto; justify-content: flex-end; }
 }
 
-/* в”Ђв”Ђ 8. RESPONSIVE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── 8. RESPONSIVE ──────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     :root { --ix-page-pad: 1rem; }
     .ix-page-head h1, main h1.text-2xl { font-size: 1.25rem; line-height: 1.75rem; }

@@ -1028,7 +1028,7 @@
                 <div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:gap-4">
                     <div class="min-w-0 flex-[0.8] text-sm sm:text-base">
                         <p class="font-bold">Part 3</p>
-                        <p class="">Listen and answer questions 1вЂ“40.</p>
+                        <p class="">Listen and answer questions 1–40.</p>
                     </div>
                 </div>
             </div>
@@ -1040,7 +1040,7 @@
                 <div data-exam-integrity-question-group="true" data-exam-integrity-question-type="MULTIPLE_CHOICE">
                     <div class="space-y-4">
                         <div class="space-y-2">
-                            <h5 class="font-semibold">Questions 21вЂ“24</h5>
+                            <h5 class="font-semibold">Questions 21–24</h5>
                             <p>Choose the correct answer.</p>
                         </div>
                         <div class="mb-6 text-center">
@@ -1208,7 +1208,7 @@
         <div data-exam-integrity-question-group="true" data-exam-integrity-question-type="MATCHING_FEATURES">
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <h5 class="font-semibold">Questions 25вЂ“30</h5>
+                    <h5 class="font-semibold">Questions 25–30</h5>
                     <p>Choose the correct function, <strong>A, B, C or D</strong>, for each country.</p>
                 </div>
                 <div class="relative flex gap-2 items-start w-fit max-w-5xl">
@@ -1624,7 +1624,7 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
 <!-- ===== RESULTS SECTION (Full Screen Overlay) ===== -->
 <div id="resultsSection" style="display:none;">
     <div class="results-inner" style="position:relative;">
-        <button id="closeResultsBtn" title="Close results & exit">вњ•</button>
+        <button id="closeResultsBtn" title="Close results & exit">✕</button>
         <div class="text-center mb-6">
             <h2 class="text-3xl font-bold mb-2">Exam Results</h2>
             <div class="inline-flex items-center px-3 py-2 bg-secondary rounded-full">
@@ -1667,7 +1667,7 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
         <!-- ===== DETAILED REVIEW SECTION ===== -->
         <div class="results-card mb-6" id="detailedReviewSection">
             <div class="review-section-title">
-                <span>рџ“‹ Detailed Review</span>
+                <span>📋 Detailed Review</span>
                 <span class="count-badge" id="reviewCountBadge">10 questions</span>
             </div>
             <div class="review-filter-tabs">
@@ -1767,11 +1767,11 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
 <!-- ===== NOTES DRAWER ===== -->
 <div id="notesDrawer" class="notes-drawer" style="display:none;">
     <div class="notes-drawer-header">
-        <span class="font-semibold text-sm">рџ“ќ Notes</span>
+        <span class="font-semibold text-sm">📝 Notes</span>
         <button id="closeNotesBtn" class="text-gray-500 hover:text-gray-700 text-lg">&times;</button>
     </div>
     <div id="notesList" class="notes-drawer-body">
-        <div class="note-card">No notes yet. Select text в†’ click Note.</div>
+        <div class="note-card">No notes yet. Select text → click Note.</div>
     </div>
     <div class="notes-drawer-footer">
         <input id="manualNoteInput" type="text" placeholder="Type a note..." class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" style="background:#fff;">
@@ -1781,9 +1781,9 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
 
 <!-- ===== SELECTION TOOLBAR (Highlight / Note on selection) ===== -->
 <div id="selectionToolbar" class="selection-toolbar" style="display:none;">
-    <button id="highlightSelectionBtn">вњЏпёЏ Highlight</button>
+    <button id="highlightSelectionBtn">✏️ Highlight</button>
     <span class="divider"></span>
-    <button id="noteSelectionBtn">рџ“ќ Note</button>
+    <button id="noteSelectionBtn">📝 Note</button>
 </div>
 
 <!-- ===== HIGHLIGHT CONTEXT MENU ===== -->
@@ -2118,12 +2118,12 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
             22: 'The paper mulberry was introduced to the Pacific rather than originating there.',
             23: 'The speakers explain that Maori people found another material that suited clothing better.',
             24: 'Large sheets are produced by sticking smaller pieces together.',
-            25: 'Samoa вЂ” spiritual.',
-            26: 'Tonga вЂ” practical.',
-            27: 'Cook Islands вЂ” spiritual.',
-            28: 'Fiji вЂ” commercial.',
-            29: 'Tahiti вЂ” recreational.',
-            30: 'Tikopia вЂ” practical.'
+            25: 'Samoa — spiritual.',
+            26: 'Tonga — practical.',
+            27: 'Cook Islands — spiritual.',
+            28: 'Fiji — commercial.',
+            29: 'Tahiti — recreational.',
+            30: 'Tikopia — practical.'
         };
 
         const questionText = {
@@ -2254,24 +2254,24 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
             }
 
             container.innerHTML = filtered.map((detail) => {
-                const statusIcon = detail.isCorrect ? 'вњ…' : 'вќЊ';
+                const statusIcon = detail.isCorrect ? '✅' : '❌';
                 const cls = detail.isCorrect ? 'correct' : 'incorrect';
                 const userAnsClass = detail.isCorrect ? 'correct-ans' : 'wrong';
                 const typeLabel = detail.qNum <= 24 ? 'Multiple Choice' : 'Matching';
 
                 return `
                         <div class="review-question-item ${cls}" data-q="${detail.qNum}" data-correct="${detail.isCorrect}">
-                            <div class="q-label">Question ${detail.qNum} В· ${typeLabel}</div>
+                            <div class="q-label">Question ${detail.qNum} · ${typeLabel}</div>
                             <div class="q-text">${escapeHtml(detail.text)}</div>
                             <div class="q-answer">
                                 <span class="status-icon">${statusIcon}</span>
                                 <span>Your answer:</span>
                                 <span class="user-ans ${userAnsClass}">${escapeHtml(detail.userAnswer)}</span>
-                                ${detail.isCorrect ? '<span class="correct-badge">вњ“ Correct</span>' : '<span class="wrong-badge">вњ— Incorrect</span>'}
-                                ${detail.isCorrect ? '' : `<span class="user-ans correct-ans">в†’ ${escapeHtml(detail.correctAnswer)}</span>`}
+                                ${detail.isCorrect ? '<span class="correct-badge">✓ Correct</span>' : '<span class="wrong-badge">✗ Incorrect</span>'}
+                                ${detail.isCorrect ? '' : `<span class="user-ans correct-ans">→ ${escapeHtml(detail.correctAnswer)}</span>`}
                             </div>
                             <button class="review-explain-btn" data-q="${detail.qNum}">
-                                рџ’Ў Explain More <span class="arrow">в–¶</span>
+                                💡 Explain More <span class="arrow">▶</span>
                             </button>
                             <div class="review-explain-content" data-q="${detail.qNum}">
                                 <strong>Hint:</strong> ${escapeHtml(detail.hint)}
@@ -2351,7 +2351,7 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
             byId('detailedReviewSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
-        // ===== FINISH BUTTON вЂ” Navigate to /part/practice/reading.html =====
+        // ===== FINISH BUTTON — Navigate to /part/practice/reading.html =====
         byId('finishResultsBtn')?.addEventListener('click', () => {
             window.location.href = '/part/practice/reading';
         });
@@ -2507,7 +2507,7 @@ stroke-linejoin="round" class="lucide lucide-arrow-right">
             notesList.innerHTML = '';
 
             if (!notes.length) {
-                notesList.innerHTML = '<div class="note-card">No notes yet. Select text в†’ click Note.</div>';
+                notesList.innerHTML = '<div class="note-card">No notes yet. Select text → click Note.</div>';
                 return;
             }
 

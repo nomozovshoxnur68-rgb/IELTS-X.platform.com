@@ -1,18 +1,18 @@
 ﻿/*
- * IELTSX вЂ” Full Tests catalog (assets/js/full-tests-data.js)
+ * IELTSX — Full Tests catalog (assets/js/full-tests-data.js)
  *
  * This is the ONE place that describes the Full Listening / Reading / Writing /
- * Speaking pages: which packs exist, which section ("Recent Exams", "Practice" вЂ¦)
+ * Speaking pages: which packs exist, which section ("Recent Exams", "Practice" …)
  * they sit in, and which tests are inside each pack.
  *
  * ADD A PACK   -> add an object to  packs.<skill>  and put its slug in a group.
  * ADD A TEST   -> add an object to  tests  of that pack:
  *                    { source: 'Original Exams | Test 4', tags: ['Gap Filling'], href: '/full-tests/reading/test-5', premium: true }
- *                 The title ("Test 1", "Test 2" вЂ¦) is numbered automatically.
+ *                 The title ("Test 1", "Test 2" …) is numbered automatically.
  * WHO CAN OPEN IT -> `premium: true` = locked (any paid plan), `premium: false` = free. Add `minPlan: 'max'` to require the Max plan.
  *                 The admin panel (Access) overrides all of this per pack and per test, no code needed.
  * NO CODE?     -> tests added in the Admin panel (Reading / Listening / Writing) show up here by themselves:
- *                 type the pack name in the admin form ("Pack 5", "Volume 9" вЂ¦). A pack name that does not
+ *                 type the pack name in the admin form ("Pack 5", "Volume 9" …). A pack name that does not
  *                 exist yet gets its own card under "Practice".
  *
  * Pack pages live at  /full-tests/<skill>/<slug>   e.g. /full-tests/reading/pack-5

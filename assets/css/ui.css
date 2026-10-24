@@ -1,5 +1,5 @@
 /* ====
-   IELTSX UI вЂ” theme switch (light / dark / system) + filter dropdowns
+   IELTSX UI — theme switch (light / dark / system) + filter dropdowns
    Loaded after the page CSS. Self-contained: it brings its own tokens so it
    looks the same on every page.
 :root {
@@ -28,7 +28,7 @@ html.dark-mode {
     --ix-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.55);
 }
 
-/* в”Ђв”Ђ theme switch: sun | moon | monitor в”Ђв”Ђ */
+/* ── theme switch: sun | moon | monitor ── */
 .theme-switch {
     display: inline-flex;
     align-items: center;
@@ -73,7 +73,7 @@ html.dark-mode {
     height: 1rem;
 }
 
-/* в”Ђв”Ђ filter dropdowns (single list) в”Ђв”Ђ */
+/* ── filter dropdowns (single list) ── */
 .filter-btn-wrap {
     position: relative;
     display: inline-flex;
@@ -144,7 +144,7 @@ html.dark-mode {
     opacity: 1;
 }
 
-/* в”Ђв”Ђ filter panels (checkboxes, grouped) в”Ђв”Ђ */
+/* ── filter panels (checkboxes, grouped) ── */
 .filter-dropdown.filter-panel {
     padding: 1rem 1.1rem 1.1rem;
     width: 27rem;
@@ -240,7 +240,7 @@ html.dark-mode {
     outline-offset: 2px;
 }
 
-/* в”Ђв”Ђ active filter badges в”Ђв”Ђ */
+/* ── active filter badges ── */
 .filter-badge-clear {
     display: inline-flex;
     align-items: center;
@@ -264,7 +264,7 @@ html.dark-mode {
     height: 12px;
 }
 
-/* в”Ђв”Ђ filter triggers on pages without the shadcn tokens (speaking, writing) в”Ђв”Ђ */
+/* ── filter triggers on pages without the shadcn tokens (speaking, writing) ── */
 .ix-filters .filter-btn-wrap .filter-trigger {
     background: var(--ix-bg);
     color: var(--ix-fg);

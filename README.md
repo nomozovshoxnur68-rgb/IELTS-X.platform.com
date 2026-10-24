@@ -74,7 +74,7 @@ they are saved in `uploads/`.
 ## Results follow the account
 
 When a signed-in student finishes a reading or listening test, the result (score, band, time) is stored on the server
-(`/api/results`), the card gets a **вњ“ Completed** pill, the **Completed / Not completed** filter works and the
+(`/api/results`), the card gets a **✓ Completed** pill, the **Completed / Not completed** filter works and the
 Performance dashboard shows the same data on every device. Signed-out visitors can still take the free tests.
 ## Access: free / locked + plan (`/admin#access`)
 
@@ -139,3 +139,14 @@ See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUB
 * Removed two broken, unlinked pages (`Full Reading Test 13/14.html`); the real tests are in `/full-tests/reading/`.
 
 
+
+## Admin: Speaking and Articles (October 2026)
+
+`/admin#speaking` and `/admin#articles` work like Reading/Listening: **+ New**, picture and audio uploads, Free/Premium, Published/Draft, **Copy**, search and filter.
+* **Speaking**: Part 1 questions, Part 2 cue card with preparation / speaking timers, Part 3, optional picture, model-answer audio and text. Students open it from the Speaking practice page; they can record themselves in the browser (never uploaded).
+* **Articles**: cover picture, topic, passage level, source, reading time, text with pictures inside (the "Insert picture" button adds `![caption](url)`; `## Heading` and `- list` also work). They appear on the Articles page next to the built-in ones.
+* Lock / unlock by plan for all of them in `/admin#access`. Run the **v7 part** at the end of `supabase-schema.sql` once on Supabase.
+
+## Repair notes
+* A wrongly resolved git merge had removed the Access (lock) routes from `server.js` and parts of several admin/page files; they are restored. Admin-made tests now follow the Access rules (before, only the old Premium flag was checked).
+* Garbled characters (`в–¦`, `вњ“`) fixed in 79 files. Articles page: cards that led to non-existing pages were removed.

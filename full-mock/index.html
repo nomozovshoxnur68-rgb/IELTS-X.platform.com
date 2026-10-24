@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Full Mock Test</title>
+<link rel="stylesheet" href="css/mock.css">
+<link rel="stylesheet" href="css/writing.css">
+</head>
+<body oncontextmenu="return false">
+
+<!-- =========================== LOGIN =========================== -->
+<section id="scLogin" class="screen">
+  <main class="lg-page">
+    <form class="lg-card" id="loginForm" autocomplete="off" novalidate>
+      <div class="lg-logo"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
+      <h1>Full Mock Test</h1>
+      <p class="lg-sub">Listening, Reading and Writing &middot; 2 hours 45 minutes</p>
+
+      <div class="fld"><label for="lgName">Candidate name</label>
+        <div class="in"><svg class="lead" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.9-3.6 3.8-5.4 7.5-5.4s6.6 1.8 7.5 5.4"/></svg><input id="lgName" autocomplete="off" spellcheck="false" placeholder="Full name"></div></div>
+      <div class="fld"><label for="lgPhone">Phone number</label>
+        <div class="in"><svg class="lead" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><input id="lgPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="+998 90 123 45 67"></div></div>
+      <div class="fld"><label for="lgEmail">Email <span class="opt">(your results will be sent here)</span></label>
+        <div class="in"><svg class="lead" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="m4 7 8 6 8-6"/></svg><input id="lgEmail" type="email" inputmode="email" autocomplete="off" spellcheck="false" placeholder="name@example.com"></div></div>
+
+      <div class="lbl">Exam mode</div>
+      <div class="modes" role="radiogroup" aria-label="Exam mode">
+        <label class="mode"><input type="radio" name="mode" value="real" checked>
+          <span class="mc"><svg viewBox="0 0 24 24" class="ck"><circle cx="12" cy="12" r="10"/><path d="m7.4 12.4 3.1 3.1 6.2-6.4"/></svg><b>Real Exam Mode</b><small>No submit button. Each section ends by itself when its time is up.</small></span></label>
+        <label class="mode"><input type="radio" name="mode" value="practice">
+          <span class="mc"><svg viewBox="0 0 24 24" class="ck"><circle cx="12" cy="12" r="10"/><path d="m7.4 12.4 3.1 3.1 6.2-6.4"/></svg><b>Practice Mode</b><small>You can submit each section yourself, before the time runs out.</small></span></label>
+      </div>
+
+      <button class="lg-btn" type="submit"><span>Start</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <div id="lgErr" role="alert"></div>
+      <p class="lg-note">The test runs in full screen from start to result. Leaving full screen or switching tabs is recorded.</p>
+    </form>
+  </main>
+</section>
+
+<!-- ======================= PRE-TEST CHECKS ======================= -->
+<section id="scChecks" class="screen hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;">
+      <div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
+      <div class="ttblock"><div class="ttid-label">Test taker ID</div><div class="ttid-sub" id="pcName">Candidate</div></div>
+    </div>
+    <span class="modebadge" id="pcMode"></span>
+  </div>
+  <main class="pc-wrap">
+    <div class="today"><h2>Today</h2><span class="rule"></span></div>
+    <div class="pc-card">
+      <h3>Pre-test checks</h3>
+      <p class="sub">Watch each guide video, then take the three papers in order.</p>
+      <div id="chkList"></div>
+    </div>
+  </main>
+</section>
+
+<div id="modHost" class="hidden"></div>
+
+<!-- =========================== WRITING =========================== -->
+<section id="scWriting" class="hidden">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
+      <div class="ttblock"><div class="ttid-label">Test taker ID</div><div class="ttid-sub" id="wName">Candidate</div></div>
+      <div class="ttblock timer" id="wClockBox"><div class="ttid-label">&nbsp;</div><div class="ttid-sub" id="wClock">60 minutes left</div></div>
+    </div>
+    <div class="hdr-right">
+      
+      <button class="icon" data-ico="signal" title="Connection"></button>
+      <button class="icon" data-ico="bell" title="Messages"></button>
+      <button class="icon" data-ico="menu" title="Options" data-action="menu-open"></button>
+      
+    </div>
+  </div>
+  <div class="pbar"><div class="pbar-inner"><h2 id="wTitle">Task 1</h2><p id="wSub"></p></div></div>
+  <div class="wmain" id="wMain">
+    <div class="wleft" id="wLeft">
+      <div id="wPrompt1"></div>
+      <div id="wPrompt2" class="hidden"></div>
+    </div>
+    <div class="wdiv" id="wDiv"><button type="button" aria-label="Resize the panes" title="Drag to resize">&#8596;</button></div>
+    <div class="wright">
+      <textarea id="wText1" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="Type your Task 1 answer here…"></textarea>
+      <textarea id="wText2" class="hidden" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="Type your Task 2 answer here…"></textarea>
+      <div class="wcount" id="wCount">Task 1: 0 words · Task 2: 0 words</div>
+    </div>
+  </div>
+  <div class="wnav">
+    <div class="wtab sel" id="wTab1" data-action="task" data-n="1"><span>Task</span><span class="n">1</span><span class="wc" id="wWc1">0 words</span></div>
+    <div class="wtab" id="wTab2" data-action="task" data-n="2"><span>Task</span><span class="n">2</span><span class="wc" id="wWc2">0 words</span></div>
+    <button class="submit" id="wSubmit" data-action="w-submit" title="Submit the Writing test">&#10003;</button>
+  </div>
+</section>
+
+<div class="menu" id="menu">
+  <div class="menu-hdr">
+    <button class="back" id="mBack" data-action="menu-root">&lsaquo; Options</button>
+    <span class="t" id="mTitle">Options</span>
+    <button class="x" data-action="menu-close" aria-label="Close">&#10005;</button>
+  </div>
+  <div class="menu-body">
+    <div id="mRoot">
+      <div class="menu-item danger" id="mSubmit" data-action="menu-submit"><span>Go to submission page</span><span>&rsaquo;</span></div>
+      <div class="menu-item" data-action="menu-view" data-v="contrast"><span>Contrast</span><span>&rsaquo;</span></div>
+      <div class="menu-item" data-action="menu-view" data-v="text"><span>Text size</span><span>&rsaquo;</span></div>
+    </div>
+    <div id="mContrast" class="hidden">
+      <div class="orow" data-contrast="bw"><span class="ck">&#10004;</span>Black on white</div>
+      <div class="orow" data-contrast="wb"><span class="ck"></span>White on black</div>
+      <div class="orow" data-contrast="yb"><span class="ck"></span>Yellow on black</div>
+    </div>
+    <div id="mText" class="hidden">
+      <div class="orow" data-ts="regular"><span class="ck">&#10004;</span>Regular</div>
+      <div class="orow" data-ts="large"><span class="ck"></span>Large</div>
+      <div class="orow" data-ts="xlarge"><span class="ck"></span>Extra large</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= ANALYSE MISTAKES ======================= -->
+<section id="scAnalyse" class="screen hidden">
+  <div class="hdr"><div class="hdr-left"><div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
+      <div class="ttblock"><div class="ttid-label">Test taker ID</div><div class="ttid-sub" id="aName">Candidate</div></div></div>
+      <div class="hdr-right"></div></div>
+  <div class="rep" id="anaBody"></div>
+</section>
+
+<!-- =========================== RESULTS =========================== -->
+<section id="scReport" class="screen hidden">
+  <div class="rx-top"><div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div><div class="rx-title" id="rName">Full Mock Test</div><div class="rx-right"><span class="modebadge" id="rMode"></span></div></div>
+  <div class="rx-bar">Exam Results</div>
+  <div class="rx-scroll"><div class="rx-page" id="repBody"></div></div>
+</section>
+
+<!-- =========================== THANK YOU =========================== -->
+<section id="scDone" class="screen hidden">
+  <main class="lg-page"><div class="lg-card done-card">
+    <div class="done-ic"><svg viewBox="0 0 24 24" class="ck"><circle cx="12" cy="12" r="10"/><path d="m7.4 12.4 3.1 3.1 6.2-6.4"/></svg></div>
+    <h1>Test complete</h1>
+    <p class="lg-sub" id="doneMsg"></p>
+    <div class="done-btns"><button class="rx-btn" data-action="show-report">View results</button>
+      <button class="rx-btn dark hidden" id="newAttemptBtn" data-action="new-attempt">Start a new attempt</button></div>
+  </div></main>
+</section>
+
+<!-- ======================= overlays ======================= -->
+<div id="fsGuard" class="guard hidden" role="alertdialog" aria-modal="true" aria-labelledby="fsT">
+  <div class="guard-box"><h2 id="fsT">Full screen is required</h2>
+    <p>The test must stay in full screen. Leaving it is recorded.</p>
+    <button class="ibtn go" data-action="go-full">Return to full screen</button></div>
+</div>
+<div id="issueDlg" class="guard hidden" role="dialog" aria-modal="true" aria-labelledby="isT">
+  <div class="guard-box wide"><h2 id="isT">Report an issue</h2>
+    <p>Describe the problem (question number, what you saw).</p>
+    <textarea id="issueText" rows="5" maxlength="1500" placeholder="Type here…"></textarea>
+    <div class="askbtns"><button class="ibtn go" data-action="issue-send">Send</button><button class="ibtn ghost" data-action="issue-close">Cancel</button></div></div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- vendor: PDF export for the report -->
+<script src="js/vendor/jspdf.umd.js"></script>
+<script src="js/vendor/jspdf.plugin.autotable.js"></script>
+<script src="js/tests.js"></script>
+<script src="js/mock.js"></script>
+<script src="js/writing.js"></script>
+</body>
+</html>

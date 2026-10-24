@@ -14,7 +14,7 @@
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const LABEL = { free: 'Demo (Free)', standard: 'Standard', max: 'Max', ultra: 'Ultra' };
-  const SKILL_ORDER = ['reading', 'listening', 'writing', 'speaking'];
+  const SKILL_ORDER = ['reading', 'listening', 'writing', 'speaking', 'article'];
 
   let data = null;                 // { skills: [...] } from /api/admin/access
   let skill = 'reading';

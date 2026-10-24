@@ -1,5 +1,5 @@
 /* ====
-   IELTSX вЂ” Full Tests pages (assets/css/full-tests.css)
+   IELTSX — Full Tests pages (assets/css/full-tests.css)
    Pack list  (/full-tests/<skill>/)  and  pack page  (/full-tests/<skill>/<pack>).
    Colours come from the shared tokens in ix-unified.css, so light + dark both work.
 
@@ -7,14 +7,14 @@
 .ft-wrap { width: 100%; max-width: 76rem; margin: 0 auto; padding: 1.5rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-/* в”Ђв”Ђ header breadcrumb в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── header breadcrumb ───────────────────────────────────────────────── */
 .ft-crumbs { display: flex; align-items: center; gap: 0.5rem; min-width: 0; font-size: 0.875rem; line-height: 1.25rem; white-space: nowrap; overflow: hidden; }
 .ft-crumb { color: hsl(var(--muted-foreground)); text-decoration: none; transition: color 0.15s; }
 .ft-crumb:hover { color: hsl(var(--foreground)); text-decoration: underline; text-underline-offset: 3px; }
 .ft-crumb-current { font-weight: 500; color: hsl(var(--foreground)); overflow: hidden; text-overflow: ellipsis; }
 .ft-crumb-sep { display: inline-flex; color: hsl(var(--muted-foreground)); }
 
-/* в”Ђв”Ђ titles в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── titles ──────────────────────────────────────────────────────────── */
 .ft-title { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
 .ft-title h1 { margin: 0; font-size: 1.5rem; line-height: 2rem; font-weight: 700; letter-spacing: -0.015em; color: hsl(var(--foreground)); }
 .ft-title p { margin: 0.125rem 0 0; font-size: 0.9375rem; color: hsl(var(--muted-foreground)); }
@@ -25,7 +25,7 @@
 .ft-amber { color: #f59e0b; } .ft-emerald { color: #10b981; } .ft-blue { color: #3b82f6; } .ft-rose { color: #f43f5e; }
 .ft-meta { margin: 0 0 1.25rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
 
-/* в”Ђв”Ђ groups + grid в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── groups + grid ───────────────────────────────────────────────────── */
 .ft-group { margin-top: 1.75rem; }
 .ft-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.875rem; }
 .ft-group-head h2 { margin: 0; font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: hsl(var(--foreground)); }
@@ -34,7 +34,7 @@
 @media (max-width: 1100px) { .ft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 680px) { .ft-grid { grid-template-columns: minmax(0, 1fr); } .ft-wrap { padding: 1rem; } }
 
-/* в”Ђв”Ђ cards в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── cards ───────────────────────────────────────────────────────────── */
 .ft-card { background: hsl(var(--card)); color: hsl(var(--card-foreground)); border: 1px solid hsl(var(--border)); border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04); transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s; }
 .ft-card:hover { box-shadow: 0 10px 24px -12px rgba(15, 23, 42, 0.28); border-color: hsl(var(--ring)); }
 html.dark-mode .ft-card { box-shadow: none; }
@@ -48,7 +48,7 @@ html.dark-mode .ft-card:hover { box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.8)
 .ft-pack-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.25rem; }
 .ft-count { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.3125rem 0.625rem; border-radius: 0.375rem; background: hsl(var(--secondary)); font-size: 0.8125rem; font-weight: 600; color: hsl(var(--foreground)); }
 
-/* в”Ђв”Ђ buttons в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── buttons ─────────────────────────────────────────────────────────── */
 .ft-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; height: 2.25rem; padding: 0 1rem; border-radius: 0.375rem; font-size: 0.8125rem; font-weight: 600; text-decoration: none; white-space: nowrap; cursor: pointer; border: 1px solid transparent; transition: background-color 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s; }
 .ft-btn-outline { background: hsl(var(--background)); color: hsl(var(--foreground)); border-color: hsl(var(--input)); }
 .ft-btn-outline:hover { background: hsl(var(--accent)); }
@@ -56,7 +56,7 @@ html.dark-mode .ft-card:hover { box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.8)
 .ft-btn-dark:hover { opacity: 0.88; }
 html.dark-mode .ft-btn-dark { background: hsl(210 20% 94%); color: hsl(0 0% 10%); }
 
-/* в”Ђв”Ђ badges в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── badges ──────────────────────────────────────────────────────────── */
 .ft-badge { display: inline-flex; align-items: center; gap: 0.3125rem; flex: none; padding: 0.1875rem 0.625rem; border-radius: 0.375rem; font-size: 0.75rem; line-height: 1rem; font-weight: 700; letter-spacing: 0.02em; }
 .ft-badge-plan { background: #fcd34d; color: #78350f; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08); }
 .ft-badge-tier { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
@@ -66,7 +66,7 @@ html.dark-mode .ft-badge-plan { background: #facc15; color: #422006; }
 html.dark-mode .ft-badge-tier { background: #3a2a08; color: #fcd34d; border-color: #7c4a03; }
 .ft-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
 
-/* в”Ђв”Ђ pack page: toolbar в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── pack page: toolbar ──────────────────────────────────────────────── */
 .ft-toolbar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
 .ft-search { position: relative; display: flex; align-items: center; flex: 1 1 16rem; min-width: 0; }
 .ft-search svg { position: absolute; left: 0.75rem; color: hsl(var(--muted-foreground)); pointer-events: none; }
@@ -80,7 +80,7 @@ html.dark-mode .ft-badge-tier { background: #3a2a08; color: #fcd34d; border-colo
 .ft-seg-icons button[aria-pressed="true"] { background: hsl(var(--foreground)); color: hsl(var(--background)); box-shadow: none; }
 html.dark-mode .ft-seg-icons button[aria-pressed="true"] { background: hsl(210 20% 94%); color: hsl(0 0% 10%); }
 
-/* в”Ђв”Ђ pack page: tests в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── pack page: tests ────────────────────────────────────────────────── */
 .ft-grid-tests { gap: 1.25rem; }
 .ft-test { display: flex; flex-direction: column; gap: 0.625rem; padding: 1.25rem; }
 .ft-test-head { display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap; }
@@ -100,7 +100,7 @@ html.dark-mode .ft-seg-icons button[aria-pressed="true"] { background: hsl(210 2
 .ft-test-row .ft-start { flex: none; }
 @media (max-width: 520px) { .ft-test-row { flex-direction: column; } .ft-test-row .ft-start { align-self: flex-end; } }
 
-/* в”Ђв”Ђ empty + loading в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── empty + loading ─────────────────────────────────────────────────── */
 .ft-empty { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 3rem 1rem; border: 1px dashed hsl(var(--border)); border-radius: 0.75rem; text-align: center; color: hsl(var(--muted-foreground)); }
 .ft-empty p { margin: 0; }
 .ft-empty-title { font-weight: 600; color: hsl(var(--foreground)); }
@@ -109,7 +109,7 @@ html.dark-mode .ft-seg-icons button[aria-pressed="true"] { background: hsl(210 2
 @keyframes ft-shimmer { to { background-position: -200% 0; } }
 @media (max-width: 680px) { .ft-skeleton { grid-template-columns: 1fr; } }
 
-/* в”Ђв”Ђ fixes: long "Source: вЂ¦" text, and header / breadcrumb never wider than the phone в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── fixes: long "Source: …" text, and header / breadcrumb never wider than the phone ───────────── */
 .ft-source { align-items: flex-start; }
 .ft-source svg { margin-top: 0.2rem; }
 .ft-source span { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.35; }
@@ -120,14 +120,14 @@ header .ft-crumbs, #ft-crumbs { display: flex; align-items: center; min-width: 0
 #ft-crumbs .ft-crumb-current { flex: 0 1 auto; }
 #ft-crumbs .ft-crumb-sep { flex: none; }
 @media (max-width: 520px) {
-    header .theme-switch { display: none; }          /* the theme switch lives in Account в†’ Appearance on phones */
+    header .theme-switch { display: none; }          /* the theme switch lives in Account → Appearance on phones */
     #ft-crumbs .ft-crumb:first-of-type { display: none; }
     #ft-crumbs .ft-crumb-sep:nth-of-type(1) { display: none; }
     .ft-toolbar { flex-wrap: wrap; }
     .ft-toolbar .ft-search { flex: 1 1 100%; }
 }
 
-/* в”Ђв”Ђ pack page: exactly like the design (title + Skill/Tier chips, search row, centred list of test cards) в”Ђв”Ђ */
+/* ── pack page: exactly like the design (title + Skill/Tier chips, search row, centred list of test cards) ── */
 .ft-title-pack { align-items: center; gap: 0.75rem; margin-bottom: 0.875rem; }
 .ft-title-pack h1 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 800; letter-spacing: -0.02em; }
 .ft-chips { gap: 0.5rem; margin-bottom: 1.25rem; }
@@ -145,7 +145,23 @@ header .ft-crumbs, #ft-crumbs { display: flex; align-items: center; min-width: 0
 #ft-count { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }   /* kept for screen readers, hidden like in the design */
 @media (max-width: 640px) { .ft-toolbar { flex-wrap: wrap; } .ft-search { flex: 1 1 100%; } }
 
-/* в”Ђв”Ђ access: Free badge + "Get Access" button (same look as the Writing cards) в”Ђв”Ђ */
+/* ── access: Free badge + "Get Access" button (same look as the Writing cards) ── */
+.ft-badge-free { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+html.dark-mode .ft-badge-free { background: #12301f; color: #86efac; border-color: #14532d; }
+.ft-btn-access { background-image: linear-gradient(90deg, #dc2626, #e11d48 55%, #ea580c); color: #fff; border-color: transparent; box-shadow: 0 6px 16px -6px rgba(225, 29, 72, 0.55); }
+.ft-btn-access:hover { background-image: linear-gradient(90deg, #b91c1c, #be123c 55%, #c2410c); color: #fff; }
+.ft-btn-access svg { width: 14px; height: 14px; }
+.ft-pack-foot .ft-btn-access { height: 2.25rem; }
+
+/* ── access: Free badge + "Get Access" button (same look as the Writing cards) ── */
+.ft-badge-free { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+html.dark-mode .ft-badge-free { background: #12301f; color: #86efac; border-color: #14532d; }
+.ft-btn-access { background-image: linear-gradient(90deg, #dc2626, #e11d48 55%, #ea580c); color: #fff; border-color: transparent; box-shadow: 0 6px 16px -6px rgba(225, 29, 72, 0.55); }
+.ft-btn-access:hover { background-image: linear-gradient(90deg, #b91c1c, #be123c 55%, #c2410c); color: #fff; }
+.ft-btn-access svg { width: 14px; height: 14px; }
+.ft-pack-foot .ft-btn-access { height: 2.25rem; }
+
+/* ── access: Free badge + "Get Access" button (same look as the Writing cards) ── */
 .ft-badge-free { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
 html.dark-mode .ft-badge-free { background: #12301f; color: #86efac; border-color: #14532d; }
 .ft-btn-access { background-image: linear-gradient(90deg, #dc2626, #e11d48 55%, #ea580c); color: #fff; border-color: transparent; box-shadow: 0 6px 16px -6px rgba(225, 29, 72, 0.55); }

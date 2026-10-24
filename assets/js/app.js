@@ -1,10 +1,10 @@
 /*
- * IELTSX вЂ” single JavaScript bundle (assets/js/app.js)
+ * IELTSX — single JavaScript bundle (assets/js/app.js)
  * 1) shared constants & helpers  2) page modules (original code, unchanged)  3) router
  */
 (function () {
   /* ======
-   * 1) SHARED CONSTANTS & HELPERS (new) вЂ” window.IELTSX
+   * 1) SHARED CONSTANTS & HELPERS (new) — window.IELTSX
    *    Names inside this block are kept exactly as in the original bundle.
    * ====== */
   var lz = (e => (e.LISTENING = "LISTENING",
@@ -299,7 +299,7 @@
   }];
 
   function jW(e) {
-      return e ? e.replace(/\s*[-|вЂ“]\s*[^-вЂ“|]+$/g, "").trim() : ""
+      return e ? e.replace(/\s*[-|–]\s*[^-–|]+$/g, "").trim() : ""
   }
   function SW(e) {
       if (e.summary && e.summary.trim().length > 0)
@@ -531,7 +531,7 @@
 
   // ---- FILTER SPECS (labels/groups exactly as in the design) ----
   function opt(value, label) { return { value: value, label: label || value }; }
-  var PLAN_OPTIONS = [opt('demo', 'Demo (Free)'), opt('max', 'Max')];
+  var PLAN_OPTIONS = [opt('demo', 'Demo (Free)'), opt('standard', 'Standard'), opt('max', 'Max'), opt('ultra', 'Ultra')];
   var STATUS_OPTIONS = [opt('not-completed', 'Not Completed'), opt('completed', 'Completed')];
   var READING_TYPE_GROUPS = [
     { label: 'Completion', options: [opt('completion', 'Completion / Gap Fill'), opt('summary-options', 'Summary with Options'), opt('diagram-labeling', 'Diagram Labeling')] },
@@ -873,7 +873,7 @@
     location.href = '/Price?premium=required&next=' + encodeURIComponent(location.pathname + location.search);
   });
   /* ======
-   * 2) PAGE MODULES вЂ” original page scripts, copied verbatim
+   * 2) PAGE MODULES — original page scripts, copied verbatim
    * ====== */
   var pages = {};
 
@@ -1076,7 +1076,7 @@
                 return filterBar.matches('section', [card.section]) &&
                     filterBar.matches('status', [IELTSX.completionKey(card.key)]) &&
                     filterBar.matches('type', card.typeKeys) &&
-                    filterBar.matches('plan', [card.freeCard ? 'demo' : 'max']) &&
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(card, card.freeCard) : (card.freeCard ? 'demo' : 'max')]) &&
                     filterBar.matches('pack', [card.pack]);
             });
         }
@@ -1395,7 +1395,7 @@
             badge: 'FREE'
         }, {
             id: 12,
-            title: 'Free: The continuing saga of the GalГЎpagos Finches',
+            title: 'Free: The continuing saga of the Galápagos Finches',
             status: 'FREE',
             types: ['True False Not Given', 'Note Completion'],
             plan: 'Starter Pack',
@@ -1573,7 +1573,7 @@
                 return filterBar.matches('passage', [card.passage]) &&
                     filterBar.matches('status', [IELTSX.completionKey(card.key)]) &&
                     filterBar.matches('type', card.typeKeys) &&
-                    filterBar.matches('plan', [card.freeCard ? 'demo' : 'max']) &&
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(card, card.freeCard) : (card.freeCard ? 'demo' : 'max')]) &&
                     filterBar.matches('pack', [card.pack]);
             });
         }
@@ -1648,7 +1648,7 @@
                                     <div class="flex gap-2 pt-1">
                                         <a href="${String(card.href || '#').replace(/\.html(?=$|[?#])/i, '')}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white h-8 rounded-md px-3 text-xs font-semibold shadow-lg hover:shadow-xl transition-all w-full">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play w-3.5 h-3.5 mr-1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                            Start Free в†’
+                                            Start Free →
                                         </a>
                                     </div>
                                 </div>
@@ -1781,13 +1781,13 @@
 
   pages['speaking'] = function () {
       // ---- speaking.js ----
-        // в”Ђв”Ђв”Ђ Disable Context Menu в”Ђв”Ђв”Ђ
+        // ─── Disable Context Menu ───
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
 
-        // в”Ђв”Ђв”Ђ Dark / Light / System: IELTSX.theme в”Ђв”Ђв”Ђ
+        // ─── Dark / Light / System: IELTSX.theme ───
         document.addEventListener('ieltsx:themechange', function() { renderCards(); });
 
-        // в”Ђв”Ђв”Ђ Data (18 topics) в”Ђв”Ђв”Ђ
+        // ─── Data (18 topics) ───
         const topicsData = [
             { id: 1, title: "Topic 19 - P3: Environmental protection", part: "Part 3", tier: "Tier 3",
                 pack: "Jan-August", plan: "Plan A", tags: ["Environment Nature", "Urban Life Places"] },
@@ -1829,7 +1829,7 @@
                 pack: "Sep-Dec", plan: "Plan B", tags: ["Technology", "Relationships"] }
         ];
 
-        // в”Ђв”Ђв”Ђ Render в”Ђв”Ђв”Ђ
+        // ─── Render ───
         let currentPage = 1;
         const perPage = 6;
 
@@ -1843,7 +1843,7 @@
                 if (!filterBar) return true;
                 return filterBar.matches('part', [item.part]) &&
                     filterBar.matches('status', [IELTSX.completionKey('speaking:' + item.id)]) &&
-                    filterBar.matches('plan', [IELTSX.isFreeItem(item) ? 'demo' : 'max']) &&
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, IELTSX.isFreeItem(item)) : (IELTSX.isFreeItem(item) ? 'demo' : 'max')]) &&
                     filterBar.matches('pack', [item.pack]);
             });
         }
@@ -1893,7 +1893,7 @@
                                         </div>
                                     </div>
                                     <div class="flex gap-2 pt-1">
-                                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+                                        <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
                                                 <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
                                                 <path d="M5 21h14"></path>
@@ -1911,7 +1911,7 @@
             document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
         }
 
-        // в”Ђв”Ђв”Ђ Pagination в”Ђв”Ђв”Ђ
+        // ─── Pagination ───
         document.getElementById('prevPageBtn').addEventListener('click', function() {
             if (currentPage > 1) { currentPage--;
                 renderCards(); }
@@ -1923,7 +1923,7 @@
                 renderCards(); }
         });
 
-        // в”Ђв”Ђв”Ђ Filters в”Ђв”Ђв”Ђ
+        // ─── Filters ───
         (function () {
             filterBar = IELTSX.createFilterBar({
                 specs: IELTSX.filterSpecs('speaking', ['Jan-August', 'Sep-Dec']),
@@ -1934,7 +1934,7 @@
         document.getElementById('searchInput').addEventListener('input', IELTSX.debounce(function() { currentPage = 1; renderCards(); }, 150));
         document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
 
-        // в”Ђв”Ђв”Ђ Sidebar Toggle в”Ђв”Ђв”Ђ
+        // ─── Sidebar Toggle ───
         (function() {
             const sidebarContainer = document.getElementById('sidebarContainer');
             const sidebarRoot = document.getElementById('main-sidebar-root');
@@ -1992,20 +1992,20 @@
             }
         })();
 
-        // в”Ђв”Ђв”Ђ Init в”Ђв”Ђв”Ђ
+        // ─── Init ───
         renderCards();
     
   };
 
   pages['writing'] = function () {
       // ---- writing.js ----
-        // в”Ђв”Ђв”Ђ Disable Context Menu в”Ђв”Ђв”Ђ
+        // ─── Disable Context Menu ───
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
 
-        // в”Ђв”Ђв”Ђ Dark / Light / System: IELTSX.theme в”Ђв”Ђв”Ђ
+        // ─── Dark / Light / System: IELTSX.theme ───
         document.addEventListener('ieltsx:themechange', function() { renderCards(); });
 
-        // в”Ђв”Ђв”Ђ Data в”Ђв”Ђв”Ђ
+        // ─── Data ───
         const writingData = [
             { id: 1, title: "Test 9 - T2: Extreme Sports Skydiving Skiing Dangerous Should Banned", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
             { id: 2, title: "Test 9 - T1: Europeans Different Age Groups Gym Attendance 1990-2010 Chart", task: "Task 1", tier: "Tier 1", type: "Line Graph", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t9.png" },
@@ -2021,7 +2021,7 @@
             { id: 12, title: "Test 4 - Task 1: Task 1", task: "Task 1", tier: "Tier 1", type: "Map", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t4.png" }
         ];
 
-        // в”Ђв”Ђв”Ђ Render в”Ђв”Ђв”Ђ
+        // ─── Render ───
         let currentPage = 1;
         const perPage = 6;
 
@@ -2035,7 +2035,7 @@
                 return filterBar.matches('task', [item.task]) &&
                     filterBar.matches('status', [IELTSX.completionKey('writing:' + item.id)]) &&
                     filterBar.matches('type', IELTSX.canonicalWritingTypes(item.type)) &&
-                    filterBar.matches('plan', [IELTSX.isFreeItem(item) ? 'demo' : 'max']) &&
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, IELTSX.isFreeItem(item)) : (IELTSX.isFreeItem(item) ? 'demo' : 'max')]) &&
                     filterBar.matches('pack', [item.pack]);
             });
         }
@@ -2086,7 +2086,7 @@
                                 </div>
                             </div>
                             <div class="flex gap-2 pt-1">
-                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+                                <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
                                         <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
                                         <path d="M5 21h14" />
@@ -2104,7 +2104,7 @@
             document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
         }
 
-        // в”Ђв”Ђв”Ђ Pagination в”Ђв”Ђв”Ђ
+        // ─── Pagination ───
         document.getElementById('prevPageBtn').addEventListener('click', function() {
             if (currentPage > 1) { currentPage--; renderCards(); }
         });
@@ -2114,7 +2114,7 @@
             if (currentPage < totalPages) { currentPage++; renderCards(); }
         });
 
-        // в”Ђв”Ђв”Ђ Filters в”Ђв”Ђв”Ђ
+        // ─── Filters ───
         (function () {
             filterBar = IELTSX.createFilterBar({
                 specs: IELTSX.filterSpecs('writing', ['09_02-16_02', 'Jan-August', 'Sep-Dec']),
@@ -2125,7 +2125,7 @@
         document.getElementById('searchInput').addEventListener('input', IELTSX.debounce(function() { currentPage = 1; renderCards(); }, 150));
         document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
 
-        // в”Ђв”Ђв”Ђ Sidebar Toggle в”Ђв”Ђв”Ђ
+        // ─── Sidebar Toggle ───
         (function() {
             const sidebarContainer = document.getElementById('sidebarContainer');
             const sidebarRoot = document.getElementById('main-sidebar-root');
@@ -2201,7 +2201,7 @@
             }
         })();
 
-        // в”Ђв”Ђв”Ђ Init в”Ђв”Ђв”Ђ
+        // ─── Init ───
         renderCards();
     
   };
@@ -2317,16 +2317,16 @@
                 date: "2025-03-28", image: "article5.png",
                 description: "Solar, wind, and battery technologies driving the green transition.",
                 href: "article5.html" },
-            { id: 6, title: "Lake Bosumtwi вЂ“ the secrets of a crater lake", passage: "Passage 3", topic: "History",
+            { id: 6, title: "Lake Bosumtwi – the secrets of a crater lake", passage: "Passage 3", topic: "History",
                 date: "2025-03-20", image: "article6.jpg",
                 description: "A major scientific project led by Earth Sciences professor Christopher Scholz represents the first large-scale investigation of Lake Bosumtwi in Ghana",
                 href: "article6.html" },
             { id: 7, title: "Halley VI Research Station, Antarctica", passage: "Passage 2", topic: "Science", date: "2026-05-17",
                 image: "/article/images/Halley VI Research Station, Antarctica.jpg",
-                description: "The British Antarctic SurveyвЂ™s new research station at Halley Bay is a portable pod structure that uses scent, colour and curves to take the edge off the worldвЂ™s longest winter.",
+                description: "The British Antarctic Survey’s new research station at Halley Bay is a portable pod structure that uses scent, colour and curves to take the edge off the world’s longest winter.",
                 href: "/collections/article-5.html" },
-            { id: 8, title: "Lever BrothersвЂ™ Sunlight Soap", passage: "Passage 1", topic: "History", date: "2026-05-17",
-                image: "/article/images/Lever BrothersвЂ™ Sunlight Soap.jpg",
+            { id: 8, title: "Lever Brothers’ Sunlight Soap", passage: "Passage 1", topic: "History", date: "2026-05-17",
+                image: "/article/images/Lever Brothers’ Sunlight Soap.jpg",
                 description: "The history of Sunlight Soap and its influence on hygiene, industrial production, marketing, public health, social responsibility, and global consumer culture.",
                 href: "/collections/article-3.html" },
             { id: 9, title: "Catch of the Day (GM Fish)", passage: "Passage 2", topic: "Technology",
@@ -2347,9 +2347,19 @@
                 href: "article12.html" },
             { id: 13, title: " History of the SS Yongala", passage: "Passage 1", topic: "History",
                 date: "2026-05-17", image: "/article/images/History of the SS Yongala.jpg",
-                description: "The final voyage of the luxury steamliner SS Yongala, its mysterious disappearance, the long search for answers, and its transformation into one of AustraliaвЂ™s greatest dive sites.",
+                description: "The final voyage of the luxury steamliner SS Yongala, its mysterious disappearance, the long search for answers, and its transformation into one of Australia’s greatest dive sites.",
                 href: "/collections/article-4.html" },
         ];
+
+        // cards whose page does not exist are dropped (they led to the 404 page); articles made in the admin panel are added
+        for (var ai = articlesData.length - 1; ai >= 0; ai--) { if (!/^\/collections\//.test(String(articlesData[ai].href || ''))) articlesData.splice(ai, 1); }
+        fetch('/api/materials?type=article', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
+            (d.items || []).forEach(function (m, i) {
+                articlesData.push({ id: 1000 + i, title: m.title, passage: m.passageLabel || 'Passage 1', topic: m.topic || 'General', date: String(m.createdAt || '').slice(0, 10) || '2026-01-01',
+                    image: m.coverUrl || '', description: m.description || m.source || '', href: '/test?id=' + encodeURIComponent(m.id), locked: !!m.locked });
+            });
+            if (document.getElementById('articlesGrid')) renderArticles();
+        }).catch(function () { /* the built-in articles still show */ });
 
         function renderArticles() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -2370,7 +2380,7 @@
                 `
                     <a href="${String(art.href || '#').replace(/\.html(?=$|[?#])/i, '')}" class="group rounded-xl border text-card-foreground flex h-full min-h-[390px] cursor-pointer flex-col overflow-hidden border-border/70 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg" style="text-decoration: none; color: inherit; background: var(--bg-card); border-color: var(--border-color);">
                         <div class="relative h-52 overflow-hidden">
-                            <img loading="lazy" decoding="async" src="${art.image}" alt="${art.title}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]">
+                            <img loading="lazy" decoding="async" src="${art.image}" alt="${String(art.title).replace(/"/g, '&quot;')}" onerror="this.style.visibility='hidden'" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"></div>
                             <div class="flex flex-wrap gap-2 absolute left-4 top-4">
                                 <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold shadow border-white/30 bg-white/90 text-slate-900" style="background: var(--bg-card); color: var(--text-primary);">${art.passage}</span>
@@ -2379,7 +2389,7 @@
                         </div>
                         <div class="flex flex-col p-6 pb-3"><div class="font-semibold line-clamp-2 text-xl leading-snug" style="color: var(--text-primary);">${art.title}</div></div>
                         <div class="p-6 pt-0 pb-4"><div class="text-muted-foreground line-clamp-3 text-base leading-7" style="color: var(--text-secondary);">${art.description}</div></div>
-                        <div class="flex items-center p-6 mt-auto px-6 pb-5 pt-0"><span class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 transition-colors group-hover:text-indigo-800">Read article<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
+                        <div class="flex items-center p-6 mt-auto px-6 pb-5 pt-0"><span class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 transition-colors group-hover:text-indigo-800">${art.locked ? '🔒 Get Access' : 'Read article'}<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
                     </a>
                 `
             ).join('');
@@ -2395,9 +2405,9 @@
                 ].map(f =>
                     `
                         <div class="rounded-xl border bg-white p-5 shadow-sm hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">
-                            <div class="text-xs" style="color: var(--text-secondary);">${f.source} В· ${f.date}</div>
+                            <div class="text-xs" style="color: var(--text-secondary);">${f.source} · ${f.date}</div>
                             <h4 class="font-semibold mt-1" style="color: var(--text-primary);">${f.title}</h4>
-                            <a href="#" class="text-indigo-600 text-sm mt-3 inline-block font-medium">Read full в†’</a>
+                            <a href="#" class="text-indigo-600 text-sm mt-3 inline-block font-medium">Read full →</a>
                         </div>
                     `
                 ).join('');
@@ -2541,7 +2551,7 @@
         const splitText = doc.splitTextToSize(content, 170);
         doc.text(splitText, 20, 35);
         doc.setFontSize(10);
-        doc.text("В© IELTSX вЂ” Official Preparation Platform. All rights reserved.", 20, 270);
+        doc.text("© IELTSX — Official Preparation Platform. All rights reserved.", 20, 270);
         doc.text("Downloaded from IELTSX PDF Library", 20, 280);
         doc.save(`${title}.pdf`);
     }
@@ -2553,9 +2563,9 @@
   pages['performance'] = function () {
       // ---- performance.js ----
         (function () {
-            // в”Ђв”Ђв”Ђ Dark / Light / System: handled by IELTSX.theme в”Ђв”Ђв”Ђ
+            // ─── Dark / Light / System: handled by IELTSX.theme ───
 
-            // в”Ђв”Ђв”Ђ Sidebar Toggle в”Ђв”Ђв”Ђ
+            // ─── Sidebar Toggle ───
             const sidebarContainer = document.getElementById('main-sidebar-root');
             const toggleButtons = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
 
@@ -2578,14 +2588,14 @@
                 });
             });
 
-            // в”Ђв”Ђв”Ђ Countdown Timer в”Ђв”Ђв”Ђ
+            // ─── Countdown Timer ───
             IELTSX.startCountdown((2 * 86400) + (23 * 3600) + (24 * 60) + 53, ['daysLeft', 'hoursLeft', 'minutesLeft', 'secondsLeft']);
         })();
     
   };
 
   /* ======
-   * 3) PAGE ROUTER вЂ” runs only the module that belongs to this page
+   * 3) PAGE ROUTER — runs only the module that belongs to this page
    * ====== */
   function detectPage() {
     var file = (location.pathname.split('/').pop() || '').replace(/\.html?$/i, '').toLowerCase();

@@ -305,9 +305,243 @@ server.listen(0, async () => {
     assert.equal((await call('POST', '/api/admin/upload-url', { jar: boss, body: { filename: 'a.sh' } })).status, 400);
     assert.equal((await call('DELETE', '/api/admin/materials/' + rid, { jar: boss })).status, 200);
     ok('admin-made tests: reading/listening/writing, grading, premium lock, drafts, image + audio uploads');
+    // --- access rules: free / locked + plan for every pack and test (admin panel -> Access)
+    {
+      const vm = require('vm');
+      // accounts are created straight in the store (sign-up is rate limited per address, earlier tests used it up) and then log in for real
+      const mk = async (name, email) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); const lr = await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j }); assert.equal(lr.status, 200, 'login ' + email);
+        return { j, id: row.id };
+      };
+      const stdU = await mk('Stan', 'stan@example.com'), maxU = await mk('Maxi', 'maxi@example.com'), nobody = await mk('Nora', 'nora@example.com');
+      await call('POST', `/api/admin/users/${stdU.id}/premium`, { body: { plan: 'Standard', days: 30 }, jar: boss });
+      await call('POST', `/api/admin/users/${maxU.id}/premium`, { body: { plan: 'Max', days: 30 }, jar: boss });
+      assert.equal((await call('GET', '/api/premium/status', { jar: stdU.j })).json.level, 1);
+      assert.equal((await call('GET', '/api/premium/status', { jar: maxU.j })).json.level, 2);
+      assert.equal((await call('GET', '/api/premium/status', { jar: nobody.j })).json.level, 0);
+      assert.equal((await call('GET', '/api/access')).json.level, 0, 'guest level 0');
+      ok('plan levels: Free 0, Standard 1, Max 2');
+
+      // defaults: every full test is locked for Free, open to any paid plan
+      const page = '/full-tests/reading/test-5.html';
+      assert.equal((await call('GET', page, { jar: nobody.j })).status, 302);
+      assert.equal((await call('GET', page, { jar: stdU.j })).status, 200);
+      assert.equal((await call('GET', page, { jar: maxU.j })).status, 200);
+
+      // admin only
+      assert.equal((await call('GET', '/api/admin/access', { jar: stdU.j })).status, 403);
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/pack-1/test-5', mode: 'free' }] }, jar: stdU.j })).status, 403);
+      let r = await call('GET', '/api/admin/access', { jar: boss }); assert.equal(r.status, 200);
+      const reading = r.json.skills.find((x) => x.skill === 'reading'); const pack1 = reading.packs.find((p) => p.slug === 'pack-1');
+      assert.ok(pack1 && pack1.tests.length === 2 && pack1.tests[0].key === 'test:reading/pack-1/test-5', 'catalog keys');
+      assert.equal(pack1.rule.mode, 'default');
+      // bad input
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [{ key: '../etc', mode: 'free' }] }, jar: boss })).status, 400);
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/pack-1/test-5', mode: 'vip' }] }, jar: boss })).status, 400);
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [] }, jar: boss })).status, 400);
+
+      // Max only for ONE test: Standard is sent to the Price page, Max still gets in
+      r = await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/pack-1/test-5', mode: 'max' }] }, jar: boss }); assert.equal(r.status, 200);
+      let x = await call('GET', page, { jar: stdU.j }); assert.equal(x.status, 302); assert.ok(/^\/Price\?premium=required&plan=max/.test(x.headers.get('location')), x.headers.get('location'));
+      assert.equal((await call('GET', page, { jar: maxU.j })).status, 200);
+      assert.equal((await call('GET', '/full-tests/reading/test-6.html', { jar: stdU.j })).status, 200, 'the other test of the pack is untouched');
+      let chk = (await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json;
+      assert.equal(chk.allowed, false); assert.equal(chk.plan, 'max'); assert.ok(chk.price.includes('plan=max'));
+      assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: maxU.j })).json.allowed, true);
+      ok('one test can be made Max-only (Standard -> Price page, Max still opens it)');
+
+      // a whole pack: Free for everybody, then Max, then back to default; a test setting wins over its pack
+      r = await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'free' }, { key: 'test:reading/pack-1/test-5', mode: 'default' }] }, jar: boss });
+      assert.equal((await call('GET', page, { jar: nobody.j })).status, 200, 'free pack: tests inherit it');
+      assert.equal((await call('GET', '/full-tests/reading/test-6.html')).status, 200, 'free for guests too');
+      assert.equal((await call('GET', '/api/access')).json.rules['pack:reading/pack-1'].locked, false);
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'max' }, { key: 'test:reading/pack-1/test-6', mode: 'free' }] }, jar: boss });
+      assert.equal((await call('GET', page, { jar: stdU.j })).status, 302, 'locked pack: Max only');
+      assert.equal((await call('GET', '/full-tests/reading/test-6.html', { jar: nobody.j })).status, 200, 'a free test inside a locked pack');
+      r = await call('GET', '/api/admin/access', { jar: boss });
+      const p1 = r.json.skills[0].packs.find((p) => p.slug === 'pack-1');
+      assert.equal(p1.rule.mode, 'max'); assert.equal(p1.tests[0].rule.locked, true); assert.equal(p1.tests[0].rule.plan, 'max'); assert.equal(p1.tests[1].rule.mode, 'free');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'default' }, { key: 'test:reading/pack-1/test-6', mode: 'default' }] }, jar: boss });
+      assert.equal((await call('GET', page, { jar: nobody.j })).status, 302, 'back to the default lock');
+      assert.equal((await call('GET', page, { jar: stdU.j })).status, 200);
+      ok('packs: free / Max / default, inheritance, a test setting beats its pack');
+
+      // tests made in the admin panel follow the same rules (and the old premium flag stays in step)
+      r = await call('POST', '/api/admin/materials', { body: { type: 'reading', title: 'Made in admin', pack: 'Pack 1', premium: false, data: { passage: 'Text', questions: [{ type: 'short', text: 'Q?', answer: 'a' }] } }, jar: boss });
+      assert.equal(r.status, 201); const mid = r.json.item.id;
+      assert.equal((await call('GET', '/api/materials/' + mid, { jar: nobody.j })).status, 200, 'free material');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'mat:' + mid, mode: 'max' }] }, jar: boss });
+      assert.equal((await call('GET', '/api/materials/' + mid, { jar: stdU.j })).status, 403);
+      assert.equal((await call('GET', '/api/materials/' + mid, { jar: maxU.j })).status, 200);
+      assert.equal((await call('GET', '/api/materials/' + mid)).status, 401);
+      let list = (await call('GET', '/api/materials?type=reading', { jar: stdU.j })).json.items.find((i) => i.id === mid); assert.equal(list.locked, true); assert.equal(list.plan, 'max');
+      assert.equal((await call('GET', '/api/admin/materials/' + mid, { jar: boss })).json.item.premium, true, 'premium flag follows');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'max' }, { key: 'mat:' + mid, mode: 'default' }] }, jar: boss });
+      ok('admin-made tests: Free / Standard / Max, pack setting inherited');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'default' }] }, jar: boss });
+      await call('DELETE', '/api/admin/materials/' + mid, { jar: boss });
+      assert.ok((await call('GET', '/api/admin/audit', { jar: boss })).json.entries.some((e) => e.action === 'access.set'), 'audited');
+
+      // Ultra + the cards of the practice pages (Reading passages, Listening sections, Writing tasks, Speaking topics)
+      const ultraU = await mk('Ulla', 'ulla@example.com');
+      await call('POST', `/api/admin/users/${ultraU.id}/premium`, { body: { plan: 'Ultra', days: 30 }, jar: boss });
+      assert.equal((await call('GET', '/api/premium/status', { jar: ultraU.j })).json.level, 3, 'Ultra = level 3');
+      assert.equal((await call('GET', '/api/premium/status', { jar: maxU.j })).json.level, 2);
+      const av = (await call('GET', '/api/admin/access', { jar: boss })).json;
+      assert.deepEqual(av.plans, ['standard', 'max', 'ultra']);
+      const counts = Object.fromEntries(av.skills.map((x) => [x.skill, (x.packs.find((p) => p.practice) || { tests: [] }).tests.length]));
+      delete counts.article; assert.deepEqual(counts, { reading: 21, listening: 5, writing: 12, speaking: 18 }, 'all practice cards are listed');
+      assert.equal((await call('GET', '/pessages/test-1.html')).status, 200, 'free by default');
+      assert.equal((await call('GET', '/pessages/test-1 explanations.html')).status, 200, 'explanations untouched');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'ultra' }] }, jar: boss });
+      x = await call('GET', '/pessages/test-1.html', { jar: maxU.j }); assert.equal(x.status, 302); assert.ok(x.headers.get('location').includes('plan=ultra'));
+      assert.equal((await call('GET', '/pessages/test-1.html', { jar: ultraU.j })).status, 200);
+      assert.equal((await call('GET', '/pessages/test-2.html')).status, 200, 'other card untouched');
+      assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/pessages/test-1'), { jar: stdU.j })).json.allowed, false);
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:listening/practice-cards', mode: 'standard' }] }, jar: boss });
+      assert.equal((await call('GET', '/sections/test-3.html', { jar: nobody.j })).status, 302);
+      assert.equal((await call('GET', '/sections/test-3.html', { jar: stdU.j })).status, 200);
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'default' }, { key: 'pack:listening/practice-cards', mode: 'default' }] }, jar: boss });
+      assert.equal((await call('GET', '/sections/test-3.html')).status, 200);
+      ok('Ultra plan + practice cards (Reading/Listening pages are enforced, Writing/Speaking listed)');
+
+      // the keys the browser builds (access.js) are the keys the server knows
+      const ctx = { window: {} }; vm.createContext(ctx);
+      vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'assets/js/access.js'), 'utf8'), ctx);
+      vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'assets/js/full-tests-data.js'), 'utf8'), ctx);
+      const D = ctx.window.IELTSX_FULL_TESTS; const adminView = (await call('GET', '/api/admin/access', { jar: boss })).json; let checked = 0;
+      for (const sk of adminView.skills) for (const pk of sk.packs.filter((p) => !p.extra && !p.practice)) {
+        const cp = D.packs[sk.skill].find((p) => p.slug === pk.slug);
+        const tests = cp.tests.map((t, i) => Object.assign({}, t, { _i: i })).sort((a, b) => ((a.number || 0) - (b.number || 0)) || (a._i - b._i));
+        const pack = ctx.window.IELTSXAccess.assignKeys(sk.skill, { slug: cp.slug, tests });
+        assert.equal(pack.key, pk.key);
+        assert.deepEqual(tests.map((t) => t.key), pk.tests.map((t) => t.key), sk.skill + '/' + pk.slug); checked += tests.length + 1;
+      }
+      assert.ok(checked > 20); ok('browser keys = server keys (' + checked + ' packs and tests)');
+    }
+    // --- access rules: free / locked + plan for every pack and test (admin panel -> Access)
+    {
+      const vm = require('vm');
+      // accounts are created straight in the store (sign-up is rate limited per address, earlier tests used it up) and then log in for real
+      const mk = async (name, email) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); const lr = await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j }); assert.equal(lr.status, 200, 'login ' + email);
+        return { j, id: row.id };
+      };
+      const stdU = await mk('Stan', 'stan@example.com'), maxU = await mk('Maxi', 'maxi@example.com'), nobody = await mk('Nora', 'nora@example.com');
+      await call('POST', `/api/admin/users/${stdU.id}/premium`, { body: { plan: 'Standard', days: 30 }, jar: boss });
+      await call('POST', `/api/admin/users/${maxU.id}/premium`, { body: { plan: 'Max', days: 30 }, jar: boss });
+      assert.equal((await call('GET', '/api/premium/status', { jar: stdU.j })).json.level, 1);
+      assert.equal((await call('GET', '/api/premium/status', { jar: maxU.j })).json.level, 2);
+      assert.equal((await call('GET', '/api/premium/status', { jar: nobody.j })).json.level, 0);
+      assert.equal((await call('GET', '/api/access')).json.level, 0, 'guest level 0');
+      ok('plan levels: Free 0, Standard 1, Max 2');
+
+      // defaults: every full test is locked for Free, open to any paid plan
+      const page = '/full-tests/reading/test-5.html';
+      assert.equal((await call('GET', page, { jar: nobody.j })).status, 302);
+      assert.equal((await call('GET', page, { jar: stdU.j })).status, 200);
+      assert.equal((await call('GET', page, { jar: maxU.j })).status, 200);
+
+      // admin only
+      assert.equal((await call('GET', '/api/admin/access', { jar: stdU.j })).status, 403);
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/pack-1/test-5', mode: 'free' }] }, jar: stdU.j })).status, 403);
+      let r = await call('GET', '/api/admin/access', { jar: boss }); assert.equal(r.status, 200);
+      const reading = r.json.skills.find((x) => x.skill === 'reading'); const pack1 = reading.packs.find((p) => p.slug === 'pack-1');
+      assert.ok(pack1 && pack1.tests.length === 2 && pack1.tests[0].key === 'test:reading/pack-1/test-5', 'catalog keys');
+      assert.equal(pack1.rule.mode, 'default');
+      // bad input
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [{ key: '../etc', mode: 'free' }] }, jar: boss })).status, 400);
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/pack-1/test-5', mode: 'vip' }] }, jar: boss })).status, 400);
+      assert.equal((await call('POST', '/api/admin/access', { body: { changes: [] }, jar: boss })).status, 400);
+
+      // Max only for ONE test: Standard is sent to the Price page, Max still gets in
+      r = await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/pack-1/test-5', mode: 'max' }] }, jar: boss }); assert.equal(r.status, 200);
+      let x = await call('GET', page, { jar: stdU.j }); assert.equal(x.status, 302); assert.ok(/^\/Price\?premium=required&plan=max/.test(x.headers.get('location')), x.headers.get('location'));
+      assert.equal((await call('GET', page, { jar: maxU.j })).status, 200);
+      assert.equal((await call('GET', '/full-tests/reading/test-6.html', { jar: stdU.j })).status, 200, 'the other test of the pack is untouched');
+      let chk = (await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json;
+      assert.equal(chk.allowed, false); assert.equal(chk.plan, 'max'); assert.ok(chk.price.includes('plan=max'));
+      assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: maxU.j })).json.allowed, true);
+      ok('one test can be made Max-only (Standard -> Price page, Max still opens it)');
+
+      // a whole pack: Free for everybody, then Max, then back to default; a test setting wins over its pack
+      r = await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'free' }, { key: 'test:reading/pack-1/test-5', mode: 'default' }] }, jar: boss });
+      assert.equal((await call('GET', page, { jar: nobody.j })).status, 200, 'free pack: tests inherit it');
+      assert.equal((await call('GET', '/full-tests/reading/test-6.html')).status, 200, 'free for guests too');
+      assert.equal((await call('GET', '/api/access')).json.rules['pack:reading/pack-1'].locked, false);
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'max' }, { key: 'test:reading/pack-1/test-6', mode: 'free' }] }, jar: boss });
+      assert.equal((await call('GET', page, { jar: stdU.j })).status, 302, 'locked pack: Max only');
+      assert.equal((await call('GET', '/full-tests/reading/test-6.html', { jar: nobody.j })).status, 200, 'a free test inside a locked pack');
+      r = await call('GET', '/api/admin/access', { jar: boss });
+      const p1 = r.json.skills[0].packs.find((p) => p.slug === 'pack-1');
+      assert.equal(p1.rule.mode, 'max'); assert.equal(p1.tests[0].rule.locked, true); assert.equal(p1.tests[0].rule.plan, 'max'); assert.equal(p1.tests[1].rule.mode, 'free');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'default' }, { key: 'test:reading/pack-1/test-6', mode: 'default' }] }, jar: boss });
+      assert.equal((await call('GET', page, { jar: nobody.j })).status, 302, 'back to the default lock');
+      assert.equal((await call('GET', page, { jar: stdU.j })).status, 200);
+      ok('packs: free / Max / default, inheritance, a test setting beats its pack');
+
+      // tests made in the admin panel follow the same rules (and the old premium flag stays in step)
+      r = await call('POST', '/api/admin/materials', { body: { type: 'reading', title: 'Made in admin', pack: 'Pack 1', premium: false, data: { passage: 'Text', questions: [{ type: 'short', text: 'Q?', answer: 'a' }] } }, jar: boss });
+      assert.equal(r.status, 201); const mid = r.json.item.id;
+      assert.equal((await call('GET', '/api/materials/' + mid, { jar: nobody.j })).status, 200, 'free material');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'mat:' + mid, mode: 'max' }] }, jar: boss });
+      assert.equal((await call('GET', '/api/materials/' + mid, { jar: stdU.j })).status, 403);
+      assert.equal((await call('GET', '/api/materials/' + mid, { jar: maxU.j })).status, 200);
+      assert.equal((await call('GET', '/api/materials/' + mid)).status, 401);
+      let list = (await call('GET', '/api/materials?type=reading', { jar: stdU.j })).json.items.find((i) => i.id === mid); assert.equal(list.locked, true); assert.equal(list.plan, 'max');
+      assert.equal((await call('GET', '/api/admin/materials/' + mid, { jar: boss })).json.item.premium, true, 'premium flag follows');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'max' }, { key: 'mat:' + mid, mode: 'default' }] }, jar: boss });
+      ok('admin-made tests: Free / Standard / Max, pack setting inherited');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'default' }] }, jar: boss });
+      await call('DELETE', '/api/admin/materials/' + mid, { jar: boss });
+      assert.ok((await call('GET', '/api/admin/audit', { jar: boss })).json.entries.some((e) => e.action === 'access.set'), 'audited');
+
+      // Ultra + the cards of the practice pages (Reading passages, Listening sections, Writing tasks, Speaking topics)
+      const ultraU = await mk('Ulla', 'ulla@example.com');
+      await call('POST', `/api/admin/users/${ultraU.id}/premium`, { body: { plan: 'Ultra', days: 30 }, jar: boss });
+      assert.equal((await call('GET', '/api/premium/status', { jar: ultraU.j })).json.level, 3, 'Ultra = level 3');
+      assert.equal((await call('GET', '/api/premium/status', { jar: maxU.j })).json.level, 2);
+      const av = (await call('GET', '/api/admin/access', { jar: boss })).json;
+      assert.deepEqual(av.plans, ['standard', 'max', 'ultra']);
+      const counts = Object.fromEntries(av.skills.map((x) => [x.skill, (x.packs.find((p) => p.practice) || { tests: [] }).tests.length]));
+      delete counts.article; assert.deepEqual(counts, { reading: 21, listening: 5, writing: 12, speaking: 18 }, 'all practice cards are listed');
+      assert.equal((await call('GET', '/pessages/test-1.html')).status, 200, 'free by default');
+      assert.equal((await call('GET', '/pessages/test-1 explanations.html')).status, 200, 'explanations untouched');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'ultra' }] }, jar: boss });
+      x = await call('GET', '/pessages/test-1.html', { jar: maxU.j }); assert.equal(x.status, 302); assert.ok(x.headers.get('location').includes('plan=ultra'));
+      assert.equal((await call('GET', '/pessages/test-1.html', { jar: ultraU.j })).status, 200);
+      assert.equal((await call('GET', '/pessages/test-2.html')).status, 200, 'other card untouched');
+      assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/pessages/test-1'), { jar: stdU.j })).json.allowed, false);
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:listening/practice-cards', mode: 'standard' }] }, jar: boss });
+      assert.equal((await call('GET', '/sections/test-3.html', { jar: nobody.j })).status, 302);
+      assert.equal((await call('GET', '/sections/test-3.html', { jar: stdU.j })).status, 200);
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'default' }, { key: 'pack:listening/practice-cards', mode: 'default' }] }, jar: boss });
+      assert.equal((await call('GET', '/sections/test-3.html')).status, 200);
+      ok('Ultra plan + practice cards (Reading/Listening pages are enforced, Writing/Speaking listed)');
+
+      // the keys the browser builds (access.js) are the keys the server knows
+      const ctx = { window: {} }; vm.createContext(ctx);
+      vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'assets/js/access.js'), 'utf8'), ctx);
+      vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'assets/js/full-tests-data.js'), 'utf8'), ctx);
+      const D = ctx.window.IELTSX_FULL_TESTS; const adminView = (await call('GET', '/api/admin/access', { jar: boss })).json; let checked = 0;
+      for (const sk of adminView.skills) for (const pk of sk.packs.filter((p) => !p.extra && !p.practice)) {
+        const cp = D.packs[sk.skill].find((p) => p.slug === pk.slug);
+        const tests = cp.tests.map((t, i) => Object.assign({}, t, { _i: i })).sort((a, b) => ((a.number || 0) - (b.number || 0)) || (a._i - b._i));
+        const pack = ctx.window.IELTSXAccess.assignKeys(sk.skill, { slug: cp.slug, tests });
+        assert.equal(pack.key, pk.key);
+        assert.deepEqual(tests.map((t) => t.key), pk.tests.map((t) => t.key), sk.skill + '/' + pk.slug); checked += tests.length + 1;
+      }
+      assert.ok(checked > 20); ok('browser keys = server keys (' + checked + ' packs and tests)');
+    }
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');
+
+
     realLog('\nALL SERVER TESTS PASSED');
   } catch (e) { realLog('\nFAILED:', e.stack || e); process.exitCode = 1; }
   server.close(); fs.rmSync(tmp, { recursive: true, force: true }); process.exit(process.exitCode || 0);
