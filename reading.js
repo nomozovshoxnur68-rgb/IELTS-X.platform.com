@@ -1,14 +1,13 @@
-/* ============================================================
-   reading-passage.js — single-passage variant of reading.js.
+/* ====
+   reading-passage.js вЂ” single-passage variant of reading.js.
    Identical engine; only the parts that assumed a 3-passage, 40-question,
    60-minute paper are driven by READING_TEST.PONLY / QTOTAL / MINUTES.
    reading.js itself is untouched and keeps serving the Full Reading Tests.
    Needs window.READING_TEST (STORAGE_KEY, SECTIONS, PASSAGES,
    VOCABULARY_DATA, READING_EXPLANATIONS, optional SYNONYMS) to be
    defined BEFORE this file is loaded.
-   ============================================================ */
 
-/* ── Options / Messages: the official full-screen pages ──────────────────
+/* в”Ђв”Ђ Options / Messages: the official full-screen pages в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The real player has no dropdown. The hamburger opens a white Options page
    whose only rows are "Go to submission page" (red), Contrast and Text size;
    the last two push sub-pages with a back arrow. These are globals because the
@@ -41,7 +40,7 @@ function exOptionsPage(page){
 }
 function exGoSubmission(){
   exCloseSheet();
-  // the same action the ✓ deliver button performs
+  // the same action the вњ“ deliver button performs
   try{ ExamApp.confirmSubmit(document.getElementById('sub-btn')); }catch(e){}
 }
 /* Contrast maps onto the three themes the file already ships. */
@@ -65,14 +64,14 @@ function toggleMenu(){
   if(st && st.classList.contains('is-open')) exCloseSettings(); else exOpenSettings();
 }
 
-/* ── Exam Settings panel ─────────────────────────────────────────────────
+/* в”Ђв”Ђ Exam Settings panel в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Replaces the full-screen Options page: Theme (Light / Dark / System),
    Text Size (Default / Large / Extra Large), Report Issue, Leave Test.
    The markup is built on first open, so every test page gets it without any
    HTML change. The old #ex-options markup is left in place, unused.
    EDIT THESE TWO LINES per site:                                          */
 var REPORT_ISSUE_URL = '';  /* where "Report Issue" opens ('' = does nothing yet) */
-var FINISH_URL = '#';       /* where "Finish" on the results screen goes — put the real link here */
+var FINISH_URL = '#';       /* where "Finish" on the results screen goes вЂ” put the real link here */
 var LEAVE_TEST_URL   = '';  /* '' = back to the page that opened the test; or e.g. '/tests' */
 
 var EX_THEME_KEY = 'cdi_reading_theme_pref';   /* 'light' | 'dark' | 'system' */
@@ -210,7 +209,7 @@ function exFinish(){
   }
   location.href=url;
 }
-/* ── Highlight popup: new icons + labels ───────────────────────────────────
+/* в”Ђв”Ђ Highlight popup: new icons + labels в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Resting popup  : [Note] [Highlight]
    On a highlight : [Remove] [Add Note]
    Same three buttons, same handlers (addNote / applyHighlight / clearHighlight);
@@ -254,7 +253,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape') exCloseSheet();
 });
 
-// ── WiFi status ──
+// в”Ђв”Ђ WiFi status в”Ђв”Ђ
 function updateWifiStatus(){
   var on=navigator.onLine;
   var btn=document.getElementById('wifi-btn');
@@ -266,19 +265,19 @@ window.addEventListener('online',updateWifiStatus);
 window.addEventListener('offline',updateWifiStatus);
 updateWifiStatus();
 
-// ── Notification popup (superseded by the Messages page; kept as a no-op so
-//    any older inline handler cannot throw) ──
+// в”Ђв”Ђ Notification popup (superseded by the Messages page; kept as a no-op so
+//    any older inline handler cannot throw) в”Ђв”Ђ
 function toggleNotifPopup(e){ if(e&&e.stopPropagation) e.stopPropagation(); exOpenSheet('messages'); }
 
-// ── Candidate name in header ──
+// в”Ђв”Ђ Candidate name in header в”Ђв”Ђ
 function updateHeaderName(name){
   var el=document.getElementById('ttid-name');
   if(el&&name) el.textContent=name;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   PDFX · one-click vector PDF export for the CDI V3 report sheets
-   ───────────────────────────────────────────────────────────────────────────
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   PDFX В· one-click vector PDF export for the CDI V3 report sheets
+   в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    ONE implementation, shared verbatim by Writing, Listening and Reading. The
    only thing that differs per test is the config object passed to PDFX.save():
    which element carries the sheets, how to build it, the page box, and what to
@@ -289,8 +288,8 @@ function updateHeaderName(name){
      text: unselectable, unsearchable, fuzzy on a 600dpi printer, and megabytes
      per file. jsPDF alone is ~360KB of library to draw shapes we can draw
      ourselves in a twentieth of that. So PDFX walks the already-typeset report
-     DOM and re-emits it as PDF vector operators — real text objects, real
-     paths — using the browser's own layout for every position and line break.
+     DOM and re-emits it as PDF vector operators вЂ” real text objects, real
+     paths вЂ” using the browser's own layout for every position and line break.
      The result is a small PDF whose text is selectable, searchable and
      extractable, produced offline, with no library and no network.
 
@@ -300,14 +299,14 @@ function updateHeaderName(name){
 
    Type: the report is designed in Bricolage Grotesque and Be Vietnam Pro,
    which are Google-hosted and therefore absent whenever these files are opened
-   offline — the sheet already falls back to the system UI face there. Rather
+   offline вЂ” the sheet already falls back to the system UI face there. Rather
    than embed several hundred KB of webfont into a file that has to run from a
    memory stick, PDFX sets the sheet in Helvetica, one of the 14 fonts every
    PDF reader is required to have built in: zero bytes, universally rendered,
    perfectly extractable. Every line break, every line position and every line
-   width is still the browser's own — each line is fitted to the exact box the
-   browser laid out for it — so the page geometry is identical either way.
-   ═══════════════════════════════════════════════════════════════════════════ */
+   width is still the browser's own вЂ” each line is fitted to the exact box the
+   browser laid out for it вЂ” so the page geometry is identical either way.
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 (function (global) {
 'use strict';
 
@@ -315,9 +314,9 @@ var PT = 72 / 96;          /* one CSS pixel in PDF points */
 var MM = 72 / 25.4;        /* one millimetre in PDF points */
 var K  = 0.5522847498;     /* circle-to-bezier constant */
 
-/* ── 1 · WinAnsiEncoding ────────────────────────────────────────────────────
+/* в”Ђв”Ђ 1 В· WinAnsiEncoding в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The single-byte encoding the standard fonts are used with. Latin-1 plus the
-   printer's punctuation the report actually uses — the en dash in "1–20", the
+   printer's punctuation the report actually uses вЂ” the en dash in "1вЂ“20", the
    middle dot in the footer, the curly apostrophe in "Teacher's notes".        */
 var WIN = (function () {
   var m = {}, i;
@@ -330,9 +329,9 @@ var WIN = (function () {
              0x02DC:0x98, 0x2122:0x99, 0x0161:0x9A, 0x203A:0x9B, 0x0153:0x9C,
              0x017E:0x9E, 0x0178:0x9F };
   for (var k in hi) m[String.fromCharCode(k)] = hi[k];
-  m[' '] = 32;        /* nbsp prints as a space */
-  m['‑'] = 45;        /* non-breaking hyphen */
-  m['​'] = -1;        /* zero-width space: drop */
+  m['В '] = 32;        /* nbsp prints as a space */
+  m['вЂ‘'] = 45;        /* non-breaking hyphen */
+  m['вЂ‹'] = -1;        /* zero-width space: drop */
   return m;
 })();
 
@@ -340,8 +339,8 @@ var WIN = (function () {
    which is also built into every reader. '3' is U+2713 and '7' is U+2717; a
    ToUnicode map is written for the font so pdftotext still extracts the real
    characters rather than the digits. */
-var DINGBAT = { '✓': 0x33, '✔': 0x34, '✗': 0x37, '✘': 0x38,
-                '✕': 0x35, '✖': 0x36 };
+var DINGBAT = { 'вњ“': 0x33, 'вњ”': 0x34, 'вњ—': 0x37, 'вњ': 0x38,
+                'вњ•': 0x35, 'вњ–': 0x36 };
 var DINGBAT_UNI = { 0x33:0x2713, 0x34:0x2714, 0x35:0x2715, 0x36:0x2716, 0x37:0x2717, 0x38:0x2718 };
 
 var winMisses = 0;
@@ -352,9 +351,9 @@ function toWin(s) {
     c = WIN[ch];
     if (c === -1) continue;
     if (c === undefined) {
-      /* Strip the accent and try again — "Đặng" sets as "Dang" rather than as
+      /* Strip the accent and try again вЂ” "Дђбє·ng" sets as "Dang" rather than as
          a row of question marks. Anything still unmappable becomes '?'.      */
-      var f = ch.normalize ? ch.normalize('NFD').replace(/[̀-ͯ]/g, '') : ch;
+      var f = ch.normalize ? ch.normalize('NFD').replace(/[МЂ-НЇ]/g, '') : ch;
       c = (f.length === 1 && WIN[f] !== undefined) ? WIN[f] : undefined;
       if (c === undefined) { c = 63; winMisses++; }
     }
@@ -363,7 +362,7 @@ function toWin(s) {
   return out;
 }
 
-/* ── 2 · the PDF file ───────────────────────────────────────────────────────
+/* в”Ђв”Ђ 2 В· the PDF file в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Objects, one content stream per page, Flate via the browser's own
    CompressionStream (zlib is exactly what /FlateDecode wants). No library.   */
 function Doc(wPt, hPt, meta) {
@@ -406,7 +405,7 @@ Doc.prototype.font = function (ps) {
 
 function streamObj(dict, data) { return { dict: dict, data: data }; }
 
-/* ── content stream builder ────────────────────────────────────────────── */
+/* в”Ђв”Ђ content stream builder в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function Page(doc) { this.doc = doc; this.ops = []; this.res = {}; }
 Page.prototype.o = function (s) { this.ops.push(s); return this; };
 function f2(v) { return (Math.round(v * 100) / 100).toString(); }
@@ -499,7 +498,7 @@ Page.prototype.image = function (res, x, y, w, h) {
              .o(res + ' Do').o('Q');
 };
 
-/* ── 3 · assembling the file ────────────────────────────────────────────── */
+/* в”Ђв”Ђ 3 В· assembling the file в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 async function deflate(bytes) {
   if (typeof CompressionStream === 'undefined') return null;
   try {
@@ -555,7 +554,7 @@ Doc.prototype.build = async function () {
   /* serialise */
   var chunks = [], len = 0, offsets = [];
   function push(u8) { chunks.push(u8); len += u8.length; }
-  push(latin1('%PDF-1.4\n%âãÏÓ\n'));
+  push(latin1('%PDF-1.4\n%ГўГЈГЏГ“\n'));
   for (var n = 1; n <= this.objs.length; n++) {
     offsets[n] = len;
     var b = this.objs[n - 1];
@@ -580,7 +579,7 @@ Doc.prototype.build = async function () {
   return all;
 };
 
-/* An <img> becomes a lossless Flate-compressed RGB XObject — the one raster
+/* An <img> becomes a lossless Flate-compressed RGB XObject вЂ” the one raster
    object in the document, and the only thing here that genuinely is a picture. */
 Doc.prototype.addImage = async function (img) {
   var key = img.currentSrc || img.src;
@@ -607,7 +606,7 @@ Doc.prototype.addImage = async function (img) {
   return rec;
 };
 
-/* ── 4 · CSS helpers ────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ 4 В· CSS helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function col(s) {
   if (!s || s === 'none' || s === 'transparent') return null;
   var m = s.match(/rgba?\(([^)]+)\)/);
@@ -721,7 +720,7 @@ function paintGradient(pg, g, x, y, w, h) {
   var span = g.horiz ? w : h;
   var period = g.rep ? Math.max(0.2, g.period) : span;
   /* A repeating gradient tiles in BOTH directions from its origin, so the
-     repetition that ends just above the top edge is on screen too — that is
+     repetition that ends just above the top edge is on screen too вЂ” that is
      the first ruled line in the teacher's-notes box. */
   var first = 0, last = 0;
   if (g.rep) {
@@ -753,7 +752,7 @@ function paintGradient(pg, g, x, y, w, h) {
   }
 }
 
-/* ── 5 · walking the sheet ──────────────────────────────────────────────── */
+/* в”Ђв”Ђ 5 В· walking the sheet в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function Painter(doc, pg, origin, scale) {
   this.doc = doc; this.pg = pg;
   this.ox = origin.x; this.oy = origin.y;      /* client px of the sheet's top-left */
@@ -796,8 +795,8 @@ Painter.prototype.decorate = function (el, cs, r) {
 };
 
 /* A CSS border is the ring between the padding box and the border box, cut
-   into four mitred pieces. Drawing it that way — rather than as four straight
-   strips — is what keeps a rounded corner a rounded corner. */
+   into four mitred pieces. Drawing it that way вЂ” rather than as four straight
+   strips вЂ” is what keeps a rounded corner a rounded corner. */
 Painter.prototype.border = function (x, y, w, h, rad, t, bc) {
   var pg = this.pg;
   var ix = x + t[3], iy = y + t[0], iw = w - t[3] - t[1], ih = h - t[0] - t[2];
@@ -886,8 +885,8 @@ Painter.prototype.textNode = function (node, cs) {
 
 /* A line has to end up exactly as wide as the box the browser measured for it,
    or the rules, cells and right-aligned columns stop lining up. The CSS
-   letter-spacing is reproduced literally, and whatever is left over — the
-   difference in width between the design's webfont and Helvetica, about 9% —
+   letter-spacing is reproduced literally, and whatever is left over вЂ” the
+   difference in width between the design's webfont and Helvetica, about 9% вЂ”
    is taken up by a horizontal scale on the glyphs rather than by pouring it
    all into the tracking, which would visibly space the text out. */
 Painter.prototype.fitLine = function (str, n, ps, size, target, tracking) {
@@ -949,7 +948,7 @@ Painter.prototype.drawLine = function (str, rect, ps, size, color, fm, tracking)
   }
 };
 
-/* An inline <svg> is re-emitted as vectors too — the Task 1 bar chart is
+/* An inline <svg> is re-emitted as vectors too вЂ” the Task 1 bar chart is
    rectangles, rules and Arial labels, all of which the PDF can draw natively,
    so the chart in the file is real vector and stays crisp at any zoom. */
 Painter.prototype.svg = function (root) {
@@ -1058,7 +1057,7 @@ Painter.prototype.walk = function (el) {
 };
 Painter.prototype.imgLookup = function (img) { return this.doc.images[img.currentSrc || img.src] || null; };
 
-/* ── 6 · pseudo-elements ────────────────────────────────────────────────────
+/* в”Ђв”Ђ 6 В· pseudo-elements в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    getComputedStyle can read a ::before, but nothing can give you its box. The
    section rules in this report are ::before/::after flex children, so before a
    sheet is walked each one is briefly turned into a real element carrying the
@@ -1092,7 +1091,7 @@ function materialisePseudo(host) {
   return made;
 }
 
-/* ── 7 · the export ─────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ 7 В· the export в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 var DEFAULT_PAGE = { w: 210, h: 297, mt: 14, mr: 15, mb: 12, ml: 15 };
 
 async function render(cfg) {
@@ -1139,7 +1138,7 @@ async function render(cfg) {
       var r = el.getBoundingClientRect();
       /* Never let a sheet spill off its page: if the browser laid out more
          than the content box holds, the whole sheet is scaled to fit rather
-         than cropped. This is a backstop — the report fitter keeps it at 1. */
+         than cropped. This is a backstop вЂ” the report fitter keeps it at 1. */
       var maxH = colH * pxPerMm;
       var scale = r.height > maxH + 0.5 ? maxH / r.height : 1;
       if (scale < 1) report.scaled.push({ page: i + 1, scale: +scale.toFixed(4), height_mm: +(r.height / pxPerMm).toFixed(2) });
@@ -1218,13 +1217,13 @@ global.PDFX = { save: save, render: render, version: '1.0' };
 const ExamApp = (function() {
 'use strict';
 
-// ====================================================================
-// TEST DATA — comes from the page (window.READING_TEST, defined by the
+// =====
+// TEST DATA вЂ” comes from the page (window.READING_TEST, defined by the
 // inline <script> in each test's HTML). Everything below this block is the
 // universal engine and is identical for every Full Reading Test.
-// ====================================================================
+// =====
 const __T = window.READING_TEST;
-if (!__T) throw new Error('reading.js: window.READING_TEST is missing — put the test data <script> before <script src="reading.js">.');
+if (!__T) throw new Error('reading.js: window.READING_TEST is missing вЂ” put the test data <script> before <script src="reading.js">.');
 const STORAGE_KEY = __T.STORAGE_KEY;
 const SECTIONS = __T.SECTIONS;
 const PASSAGES = __T.PASSAGES;
@@ -1256,7 +1255,7 @@ function synSectionHTML() {
     + '</div>';
 }
 
-// ── DERIVED INDEXES (auto-built from SECTIONS — do not edit) ──────────
+// в”Ђв”Ђ DERIVED INDEXES (auto-built from SECTIONS вЂ” do not edit) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const QMETA = {};                       // qid -> { p, sec }
 let NAV_RANGES = {}, NAV_GROUPS = {}, PBAR_DESCS = {};
 function sectionOf(qid){ return QMETA[qid] ? QMETA[qid].sec : null; }
@@ -1288,9 +1287,9 @@ rebuildTestIndex();
 
 
 
-// ====================================================================
+// =====
 // STATE
-// ====================================================================
+// =====
 
 const state = {
   student: { name: '' },
@@ -1309,7 +1308,7 @@ const state = {
   timePerQuestion: {},
   activeTimer: { type: 'idle', qid: null, startTime: null },
   vocabBasket: [],
-  // V3 —
+  // V3 вЂ”
   annotations: { 1: [], 2: [], 3: [] },   // persisted highlights + notes
   paceShown: {},                          // which pacing markers have fired
   fsGranted: false,                       // did the browser actually grant fullscreen
@@ -1321,15 +1320,15 @@ let timerInterval = null;
 /* Progress is deliberately NOT persisted. A sitting lives in memory only:
    reload and the paper restarts, which is what the Cosmos build already
    implied by removing the resume sheet. Preferences (theme, text size,
-   notes) are unaffected — those are stored under their own keys.
+   notes) are unaffected вЂ” those are stored under their own keys.
    STORAGE_KEY stays because its trailing digits set the test number. */
-function saveState() { /* no-op — progress is not saved */ }
+function saveState() { /* no-op вЂ” progress is not saved */ }
 
 function loadState() { return false; }   /* nothing is ever restored */
 
-// ====================================================================
+// =====
 // STAGE NAVIGATION
-// ====================================================================
+// =====
 
 const STAGES = ['registration','reading-intro','reading','completion','results'];
 
@@ -1339,7 +1338,7 @@ function reducedMotion() {
 
 // The CDI mark is pasted once, on the registration card. Every other place
 // that needs it (results topbar, certificate header) carries an empty
-// .brand-ref <img> and is filled in from that one copy at runtime — the logo
+// .brand-ref <img> and is filled in from that one copy at runtime вЂ” the logo
 // is ~21KB of base64, so referencing beats re-pasting.
 function applyBrandLogo(){
   // registration now uses Listening's .brand-logo; .reg-mark is the pre-port name
@@ -1351,7 +1350,7 @@ function applyBrandLogo(){
     if (refs[i].getAttribute('src') !== url) refs[i].setAttribute('src', url);
   }
   // The transplanted certificate carries the mark as a background on a div
-  // (.logo-mark), not an <img>, so it needs painting separately — this is what
+  // (.logo-mark), not an <img>, so it needs painting separately вЂ” this is what
   // the Listening engine's applyBrandLogo() does.
   var marks = document.querySelectorAll('#stage-results .logo-mark');
   for (var m = 0; m < marks.length; m++){
@@ -1383,12 +1382,12 @@ function goToStage(name, then) {
     window.scrollTo(0,0);
     // Tell the particle layer which stage is live. 'reading' is NOT one of its
     // COSMIC stages, so this is what hides the canvas and drops the scene out
-    // of the render path for the exam screen — zero GPU work behind the test.
+    // of the render path for the exam screen вЂ” zero GPU work behind the test.
     // (The layer also polls this every frame; calling it here makes the
     // hand-off cost zero frames instead of one.)
     try { if (window.CDIAtmosphere) window.CDIAtmosphere.sync(); } catch(e) {}
     // Lets callers layer something on top once the target stage has actually
-    // settled in — e.g. the results modal, which must not be added to
+    // settled in вЂ” e.g. the results modal, which must not be added to
     // #stage-results before settle() has finished clearing 'active' off it.
     if (typeof then === 'function') then();
   };
@@ -1404,9 +1403,9 @@ function goToStage(name, then) {
   }
 }
 
-// ====================================================================
+// =====
 // FULL-SCREEN + ANTI-CHEAT
-// ====================================================================
+// =====
 
 // V3: track whether fullscreen was ever actually granted. Without this, a
 // browser that refuses the request makes the exit-handler fire immediately
@@ -1423,7 +1422,7 @@ function enterFullscreen(quiet) {
     state.fsGranted = fullscreenActive();
     if (!state.fsGranted && !quiet) {
       // Say so, rather than quietly arming a trap the student cannot see.
-      toast('Full-screen is unavailable in this browser — the test will run windowed.', 'warn');
+      toast('Full-screen is unavailable in this browser вЂ” the test will run windowed.', 'warn');
     }
   };
   if (req) {
@@ -1463,7 +1462,7 @@ function hasLiveAttempt() {
 }
 /* PROCTORING IS OFF.
    With the registration card removed there is no click left to launch the
-   paper, and a browser will not grant full-screen without one — so the
+   paper, and a browser will not grant full-screen without one вЂ” so the
    full-screen requirement and the three-strike system have been retired
    together. Returning false here disables both the tab-switch strike and the
    left-full-screen strike at their single source, without touching any of the
@@ -1487,7 +1486,7 @@ function recordViolation(reason) {
   document.getElementById('warning-strikes-text').innerHTML =
     state.warnings >= 3
       ? '<strong style="color:var(--crimson)">Final warning reached.</strong> The exam has been terminated.'
-      : 'Warning <strong>'+state.warnings+' of 3</strong> — the exam will be terminated on the third violation.';
+      : 'Warning <strong>'+state.warnings+' of 3</strong> вЂ” the exam will be terminated on the third violation.';
 
   document.getElementById('warning-overlay').classList.add('show');
 
@@ -1563,9 +1562,9 @@ function setupAntiCheat() {
   });
 }
 
-// ====================================================================
+// =====
 // TIMERS
-// ====================================================================
+// =====
 
 function fmt(seconds) {
   if (seconds < 0) seconds = 0;
@@ -1574,7 +1573,7 @@ function fmt(seconds) {
   return m + ':' + s;
 }
 
-// The official player never shows mm:ss — the clock reads "NN minutes left"
+// The official player never shows mm:ss вЂ” the clock reads "NN minutes left"
 // and is typeset exactly like the Test-taker-ID line. Under a minute it counts
 // the last seconds down, because "0 minutes left" is not an honest reading.
 function fmtMinutesLeft(seconds) {
@@ -1588,9 +1587,9 @@ function startTimer(section, onExpire) {
   pauseTimer();
   const el = document.getElementById('timer-'+section);
 
-  // V3 — wall-clock, not tick-count. setInterval is throttled hard in a
+  // V3 вЂ” wall-clock, not tick-count. setInterval is throttled hard in a
   // background tab, so counting one second per fire made the exam run SLOWER
-  // than real time the moment a student switched away — the opposite of what
+  // than real time the moment a student switched away вЂ” the opposite of what
   // a timed test must do. Every tick now charges the real elapsed delta.
   let last = Date.now();
 
@@ -1599,14 +1598,14 @@ function startTimer(section, onExpire) {
     let delta = Math.round((now - last) / 1000);
     last = now;
     if (delta <= 0) return;              // clock skewed backwards; skip
-    if (delta > 60) delta = 60;          // machine slept — don't burn the hour
+    if (delta > 60) delta = 60;          // machine slept вЂ” don't burn the hour
 
     state.timers[section] = Math.max(0, state.timers[section] - delta);
     if (section === 'reading' && state.currentPassage) {
         state.passageTimes[state.currentPassage] += delta;
     }
     // V3: timePerQuestion existed in V2's state object but nothing ever wrote to
-    // it. Wire it up — "where did my hour actually go" is the question students
+    // it. Wire it up вЂ” "where did my hour actually go" is the question students
     // cannot answer for themselves, and it is the one our pacing research says
     // decides the score.
     if (section === 'reading' && state.activeQuestion) {
@@ -1625,12 +1624,12 @@ function startTimer(section, onExpire) {
   timerInterval = setInterval(tick, 1000);
 }
 
-// V3 — pacing markers. "I knew the answers but ran out of time" is a pacing
+// V3 вЂ” pacing markers. "I knew the answers but ran out of time" is a pacing
 // failure, not a language one, and Passage 3 is where the clock actually runs
 // out. One overall countdown never tells a student they are already behind.
 const PACE_MARKS = [
   { at: MINUTES*60 - Math.round(MINUTES/2)*60, key: 'half', title: Math.round(MINUTES/2) + ' minutes gone',
-    sub: 'Half of your ' + MINUTES + ' minutes has gone — check how many questions are still open.' }
+    sub: 'Half of your ' + MINUTES + ' minutes has gone вЂ” check how many questions are still open.' }
 ];
 
 function checkPace(remaining) {
@@ -1647,7 +1646,7 @@ function checkPace(remaining) {
   });
 }
 
-// V3 — the overall countdown never says WHERE you are behind. passageTimes is
+// V3 вЂ” the overall countdown never says WHERE you are behind. passageTimes is
 // already accumulating every tick; this just reads it. 15/20/25 is the split
 // the pacing research recommends, so each passage gets its own budget.
 const PASSAGE_BUDGET = {};   // single passage: the overall clock is the budget
@@ -1664,7 +1663,7 @@ function checkPassagePace() {
   const mins = Math.round(PASSAGE_BUDGET[p] / 60);
   showPace(
     `${mins} minutes on Passage ${p}`,
-    p < 3 ? `That is the budget for this one. Move on — you can come back if time allows.`
+    p < 3 ? `That is the budget for this one. Move on вЂ” you can come back if time allows.`
           : `You are into your reserve. Answer every remaining question, even as a guess.`
   );
 }
@@ -1718,9 +1717,9 @@ function pauseTimer() {
   }
 }
 
-// ====================================================================
+// =====
 // TOAST
-// ====================================================================
+// =====
 
 let toastTimeout = null;
 const TOAST_ICON = {
@@ -1739,9 +1738,9 @@ function toast(msg, type, duration) {
   toastTimeout = setTimeout(() => el.classList.remove('show'), duration || 3500);
 }
 
-// ====================================================================
-// READING — BUILD PASSAGE + QUESTIONS
-// ====================================================================
+// =====
+// READING вЂ” BUILD PASSAGE + QUESTIONS
+// =====
 
 function renderReading() {
   switchPassage(state.currentPassage || 1);
@@ -1832,7 +1831,7 @@ function addNote() {
     span.onclick = function(e) { ExamApp.openNote(this, e); };
     range.surroundContents(span);
   } catch(e) {
-    // Selection crosses element boundaries — wrap per node and anchor the note
+    // Selection crosses element boundaries вЂ” wrap per node and anchor the note
     // to the first fragment, matching the behaviour of applyHighlight.
     span = (wrapRangeSegments(range, 'hl-note', '') || [])[0] || null;
   }
@@ -1852,7 +1851,7 @@ function openNote(span, e) {
   const ta = document.getElementById('note-textarea');
   ta.value = span.getAttribute('data-note') || '';
   
-  // Clamp inside the viewport — notes near the right edge or the bottom of a
+  // Clamp inside the viewport вЂ” notes near the right edge or the bottom of a
   // passage were previously positioned off-screen and looked like a dead button.
   modal.classList.add('show');
   const w = modal.offsetWidth  || 290;
@@ -1869,7 +1868,7 @@ function saveNote() {
     const ta = document.getElementById('note-textarea');
     const val = ta.value.trim();
     activeNoteSpan.setAttribute('data-note', val);
-    activeNoteSpan.setAttribute('title', val || 'Empty note — click to edit');
+    activeNoteSpan.setAttribute('title', val || 'Empty note вЂ” click to edit');
   }
   closeNote();
   syncAnnotations();
@@ -2050,7 +2049,7 @@ function injectHeadingSlots(paraMap) {
 const HDR_TITLE_PREFIX = '[Demo]';
 function switchPassage(n) {
   state.currentPassage = n;
-  // V3 — do NOT pre-charge this passage's first question. The old code set
+  // V3 вЂ” do NOT pre-charge this passage's first question. The old code set
   // activeQuestion to a hardcoded [0,1,14,27][n], so every second spent
   // reading the passage before touching any question was billed to Q1/Q14/Q27.
   // That made the "took over 90s" flag fire on the first question of every
@@ -2070,7 +2069,7 @@ function switchPassage(n) {
   if (hdrTitle) hdrTitle.innerHTML = HDR_TITLE_PREFIX + ' ' + p.title + ' - P' + n;
   // .sectionStimulus carries margin:16px 0 inside a pane padded 0 16px, so the
   // passage column is 688px wide starting at x=16 and its title's top edge
-  // lands at y=192 — level with the first question in the right-hand pane.
+  // lands at y=192 вЂ” level with the first question in the right-hand pane.
   document.getElementById('passage-pane').innerHTML = `
     <div class="sectionStimulus reading-passage">
       <h2 class="passage-title">${p.title}</h2>
@@ -2111,9 +2110,9 @@ function readingMcq(id, label, choices) {
       <span class="feedback-pill" id="rfb-${id}"></span>
     </div>
     <div class="options">
-      ${/* The real exam shows no A/B/C/D circle — just a native radio and the
+      ${/* The real exam shows no A/B/C/D circle вЂ” just a native radio and the
             option text. The letter lives only in the input's value.
-            (FAM Test ACR P3 Q32-35: <label><input type=radio value=A><p>…</p>) */''}
+            (FAM Test ACR P3 Q32-35: <label><input type=radio value=A><p>вЂ¦</p>) */''}
       ${choices.map(c => `<label class="option">
         <input type="radio" name="rq-${id}" value="${c.charAt(0)}" data-q="${id}">
         <span>${c.substring(3)}</span>
@@ -2126,7 +2125,7 @@ function renderReadingQuestions(n) {
   return (SECTIONS[n] || []).map((sec, i) => renderSection(sec, n, i)).join('');
 }
 
-// ── shared inline builders ───────────────────────────────────────────
+// в”Ђв”Ђ shared inline builders в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // text gap (notes / summary / sentence / table / flow-chart / map-input)
 function gapInput(id, limit) {
   return `<span class="prose-gap" id="rq-card-${id}">`
@@ -2146,13 +2145,13 @@ function fillTokens(str, builder) {
   return String(str).replace(/\{\{\s*(\d+)\s*\}\}/g, (m, id) => builder(parseInt(id, 10)));
 }
 // The official player prints NO bold type-name line ("True / False / Not
-// Given", "Notes completion", ...). The block is h3.scorableItemHeadline —
-// the question range, 700 16px, margin 0 0 8px — followed straight away by the
+// Given", "Notes completion", ...). The block is h3.scorableItemHeadline вЂ”
+// the question range, 700 16px, margin 0 0 8px вЂ” followed straight away by the
 // instruction paragraph at 16px/24px with <strong> on the keywords. sec.title
 // is still carried in the data and is used by review mode, so it is rendered
 // into the DOM and hidden rather than dropped.
 function secHead(sec) {
-  // The two grid tasks (which paragraph / match each item) open with a bold "Questions 14–17" line.
+  // The two grid tasks (which paragraph / match each item) open with a bold "Questions 14вЂ“17" line.
   // The range is taken from the question numbers, so it never needs typing in the data.
   let num = sec.num;
   if (!num && (sec.type === 'matching-info' || sec.type === 'matching-features') && sec.items && sec.items.length) {
@@ -2199,11 +2198,11 @@ const RENDERERS = {
   flowchart:(sec) => renderFlowchart(sec)
 };
 
-// ── Choose-TWO (and similar multi-select) ─────────────────────────────
+// в”Ђв”Ђ Choose-TWO (and similar multi-select) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function renderMcqMulti(sec) {
   const gid = sec.gid;
   const ids = siblingIds(sec);
-  const label = ids.length > 1 ? `${ids[0]}–${ids[ids.length - 1]}` : `${ids[0]}`;
+  const label = ids.length > 1 ? `${ids[0]}вЂ“${ids[ids.length - 1]}` : `${ids[0]}`;
   return `<div class="q-card" id="rq-multi-${gid}">`
     + `<div class="q-row">`
     +   `<span class="q-pill" data-qid="${ids[0]}">${label}</span>`
@@ -2218,7 +2217,7 @@ function renderMcqMulti(sec) {
     + `</div></div>`;
 }
 
-// ── Word-bank summary (drag A–J into the gaps) ────────────────────────
+// в”Ђв”Ђ Word-bank summary (drag AвЂ“J into the gaps) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function bankTiles(sec) {
   const pre = (sec.items && sec.items[0]) ? sec.items[0].id : 'b';
   return (sec.bank || []).map(w => `<div class="word-tile" id="wtile-${pre}-${w.id}" draggable="true"`
@@ -2236,14 +2235,14 @@ function renderWordBank(sec) {
     + `</div>`;
 }
 
-// ── Shared clickable grid (the real exam's tableMatchInteraction) ─────
+// в”Ђв”Ђ Shared clickable grid (the real exam's tableMatchInteraction) в”Ђв”Ђв”Ђв”Ђв”Ђ
 // Matching-information AND matching-features are the SAME widget in the real
 // exam: a grid with the option letters as bare column headers and one row per
 // question. Verified in the official British Council familiarisation test
 // (FAM Test ACR, Passage 2), where both render as tableMatchInteraction:
-//   Q14–17 "Which paragraph contains the following information?
-//            Choose the correct paragraph (A – F)."
-//   Q18–22 "Choose the correct person (A – F) for each statement."
+//   Q14вЂ“17 "Which paragraph contains the following information?
+//            Choose the correct paragraph (A вЂ“ F)."
+//   Q18вЂ“22 "Choose the correct person (A вЂ“ F) for each statement."
 // Neither is a dropdown; neither is a lettered-circle list.
 // The hidden radio per cell keeps name="rq-{id}", so setReadingInput's restore
 // path and the grading code keep working untouched.
@@ -2268,15 +2267,15 @@ function matchGrid(sec, cols) {
        + `<thead>${head}</thead><tbody>${body}</tbody></table></div>`;
 }
 
-// ── Matching information (which paragraph A–J?) — grid, no legend ─────
+// в”Ђв”Ђ Matching information (which paragraph AвЂ“J?) вЂ” grid, no legend в”Ђв”Ђв”Ђв”Ђв”Ђ
 // Paragraph letters are self-explanatory, so the real exam shows no legend
-// box for this task — just the grid.
+// box for this task вЂ” just the grid.
 function renderMatchingInfo(sec) {
   const cols = (sec.options || ['A','B','C','D','E','F','G']).map(l => ({ l }));
   return matchGrid(sec, cols);
 }
 
-// ── Reference box used by matching-features and sentence-endings ──────
+// в”Ђв”Ђ Reference box used by matching-features and sentence-endings в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // The real exam titles this legend ("List of people" in FAM Test ACR P2).
 function refBox(rows, label) {
   return `<div class="option-list-box" style="margin-bottom:10px;">`
@@ -2287,13 +2286,13 @@ function refBox(rows, label) {
 }
 function letterSelect(id, rows) {
   return `<select id="rq-${id}" class="dropdown" data-q="${id}" onchange="ExamApp.onSelectChange(${id})">`
-    + `<option value="">– Select –</option>`
-    + rows.map(r => `<option value="${r.l}">${r.l} — ${r.name || r.text}</option>`).join('')
+    + `<option value="">вЂ“ Select вЂ“</option>`
+    + rows.map(r => `<option value="${r.l}">${r.l} вЂ” ${r.name || r.text}</option>`).join('')
     + `</select>`
     + `<span class="feedback-pill" id="rfb-${id}"></span>`;
 }
 
-// ── Matching features / people ────────────────────────────────────────
+// в”Ђв”Ђ Matching features / people в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // Same grid as matching-information, preceded by the titled legend that maps
 // each letter to a person (FAM Test ACR P2 calls it "List of people").
 function renderMatchingFeatures(sec) {
@@ -2313,7 +2312,7 @@ function onGridPick(qid, letter) {
   saveState();
 }
 
-// ── Matching sentence endings — endings reference + dropdown per stem ─
+// в”Ђв”Ђ Matching sentence endings вЂ” endings reference + dropdown per stem в”Ђ
 function renderSentenceEndings(sec) {
   // Normalise endings into bank format so the existing word-tile / word-drop
   // machinery (placeWord, refreshWordZone, refreshWordBank) works unchanged.
@@ -2342,7 +2341,7 @@ function renderSentenceEndings(sec) {
   return `<div class="q-card" style="margin-bottom:6px;"><div class="word-bank-list">${tiles}</div></div>` + rows;
 }
 
-// ── Matching headings (drag headings onto bars above paragraphs) ──────
+// в”Ђв”Ђ Matching headings (drag headings onto bars above paragraphs) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // Slots are injected into the passage pane by injectHeadingSlots() using
 // PASSAGES[n].headingSlots; here we render only the heading bank.
 function renderMatchingHeadings(sec, n) {
@@ -2360,7 +2359,7 @@ function renderMatchingHeadings(sec, n) {
     + `</div></div>`;
 }
 
-// ── Map / plan / diagram labelling ────────────────────────────────────
+// в”Ђв”Ђ Map / plan / diagram labelling в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // sec.image: data-URI or path. sec.mode: 'input' (type a word) or 'select'
 // (pick a letter from sec.bank). sec.labels: [{id, x, y}] as % positions.
 function renderMap(sec) {
@@ -2385,7 +2384,7 @@ function renderMap(sec) {
   return `<div class="q-card">${bankBox}${stage}</div>`;
 }
 
-// ── Table completion ──────────────────────────────────────────────────
+// в”Ђв”Ђ Table completion в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // sec.headers?: [..]; sec.rows: [[cell,...],...]; cells may contain {{id}}.
 function renderTable(sec) {
   const limit = sec.wordLimit || 0;
@@ -2403,7 +2402,7 @@ function renderTable(sec) {
     + `</div>`;
 }
 
-// ── Flow-chart completion ─────────────────────────────────────────────
+// в”Ђв”Ђ Flow-chart completion в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 // sec.boxes: ["text {{id}} text", ...]; a vertical stack of boxes joined by arrows.
 // With sec.bank the gaps are drop zones and the words sit in a column to the right.
 function renderFlowchart(sec) {
@@ -2437,7 +2436,7 @@ function readingFillRow(id, fullText) {
   if (parts.length < 2) parts = fullText.split(` ${id} `); 
   
   return `<div class="gap-line" id="rq-card-${id}">
-    <span>• ${parts[0] || ''}</span>
+    <span>вЂў ${parts[0] || ''}</span>
     <span class="gap-field">
       <input type="text" id="rq-${id}" class="gap-input" data-q="${id}" oninput="ExamApp.onReadingInput(${id})" autocomplete="off" placeholder="${id}">
     </span>
@@ -2458,8 +2457,8 @@ function readingFillSentence(id, before, after, limit) {
 }
 
 // Renders summary-completion items as inline prose (gaps sit within flowing text)
-// items: array with {id, label, after?} — label may contain "N _____" pattern or be the before-text
-// `bulleted` renders each item as its own disc bullet — the real exam's note
+// items: array with {id, label, after?} вЂ” label may contain "N _____" pattern or be the before-text
+// `bulleted` renders each item as its own disc bullet вЂ” the real exam's note
 // completion is a <ul> per gap (ul: list-style disc outside, padding-left 40px,
 // margin 16px 0; li text 16px/24px). Summary completion stays flowing prose.
 function readingProseSummary(items, limit, bulleted) {
@@ -2532,7 +2531,7 @@ function toggleFlag(section, qid) {
 }
 
 
-// ── MATCHING HEADINGS ENGINE ──────────────────────────────────────────
+// в”Ђв”Ђ MATCHING HEADINGS ENGINE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let draggedHeadingId = null;
 let activeHeadingTileId = null;
 
@@ -2612,7 +2611,7 @@ function refreshHeadingSlot(qNum) {
   const heading = p && p.headings ? p.headings.find(h => h.id === hid) : null;
   if (heading) {
     slot.classList.add('filled');
-    slot.innerHTML = `<span class="slot-text">${heading.id}. ${heading.text}</span><span class="slot-plus">✕</span>`;
+    slot.innerHTML = `<span class="slot-text">${heading.id}. ${heading.text}</span><span class="slot-plus">вњ•</span>`;
   } else {
     slot.classList.remove('filled');
     slot.innerHTML = `<span style="color:#444;font-weight:700">${qNum}</span><span class="slot-plus">+</span>`;
@@ -2627,9 +2626,9 @@ function refreshHeadingBank() {
     if (tile) tile.classList.toggle('used', usedIds.has(h.id));
   });
 }
-// ─────────────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
-// ── WORD-BANK SUMMARY ENGINE (Q37-40) ────────────────────────────────
+// в”Ђв”Ђ WORD-BANK SUMMARY ENGINE (Q37-40) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let draggedWordId = null, activeWordId = null;
 
 function onWordDragStart(e, wid) {
@@ -2690,7 +2689,7 @@ function refreshWordBank(anyQid) {
   // and a bare letter id made them hide each other's tiles
   (sec.bank || []).forEach(w => { const t = document.getElementById('wtile-'+ids[0]+'-'+w.id); if(t) t.classList.toggle('used', used.has(w.id)); });
 }
-// ─────────────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 function isAnswered(i){ return !!(state.readingAnswers[i] && state.readingAnswers[i].toString().trim() !== ''); }
 function groupAnswered(g){ return g.every(isAnswered); }
@@ -2712,7 +2711,7 @@ function updateReadingNav() {
 
   // The footer is three flex:1 cells with min-width:auto plus a 76.8px deliver
   // button. Only the SELECTED cell carries the 3px strip, and it is painted as
-  // a ::before inside the cell's own top band — one dash per number box, plus a
+  // a ::before inside the cell's own top band вЂ” one dash per number box, plus a
   // 98.48px dash over "Part N". The boxes themselves touch: no gap, and the
   // pitch is the box's own content-driven width (20.91 / 29.80).
   function partHTML(p) {
@@ -2721,7 +2720,7 @@ function updateReadingNav() {
     if (p === cur) {
       let pills = '';
       groups.forEach(g => {
-        const label = g.length > 1 ? `${g[0]}–${g[g.length-1]}` : `${g[0]}`;
+        const label = g.length > 1 ? `${g[0]}вЂ“${g[g.length-1]}` : `${g[0]}`;
         let cls = 'qpill';
         if (g.length > 1) cls += ' grp';
         if (g.indexOf(curQ) >= 0) cls += ' current';
@@ -2752,7 +2751,7 @@ function updateReadingNav() {
     + '<path transform="translate(0,1536) scale(1,-1)" d="M1671 566q0 -40 -28 -68l-724 -724q-28 -28 -68 -28t-68 28l-420 420q-28 28 -28 68t28 68l152 152q28 28 68 28t68 -28l200 -200l504 504q28 28 68 28t68 -28l152 -152q28 -28 28 -68z"/></svg>';
   const submitBtn = !document.body.classList.contains('review-mode')
     ? `<button id="sub-btn" onclick="ExamApp.confirmSubmit(this)" title="Submit & finish" aria-label="Submit">${TICK}</button>`
-    : `<button id="sub-btn" onclick="ExamApp.backToResults()" title="Back to results" style="font-size:14px;width:auto;max-width:none;flex:0 0 auto;padding:0 16px;">← Results</button>`;
+    : `<button id="sub-btn" onclick="ExamApp.backToResults()" title="Back to results" style="font-size:14px;width:auto;max-width:none;flex:0 0 auto;padding:0 16px;">в†ђ Results</button>`;
 
   nav.innerHTML = PARTS.map(partHTML).join("") + submitBtn;
 
@@ -2761,7 +2760,7 @@ function updateReadingNav() {
 }
 
 // The blue ring on a gap-fill box and the blue outline on a question badge both
-// mean "this is the current scorable item" — not "focused". They persist after
+// mean "this is the current scorable item" вЂ” not "focused". They persist after
 // blur until another question becomes current.
 function markCurrentItem(qid) {
   document.querySelectorAll('#questions-pane .gap-input.is-current, #passage-pane .gap-input.is-current')
@@ -2840,10 +2839,10 @@ function doScrollTo(qid) {
 }
 
 function attachScrollObserver() {
-  // intentionally empty — active question only updates on pill click, not scroll
+  // intentionally empty вЂ” active question only updates on pill click, not scroll
 }
 
-// V3 — the Notes drawer. The real player keeps every note in a right-hand
+// V3 вЂ” the Notes drawer. The real player keeps every note in a right-hand
 // panel; without one, a student who wrote eight notes across three passages
 // has no way to read them back. Notes carry their quoted text so the list
 // works for passages that are not currently rendered.
@@ -2918,13 +2917,13 @@ function deleteNoteAt(passage, start) {
   renderNotesDrawer();
 }
 
-// V3 — announce question state the way the real player does:
+// V3 вЂ” announce question state the way the real player does:
 // "Question 4, Not attempted" / "Attempted", and mark the active one.
 function decorateQuestionAria() {
   document.querySelectorAll('#questions-pane .q-pill[data-qid]').forEach(pill => {
     const id = pill.dataset.qid;
     const answered = !!(state.readingAnswers[id] || '').toString().trim();
-    // The official badge is an inert span — no role, no tab stop, no click
+    // The official badge is an inert span вЂ” no role, no tab stop, no click
     // target. Only the label is announced.
     pill.removeAttribute('role');
     pill.removeAttribute('tabindex');
@@ -2936,7 +2935,7 @@ function decorateQuestionAria() {
   });
 }
 
-// V3 — a one-shot pulse on the question number when an answer registers.
+// V3 вЂ” a one-shot pulse on the question number when an answer registers.
 function pulseAnswered(qid) {
   const pill = document.querySelector(`#questions-pane .q-pill[data-qid="${qid}"]`);
   if (!pill) return;
@@ -2955,18 +2954,18 @@ function setActivePill(qid) {
   markCurrentItem(numId || qid);
 }
 
-// ====================================================================
+// =====
 // HIGHLIGHTING (Reading)
-// ====================================================================
+// =====
 
-// ====================================================================
-// V3 — ANNOTATION PERSISTENCE
+// =====
+// V3 вЂ” ANNOTATION PERSISTENCE
 // V2 kept highlights and notes purely in the DOM, so a reload wiped every
 // mark a student had made while every other piece of state survived. We
 // address annotations by character offset into the passage's own text,
 // deliberately skipping form controls and heading slots so that answering
 // a question can never shift a stored offset.
-// ====================================================================
+// =====
 
 const USER_HL_CLASSES = ['hl-y','hl-g','hl-p','hl-note'];
 
@@ -3074,7 +3073,7 @@ function clearUserAnnotations(root) {
 }
 
 // Collapse duplicates, and merge touching/overlapping plain highlights of the
-// same colour. Notes are never merged — each one carries its own text.
+// same colour. Notes are never merged вЂ” each one carries its own text.
 function tidyAnnotations(list) {
   const seen = new Set();
   const uniq = [];
@@ -3134,7 +3133,7 @@ function restoreAnnotations(passageNum) {
       span.className = 'hl ' + a.c;
       if (a.c === 'hl-note') {
         span.setAttribute('data-note', a.n || '');
-        span.setAttribute('title', a.n || 'Empty note — click to edit');
+        span.setAttribute('title', a.n || 'Empty note вЂ” click to edit');
         span.onclick = function(ev) { ExamApp.openNote(this, ev); };
       }
       try {
@@ -3155,7 +3154,7 @@ function applyHighlight(colorClass) {
     span.className = 'hl ' + colorClass;
     range.surroundContents(span);
   } catch(e) {
-    // Selection spans element boundaries — wrap each text node separately.
+    // Selection spans element boundaries вЂ” wrap each text node separately.
     try { wrapRangeSegments(range, colorClass, ''); }
     catch(e2) { toast('Could not highlight that selection', 'error'); }
   }
@@ -3224,7 +3223,7 @@ function setupHighlighter() {
       const rect = range.getBoundingClientRect();
 
       // The official adder carries only Note and Highlight. Clear is ours, and
-      // it is revealed only when the selection already lies on a highlight —
+      // it is revealed only when the selection already lies on a highlight вЂ”
       // otherwise the resting toolbar is wider than the real one.
       let onHl = false;
       try {
@@ -3247,9 +3246,9 @@ function setupHighlighter() {
   });
 }
 
-// ====================================================================
+// =====
 // FLOW CONTROL
-// ====================================================================
+// =====
 
 function validateStart() {
   const nameEl = document.getElementById('start-name');
@@ -3271,7 +3270,7 @@ function validateStart() {
   state.student.name = name;
   saveState();
   updateHeaderName(name);
-  // The briefing greets the candidate by first name — the one place in the
+  // The briefing greets the candidate by first name вЂ” the one place in the
   // whole shell where the product speaks to a person rather than a user.
   const greet = document.getElementById('intro-greet');
   if (greet) {
@@ -3315,11 +3314,11 @@ function beginReading() {
     goToStage('reading');
     renderReading();
     startTimer('reading', () => {
-      toast('Reading time is up — exam complete', 'success');
+      toast('Reading time is up вЂ” exam complete', 'success');
       finishExam();
     });
     setupResizer();
-    /* goToStage() above has NOT swapped yet — it cross-fades the outgoing
+    /* goToStage() above has NOT swapped yet вЂ” it cross-fades the outgoing
        stage for 240ms first. Dropping the curtain here re-lit the field for
        exactly that long. It comes down once the exam is actually on screen. */
     setTimeout(function () { document.body.classList.remove('cdi-exit'); }, 240);
@@ -3328,7 +3327,7 @@ function beginReading() {
 }
 
 function confirmSubmit(btn) {
-  // Real-exam ✓ icon button: confirm via colour + toast (keeps the two-step safety)
+  // Real-exam вњ“ icon button: confirm via colour + toast (keeps the two-step safety)
   if (btn && btn.id === 'sub-btn') {
     if (!btn.dataset.confirm) {
       btn.dataset.confirm = '1';
@@ -3367,8 +3366,8 @@ function finishExam() {
   pauseTimer();
   state.finishedAt = new Date().toISOString();
   // Submitting leaves full-screen on purpose. The fullscreen-change handler
-  // fires before goToStage('completion') has run — and goToStage only assigns
-  // state.stage inside its deferred cross-fade settle() — so the anti-cheat
+  // fires before goToStage('completion') has run вЂ” and goToStage only assigns
+  // state.stage inside its deferred cross-fade settle() вЂ” so the anti-cheat
   // still saw stage 'reading' and charged the student a strike for their own
   // submit. Flag the deliberate exit; recordViolation() honours it.
   state.finishing = true;
@@ -3423,9 +3422,9 @@ function zoomText(step) {
   document.documentElement.style.setProperty('--text-zoom', currentTextZoom + 'px');
 }
 
-// ====================================================================
+// =====
 // RESULTS COMPUTATION
-// ====================================================================
+// =====
 
 function checkAnswerMatch(given, correct) {
   if (!given) return false;
@@ -3456,7 +3455,7 @@ function bandFor(score) {
   return 0;
 }
 
-// V3 — why a mark was actually lost.
+// V3 вЂ” why a mark was actually lost.
 // A student self-marking a completion answer sees red and concludes "my reading
 // is bad", when a large share of those losses are a missing plural or one wrong
 // letter on an answer they located correctly. Naming the cause changes what
@@ -3477,7 +3476,7 @@ function levenshtein(a, b) {
 }
 
 // Only completion-style answers can have a "near miss". Letters, TRUE/FALSE and
-// roman numerals are either right or wrong — a typo there is not a spelling slip.
+// roman numerals are either right or wrong вЂ” a typo there is not a spelling slip.
 function isOpenAnswer(correct) {
   const c = String(correct || '').trim();
   if (!c || c.length < 3) return false;
@@ -3491,7 +3490,7 @@ function isOpenAnswer(correct) {
 // label in the answer table (the old code hardcoded plural-or-spelling).
 const CAUSE_LABEL = { plural:'plural', spelling:'spelling', limit:'over limit' };
 
-// V3 — the word limit is authored per section and already enforced visually
+// V3 вЂ” the word limit is authored per section and already enforced visually
 // while typing (onReadingInput paints an amber border). It was never checked
 // at grading time, so "the 29 centimeters" for a ONE WORD answer scored zero
 // with no explanation. Over-limit is a rule slip, not a comprehension failure.
@@ -3502,7 +3501,7 @@ function classifyMiss(given, correct, limit) {
   const variants = String(correct || '').toLowerCase().split('|').map(s => s.trim());
   for (const c of variants) {
     if (!c || g === c) continue;
-    // singular/plural only — not any trailing letter
+    // singular/plural only вЂ” not any trailing letter
     if (g === c + 's' || c === g + 's' || g === c + 'es' || c === g + 'es') return 'plural';
     const d = levenshtein(g, c);
     if (d > 0 && d <= 2 && c.length >= 4 && Math.abs(g.length - c.length) <= 2) return 'spelling';
@@ -3533,7 +3532,7 @@ function gradeReading() {
        status = isCorrect ? 'correct' : 'wrong';
     }
 
-    // V3 — carry the section through. Without `type` here nothing downstream
+    // V3 вЂ” carry the section through. Without `type` here nothing downstream
     // can express a per-type accuracy or a False-vs-Not-Given confusion rate,
     // which is what the highest-error question type actually needs.
     const sec = sectionOf(i) || {};
@@ -3541,14 +3540,14 @@ function gradeReading() {
     if (status === 'wrong' && isOpenAnswer(correct)) cause = classifyMiss(given, correct, sec.wordLimit);
     state.answerCauses[i] = cause;
     // `passage` is the only field added to a row. Everything the review screen
-    // already reads — id, ua, ca, status, cause, type, secs — is untouched.
+    // already reads вЂ” id, ua, ca, status, cause, type, secs вЂ” is untouched.
     detail.push({ id: i, ua: given, ca: correct ? correct : '', status: status,
                   cause: cause, type: sec.type || null,
                   passage: passageOf(i),
                   secs: state.timePerQuestion[i] || 0 });
   }
 
-  // ── V3 / R3 — the shape grew, it never changed. `score`, `total` and
+  // в”Ђв”Ђ V3 / R3 вЂ” the shape grew, it never changed. `score`, `total` and
   // `detail` are exactly what they were; `counts`, `byPassage` and `band` are
   // additions the certificate and the printed report need, and any caller
   // that ignores them behaves as before.
@@ -3575,7 +3574,7 @@ function gradeReading() {
   return { score, total: QTOTAL, detail, counts, byPassage, band: bandFor(score) };
 }
 
-/* ── Band vocabulary ───────────────────────────────────────────
+/* в”Ђв”Ђ Band vocabulary в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Ported verbatim from the Writing engine so a Reading report and a Writing
    report describe the same band in the same words. */
 function bandLabel(b) {
@@ -3594,7 +3593,7 @@ function bandTier(b) {
   if (b >= 5.5) return 'mid';
   return 'low';
 }
-/* Score colour ramp. Deliberately calm: a weak band is graphite, never red —
+/* Score colour ramp. Deliberately calm: a weak band is graphite, never red вЂ”
    the certificate reports, it does not scold. The --cv-* tokens are defined on
    #stage-results .cert and on #print-report, so the same call works in both. */
 function bandColorVar(b) {
@@ -3603,7 +3602,7 @@ function bandColorVar(b) {
   if (b > 0)    return 'var(--cv-low,#78818f)';
   return 'var(--cv-none,#b3ada4)';
 }
-/* Council-of-Europe equivalence — the thing a university admissions page
+/* Council-of-Europe equivalence вЂ” the thing a university admissions page
    actually quotes back at the candidate. */
 function cefrOf(b) {
   if (b >= 8.5) return 'C2';
@@ -3611,7 +3610,7 @@ function cefrOf(b) {
   if (b >= 5.5) return 'B2';
   if (b >= 4.0) return 'B1';
   if (b > 0)    return 'A2';
-  return '—';
+  return 'вЂ”';
 }
 /* The official IELTS band description for the awarded level. Public wording,
    not personalised feedback. */
@@ -3626,10 +3625,10 @@ function bandDescriptor(b) {
 }
 function bandDescHeading(b, screen) {
   if (b <= 0) return 'No band was awarded';
-  return screen ? 'What Band ' + b.toFixed(1) + ' means · ' + bandDescriptor(b).n
-                : 'Band ' + b.toFixed(1) + ' · ' + bandDescriptor(b).n;
+  return screen ? 'What Band ' + b.toFixed(1) + ' means В· ' + bandDescriptor(b).n
+                : 'Band ' + b.toFixed(1) + ' В· ' + bandDescriptor(b).n;
 }
-/* What the band actually buys the candidate — the one honest sentence that
+/* What the band actually buys the candidate вЂ” the one honest sentence that
    keeps a 5.5 from feeling like a dead end and an 8.5 from feeling flat. */
 const BAND_TARGETS = [
   { b: 5.5, why: 'the usual floor for foundation and pathway courses' },
@@ -3651,10 +3650,10 @@ function bandMilestone(overall, raw) {
   if (!next) return '<b>Band ' + overall.toFixed(1) + '</b> sits at or above what virtually every university and visa route requires.';
   const need = marksForBand(next.b) - raw;
   const marks = need > 0 ? '<b>' + need + ' more mark' + (need > 1 ? 's' : '') + '</b>' : '<b>' + (next.b - overall).toFixed(1) + ' to go</b>';
-  return marks + ' to Band ' + next.b.toFixed(1) + ' — ' + next.why + '.';
+  return marks + ' to Band ' + next.b.toFixed(1) + ' вЂ” ' + next.why + '.';
 }
 
-/* ── Document furniture ────────────────────────────────────── */
+/* в”Ђв”Ђ Document furniture в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 const CERT_TEST_NO = (String(STORAGE_KEY).match(/(\d+)\s*$/) || [0,'1'])[1].replace(/^0+/, '') || '1';
 function certReduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
 function certLogoSrc() { const i = document.querySelector('.brand-logo, .reg-mark, .brand-ref'); return (i && i.getAttribute('src')) || ''; }
@@ -3676,13 +3675,13 @@ function certMinSec(secs) {
   return Math.floor(secs/60) + 'm ' + String(secs % 60).padStart(2,'0') + 's';
 }
 /* A passage mark converted to the band it would be worth over a whole paper.
-   Scaling to 40 is the only honest way to put a 9-out-of-13 on the 0–9 scale,
+   Scaling to 40 is the only honest way to put a 9-out-of-13 on the 0вЂ“9 scale,
    and the legend says so rather than letting the number imply more. */
 function passageBand(p) { return p.total ? bandFor(Math.round(p.correct / p.total * QTOTAL)) : 0; }
 
 /* Which passage is the candidate's best, and which one is costing them most.
    Judged on accuracy, so a 14-question passage is not flagged simply for
-   holding more questions. Returns [] when the profile is flat — a level
+   holding more questions. Returns [] when the profile is flat вЂ” a level
    profile has no headline. */
 function passageTags(rows) {
   const acc = r => r.total ? r.correct / r.total : 0;
@@ -3702,7 +3701,7 @@ function escapeHtml(s) {
 }
 
 function formatDate(iso) {
-  if (!iso) return '—';
+  if (!iso) return 'вЂ”';
   try {
     const d = new Date(iso);
     return d.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric'});
@@ -3720,15 +3719,15 @@ function renderCol(qs) {
         <tr class="${i%2===1?'alt':''}" data-st="${q.status}" data-slip="${q.cause?1:0}" data-slow="${(q.secs||0)>90?1:0}">
           <td class="td-num">${q.id}${q.secs?`<span class="td-secs${q.secs>90?' slow':''}">${q.secs>=60?Math.floor(q.secs/60)+'m'+(q.secs%60?(q.secs%60)+'s':''):q.secs+'s'}</span>`:''}</td>
           <td class="td-user ${q.status==='wrong'?'wrong':''}">${q.ua?escapeHtml(q.ua):'<span class="empty">not answered</span>'}${q.cause?`<span class="cause-tag ${q.cause}">${CAUSE_LABEL[q.cause]||q.cause}</span>`:''}</td>
-          <td class="td-correct">${q.status!=='correct'?escapeHtml(q.ca.replace(/\|/g,' / ')):'<span class="dash">—</span>'}</td>
-          <td class="td-status ${q.status}">${q.status==='correct'?'✓':q.status==='wrong'?'✗':'—'}</td>
+          <td class="td-correct">${q.status!=='correct'?escapeHtml(q.ca.replace(/\|/g,' / ')):'<span class="dash">вЂ”</span>'}</td>
+          <td class="td-status ${q.status}">${q.status==='correct'?'вњ“':q.status==='wrong'?'вњ—':'вЂ”'}</td>
         </tr>`).join('')}
       </tbody>
     </table>`;
 }
 
-// V3 — band trend across every V3 reading test, not just this one.
-/* ── Where the marks went ──/* ── Where the marks went ──────────────────────────────────────
+// V3 вЂ” band trend across every V3 reading test, not just this one.
+/* в”Ђв”Ђ Where the marks went в”Ђв”Ђ/* в”Ђв”Ђ Where the marks went в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The one diagnosis Reading can make that Writing cannot. A mark lost to a
    plural, a spelling or a word-limit breach is a proofreading problem; a mark
    lost to a misread is a comprehension problem; a blank is a clock problem.
@@ -3746,22 +3745,22 @@ function lossAnalysis(qs) {
   let lead;
   if (!lost) lead = 'Every one of the forty marks was scored. There is nothing to diagnose on this paper.';
   else if (blank.length && missed.length)
-    lead = 'You lost ' + lost + ' marks — ' + blank.length + ' left blank, ' + missed.length + ' answered wrong.';
+    lead = 'You lost ' + lost + ' marks вЂ” ' + blank.length + ' left blank, ' + missed.length + ' answered wrong.';
   else if (blank.length)
     lead = 'You lost ' + lost + ' mark' + (lost>1?'s':'') + ', every one of them left blank. That is a clock problem, not a reading one.';
   else if (fixable)
-    lead = 'You lost ' + lost + ' mark' + (lost>1?'s':'') + ' — but ' + fixable + ' of them ' + (fixable>1?'were':'was') + ' a slip, not a misread.';
+    lead = 'You lost ' + lost + ' mark' + (lost>1?'s':'') + ' вЂ” but ' + fixable + ' of them ' + (fixable>1?'were':'was') + ' a slip, not a misread.';
   else
     lead = 'You lost ' + lost + ' mark' + (lost>1?'s':'') + ', and all of them were genuine misreads.';
   const notes = [];
-  if (fixable) notes.push('You found the right place in the passage on ' + fixable + ' of these — the answer just did not come out of your pen the way the key wanted it. That is proofreading, and it is the cheapest band you will ever gain.');
-  if (blank.length >= 5) notes.push(blank.length + ' blanks is the single biggest thing standing between you and a higher band. A guess costs nothing in IELTS Reading — there is no penalty for a wrong answer, so never leave one empty.');
+  if (fixable) notes.push('You found the right place in the passage on ' + fixable + ' of these вЂ” the answer just did not come out of your pen the way the key wanted it. That is proofreading, and it is the cheapest band you will ever gain.');
+  if (blank.length >= 5) notes.push(blank.length + ' blanks is the single biggest thing standing between you and a higher band. A guess costs nothing in IELTS Reading вЂ” there is no penalty for a wrong answer, so never leave one empty.');
   return { missed:missed.length, blank:blank.length, plural, spelling, limitOv, fixable, real, lost, lead, notes };
 }
 
-/* ── The certificate ─────────────────────────────────────────── */
+/* в”Ђв”Ђ The certificate в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function renderResults() {
-  /* "Exam Results" screen — header, grey title bar, then band score,
+  /* "Exam Results" screen вЂ” header, grey title bar, then band score,
      incorrect questions, mistakes by passage and mistakes by question type,
      with Report Issue / Review Mistakes / Finish underneath. Unanswered
      questions count as incorrect, exactly as on the real answer sheet. */
@@ -3850,7 +3849,7 @@ function reviewQuestion(qid) {
   try { jumpToReading(qid); } catch (e) {}
 }
 
-/* ── the reveal ─────────────────────────────────────────────────
+/* в”Ђв”Ђ the reveal в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The band counts up, the ruler and every bar grow from zero. All of it
    degrades to the finished state instantly when motion is reduced. */
 function playCertReveal(root) {
@@ -3883,12 +3882,12 @@ function playCertReveal(root) {
   requestAnimationFrame(step);
 }
 
-// ====================================================================
-// PRINTABLE REPORT — exactly two A4 pages:
-//   1 · the Test Report Form   2 · the Schedule of Answers (all forty)
+// =====
+// PRINTABLE REPORT вЂ” exactly two A4 pages:
+//   1 В· the Test Report Form   2 В· the Schedule of Answers (all forty)
 // Typeset for A4 in ink, not a screenshot of the dark score panel: the
 // screen certificate is never what reaches the paper.
-// ====================================================================
+// =====
 function printStylesheet() {
   return '<style>' +
     '#print-report{font-family:var(--cert-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif);color:#151310;' +
@@ -3967,7 +3966,7 @@ function printStylesheet() {
     '#print-report .pr-notes-lines{flex:1;min-height:18mm;background-image:repeating-linear-gradient(180deg,transparent 0 7.3mm,#d6cdbd 7.3mm 7.6mm)}' +
     '#print-report .pr-foot{margin-top:auto;display:flex;justify-content:space-between;gap:6mm;padding-top:2.5mm;' +
       'border-top:0.6pt solid #ddd6ca;font-size:6.8pt;color:#8a7f70;letter-spacing:.04em}' +
-    /* page 2 — the schedule */
+    /* page 2 вЂ” the schedule */
     '#print-report .print-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1.2pt solid #17356a;padding-bottom:2mm;margin-bottom:4mm}' +
     '#print-report .print-brand{font-family:var(--cert-display,inherit);font-weight:700;font-size:11pt;color:#17356a;letter-spacing:-.01em}' +
     '#print-report .print-task-tag{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:#7b7062}' +
@@ -3997,7 +3996,7 @@ function printCertPage(rd, band, d) {
   const id   = certId(state.student.name, d);
   const head = '<div class="pr-rule"></div><div class="pr-head">' +
     '<div class="pr-brand"><img src="' + certLogoSrc() + '" alt=""><div>' +
-    '<div class="pr-brand-name">READING CDI</div><div class="pr-brand-sub">IELTS ACADEMIC · READING</div></div></div>' +
+    '<div class="pr-brand-name">READING CDI</div><div class="pr-brand-sub">IELTS ACADEMIC В· READING</div></div></div>' +
     '<div class="pr-headr"><div class="pr-kicker">' + escapeHtml(certTestName()) + '</div>' +
     '<div class="pr-title">Test Report Form</div><div class="pr-date">' + certDateStr(d) + '</div></div></div>' +
     '<div class="pr-id">' +
@@ -4005,7 +4004,7 @@ function printCertPage(rd, band, d) {
     '<div><div class="l">Test date</div><div class="v">' + certDateStr(d) + '</div></div>' +
     '<div><div class="l">Module</div><div class="v mod">Academic Reading</div></div>' +
     '<div><div class="l">Report no.</div><div class="v" style="font-size:8.2pt;letter-spacing:.03em;white-space:nowrap">' + id + '</div></div></div>';
-  const foot = '<div class="pr-foot"><span>READING CDI · @READING_CDI · practice score, not an official IELTS result</span>' +
+  const foot = '<div class="pr-foot"><span>READING CDI В· @READING_CDI В· practice score, not an official IELTS result</span>' +
     '<span>' + id + '</span></div>';
 
   const ticks = [0,1,2,3,4,5,6,7,8,9].map(n =>
@@ -4021,7 +4020,7 @@ function printCertPage(rd, band, d) {
     '%;background:' + col + '"></i></div><span class="pr-num" style="color:' + col + '">' + text + '</span></div></td>';
   const critRows = rows.map((p, i) => {
     const b = passageBand(p), col = bandColorVar(b);
-    return '<tr><td class="n">Passage ' + p.passage + '<em>Q' + p.first + '–' + p.last + '</em>' + tags[i] + '</td>' +
+    return '<tr><td class="n">Passage ' + p.passage + '<em>Q' + p.first + 'вЂ“' + p.last + '</em>' + tags[i] + '</td>' +
       barCell((p.correct / p.total * 100).toFixed(1), col, p.correct + '<small>/' + p.total + '</small>') +
       barCell((b / 9 * 100).toFixed(1), col, b.toFixed(1)) + '</tr>';
   }).join('') +
@@ -4038,7 +4037,7 @@ function printCertPage(rd, band, d) {
     L.blank    ? '<span><b>' + L.blank    + '</b> left blank</span>'        : ''
   ].join('');
   const pace = rows.map(p => '<div><b>Passage ' + p.passage + '</b>' + certMinSec(p.secs) +
-    (p.secs > 20*60 ? ' · over the 20-minute target' : '') + '</div>').join('');
+    (p.secs > 20*60 ? ' В· over the 20-minute target' : '') + '</div>').join('');
 
   return '<div class="print-page pr-cert">' + head +
     '<div class="pr-score"><div class="pr-band">' +
@@ -4046,7 +4045,7 @@ function printCertPage(rd, band, d) {
     '<div class="pr-band-lvl">' + bandLabel(band) + '</div>' +
     '<div class="pr-band-f" style="margin-top:1mm">CEFR ' + cefrOf(band) + '</div>' +
     '<div class="pr-band-f">' + nC + ' of ' + tot + ' correct, converted on<br>the Academic Reading band table</div></div>' +
-    '<div class="pr-side"><div class="pr-scale-cap">Position on the IELTS 0–9 scale</div>' +
+    '<div class="pr-side"><div class="pr-scale-cap">Position on the IELTS 0вЂ“9 scale</div>' +
     '<div class="pr-scale"><i style="width:' + (band / 9 * 100).toFixed(1) + '%;background:' + bandColorVar(band) + '"></i></div>' +
     '<div class="pr-ticks">' + ticks + '</div>' +
     '<div class="pr-note-line">' + bandMilestone(band, nC).replace(/<\/?b>/g, '') + '</div>' +
@@ -4057,7 +4056,7 @@ function printCertPage(rd, band, d) {
     foot + '</div>';
 }
 
-/* Page two: the Schedule of Answers, the way an awarding body issues one —
+/* Page two: the Schedule of Answers, the way an awarding body issues one вЂ”
    number, answer given, key, mark. No ticks, no colour blocks: a wrong answer
    is set in italic beside its key, which is the apparatus of a critical
    edition and prints far better than a red cross. */
@@ -4083,16 +4082,16 @@ function printSchedulePage(rd, d) {
     '<div class="pr-scols">' + table(qs.slice(0, half).map(markRow).join('')) +
     table(qs.slice(half).map(markRow).join('')) + '</div>' +
     '<div class="pr-notes"><div class="pr-notes-h">Teacher\'s notes</div><div class="pr-notes-lines"></div></div>' +
-    '<div class="pr-pagefoot"><span>' + escapeHtml(state.student.name || 'Candidate') + ' · ' + certDateStr(d) +
-    ' · ' + rd.counts.correct + ' of ' + (qs.length || QTOTAL) + '</span>' +
-    '<span>Page 2 of 2 · ' + id + '</span></div></div>';
+    '<div class="pr-pagefoot"><span>' + escapeHtml(state.student.name || 'Candidate') + ' В· ' + certDateStr(d) +
+    ' В· ' + rd.counts.correct + ' of ' + (qs.length || QTOTAL) + '</span>' +
+    '<span>Page 2 of 2 В· ' + id + '</span></div></div>';
 }
 
 function printReportHtml() {
   const rd = gradeReading();
   const band = bandFor(rd.score);
   const d = certDate();
-  /* ONE A4 sheet. The report used to carry a second page — the Schedule of
+  /* ONE A4 sheet. The report used to carry a second page вЂ” the Schedule of
      Answers, all forty rows. The certificate is the thing a student keeps and
      shows, so it is the whole document now; the per-question record still
      lives on the results screen, which is where it is actually read. Listening
@@ -4129,8 +4128,8 @@ function measurePrintPages(host) {
   const limit = 265 * pxPerMm;
   host.querySelectorAll('.print-page').forEach(page => {
     if (page.getBoundingClientRect().height <= limit) return;
-    /* 1 · the ruled annotation space gives up its height before it gives up
-           its existence — a report with nowhere to write on it is worse than
+    /* 1 В· the ruled annotation space gives up its height before it gives up
+           its existence вЂ” a report with nowhere to write on it is worse than
            a short one. */
     const notes = page.querySelector('.pr-notes');
     if (notes) {
@@ -4153,10 +4152,10 @@ function measurePrintPages(host) {
 }
 try { window.addEventListener('beforeprint', buildPrintReport); } catch (e) { /* the button still works */ }
 
-/* ── "Save Report as PDF" ─────────────────────────────────────────────────
+/* в”Ђв”Ђ "Save Report as PDF" в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The button used to be labelled "Download Report" and call window.print()
    raw, which is a promise the page could not keep: nothing is downloaded, and
-   the report was only ever built by the beforeprint listener above — a hook
+   the report was only ever built by the beforeprint listener above вЂ” a hook
    Safari fires late and headless Chrome does not fire at all, so the dialog
    could open onto an empty sheet.
 
@@ -4164,20 +4163,20 @@ try { window.addEventListener('beforeprint', buildPrintReport); } catch (e) { /*
    loaded from a CDN at the top of this file, so they are already dead when the
    page runs offline, which is most of the time). It was rejected on the
    artefact, not the file size: that pair can only rasterise the report and
-   pdf.addImage() it, which yields a picture of a page — no selectable text, no
+   pdf.addImage() it, which yields a picture of a page вЂ” no selectable text, no
    vector rules, and visible softness on any real printer. This file already
    owns a properly typeset A4 report (#print-report, fitted by fitPrintPages),
    and every browser's "Save as PDF" destination turns it into a genuine PDF
    with live text. So: build the report first, then open the dialog, and say
    plainly on the button and in the toast what the next step is. */
-/* A4 · the ONE @page rule this file declares is size:A4;margin:14mm 15mm 12mm,
+/* A4 В· the ONE @page rule this file declares is size:A4;margin:14mm 15mm 12mm,
    and PDFX must be told the same box or the report is typeset to one geometry
    and imposed onto another. Listening and Writing use 14mm all round; Reading
    is 15mm on the sides. */
 const PDF_PAGE = { w: 210, h: 297, mt: 14, mr: 15, mb: 12, ml: 15 };
 
 /* The downloaded file is named for the certificate it contains: same wording,
-   same order — V3-Reading-1-Islom-Kenjayev-20260902. The sitting date is what
+   same order вЂ” V3-Reading-1-Islom-Kenjayev-20260902. The sitting date is what
    stops a re-sit silently overwriting the first attempt; without it the browser
    just appends "(1)" and the two are no longer tellable apart. */
 function reportFileStem() {
@@ -4189,8 +4188,8 @@ function reportFileStem() {
 
 /* One click, one file. Until now this test was the only one of the three that
    could not hand the candidate a certificate: its single button opened the
-   print dialog and asked them to find "Save as PDF" themselves. PDFX — the
-   block inlined above, byte-identical to the copies in Listening and Writing —
+   print dialog and asked them to find "Save as PDF" themselves. PDFX вЂ” the
+   block inlined above, byte-identical to the copies in Listening and Writing вЂ”
    walks the already-typeset #print-report and writes a real vector PDF with
    live text, offline, with no CDN. The print route stays beside it, because a
    real printer still renders sharper than any exporter. */
@@ -4205,7 +4204,7 @@ function buildCertSheet() {
 
 let pdfBusy = false;
 /* The certificate, photographed rather than redrawn. A capture cannot drift
-   from the screen the way a second typesetting can — what you see is the file.
+   from the screen the way a second typesetting can вЂ” what you see is the file.
    html2canvas + jsPDF are already loaded above, but they come from a CDN, so
    when they are absent (offline) this hands over to the vector exporter. */
 function downloadReport() {
@@ -4217,7 +4216,7 @@ function downloadReport() {
   pdfBusy = true;
   var btn = document.getElementById('results-download-btn');
   var was = btn ? btn.textContent : null;
-  if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'BuildingвЂ¦'; }
 
   var settled = false;
   var done = function () {
@@ -4229,7 +4228,7 @@ function downloadReport() {
 
   /* A capture is CPU work with no timeout of its own: on a slow machine, or one
      without hardware acceleration, it can run long enough that the button looks
-     dead — and if it never settles, it stays that way for the rest of the
+     dead вЂ” and if it never settles, it stays that way for the rest of the
      session. After twenty-five seconds the vector exporter answers instead, so
      the button always comes back and a PDF always arrives. */
   var watchdog = setTimeout(function () {
@@ -4244,25 +4243,25 @@ function downloadReport() {
     useCORS: true,
     logging: false,
     /* Two things are skipped outright.
-       · the star field: a live canvas behind the sheet, no part of the document
-       · the review call-to-action: it is a button, useless on paper — and it is
+       В· the star field: a live canvas behind the sheet, no part of the document
+       В· the review call-to-action: it is a button, useless on paper вЂ” and it is
          also the only thing here styled with color-mix(), which html2canvas
          1.4.1 cannot parse. It throws "unsupported color function" in 50ms and
          takes the whole capture with it. Not cloning it avoids both. */
-    /* only the star field is skipped outright — a live canvas behind the
+    /* only the star field is skipped outright вЂ” a live canvas behind the
        sheet, no part of the document */
     ignoreElements: function (el) { return el.id === 'cdi-stars-host'; },
     /* html2canvas rasterises a CLONE of the document, and in that clone the
        certificate's entrance keyframes start again from the top. It paints
        immediately, so every part is caught at opacity 0 and the capture comes
-       back a blank white sheet — in 50ms, which is the tell. Killing animation
+       back a blank white sheet вЂ” in 50ms, which is the tell. Killing animation
        in the clone leaves every part at its resting state. */
     onclone: function (doc) {
       var st = doc.createElement('style');
       st.textContent =
         /* the entrance keyframes, as above */
         '*,*::before,*::after{animation:none!important;transition:none!important}' +
-        /* The band score is gradient-filled text — background-clip:text with a
+        /* The band score is gradient-filled text вЂ” background-clip:text with a
            transparent colour. html2canvas 1.4.1 cannot clip a background to
            glyphs, so it painted the gradient as a solid block and the number
            itself, being transparent, never appeared: the most important figure
@@ -4270,14 +4269,14 @@ function downloadReport() {
         '#stage-results .band-num{background:none!important;' +
         '-webkit-background-clip:border-box!important;background-clip:border-box!important;' +
         'color:#ffffff!important}' +
-        /* The call-to-action is a button — meaningless on paper — and it is the
+        /* The call-to-action is a button вЂ” meaningless on paper вЂ” and it is the
            only thing here painted with color-mix(). Chrome serialises that to
-           `color(srgb …)`, which html2canvas 1.4.1 reports as an unsupported
+           `color(srgb вЂ¦)`, which html2canvas 1.4.1 reports as an unsupported
            colour function and dies on in 50ms. Hiding it is not enough on its
            own, because the computed value is still read; the colours have to be
-           overridden too, so nothing in the tree computes to color(srgb …).
+           overridden too, so nothing in the tree computes to color(srgb вЂ¦).
            Doing both here also removes its box, which skipping the clone did
-           not — that left a dark band above the footer. */
+           not вЂ” that left a dark band above the footer. */
         '.review-cta{display:none!important;background:#ffffff!important;' +
         'border-color:#e6eaf2!important;background-image:none!important}';
       (doc.head || doc.documentElement).appendChild(st);
@@ -4299,7 +4298,7 @@ function downloadReport() {
     try { toast('Certificate saved to your downloads.', 'success', 4200); } catch (e) {}
     done();
   }).catch(function () {
-    /* a failed capture is not a dead end — the drawn report still works */
+    /* a failed capture is not a dead end вЂ” the drawn report still works */
     done();
     downloadReportVector();
   });
@@ -4311,18 +4310,18 @@ function downloadReportVector() {
   pdfBusy = true;
   const btn = document.getElementById('results-download-btn');
   const was = btn ? btn.textContent : null;
-  if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'BuildingвЂ¦'; }
   PDFX.save({
     hostId: 'results-content',
     page: PDF_PAGE,
     build: buildCertSheet,
     fileName: reportFileStem(),
-    meta: { title: 'READING CDI — ' + (state.student.name || 'Candidate'), author: 'READING CDI', subject: 'IELTS Academic Reading · Test Report Form' }
+    meta: { title: 'READING CDI вЂ” ' + (state.student.name || 'Candidate'), author: 'READING CDI', subject: 'IELTS Academic Reading В· Test Report Form' }
   }).then(function (r) {
-    toast('Report saved to your downloads — ' + r.pages.length + ' pages, ' +
+    toast('Report saved to your downloads вЂ” ' + r.pages.length + ' pages, ' +
           Math.max(1, Math.round(r.bytes / 1024)) + ' KB, with selectable text.', 'success', 5200);
   }).catch(function () {
-    toast('Could not build the PDF here — opening the print dialog instead.', 'error', 5000);
+    toast('Could not build the PDF here вЂ” opening the print dialog instead.', 'error', 5000);
     saveReportPdf();
   }).then(function () {
     pdfBusy = false;
@@ -4332,21 +4331,21 @@ function downloadReportVector() {
 
 function saveReportPdf() {
   try { buildPrintReport(); } catch (e) { /* print still shows whatever is there */ }
-  try { toast('Choose “Save as PDF” as the destination to keep a copy.', 'info', 5000); } catch (e) {}
+  try { toast('Choose вЂњSave as PDFвЂќ as the destination to keep a copy.', 'info', 5000); } catch (e) {}
   // One frame, so the freshly built report has been laid out before the
   // dialog snapshots the document.
   requestAnimationFrame(() => { try { window.print(); } catch (e) {} });
 }
 
-// ====================================================================
+// =====
 // REVIEW MODE
-// ====================================================================
+// =====
 
 // Always-visible correct answer for the currently rendered passage.
 // Generic: detects each question's anchor element and reveals the answer
 // the same way for every IELTS task type. Source of truth = SECTIONS
 // (surfaced via gradeReading().detail). Safe to call repeatedly and per
-// passage — missing elements are simply skipped.
+// passage вЂ” missing elements are simply skipped.
 function applyReviewReveal() {
   gradeReading().detail.forEach(d => revealOne(d));
 }
@@ -4356,7 +4355,7 @@ function ansText(ca) { return escapeHtml(String(ca == null ? '' : ca).replace(/\
 // One builder for the answer-feedback chip, ported from the Listening engine.
 // `ans` must already be escaped by the caller. The badge states the verdict;
 // the field beside it holds the CORRECT answer, which is why it stays green
-// even on a wrong answer — only the badge turns crimson.
+// even on a wrong answer вЂ” only the badge turns crimson.
 function feedbackHTML(ok, ans) {
   if (ok) return '<span class="fb-badge fb-ok" aria-hidden="true">\u2713</span>';
   return '<span class="fb-badge fb-no" aria-hidden="true">\u2717</span>' +
@@ -4374,7 +4373,7 @@ function revealOne(d) {
   const correct = d.status === 'correct';
   const caText = ansText(d.ca);
 
-  // 1) Choose-TWO multi-select (Q21–22): highlight the correct options green,
+  // 1) Choose-TWO multi-select (Q21вЂ“22): highlight the correct options green,
   //    mark the student's wrong picks red.
   const mg = multiGroupOf(d.id);
   if (mg) {
@@ -4414,12 +4413,12 @@ function revealOne(d) {
     const sec = sectionOf(d.id);
     const lookup = {};
     ((sec && (sec.people || sec.endings)) || []).forEach(o => { lookup[o.l] = o.name || o.text || ''; });
-    const cname = lookup[d.ca] ? (' — ' + lookup[d.ca]) : '';
+    const cname = lookup[d.ca] ? (' вЂ” ' + lookup[d.ca]) : '';
     setStatusPill(d.id, correct, caText + cname);
     return;
   }
 
-  // 3) Matching info / features → paragraph (drop-zone div, shares id rq-{id})
+  // 3) Matching info / features в†’ paragraph (drop-zone div, shares id rq-{id})
   if (el && el.classList.contains('drop-zone')) {
     el.classList.add(correct ? 'correct' : 'wrong');
     if (!correct) {
@@ -4430,7 +4429,7 @@ function revealOne(d) {
     return;
   }
 
-  // 4) Word-bank drag summary (Q37–40 style)
+  // 4) Word-bank drag summary (Q37вЂ“40 style)
   const wdrop = document.getElementById('wdrop-' + d.id);
   if (wdrop) {
     const correctWord = (bankOf(d.id).find(w => w.id === d.ca) || {}).word || d.ca;
@@ -4453,9 +4452,9 @@ function revealOne(d) {
     slot.classList.add('filled', correct ? 'correct' : 'wrong');
     if (correct) {
       const cur = slot.querySelector('.slot-text');
-      if (cur && !slot.querySelector('.slot-tick')) cur.insertAdjacentHTML('beforeend', '<span class="slot-tick">✓</span>');
+      if (cur && !slot.querySelector('.slot-tick')) cur.insertAdjacentHTML('beforeend', '<span class="slot-tick">вњ“</span>');
     } else {
-      slot.innerHTML = `<span class="slot-correct">✓ ${escapeHtml(correctLabel)}</span>`;
+      slot.innerHTML = `<span class="slot-correct">вњ“ ${escapeHtml(correctLabel)}</span>`;
     }
     return;
   }
@@ -4498,12 +4497,12 @@ function revealOne(d) {
 function reviewExam(then) {
   // Review is the exam screen, unlocked: the same passage beside the same
   // questions the student sat, with every answer revealed in place and an
-  // explanation button on each question. It is NOT a separate screen — the
+  // explanation button on each question. It is NOT a separate screen вЂ” the
   // whole point is that the student sees what they saw, annotated.
   document.body.classList.add('review-mode');
 
   /* The double-click dictionary is wired inside loadReadingPassage(), behind
-     a review-mode check — and review deliberately does NOT re-render the
+     a review-mode check вЂ” and review deliberately does NOT re-render the
      passage, so it was never bound when review was entered from the results
      screen. It only appeared if the student moved to another passage. It is
      idempotent, so binding it here too is safe. */
@@ -4511,7 +4510,7 @@ function reviewExam(then) {
 
   // Reveal the correct answer for every question on the currently rendered
   // passage. loadReadingPassage() re-runs this on each passage switch, so the
-  // reveal persists as the student navigates P1↔P2↔P3.
+  // reveal persists as the student navigates P1в†”P2в†”P3.
   applyReviewReveal();
 
   setTimeout(() => injectExplanationButtons(), 100);
@@ -4521,13 +4520,13 @@ function reviewExam(then) {
   window.scrollTo(0,0);
 }
 
-// ====================================================================
+// =====
 // V3: RESULTS AS A MODAL WINDOW OVER THE PASSAGE
-// ====================================================================
+// =====
 // The report used to be its own full-screen stage. It now opens as a card
 // floating over the (already-reviewed) passage, Flower Power-style: the
 // paper stays mounted and visible behind a dimmed backdrop, and closing the
-// card is all it takes to get back to it — no second screen to navigate.
+// card is all it takes to get back to it вЂ” no second screen to navigate.
 function openResultsModal() {
   renderResults();
   reviewExam(() => {
@@ -4541,9 +4540,9 @@ function closeResultsModal() {
   if (rs) rs.classList.remove('active');
 }
 
-// ====================================================================
+// =====
 // SPLIT PANE RESIZER
-// ====================================================================
+// =====
 
 function setupResizer() {
   const resizer = document.getElementById('resizer');
@@ -4551,7 +4550,7 @@ function setupResizer() {
   const right = document.getElementById('questions-pane');
   if (!resizer || !left || !right) return;
   // The grab target is the 16px transparent .resizeBar to the right of the 2px
-  // rule, plus the 36px handle sitting on it — not the 2px rule itself.
+  // rule, plus the 36px handle sitting on it вЂ” not the 2px rule itself.
   const grab = document.getElementById('resize-bar') || resizer;
   let dragging = false;
   grab.addEventListener('mousedown', (e) => { dragging = true; document.body.style.cursor = 'ew-resize'; e.preventDefault(); });
@@ -4568,12 +4567,12 @@ function setupResizer() {
   document.addEventListener('mouseup', () => { dragging = false; document.body.style.cursor = ''; });
 }
 
-// ====================================================================
+// =====
 // V3: EXPLANATION BUTTONS injection (review mode)
-// ====================================================================
+// =====
 
-// The button's mark. Was the 💡 emoji, which each OS draws as a different
-// picture at a size and colour the page cannot control — next to drawn,
+// The button's mark. Was the рџ’Ў emoji, which each OS draws as a different
+// picture at a size and colour the page cannot control вЂ” next to drawn,
 // stroked icons everywhere else, it read as a sticker. One stroke glyph,
 // inheriting currentColor so it flips to white when the button fills.
 const EXPLAIN_ICON =
@@ -4595,7 +4594,7 @@ function injectExplanationButtons() {
   const qPane = document.getElementById('questions-pane');
   if (!qPane) return;
 
-  // ── Helper: build a shared panel + lightbulb row for grouped questions ──
+  // в”Ђв”Ђ Helper: build a shared panel + lightbulb row for grouped questions в”Ђв”Ђ
   function injectGroupRow(container, ids) {
     if (!container || container.querySelector('.explain-trigger-row')) return;
     const sharedPanel = document.createElement('div');
@@ -4620,18 +4619,18 @@ function injectExplanationButtons() {
           let bridgeHTML = '';
           if (data.paraphraseMap && data.paraphraseMap.length > 0) {
             const rows = data.paraphraseMap.map(pm =>
-              `<div class="pb-row"><span class="pb-q">${pm.q}</span><span class="pb-icon">→</span><span class="pb-p">${pm.p}</span></div>`
+              `<div class="pb-row"><span class="pb-q">${pm.q}</span><span class="pb-icon">в†’</span><span class="pb-p">${pm.p}</span></div>`
             ).join('');
             bridgeHTML = `<div class="pb-header">Synonym Map</div><div class="paraphrase-bridge">${rows}</div>`;
           }
           sharedPanel.dataset.activeQ = id;
-          sharedPanel.innerHTML = `<div class="ep-title">Q${id} — Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
+          sharedPanel.innerHTML = `<div class="ep-title">Q${id} вЂ” Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
           sharedPanel.classList.add('show');
           btn.classList.add('open');
           if (data.highlights?.length) highlightPassagePhrases(data.highlights);
           // Highlight BOTH sides of each paraphrase pair. The question side was
           // missing here, so grouped types (summary completion, notes, table)
-          // only ever lit up the passage — half the point of a synonym map.
+          // only ever lit up the passage вЂ” half the point of a synonym map.
           // `container` is the whole q-card; the matcher already skips
           // .explain-panel, so the panel's own copy of the text is not hit.
           if (data.paraphraseMap?.length) {
@@ -4660,7 +4659,7 @@ function injectExplanationButtons() {
     container.appendChild(sharedPanel);
   }
 
-  // ── Helper: build a standard full-text button for a single q-card ──
+  // в”Ђв”Ђ Helper: build a standard full-text button for a single q-card в”Ђв”Ђ
   function injectFullBtn(card, numId, labelOverride) {
     if (!card || card.querySelector(`.explain-btn[data-qid="${numId}"]`)) return;
     const data = READING_EXPLANATIONS[numId]; if (!data) return;
@@ -4674,11 +4673,11 @@ function injectExplanationButtons() {
     let bridgeHTML = '';
     if (data.paraphraseMap && data.paraphraseMap.length > 0) {
       const rows = data.paraphraseMap.map(pm =>
-        `<div class="pb-row"><span class="pb-q">${pm.q}</span><span class="pb-icon">→</span><span class="pb-p">${pm.p}</span></div>`
+        `<div class="pb-row"><span class="pb-q">${pm.q}</span><span class="pb-icon">в†’</span><span class="pb-p">${pm.p}</span></div>`
       ).join('');
       bridgeHTML = `<div class="pb-header">Synonym Map</div><div class="paraphrase-bridge">${rows}</div>`;
     }
-    panel.innerHTML = `<div class="ep-title">Q${labelOverride || numId} — Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
+    panel.innerHTML = `<div class="ep-title">Q${labelOverride || numId} вЂ” Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
     btn.addEventListener('click', () => {
       const isOpen = panel.classList.contains('show');
       document.querySelectorAll('.explain-panel.show').forEach(p => p.classList.remove('show'));
@@ -4689,7 +4688,7 @@ function injectExplanationButtons() {
         if (data.highlights?.length) highlightPassagePhrases(data.highlights);
         if (data.paraphraseMap?.length) {
           // grid rows (matching features / information) are <tr> with .mg-label,
-          // not .q-text — fall back to the row so the question side still lights up
+          // not .q-text вЂ” fall back to the row so the question side still lights up
           const qTextEl = card.querySelector('.q-text') || card;
           data.paraphraseMap.forEach((mapObj, idx) => {
             const cc = `syn-hl-${(idx%4)+1}`;
@@ -4698,7 +4697,7 @@ function injectExplanationButtons() {
           });
         } else if (data.synonyms?.length) {
           // grid rows (matching features / information) are <tr> with .mg-label,
-          // not .q-text — fall back to the row so the question side still lights up
+          // not .q-text вЂ” fall back to the row so the question side still lights up
           const qTextEl = card.querySelector('.q-text') || card;
           data.synonyms.forEach((pair, idx) => {
             const cc = `syn-hl-${(idx%4)+1}`;
@@ -4715,8 +4714,8 @@ function injectExplanationButtons() {
     card.appendChild(btn); card.appendChild(panel);
   }
 
-  // ── Matching-headings helper: one explanation per paragraph, injected
-  //    in the passage pane directly above that paragraph's heading slot ──
+  // в”Ђв”Ђ Matching-headings helper: one explanation per paragraph, injected
+  //    in the passage pane directly above that paragraph's heading slot в”Ђв”Ђ
   function injectHeadingSlotBtn(qNum) {
     const slot = document.getElementById('hslot-' + qNum);
     if (!slot) return;
@@ -4733,11 +4732,11 @@ function injectExplanationButtons() {
     let bridgeHTML = '';
     if (data.paraphraseMap && data.paraphraseMap.length) {
       const rows = data.paraphraseMap.map(pm =>
-        `<div class="pb-row"><span class="pb-q">${pm.q}</span><span class="pb-icon">→</span><span class="pb-p">${pm.p}</span></div>`
+        `<div class="pb-row"><span class="pb-q">${pm.q}</span><span class="pb-icon">в†’</span><span class="pb-p">${pm.p}</span></div>`
       ).join('');
       bridgeHTML = `<div class="pb-header">Synonym Map</div><div class="paraphrase-bridge">${rows}</div>`;
     }
-    panel.innerHTML = `<div class="ep-title">Q${qNum} — Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
+    panel.innerHTML = `<div class="ep-title">Q${qNum} вЂ” Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
     btn.addEventListener('click', () => {
       const isOpen = panel.classList.contains('show');
       document.querySelectorAll('.explain-panel.show').forEach(p => p.classList.remove('show'));
@@ -4763,14 +4762,14 @@ function injectExplanationButtons() {
     slot.parentNode.insertBefore(wrap, slot);
   }
 
-  // ── DATA-DRIVEN PLACEMENT ────────────────────────────────────────────
+  // в”Ђв”Ђ DATA-DRIVEN PLACEMENT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   // The button style is decided purely by the section's `type`, so a new
   // test never needs this function edited. Per-card full buttons for
-  // single-answer types; one compact 💡-row for grouped/prose types;
+  // single-answer types; one compact рџ’Ў-row for grouped/prose types;
   // per-paragraph buttons in the passage pane for matching-headings;
   // one combined button for choose-TWO.
   // matching-info / matching-features render as a .match-grid whose questions are
-  // <tr> rows, not .q-card elements — so the per-card path silently found no
+  // <tr> rows, not .q-card elements вЂ” so the per-card path silently found no
   // container and those types ended up with no explanation button at all.
   // They belong on the grouped path: one compact lightbulb row placed BELOW the
   // grid, the same way summary/notes completion does it.
@@ -4783,13 +4782,13 @@ function injectExplanationButtons() {
     if (sec.type === 'matching-headings') {
       ids.forEach(injectHeadingSlotBtn);
     } else if (sec.type === 'mcq-multi') {
-      const label = ids.length > 1 ? (ids[0] + '–' + ids[ids.length - 1] + ' Explanation') : 'Explanation';
+      const label = ids.length > 1 ? (ids[0] + 'вЂ“' + ids[ids.length - 1] + ' Explanation') : 'Explanation';
       injectFullBtn(document.getElementById('rq-multi-' + sec.gid), ids[0], label);
     } else if (PER_CARD.has(sec.type)) {
       ids.forEach(id => injectFullBtn(document.getElementById('rq-card-' + id), id));
     } else if (GROUP_ROW.has(sec.type)) {
       const block = document.getElementById('secblock-' + pp + '-' + i);
-      // Grid types (.match-grid) have no .q-card wrapper — fall back to the
+      // Grid types (.match-grid) have no .q-card wrapper вЂ” fall back to the
       // section block so the row still lands, after the grid.
       const card = block ? (block.querySelector('.q-card') || block) : null;
       injectGroupRow(card, ids);
@@ -4813,13 +4812,13 @@ function highlightPassagePhrases(phrases) {
 // that differ between the authored explanation strings and the passage HTML.
 function normForMatch(str) {
   return str
-    .replace(/[‘’‛ʼ]/g, "'")
-    .replace(/[“”‟]/g, '"')
-    .replace(/[‐‑‒–—―]/g, '-')
-    .replace(/[   ]/g, ' ');
+    .replace(/[вЂвЂ™вЂ›Кј]/g, "'")
+    .replace(/[вЂњвЂќвЂџ]/g, '"')
+    .replace(/[вЂђвЂ‘вЂ’вЂ“вЂ”вЂ•]/g, '-')
+    .replace(/[В вЂ‡вЂЇ]/g, ' ');
 }
 
-// V3 — the old version searched each text node in isolation, so any phrase that
+// V3 вЂ” the old version searched each text node in isolation, so any phrase that
 // crossed an inline element (<strong>, the paragraph letter, an <em>) simply
 // never matched and the highlight silently didn't appear. That is why summary
 // completion in particular kept failing: its supporting sentences are long and
@@ -4869,13 +4868,13 @@ function highlightNodeText(rootEl, textToFind, colorClass, baseClass) {
   range.setStart(a.node, a.off);
   range.setEnd(b.node, b.off + 1);
 
-  // one node — the cheap path; otherwise wrap each intersecting slice
+  // one node вЂ” the cheap path; otherwise wrap each intersecting slice
   try {
     const span = document.createElement('span');
     span.className = cls;
     range.surroundContents(span);
     return true;
-  } catch (e) { /* spans multiple nodes — fall through */ }
+  } catch (e) { /* spans multiple nodes вЂ” fall through */ }
 
   const jobs = [];
   nodes.forEach(node => {
@@ -4896,9 +4895,9 @@ function highlightNodeText(rootEl, textToFind, colorClass, baseClass) {
   return jobs.length > 0;
 }
 
-// ====================================================================
+// =====
 // V3: DOUBLE-CLICK DICTIONARY SETUP
-// ====================================================================
+// =====
 
 let dictListenersAttached = false;
 let dictRequestSeq = 0;
@@ -4961,7 +4960,7 @@ function setupDictionary(passageNum) {
 
       /* fetch() has no timeout of its own: a slow link or a captive portal
          leaves a request that neither resolves nor rejects, and the popup used
-         to hold "Translating…" for the rest of the session. */
+         to hold "TranslatingвЂ¦" for the rest of the session. */
       const ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
       const bail = setTimeout(() => { if (ctl) ctl.abort(); }, 6000);
       const settle = (msg, cls) => {
@@ -4977,7 +4976,7 @@ function setupDictionary(passageNum) {
             clearTimeout(bail);
             if (seq !== dictRequestSeq) return;
             let trans = data && data.responseData && data.responseData.translatedText;
-            /* a reply with nothing usable in it is still an answer — say so
+            /* a reply with nothing usable in it is still an answer вЂ” say so
                rather than leaving the spinner running */
             if (!trans) { settle('No translation came back for this word.', 'dict-miss'); return; }
             if (trans.toLowerCase() === sel.toLowerCase() && data.responseData.match < 0.5) {
@@ -4986,7 +4985,7 @@ function setupDictionary(passageNum) {
             settle(trans);
         }).catch(() => {
             clearTimeout(bail);
-            settle('Not in the offline glossary, and it could not be looked up — check your connection.', 'dict-miss');
+            settle('Not in the offline glossary, and it could not be looked up вЂ” check your connection.', 'dict-miss');
         });
     }
   });
@@ -5011,9 +5010,9 @@ function c1c2Words() {
   return out;
 }
 
-// ====================================================================
+// =====
 // V3: VOCAB PDF EXPORT
-// ====================================================================
+// =====
 
 function exportVocabularyPdf() {
   const words = c1c2Words();
@@ -5056,7 +5055,7 @@ function exportVocabularyPdf() {
         <div style="margin-bottom: 6px;">
           <span class="vp-word" style="font-size: 17px; font-weight: 700; color: #16305c; letter-spacing: -.005em;">${escapeHtml(w.word)}</span>
           <span class="vp-cefr" style="font-size: 11px; font-weight: 800; color: #fff; background: #2c5fa8; padding: 2px 7px; border-radius: 4px; margin-left: 8px; vertical-align: middle;">${w.cefr}</span>
-          <span class="vp-uz" style="font-size: 14px; font-weight: 600; color: #0f172a; margin-left: 6px;">— ${escapeHtml(w.uz)}</span>
+          <span class="vp-uz" style="font-size: 14px; font-weight: 600; color: #0f172a; margin-left: 6px;">вЂ” ${escapeHtml(w.uz)}</span>
         </div>
         <div class="vp-model" style="font-size: 12.5px; color: #7c88a0; font-style: italic;">"${escapeHtml(w.model)}"</div>
       </div>`).join('');
@@ -5067,17 +5066,17 @@ function exportVocabularyPdf() {
           <div class="vp-header">
             <div class="vp-logo-block">
               <img src="${markSrc}" style="width:42px;height:42px;border-radius:6px;object-fit:cover;display:block;" alt="CDI">
-              <div class="vp-logo-text">READING CDI<div class="sub">IELTS Academic Vocabulary · C1 &amp; C2</div></div>
+              <div class="vp-logo-text">READING CDI<div class="sub">IELTS Academic Vocabulary В· C1 &amp; C2</div></div>
             </div>
             <div class="vp-meta">
-              <div class="passage-label">Passage ${chunk.passage} · C1 &amp; C2 Vocabulary${chunk.parts > 1 ? ' (' + chunk.part + '/' + chunk.parts + ')' : ''}</div>
+              <div class="passage-label">Passage ${chunk.passage} В· C1 &amp; C2 Vocabulary${chunk.parts > 1 ? ' (' + chunk.part + '/' + chunk.parts + ')' : ''}</div>
               <div class="passage-title-text">${escapeHtml(chunk.title)}</div>
             </div>
           </div>
           <div style="margin-top: 10px;">${rows}</div>
         </div>
         <div class="vp-footer">
-          <div>READING CDI · Practice tests for serious results</div>
+          <div>READING CDI В· Practice tests for serious results</div>
           <div>Page ${idx + 1} of ${totalPages}</div>
         </div>
       </div>`;
@@ -5089,7 +5088,7 @@ function exportVocabularyPdf() {
   container.style.zIndex = '-1';
 
   const safeName = (state.name || 'Student').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-  toast(`Generating vocabulary PDF (${words.length} C1/C2 words)…`);
+  toast(`Generating vocabulary PDF (${words.length} C1/C2 words)вЂ¦`);
 
   setTimeout(async () => {
     try {
@@ -5118,9 +5117,9 @@ function exportVocabularyPdf() {
   }, 300);
 }
 
-// ====================================================================
+// =====
 // INIT
-// ====================================================================
+// =====
 
 function toggleTimer() {
   if (state.timers.reading <= 300) {
@@ -5132,13 +5131,13 @@ function toggleTimer() {
   saveState();
 }
 
-// V3 — resume, without a browser dialog. A raw confirm() was the one place the
+// V3 вЂ” resume, without a browser dialog. A raw confirm() was the one place the
 // wrapper dropped out of its own design language, and it blocks the page while
 // open. This is the same decision in a styled sheet.
-/* V3 — a reload ends the sitting, and the page says so before it acts.
+/* V3 вЂ” a reload ends the sitting, and the page says so before it acts.
    This used to offer Resume, and before that it silently wiped the save with no
    prompt at all. Both were wrong in the same direction: the engine decided.
-   Now there is one honest outcome — the paper starts again — and the candidate
+   Now there is one honest outcome вЂ” the paper starts again вЂ” and the candidate
    is told what that costs before anything is destroyed. Closing the tab on this
    sheet leaves the save untouched. */
 function restartSheet(onGo) {
@@ -5156,7 +5155,7 @@ function restartSheet(onGo) {
   if (warn) warn.textContent = finished
     ? 'The band score and the marked answers from that attempt are gone.'
     : 'The answers, the flags and the notes from that attempt are gone.';
-  // Name what is being lost rather than gesturing at it — an unfinished paper
+  // Name what is being lost rather than gesturing at it вЂ” an unfinished paper
   // has a number attached, and the number is the argument.
   if (meta) {
     if (finished) { meta.textContent = ''; }
@@ -5210,7 +5209,7 @@ function init() {
 
 function startFresh() {
   state.finishing = false;
-  // V3 — a declined "resume?" must leave nothing of the old attempt behind.
+  // V3 вЂ” a declined "resume?" must leave nothing of the old attempt behind.
   // loadState() has already merged the previous session in by this point, so
   // every key it touched has to be reset here. Missing `annotations` carried
   // the last attempt's highlights into a "fresh" test; missing `paceShown`
@@ -5227,7 +5226,7 @@ function startFresh() {
   });
 
   // The login card opens the paper again. Nothing is rendered and no clock
-  // runs until the candidate has given a name and pressed "Start test" —
+  // runs until the candidate has given a name and pressed "Start test" вЂ”
   // validateStart() -> beginExam() -> beginReading() is the whole route.
   document.body.classList.remove('no-select');
   goToStage('registration');
@@ -5240,10 +5239,10 @@ function startFresh() {
   }
 }
 
-// V3 — the band score counts up on reveal. Small thing; it makes the score
+// V3 вЂ” the band score counts up on reveal. Small thing; it makes the score
 // report feel like a result being delivered rather than a number that was
 // always sitting there.
-// V3 — let a student jump straight to the questions worth re-reading, instead
+// V3 вЂ” let a student jump straight to the questions worth re-reading, instead
 // of scrolling 40 rows to find the four that matter.
 function bindResultFilters() {
   const root = document.getElementById('stage-results');
@@ -5269,7 +5268,7 @@ function bindResultFilters() {
 }
 
 function animateBand() {
-  // V3 — deliberately inert. A certificate is a document, not a dashboard:
+  // V3 вЂ” deliberately inert. A certificate is a document, not a dashboard:
   // counting the band up made the figure disagree with the written words
   // ("3.5" while the line read "Band Four") for the whole 900ms.
   return;
@@ -5304,12 +5303,12 @@ new MutationObserver(() => {
 document.addEventListener('DOMContentLoaded', init);
 
 
-// ====================================================================
-// FLOWER POWER — every answer sentence highlighted in the passage, with
+// =====
+// FLOWER POWER вЂ” every answer sentence highlighted in the passage, with
 // the English + Uzbek note opening inline underneath when it is clicked.
-// ====================================================================
+// =====
 function fpNoteHTML(id, data) {
-  return '<span class="fp-row fp-en"><b>Q' + id + ' — Why:</b> ' + (data.en || '') + '</span>'
+  return '<span class="fp-row fp-en"><b>Q' + id + ' вЂ” Why:</b> ' + (data.en || '') + '</span>'
        + '<span class="fp-row"><b>Tushuntirish:</b> ' + (data.uz || '') + '</span>';
 }
 function fpPaintPassage() {
@@ -5360,9 +5359,9 @@ function fpStart() {
   fpTimer = setInterval(fpPaintPassage, 600);
 }
 
-// ====================================================================
+// =====
 // PUBLIC API
-// ====================================================================
+// =====
 
 return {
   validateStart, beginReading, finishExam, fpPaintPassage,
@@ -5399,7 +5398,7 @@ window.__cdiRevealed = function(){ return true; };
   function say() {
     var fp = document.querySelector('#stage-registration .ch-fineprint');
     if (fp) fp.textContent = 'This test was prepared & built by Islom Kenjayev ' +
-                             '· IELTS 8.5 (L 9.0 · R 9.0)';
+                             'В· IELTS 8.5 (LВ 9.0 В· RВ 9.0)';
     var el = document.getElementById('start-name');
     if (el) el.placeholder = 'Type your full name';
 
@@ -5412,29 +5411,29 @@ window.__cdiRevealed = function(){ return true; };
       sub.innerHTML = '';
       if (greet) sub.appendChild(greet);
       sub.appendChild(document.createTextNode(
-        ' Three passages, forty questions, one 60‑minute clock.'));
+        ' Three passages, forty questions, one 60вЂ‘minute clock.'));
     }
     /* the two notes worth keeping out of the five, plus what the button does */
     var bf = document.querySelector('#stage-reading-intro .ch-fineprint');
     if (bf) bf.textContent = 'This test was prepared & built by Islom Kenjayev ' +
-                             '· IELTS 8.5 (L 9.0 · R 9.0)';
+                             'В· IELTS 8.5 (LВ 9.0 В· RВ 9.0)';
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', say);
   else say();
 })();
 
-/* ── full-screen at the door ────────────────────────────────────────────────
+/* в”Ђв”Ђ full-screen at the door в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    A browser will not hand out full-screen on page load: the API requires a
    transient user gesture, and a load-time request is refused by every engine.
-   So the FIRST gesture on the registration screen is armed instead — the click
+   So the FIRST gesture on the registration screen is armed instead вЂ” the click
    into the name field, or the first key pressed. In practice that is
    indistinguishable from automatic, because typing a name is the first thing
    anyone does on this screen; by the time they reach Begin they are already
    full-screen. (For genuinely automatic, the page has to be launched that way:
-   Chrome's --start-fullscreen / --kiosk, or F11 · ctrl-cmd-F.)
+   Chrome's --start-fullscreen / --kiosk, or F11 В· ctrl-cmd-F.)
 
    It deliberately does NOT call the engine's enterFullscreen(). That sets
-   state.fsGranted, which is what arms the strike counter — so a candidate who
+   state.fsGranted, which is what arms the strike counter вЂ” so a candidate who
    opens the paper, goes full-screen, then leaves before starting would be
    charged a violation for it. Leaving the flag alone means the engine arms the
    counter itself, at the point the exam actually begins. */

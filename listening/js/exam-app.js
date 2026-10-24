@@ -1384,9 +1384,9 @@ function setupHighlighter() {
   });
 }
 
-// ====================================================================
+// =====
 // FLOW CONTROL
-// ====================================================================
+// =====
 
 function validateStart(){
   const nameEl=document.getElementById('start-name');
@@ -1993,13 +1993,13 @@ function feedbackHTML(ok,ans){
          '<span class="fb-ans">'+ans+'</span>';
 }
 
-// ====================================================================
+// =====
 // PRINTABLE REPORT — two A4 pages:
 //   1 · the Test Report Form   2 · the full answer record
 // Typeset in ink, not a screenshot of the dark score panel. The whole
 // stylesheet ships inside #print-report so the sheet cannot inherit the
 // chamber ground, a dark theme or the on-screen animations.
-// ====================================================================
+// =====
 function printStylesheet(){
   /* NB: no @page here. The single @page rule for the document lives in the
      head stylesheet; two of them is what broke A4. */

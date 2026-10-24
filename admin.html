@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>IELTSX — Admin Panel</title>
+<title>IELTSX вЂ” Admin Panel</title>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -17,61 +17,58 @@
   </div>
   <nav class="admin-nav">
     <div class="nav-label">Management</div>
-    <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico">▦</span><span class="grow">Dashboard</span></a>
-    <a class="nav-item" href="#users" data-nav="users"><span class="ico">♙</span><span class="grow">Users</span></a>
-    <a class="nav-item" href="#premium" data-nav="premium"><span class="ico">★</span><span class="grow">Premium</span></a>
-    <a class="nav-item" href="#orders" data-nav="orders"><span class="ico">◈</span><span class="grow">Orders</span><span id="orders-count" class="pill" hidden>0</span></a>
-    <a class="nav-item" href="#activity" data-nav="activity"><span class="ico">✎</span><span class="grow">Test activity</span></a>
-    <a class="nav-item" href="#audit" data-nav="audit"><span class="ico">☰</span><span class="grow">Activity log</span></a>
+    <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico">в–¦</span><span class="grow">Dashboard</span></a>
+    <a class="nav-item" href="#users" data-nav="users"><span class="ico">в™™</span><span class="grow">Users</span></a>
+    <a class="nav-item" href="#premium" data-nav="premium"><span class="ico">в…</span><span class="grow">Premium</span></a>
+    <a class="nav-item" href="#orders" data-nav="orders"><span class="ico">в—€</span><span class="grow">Orders</span><span id="orders-count" class="pill" hidden>0</span></a>
+    <a class="nav-item" href="#activity" data-nav="activity"><span class="ico">вњЋ</span><span class="grow">Test activity</span></a>
+    <a class="nav-item" href="#audit" data-nav="audit"><span class="ico">в°</span><span class="grow">Activity log</span></a>
     <div class="nav-label">Content</div>
-    <a class="nav-item" href="#reading" data-nav="reading"><span class="ico">▤</span><span class="grow">Reading tests</span></a>
-    <a class="nav-item" href="#listening" data-nav="listening"><span class="ico">♪</span><span class="grow">Listening tests</span></a>
-    <a class="nav-item" href="#writing" data-nav="writing"><span class="ico">✐</span><span class="grow">Writing tasks</span></a>
-<<<<<<< HEAD
-=======
-    <a class="nav-item" href="#access" data-nav="access"><span class="ico">⚿</span><span class="grow">Access (lock / plans)</span></a>
+    <a class="nav-item" href="#reading" data-nav="reading"><span class="ico">в–¤</span><span class="grow">Reading tests</span></a>
+    <a class="nav-item" href="#listening" data-nav="listening"><span class="ico">в™Є</span><span class="grow">Listening tests</span></a>
+    <a class="nav-item" href="#writing" data-nav="writing"><span class="ico">вњђ</span><span class="grow">Writing tasks</span></a>
+    <a class="nav-item" href="#access" data-nav="access"><span class="ico">вљї</span><span class="grow">Access (lock / plans)</span></a>
     <a class="nav-item" href="#vocab" data-nav="vocab"><span class="ico">Aa</span><span class="grow">Vocabulary</span></a>
->>>>>>> fb33267 (Initial commit)
     <div class="nav-label">Site</div>
-    <a class="nav-item" href="/"><span class="ico">⌂</span><span class="grow">Open website</span></a>
-    <button class="nav-item" data-logout type="button"><span class="ico">↪</span><span class="grow">Sign out</span></button>
+    <a class="nav-item" href="/"><span class="ico">вЊ‚</span><span class="grow">Open website</span></a>
+    <button class="nav-item" data-logout type="button"><span class="ico">в†Є</span><span class="grow">Sign out</span></button>
   </nav>
 </aside>
 <div class="scrim" id="scrim"></div>
 
 <main class="admin-main">
   <header class="topbar">
-    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu">☰</button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu">в°</button>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
-    <button class="btn btn-sm" id="refresh" type="button" title="Reload all data">↻ Refresh</button>
+    <button class="btn btn-sm" id="refresh" type="button" title="Reload all data">в†» Refresh</button>
     <div class="admin-user"><div><strong id="admin-name" style="font-size:13px">Administrator</strong><div id="admin-role" class="muted sm">Full access</div></div><div id="admin-avatar" class="avatar">A</div></div>
   </header>
 
   <div class="page">
 
-  <!-- ═════════ Dashboard ═════════ -->
+  <!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ Dashboard в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
   <section class="view active" id="view-dashboard">
     <div class="grid stats">
-      <div class="card stat"><div><div class="stat-label">Total users</div><div class="stat-value" id="stat-users">–</div><div class="stat-sub" id="stat-users-sub">&nbsp;</div></div><div class="stat-icon">♙</div></div>
-      <div class="card stat"><div><div class="stat-label">Premium users</div><div class="stat-value" id="stat-premium">–</div><div class="stat-sub" id="stat-premium-sub">&nbsp;</div></div><div class="stat-icon">★</div></div>
-      <div class="card stat"><div><div class="stat-label">Tests taken</div><div class="stat-value" id="stat-tests">–</div><div class="stat-sub" id="stat-tests-sub">&nbsp;</div></div><div class="stat-icon">✎</div></div>
-      <div class="card stat"><div><div class="stat-label">Revenue (confirmed)</div><div class="stat-value" id="stat-revenue">–</div><div class="stat-sub" id="stat-revenue-sub">&nbsp;</div></div><div class="stat-icon">◈</div></div>
+      <div class="card stat"><div><div class="stat-label">Total users</div><div class="stat-value" id="stat-users">вЂ“</div><div class="stat-sub" id="stat-users-sub">&nbsp;</div></div><div class="stat-icon">в™™</div></div>
+      <div class="card stat"><div><div class="stat-label">Premium users</div><div class="stat-value" id="stat-premium">вЂ“</div><div class="stat-sub" id="stat-premium-sub">&nbsp;</div></div><div class="stat-icon">в…</div></div>
+      <div class="card stat"><div><div class="stat-label">Tests taken</div><div class="stat-value" id="stat-tests">вЂ“</div><div class="stat-sub" id="stat-tests-sub">&nbsp;</div></div><div class="stat-icon">вњЋ</div></div>
+      <div class="card stat"><div><div class="stat-label">Revenue (confirmed)</div><div class="stat-value" id="stat-revenue">вЂ“</div><div class="stat-sub" id="stat-revenue-sub">&nbsp;</div></div><div class="stat-icon">в—€</div></div>
     </div>
     <div class="grid two-col">
       <div class="card"><div class="section-head"><div><div class="section-title">New sign-ups</div><div class="muted sm">Last 14 days</div></div></div><div class="chart" id="chart-signups"></div><div class="chart-x" id="chart-signups-x"></div></div>
       <div class="card"><div class="section-head"><div><div class="section-title">Tests finished</div><div class="muted sm">Last 14 days</div></div></div><div class="chart" id="chart-tests"></div><div class="chart-x" id="chart-tests-x"></div></div>
     </div>
     <div class="grid two-col">
-      <div class="card"><div class="section-head"><div class="section-title">Needs your attention</div></div><div id="attention"><div class="empty">Loading…</div></div></div>
+      <div class="card"><div class="section-head"><div class="section-title">Needs your attention</div></div><div id="attention"><div class="empty">LoadingвЂ¦</div></div></div>
       <div class="card"><div class="section-head"><div class="section-title">Audience</div></div><div id="audience"></div></div>
     </div>
   </section>
 
-  <!-- ═════════ Users ═════════ -->
+  <!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ Users в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
   <section class="view" id="view-users">
     <div class="card">
       <div class="section-head"><div><div class="section-title">Users</div><div class="muted sm">Everybody who signed in with an account stays here. Open a user to give or take Premium, see their tests, suspend or delete them.</div></div>
-        <a class="btn btn-sm" href="/api/admin/users.csv" download>⬇ Export CSV</a></div>
+        <a class="btn btn-sm" href="/api/admin/users.csv" download>в¬‡ Export CSV</a></div>
       <div class="toolbar">
         <input id="user-search" class="field grow" type="search" placeholder="Search name, e-mail or user ID" autocomplete="off">
         <select id="user-filter" class="field" aria-label="Filter">
@@ -79,19 +76,19 @@
           <option value="admin">Admins</option><option value="blocked">Suspended</option><option value="unverified">E-mail not verified</option><option value="inactive">Inactive 30+ days</option>
         </select>
         <select id="user-sort" class="field" aria-label="Sort">
-          <option value="new">Newest first</option><option value="active">Recently active</option><option value="tests">Most tests</option><option value="name">Name A–Z</option><option value="old">Oldest first</option>
+          <option value="new">Newest first</option><option value="active">Recently active</option><option value="tests">Most tests</option><option value="name">Name AвЂ“Z</option><option value="old">Oldest first</option>
         </select>
       </div>
       <div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Plan</th><th>Status</th><th class="right">Tests</th><th>Avg band</th><th>Last active</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="users-body"></tbody></table></div>
-      <div class="pager"><span class="muted sm" id="users-info"></span><div class="actions"><button class="btn btn-sm" id="users-prev" type="button">← Prev</button><button class="btn btn-sm" id="users-next" type="button">Next →</button></div></div>
+      <div class="pager"><span class="muted sm" id="users-info"></span><div class="actions"><button class="btn btn-sm" id="users-prev" type="button">в†ђ Prev</button><button class="btn btn-sm" id="users-next" type="button">Next в†’</button></div></div>
     </div>
   </section>
 
-  <!-- ═════════ Premium ═════════ -->
+  <!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ Premium в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
   <section class="view" id="view-premium">
     <div class="card">
       <div class="section-head"><div><div class="section-title">Give Premium</div><div class="muted sm">Type a name or e-mail, pick the person, choose the plan and duration.</div></div></div>
-      <input id="give-q" class="field" type="search" placeholder="Search a user to give Premium…" autocomplete="off">
+      <input id="give-q" class="field" type="search" placeholder="Search a user to give PremiumвЂ¦" autocomplete="off">
       <div id="give-results" style="margin-top:10px"></div>
     </div>
     <div class="card">
@@ -100,16 +97,16 @@
     </div>
   </section>
 
-  <!-- ═════════ Orders ═════════ -->
+  <!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ Orders в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
   <section class="view" id="view-orders">
     <div class="card">
-      <div class="section-head"><div><div class="section-title">Orders</div><div class="muted sm">When a student has paid, press “Confirm payment” and the plan turns on (an active plan is extended).</div></div></div>
+      <div class="section-head"><div><div class="section-title">Orders</div><div class="muted sm">When a student has paid, press вЂњConfirm paymentвЂќ and the plan turns on (an active plan is extended).</div></div></div>
       <div class="tabs" id="order-tabs"></div>
       <div class="table-wrap"><table class="table"><thead><tr><th>Code</th><th>Buyer</th><th>Plan</th><th>Amount</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="orders-body"></tbody></table></div>
     </div>
   </section>
 
-  <!-- ═════════ Test activity ═════════ -->
+  <!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ Test activity в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
   <section class="view" id="view-activity">
     <div class="card">
       <div class="section-head"><div><div class="section-title">Test activity</div><div class="muted sm">The latest finished tests of all students.</div></div></div>
@@ -118,7 +115,7 @@
     </div>
   </section>
 
-  <!-- ═════════ Audit ═════════ -->
+  <!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ Audit в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
   <section class="view" id="view-audit">
     <div class="card">
       <div class="section-head"><div><div class="section-title">Activity log</div><div class="muted sm">Every admin action is recorded: who changed what and when.</div></div></div>
@@ -130,11 +127,6 @@
   <section class="view" id="view-reading"><div id="content-reading"></div></section>
   <section class="view" id="view-listening"><div id="content-listening"></div></section>
   <section class="view" id="view-writing"><div id="content-writing"></div></section>
-<<<<<<< HEAD
-=======
-  <section class="view" id="view-vocab"><div id="content-vocab"></div></section>
-  <section class="view" id="view-access"><div id="content-access"></div></section>
->>>>>>> fb33267 (Initial commit)
 
   </div>
 </main>
@@ -157,17 +149,16 @@
 </div></div>
 <!-- test builder -->
 <div id="builder" class="modal-backdrop"><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="builder-title">
-  <div class="cb-top"><h3 id="builder-title">New test</h3><button class="btn btn-sm" data-cb-close type="button" aria-label="Close">✕</button></div>
+  <div class="cb-top"><h3 id="builder-title">New test</h3><button class="btn btn-sm" data-cb-close type="button" aria-label="Close">вњ•</button></div>
   <div id="builder-body" class="cb-body"></div>
   <div class="modal-actions"><button class="btn" data-cb-close type="button">Cancel</button><button class="btn btn-primary" id="cb-save" type="button">Create</button></div>
 </div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script src="admin.js"></script>
 <script src="admin-content.js"></script>
-<<<<<<< HEAD
-=======
 <script src="admin-vocab.js"></script>
 <script src="admin-access.js"></script>
->>>>>>> fb33267 (Initial commit)
 </body>
 </html>
+
+

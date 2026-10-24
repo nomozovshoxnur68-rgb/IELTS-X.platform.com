@@ -1,14 +1,12 @@
-/* ============================================================
-   reading.css — shared stylesheet for every Full Reading Test page
+/* ====
+   reading.css вЂ” shared stylesheet for every Full Reading Test page
    (base + cosmos-registration + mono-skin, in the original cascade order)
-   ============================================================ */
 
 /* ---------- 1. base ---------- */
-/* ============================================================
-   REAL-EXAM SKIN  —  fonts/colours/layout copied from the
+/* ====
+   REAL-EXAM SKIN  вЂ”  fonts/colours/layout copied from the
    official computer-delivered IELTS interface.
    All functions + content come from the CDI engine below.
-   ============================================================ */
 :root{
   --sans: Arial, Helvetica, sans-serif;
   --mono: Arial, Helvetica, sans-serif;
@@ -76,7 +74,7 @@ body{
 }
 body.no-select{user-select:auto;-webkit-user-select:auto}
 body.no-select input,body.no-select textarea{user-select:text;-webkit-user-select:text}
-/* No custom ::selection — the real player uses Chrome's native blue. Forcing
+/* No custom ::selection вЂ” the real player uses Chrome's native blue. Forcing
    yellow made every drag look like a highlight had already been applied. */
 
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -84,7 +82,7 @@ body.no-select input,body.no-select textarea{user-select:text;-webkit-user-selec
 ::-webkit-scrollbar-thumb{background:#b8b8b8;border-radius:0}
 body.dark-mode ::-webkit-scrollbar-thumb{background:#555}
 /* reading panes use the thick gray real-exam scrollbar (middle + far-right) */
-/* 17px and full-length — the transparent end caps made ours a short floating
+/* 17px and full-length вЂ” the transparent end caps made ours a short floating
    pill, which the real player does not have. */
 #passage-pane::-webkit-scrollbar,#questions-pane::-webkit-scrollbar{width:17px}
 #passage-pane::-webkit-scrollbar-track,#questions-pane::-webkit-scrollbar-track{background:transparent}
@@ -95,11 +93,11 @@ body.dark-mode #passage-pane::-webkit-scrollbar-thumb,body.dark-mode #questions-
 
 .hidden{display:none !important}
 
-/* ========== STAGES ========== */
+/* === STAGES === */
 .stage{position:fixed;inset:0;display:none;flex-direction:column}
 .stage.active{display:flex}
 
-/* text zoom (A-/A+) — applies to all exam content */
+/* text zoom (A-/A+) вЂ” applies to all exam content */
 .passage-text p,.q-text,.task-text,.option,.gap-input,.pass-body p,.qrow span,.notes-li,.sum-text,
 .instruction,.section-head h2,.section-head .num,
 h2.passage-title,
@@ -117,10 +115,10 @@ h2.passage-title,
   transition:font-size .15s ease;
 }
 /* Measured off the live IELTS Inspera player: every piece of exam copy is
-   Arial 16px / 24px / weight 400. Do not "improve" these numbers — matching
+   Arial 16px / 24px / weight 400. Do not "improve" these numbers вЂ” matching
    them is the product. */
 /* NOTE: the block above sets font-size with !important on every selector it
-   lists. A `font-size` written later for any of them is DEAD — `--base-size`
+   lists. A `font-size` written later for any of them is DEAD вЂ” `--base-size`
    is the only lever. Measured values from the live player: */
 .passage-text p{--base-size:16px}
 .q-text{--base-size:16px}
@@ -133,12 +131,11 @@ h2.passage-title{--base-size:17.6px}
 .para-heading-slot,.slot-text{--base-size:16px}
 .bnav-plabel,.bnav-plabel2{--base-size:16px}
 
-/* ============================================================
+/* ====
    HEADER (real-exam top bar)
-   ============================================================ */
 /* Measured on the live Inspera Reading player at 1440x900 DPR2: the header is
    1440 x 56 of pure #fff with NO border and NO box-shadow. The rule under it is
-   header::after — a 1px #C1C1C1 hairline sitting on the 55px row. Both the
+   header::after вЂ” a 1px #C1C1C1 hairline sitting on the 55px row. Both the
    Reading recon and the Writing build measured this independently. */
 #hdr{
   position:relative;z-index:500;flex:0 0 auto;height:56px;min-height:56px;
@@ -195,7 +192,7 @@ h2.passage-title{--base-size:17.6px}
   display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tg-circle svg{width:16px;height:16px}
 
-/* The small hamburger dropdown is gone — the official player opens a
+/* The small hamburger dropdown is gone вЂ” the official player opens a
    full-screen Options page instead (see the OPTIONS / MESSAGES block). Only the
    theme-dot rule survives, because setTheme() still syncs any dots that other
    stages render. */
@@ -203,10 +200,10 @@ h2.passage-title{--base-size:17.6px}
 .theme-dot:hover{transform:scale(1.12)}
 .theme-dot.active{border-color:var(--primary)}
 
-/* Timer. The real player shows a plain clock — no pill, no border, and
+/* Timer. The real player shows a plain clock вЂ” no pill, no border, and
    crucially no "live" status dot. It FLASHES at 10 and 5 minutes remaining
    rather than turning amber/red, so the warning states are blinks. */
-/* The clock is styled exactly like .header__name — 600 16px/18px Arial, #000 —
+/* The clock is styled exactly like .header__name вЂ” 600 16px/18px Arial, #000 вЂ”
    and reads "NN minutes left". The official player shows no mm:ss and no eye
    toggle; the warning states are a flash of the same black text. */
 #hdr .timer{
@@ -221,12 +218,11 @@ h2.passage-title{--base-size:17.6px}
 #hdr .timer-text{min-width:0;text-align:left;display:inline-block;white-space:nowrap}
 #hdr .timer-text.hidden{visibility:hidden}
 
-/* ============================================================
+/* ====
    PASSAGE INFO BAR  (rounded card, real-exam style)
-   ============================================================ */
 /* Measured: warm off-white #F1F2EC, 1px #D5D5D5, 16px margin, and BOTH lines
-   at 16px — the title is only distinguished by weight, not by size. */
-/* There is NO grey band behind the rubric card — the area around it is plain
+   at 16px вЂ” the title is only distinguished by weight, not by size. */
+/* There is NO grey band behind the rubric card вЂ” the area around it is plain
    white. The card itself is 1407 x 72 at x=16 y=72: 1373 x 46 of content
    inside 12px/16px padding and a 1px #D5D5D5 border. It is display:block, not
    flex: an h2 of 700 16px/normal (18px tall) with a 4px bottom margin, then a
@@ -239,10 +235,9 @@ h2.passage-title{--base-size:17.6px}
 #pbar-desc{display:block;font:400 16px/24px Arial,sans-serif;color:#000;margin:0}
 body.dark-mode #pbar-inner{background:var(--panel);border-color:var(--line-2)}
 
-/* ============================================================
+/* ====
    MAIN SPLIT
-   ============================================================ */
-/* Arial only inside the exam region — the official player never falls back
+/* Arial only inside the exam region вЂ” the official player never falls back
    through Helvetica, and the global --sans stack does. */
 #stage-reading{flex-direction:column;background:#fff;font-family:Arial,sans-serif;color:#000}
 /* The exam region is measured at y=160, height 687. Both panes scroll
@@ -257,7 +252,7 @@ body.dark-mode #pbar-inner{background:var(--panel);border-color:var(--line-2)}
 
 /* The 2px rgba(0,0,0,.5) rule IS the boundary at x=720-722. The 16px
    ew-resize strip lies to its RIGHT (x=722-738), transparent, overlapping the
-   question pane — it is not a filled 16px gutter with a centred hairline. */
+   question pane вЂ” it is not a filled 16px gutter with a centred hairline. */
 .split-divider{width:2px;flex:0 0 2px;background:rgba(0,0,0,.5);position:relative;z-index:100;cursor:default}
 .split-divider .resizeBar{position:absolute;top:0;bottom:0;left:2px;width:16px;background:transparent;
   cursor:ew-resize;z-index:1;transition:opacity .3s ease-out}
@@ -271,7 +266,7 @@ body.dark-mode #pbar-inner{background:var(--panel);border-color:var(--line-2)}
 body.dark-mode .split-divider #div-btn{background:var(--ex-panel-2);border-color:var(--ex-line-2);color:var(--ex-ink-2)}
 body.dark-mode .split-divider #div-btn:hover{border-color:var(--ex-ink-3);color:var(--ex-ink)}
 
-/* prev / next arrows — position:absolute, right:32px, bottom:88px, 55.89 x
+/* prev / next arrows вЂ” position:absolute, right:32px, bottom:88px, 55.89 x
    55.19, 3px radius, 2.4px gap, NO shadow. Glyphs are FontAwesome \f060 /
    \f061 at 22.30 x 26 with a 10.4px bottom margin. */
 #qnav-arrows{position:absolute;right:32px;bottom:88px;display:flex;z-index:100}
@@ -289,20 +284,20 @@ body.notes-open #qnav-arrows{right:332px}
 .qnav-btn:disabled{background:#DDDDDD;cursor:default}
 .qnav-btn:disabled svg{fill:#fff}
 
-/* passage text — .sectionStimulus is a 688px column at x=16 with margin 16px 0,
+/* passage text вЂ” .sectionStimulus is a 688px column at x=16 with margin 16px 0,
    so the title's top edge lands at y=192, level with the first question. */
 #passage-pane .sectionStimulus{margin:16px 0;padding-top:16px;background:transparent;min-width:300px;max-width:1000px}
 #passage-pane .passage-num{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);text-align:center}
 /* Part 1 uses h2 700 17.6px/21.12px with a 14.608px bottom margin. */
 #passage-pane h2.passage-title{font-weight:700;line-height:21.12px;text-align:left;margin:0 0 14.608px;color:#000}
-/* ── Matching Headings: passage slot ── */
+/* в”Ђв”Ђ Matching Headings: passage slot в”Ђв”Ђ */
 @keyframes slotPulse{0%,100%{box-shadow:0 0 0 0 rgba(90,131,194,.35)}50%{box-shadow:0 0 0 5px rgba(90,131,194,.08)}}
-/* .gapMatchInteraction__dropZone.gap — measured: inline-flex, 534 x 24,
+/* .gapMatchInteraction__dropZone.gap вЂ” measured: inline-flex, 534 x 24,
    1px dashed #333, radius 5px, #fff, margin 1px, min-width 10 / min-height 16,
    text centred at 16px/24px, and 2px dashed #418EC8 while it is the current
    question. The populated appearance could not be measured (no drag was
    performed against the live player), so it keeps the same box with a solid
-   border — consistent with the states that WERE measured. */
+   border вЂ” consistent with the states that WERE measured. */
 .para-heading-slot{position:relative;display:inline-flex;align-items:center;justify-content:center;
   width:534px;max-width:100%;height:24px;min-width:10px;min-height:16px;
   border:1px dashed #333;border-radius:5px;padding:0;margin:1px;
@@ -331,11 +326,11 @@ body.dark-mode .para-heading-slot:hover{border-color:#ccc;background:#2a2a2a}
 body.dark-mode .para-heading-slot.drag-over{background:#2a2a2a;border-color:#eee}
 body.dark-mode .para-heading-slot.filled{background:#282828;color:#eee;border-color:#ccc}
 body.dark-mode .para-heading-slot .slot-text{color:#eee}
-/* ── Matching Headings: per-paragraph explanation (review mode, passage pane) ── */
+/* в”Ђв”Ђ Matching Headings: per-paragraph explanation (review mode, passage pane) в”Ђв”Ђ */
 .heading-explain-wrap{margin:0 0 6px}
 .heading-explain-wrap .explain-btn{margin-top:0}
 .heading-explain-wrap .explain-panel{margin-top:6px}
-/* ── Matching Headings: question pane bank ── */
+/* в”Ђв”Ђ Matching Headings: question pane bank в”Ђв”Ђ */
 /* h4.tokenHeader "List of Headings": 700 16px, margin 0 0 8px, 18 tall.
    .gapChoiceContainer: min-height 34px, margin 0 0 16px, radius 5px, no border.
    .gapChoice: height 24, 1px #919191, radius 4px, margin 3px 3px 8px, and the
@@ -355,7 +350,7 @@ body.dark-mode .heading-tile{border-color:#444;background:var(--paper)}
 body.dark-mode .heading-tile:hover{border-color:#aaa;background:#2a2a2a}
 body.dark-mode .heading-tile.selected{background:#2a2a2a;border-color:#ccc}
 #passage-pane .passage-text{margin-top:0}
-/* p { margin:16px 0 } — the margins collapse, so the visible gap between two
+/* p { margin:16px 0 } вЂ” the margins collapse, so the visible gap between two
    paragraphs is 16px, and so is the gap from the title to the first one. */
 #passage-pane .passage-text p{line-height:24px;color:#000;margin:16px 0;text-align:left;font-weight:400}
 #passage-pane .passage-text p:first-child{margin-top:0}
@@ -365,15 +360,14 @@ body.dark-mode .heading-tile.selected{background:#2a2a2a;border-color:#ccc}
    with white text. The old yellow/green/pink set was a nice study tool but it
    is the loudest non-exam element on the passage pane, so the exam stage gets
    the real thing. The three class names are kept so stored annotations from an
-   earlier attempt still restore — they simply all render as the exam colour. */
+   earlier attempt still restore вЂ” they simply all render as the exam colour. */
 .hl{border-radius:1px}
 .hl-y,.hl-g,.hl-p{background:#820240;color:#fff}
 body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#820240;color:#fff}
 .hl-note{background:#820240;color:#fff;border-bottom:2px dashed #d4a017;cursor:pointer}
 
-/* ============================================================
+/* ====
    QUESTIONS  (re-styling the CDI engine output, flat exam look)
-   ============================================================ */
 /* Each question GROUP is one .QuestionDisplay__questionDisplayWrapper:
    padding 16px 16px 0 17px inside a 718px pane, and inside that a 645px text
    column with a 40px flag gutter reserved on the right. 17 + 645 + 56 = 718,
@@ -395,7 +389,7 @@ body.dark-mode .hl-y,body.dark-mode .hl-g,body.dark-mode .hl-p{background:#82024
 .q-card.flagged{box-shadow:none;padding-left:0}
 body.dark-mode .q-card,body.dark-mode .q-card:hover{border-color:transparent}
 
-/* p.interaction-prompt — flex, baseline-aligned, 4px bottom margin, 27 tall */
+/* p.interaction-prompt вЂ” flex, baseline-aligned, 4px bottom margin, 27 tall */
 /* .choiceInteraction__promptAndButtonRow is a 31-tall FLEX row, so the
    prompt's 4px bottom margin is contained and does not collapse into the
    option list's 4.8px top margin. Written as padding here for the same effect:
@@ -418,7 +412,7 @@ body.dark-mode .q-card,body.dark-mode .q-card:hover{border-color:transparent}
 .subhead{font-size:13px;font-weight:700;margin:10px 0 5px;padding-bottom:0;border:none;color:var(--ink)}
 
 /* T/F/NG + Y/N/NG + MCQ option rows.
-   Measured on the live player: each row is 43px tall — label padding
+   Measured on the live player: each row is 43px tall вЂ” label padding
    9.6px 8px 9.6px 32px, weight 400, 1px between rows. The indent lives on
    the ROW, not on the container, which is why .options has no padding-left. */
 .options{display:block;padding-left:0;margin:4.8px 0 24px}
@@ -431,7 +425,7 @@ body.dark-mode .q-card,body.dark-mode .q-card:hover{border-color:transparent}
   font-weight:400;color:#000;line-height:24px}
 .option:hover{background:#E4E4E4}
 /* the real exam uses raw native radios/checkboxes, absolutely positioned so
-   the label's 32px left padding — not a flex gap — sets the text indent */
+   the label's 32px left padding вЂ” not a flex gap вЂ” sets the text indent */
 .option input[type=radio],.option input[type=checkbox]{position:absolute;left:8px;top:11.6px;
   display:inline-block;flex-shrink:0;cursor:pointer;margin:3px 8px 0 5px}
 .option>span{display:block;font:400 16px/24px Arial,sans-serif;color:#000}
@@ -450,7 +444,7 @@ body.dark-mode .option.correct{background:rgba(46,125,50,.18)}
 body.dark-mode .option.wrong{background:rgba(196,18,48,.18)}
 .option.disabled{pointer-events:none}
 
-/* Choose-TWO multi-select rows — identical markup to the radio group, only the
+/* Choose-TWO multi-select rows вЂ” identical markup to the radio group, only the
    control differs (checkbox metrics put it 1px left of the radio). */
 .multi-opts{padding-left:0;gap:0;margin:4.8px 0 24px}
 .multi-opts .option{padding:9.6px 8px 9.6px 32px;font-weight:400}
@@ -460,7 +454,7 @@ body.dark-mode .option.wrong{background:rgba(196,18,48,.18)}
 .multi-opts .option.maxed{opacity:.4;pointer-events:none}
 body.dark-mode .multi-opts .option.selected{background:#1d3a63}
 body.dark-mode .multi-opts .option:hover{background:#1a2535}
-/* TRUE / FALSE / NOT GIVEN + YES / NO / NOT GIVEN — stacked, full-width rows */
+/* TRUE / FALSE / NOT GIVEN + YES / NO / NOT GIVEN вЂ” stacked, full-width rows */
 .tfn-opts{padding-left:0;gap:0}
 .tfn-opts .option{padding:9.6px 8px 9.6px 32px;font-weight:400}
 .tfn-opts .option.selected{background:#BBD8F0}
@@ -482,14 +476,14 @@ body.dark-mode .tfn-opts .option.selected{background:#1d3a63}
 body.dark-mode .gap-num{color:#bbb}
 .gap-field .gap-input:not(:placeholder-shown) + .gap-num,
 .prose-gap .gap-input:not(:placeholder-shown) + .gap-num{display:none}
-/* ── Prose-style summary completion ── */
+/* в”Ђв”Ђ Prose-style summary completion в”Ђв”Ђ */
 .prose-summary{line-height:24px;color:#000;font-weight:400;padding:0}
 /* note completion: one disc bullet per gap, matching the real exam's <ul>
    (list-style disc outside, padding-left 40px, margin 16px 0; li 16px/24px) */
 .notes-list ul{list-style:disc outside;padding:0 0 0 40px;margin:16px 0}
 .notes-list li{line-height:24px;color:#000;font-weight:400}
 /* The note-completion / summary title is 700 17.6px/21.12px with a 14.608px
-   bottom margin — the same step the passage title uses. Rendered as an h4 so it
+   bottom margin вЂ” the same step the passage title uses. Rendered as an h4 so it
    keeps the --base-size hook the text-size control drives. */
 .note-title{--base-size:17.6px;font-weight:700;line-height:21.12px;color:#000;margin:0 0 14.608px}
 /* Measured off the live Inspera player: input.textEntryInteractionValue is
@@ -505,20 +499,20 @@ body.dark-mode .gap-num{color:#bbb}
 .prose-gap .gap-input{width:20px;min-width:144px;max-width:100%;height:22.39px;padding:0 8px;
   margin:.8px 4px -1.6px;border:1px solid #535353;border-radius:3px;font-weight:400;
   box-shadow:none;background:#fff;color:#000;overflow:clip;transition:border .2s linear}
-/* The question number is the input's own placeholder — bold, solid black and
-   CENTRED — while the typed value is regular weight and left-aligned. The
+/* The question number is the input's own placeholder вЂ” bold, solid black and
+   CENTRED вЂ” while the typed value is regular weight and left-aligned. The
    placeholder is not hidden on focus: it disappears only when text is typed,
    exactly as an ordinary placeholder does. */
 .gap-input{display:inline-block;box-sizing:border-box;text-align:start;line-height:normal;cursor:text}
 .gap-input::placeholder{color:#000;font-family:Arial,sans-serif;font-weight:700;text-align:center;opacity:1}
-/* The blue ring means "this is the current scorable item", NOT "focused" — it
+/* The blue ring means "this is the current scorable item", NOT "focused" вЂ” it
    is painted on focus and stays after blur until another question is current. */
 .prose-gap .gap-input:focus,
 .prose-gap .gap-input.is-current{border:1px solid #418EC8;box-shadow:0 0 0 1px #418EC8;outline:none}
 body.dark-mode .prose-gap .gap-input{border-color:#999}
 body.dark-mode .prose-gap .gap-num{color:#ccc}
-/* ── Word-bank summary (Q37-40 style) ── */
-/* .gapChoiceContainer is a plain wrapping flex row — no border, no fill, 5px
+/* в”Ђв”Ђ Word-bank summary (Q37-40 style) в”Ђв”Ђ */
+/* .gapChoiceContainer is a plain wrapping flex row вЂ” no border, no fill, 5px
    radius, 16px bottom margin. The tokens themselves are the only boxes. */
 .word-bank-list{display:flex;flex-wrap:wrap;align-items:flex-start;gap:0;padding:0;border:none;
   border-radius:5px;margin:0 0 16px;background:transparent;min-height:34px}
@@ -568,7 +562,7 @@ body.dark-mode .word-drop.filled{background:#2a2a2a;color:#eee}
 /* Reference list of the lettered options. Red is reserved for the logo and
    the submit button in the real player, so the accent here is neutral. */
 /* No legend box appears in the official Reading demo, so this reuses the one
-   card treatment the player does define — the rubric card: #F1F2EC on a 1px
+   card treatment the player does define вЂ” the rubric card: #F1F2EC on a 1px
    #D5D5D5 border at 4px radius, 12px/16px padding, everything 16px/24px. */
 .option-list-box{background:#F1F2EC;border:1px solid #D5D5D5;
   border-radius:4px;padding:12px 16px;margin:0 0 16px}
@@ -577,7 +571,7 @@ body.dark-mode .word-drop.filled{background:#2a2a2a;color:#eee}
 .option-list-box li{font-size:16px;line-height:24px;padding:0;color:#000;font-weight:400;display:flex;align-items:baseline;gap:8px}
 .option-list-box li .pl-letter{font-weight:700;color:#000;width:20px;flex-shrink:0}
 
-/* ── Heading / Paragraph match bank (real-exam style) ── */
+/* в”Ђв”Ђ Heading / Paragraph match bank (real-exam style) в”Ђв”Ђ */
 .heading-bank{margin:10px 0 14px;padding:14px 16px;background:var(--paper);border:1px solid var(--line-3);border-radius:6px}
 .bank-label{font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:10px}
 .bank-items{display:flex;flex-direction:column;gap:5px}
@@ -651,9 +645,8 @@ body.dark-mode .syn-hl-applied.syn-hl-2{background:rgba(244,154,176,0.25)}
 body.dark-mode .syn-hl-applied.syn-hl-3{background:rgba(147,197,253,0.28)}
 body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
 
-/* ============================================================
+/* ====
    HIGHLIGHTER + DICTIONARY POPUPS
-   ============================================================ */
 /* Real player's adder: white card, 1px #737373, 4px radius, icon-above-label
    buttons with 12px #737373 labels, and a small arrow pointing at the text. */
 .hl-popup{position:absolute;z-index:9999;background:#fff;padding:0;border:1px solid #737373;border-radius:4px;
@@ -666,7 +659,7 @@ body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
   border:6px solid transparent;border-bottom-color:#fff;margin-bottom:-1px}
 .hl-popup::before{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
   border:7px solid transparent;border-bottom-color:#737373}
-/* Measured: the adder is 114.1 x 55 with just two buttons — Note 45.4 x 53 and
+/* Measured: the adder is 114.1 x 55 with just two buttons вЂ” Note 45.4 x 53 and
    Highlight 66.7 x 53. Clear is ours, and it only appears when the selection
    already sits on a highlight, so the resting toolbar matches the official one. */
 .hl-popup .tool-btn{min-width:45.4px;height:53px;border:none;background:transparent;cursor:pointer;
@@ -687,7 +680,7 @@ body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
 .hl-popup .tool-btn.erase::before{display:none}
 .hl-popup .tool-btn span{font-family:var(--sans);font-size:12px;line-height:1;color:#737373;white-space:nowrap}
 
-/* COSMOS: the consoles' glass, not a flat slab. It stays dark on purpose —
+/* COSMOS: the consoles' glass, not a flat slab. It stays dark on purpose вЂ”
    the exam beneath it may be light, dark or sepia, and one dark card reads on
    all three without being restyled for each. */
 .dict-popup{position:absolute;z-index:9999;
@@ -703,15 +696,14 @@ body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
   border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:5px;letter-spacing:-.005em}
 .dict-pos{font-size:10px;color:#8494ae;font-weight:600;text-transform:uppercase;margin-left:6px;letter-spacing:.08em}
 .dict-cefr{font-size:10px;color:#08101f;font-weight:700;background:#7fb2ff;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
-/* a word the glossary does not carry is an absence, not a fault — muted ink */
+/* a word the glossary does not carry is an absence, not a fault вЂ” muted ink */
 .dict-miss{color:#8fa0bb;font-style:italic}
 .dict-def{line-height:1.55;color:#dfe8f6}
 .dict-example{line-height:1.55;color:#8fa0bb;font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09)}
 
-/* ============================================================
+/* ====
    BOTTOM NAVIGATOR (real-exam)
-   ============================================================ */
-/* Measured on the live player: footer 1440 x 53 at y=847 — 50px of content
+/* Measured on the live player: footer 1440 x 53 at y=847 вЂ” 50px of content
    under a 3px top border. Three part cells (flex:1 1 0%, min-width:auto, 1px
    side margins) plus a 76.8px deliver button, so the SELECTED cell grows past
    a third of the bar whenever its own content needs more room:
@@ -723,21 +715,21 @@ body.dark-mode .syn-hl-applied.syn-hl-4{background:rgba(253,186,116,0.25)}
 #reading-nav{display:flex;align-items:stretch;width:100%;height:53px;overflow:visible}
 body.dark-mode #bnav{background:var(--paper)}
 
-/* ── the cell ───────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ the cell в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 .bnav-part{position:relative;display:flex;flex:1 1 0%;min-width:auto;margin:0 1px;
   height:53px;border-top:3px solid #fff;background:#fff;text-align:center;overflow:visible}
 .bnav-part.cur{justify-content:flex-start}
 .bnav-part.other{justify-content:center;cursor:pointer}
 body.dark-mode .bnav-part{background:var(--paper);border-top-color:var(--paper)}
 
-/* ── the "Part N" button ────────────────────────────────────────────────── */
+/* в”Ђв”Ђ the "Part N" button в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 .bnav-plabel{position:relative;display:block;box-sizing:border-box;height:50px;padding:16px 20px;
   color:#333;text-align:center;cursor:default;border:none;background:transparent;white-space:nowrap;
   font-family:Arial,sans-serif;font-weight:400;line-height:normal}
 .bnav-part.cur .bnav-plabel{flex:0 1 0%;font-weight:600}
 .bnav-part.other .bnav-plabel{flex:1 1 0%}
 .bnav-part.other .bnav-plabel:hover{background:#efefef;color:#262626}
-/* the 98.48 x 3 grey dash over "Part N" — selected cell only */
+/* the 98.48 x 3 grey dash over "Part N" вЂ” selected cell only */
 .bnav-part.cur .bnav-plabel::before{content:'';position:absolute;top:-3px;left:1px;right:1px;height:3px;
   background:#D7D7D7;transition:background .2s ease-in}
 .bnav-part.cur.done .bnav-plabel::before{background:#358E14}
@@ -745,7 +737,7 @@ body.dark-mode .bnav-part{background:var(--paper);border-top-color:var(--paper)}
 .bnav-pscore{display:inline-block;font-family:Arial,sans-serif;font-weight:400;color:#757575}
 .bnav-check{display:none}
 
-/* ── the number boxes: contiguous, no gap, content-driven width ─────────── */
+/* в”Ђв”Ђ the number boxes: contiguous, no gap, content-driven width в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 .bnav-pills{display:flex;align-items:stretch}
 .qpill{position:relative;display:block;box-sizing:border-box;height:26.78px;margin:11.61px 0;
   padding:2.4px 4px;border:2px solid transparent;border-radius:3px;background:transparent;
@@ -765,7 +757,7 @@ body.dark-mode .qpill{color:var(--ex-ink-2)}
 body.dark-mode .qpill.current{background:var(--ex-panel-2);border-color:var(--ex-focus)}
 body.dark-mode .qpill::before{background:#4a4a4a}
 
-/* ── deliver button: 76.8 x 53, #efefef / #535353, 19.2px tick ──────────── */
+/* в”Ђв”Ђ deliver button: 76.8 x 53, #efefef / #535353, 19.2px tick в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 #sub-btn{flex:0 0 76.8px;width:76.8px;max-width:76.8px;height:53px;padding:16px;
   background:#efefef;border:none;border-radius:0;color:#535353;cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:19.2px}
@@ -792,8 +784,8 @@ body.dark-mode #sub-btn{background:var(--ex-panel-2);color:var(--ex-ink-2)}
 .btn-get-key{border-color:var(--primary);color:var(--primary);background:var(--paper)}
 .btn-get-key:hover{background:var(--primary);color:#fff !important}
 
-/* ════════ ENTRY TYPOGRAPHY (start page + briefing only) ════════
-   No webfonts are possible here — the file runs from file:// with no network,
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ ENTRY TYPOGRAPHY (start page + briefing only) в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   No webfonts are possible here вЂ” the file runs from file:// with no network,
    so a @font-face would silently fall back and look broken. These are all
    OS-bundled faces, each with a chain down to a guaranteed generic. Warmer and
    more humanist than the Georgia/system-sans pairing used elsewhere. */
@@ -810,15 +802,15 @@ body.dark-mode #sub-btn{background:var(--ex-panel-2);color:var(--ex-ink-2)}
 /* the name a student types should feel like handwriting on a form, not UI */
 #stage-registration .reg-input{font-family:var(--entry-display);font-weight:500}
 #stage-reading-intro .ri-tips li b{font-family:var(--serif-data);font-weight:400}
-/* Avenir/Optima run small and light — nudge weights so nothing looks anaemic */
+/* Avenir/Optima run small and light вЂ” nudge weights so nothing looks anaemic */
 :is(#stage-registration,#stage-reading-intro) .reg-brand,
 :is(#stage-registration,#stage-reading-intro) .ri-kicker{font-weight:600;letter-spacing:.22em}
 :is(#stage-registration,#stage-reading-intro) .reg-cta,
 :is(#stage-registration,#stage-reading-intro) .ri-cta{font-weight:600;letter-spacing:.01em}
 
-/* ════════ A4 CERTIFICATE + SCHEDULE OF ANSWERS ════════
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ A4 CERTIFICATE + SCHEDULE OF ANSWERS в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
    Two sheets, as awarding bodies actually issue results. Sheet 1 is ceremonial
-   and shareable; sheet 2 carries all forty answers. Classical devices only —
+   and shareable; sheet 2 carries all forty answers. Classical devices only вЂ”
    an Oxford (thick-thin) rule frame, real small caps, hairline table, the score
    written in words. No gradient bar, no KPI strip, no tinted callout, no ticks.
    Bottom margin is deliberately larger than the top so the block sits above the
@@ -868,7 +860,7 @@ body.dark-mode #sub-btn{background:var(--ex-panel-2);color:var(--ex-ink-2)}
 .cert-ref{font-family:var(--serif-data);margin-top:16px;font-size:9.5px;letter-spacing:.16em;color:#4A4A4A;
   text-transform:uppercase}
 
-/* ── sheet 2 ── */
+/* в”Ђв”Ђ sheet 2 в”Ђв”Ђ */
 .cert-sheet--schedule .cert-frame{padding:16mm 16mm 20mm;align-items:stretch;text-align:left}
 .sc-head{text-align:center;margin-bottom:4px}
 .sc-title{display:block;font-size:19px;letter-spacing:.1em;color:#111;
@@ -921,7 +913,7 @@ body.dark-mode #sub-btn{background:var(--ex-panel-2);color:var(--ex-ink-2)}
 body.cosmos-cert #stage-results{background:transparent}
 body.dark-mode .cert-sheet{background:#fff}
 
-/* ── resume sheet ── */
+/* в”Ђв”Ђ resume sheet в”Ђв”Ђ */
 .resume-sheet{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;
   padding:24px;background:rgba(12,16,24,.72);-webkit-backdrop-filter:saturate(.6) blur(2px);backdrop-filter:saturate(.6) blur(2px);
   opacity:0;pointer-events:none;transition:opacity .18s ease}
@@ -948,9 +940,9 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
   .resume-sheet,.resume-sheet .rsm-card{transition:none}
 }
 
-/* ============================================================
+/* ====
    START / REGISTRATION
-   The registration screen is the CDI cosmic shell's — every rule
+   The registration screen is the CDI cosmic shell's вЂ” every rule
    that draws it lives in the COSMIC SHELL block at the foot of
    this stylesheet, id-scoped to #stage-registration so it wins
    against the wrapper-theme layer in between.
@@ -960,14 +952,12 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
    carries Listening/Writing's .start-card), so the rules were
    dead weight and are deleted rather than layered over.
    Only the stage box itself is kept, as the no-WebGL floor.
-   ============================================================ */
 #stage-registration{
   align-items:center;justify-content:center;overflow-y:auto;padding:24px;
   background:var(--panel);
 }
-/* ============================================================
+/* ====
    TRANSITION / INSTRUCTIONS
-   ============================================================ */
 .transition-stage{background:var(--panel);align-items:center;justify-content:center;padding:30px}
 .trans-card{width:100%;max-width:720px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:44px 48px 40px;box-shadow:var(--shadow-md);text-align:center}
 .trans-icon{font-size:44px;margin-bottom:6px}
@@ -978,11 +968,10 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
 .trans-rules h4{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--ink)}
 .trans-rules ul{list-style:none}
 .trans-rules li{font-size:14px;color:var(--ink-soft);margin:6px 0;padding-left:22px;position:relative;line-height:1.5}
-.trans-rules li::before{content:'✓';position:absolute;left:0;color:var(--emerald);font-weight:800}
+.trans-rules li::before{content:'вњ“';position:absolute;left:0;color:var(--emerald);font-weight:800}
 
-/* ============================================================
+/* ====
    COMPLETION
-   ============================================================ */
 #stage-completion{background:var(--panel);align-items:center;justify-content:center;padding:30px;overflow-y:auto}
 .complete-card{width:100%;max-width:600px;background:var(--paper);border-radius:var(--radius-lg);padding:48px 44px 40px;text-align:center;box-shadow:var(--shadow-md);border:1px solid var(--line)}
 .complete-icon{font-size:56px;margin-bottom:14px}
@@ -990,24 +979,22 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
 .complete-sub{color:var(--ink-soft);font-size:15px;line-height:1.6;margin-bottom:28px}
 .password-wrap{margin:18px auto 0;max-width:380px}
 
-/* ============================================================
+/* ====
    RESULTS  (CDI certificate, recoloured flat/red)
    Owner: R3.  Only the stage shell lives here.  The certificate
    itself is typeset further down this sheet, under
-   "CERTIFICATE — the CDI document", because it has to sit after
+   "CERTIFICATE вЂ” the CDI document", because it has to sit after
    every other #stage-results rule the wrapper skins left behind.
-   ============================================================ */
 #stage-results{background:var(--panel);flex-direction:column}
 #stage-results .results-content{margin:0;padding:44px 24px 80px;overflow-y:auto;overscroll-behavior:contain;flex:1;width:100%}
 
-/* ============================================================
+/* ====
    WARNING OVERLAY (anti-cheat) + TOAST
    [PORTED FROM: the Writing master.]  Both are CDI chrome, not
    exam chrome. Selectors are id-scoped so no later block in
-   this stylesheet can flip them back to a half-styled state —
+   this stylesheet can flip them back to a half-styled state вЂ”
    and the toast itself is styled with the shell, at the foot
    of the file, because a later `.toast` rule exists down there.
-   ============================================================ */
 .warning-overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
 .warning-overlay.show{display:flex}
 #warning-overlay{--crimson:#ff5e78;background:radial-gradient(900px 600px at 50% 36%,rgba(24,8,14,.72),rgba(4,6,12,.90));
@@ -1068,7 +1055,7 @@ body.dark-mode .resume-sheet .rsm-title{color:#f3ede5}
 body.review-mode .gap-input,body.review-mode .dropdown,body.review-mode .option{pointer-events:none}
 body.review-mode .q-pill{cursor:default;opacity:.8}
 body.review-mode .timer{display:none}
-/* Full screen is a REVIEW affordance only — the real player has no such button,
+/* Full screen is a REVIEW affordance only вЂ” the real player has no such button,
    so it must never show while the exam is running. It sits beside the wifi
    glyph, first in the icon rail. */
 /* Scoped to #hdr on purpose: `#hdr .ex-icbtn{display:flex}` at the top of this
@@ -1079,9 +1066,8 @@ body.is-fullscreen #hdr #fs-btn .fs-in{display:none}
 body.is-fullscreen #hdr #fs-btn .fs-out{display:inline !important}
 .fs-review-btn{display:none}
 
-/* ============================================================
+/* ====
    VOCAB PDF (off-screen, white)
-   ============================================================ */
 #vocab-print{position:absolute;left:-10000px;top:0;width:794px;background:#fff;color:#0f172a;font-family:var(--sans)}
 .vp-page{width:794px;min-height:1122px;padding:48px 52px;box-sizing:border-box;background:#fff}
 .vp-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:2px solid #16305c;margin-bottom:22px}
@@ -1093,8 +1079,8 @@ body.is-fullscreen #hdr #fs-btn .fs-out{display:inline !important}
 .vp-footer{margin-top:32px;padding-top:14px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;font-weight:600}
 
 /* Printing is owned by the certificate block further down the sheet: the
-   screen report is hidden and #print-report — a typeset two-page ink
-   version — is what actually reaches the paper. Nothing to do here. */
+   screen report is hidden and #print-report вЂ” a typeset two-page ink
+   version вЂ” is what actually reaches the paper. Nothing to do here. */
 
 @media (max-width:880px){
   #hdr,.topbar{padding:0 12px}
@@ -1105,8 +1091,8 @@ body.is-fullscreen #hdr #fs-btn .fs-out{display:inline !important}
   #tg-link span:not(.tg-circle){display:none}
 }
 
-/* ── IELTS Authentic Header ── */
-/* #E31837 is the red in the official ielts.svg the real player serves — not
+/* в”Ђв”Ђ IELTS Authentic Header в”Ђв”Ђ */
+/* #E31837 is the red in the official ielts.svg the real player serves вЂ” not
    the #C41230 used elsewhere. There is also no divider rule after the logo. */
 .ielts-wordmark{
   font-family:'Arial Black',Arial,sans-serif;font-weight:900;font-size:28px;
@@ -1131,7 +1117,7 @@ body.is-fullscreen #hdr #fs-btn .fs-out{display:inline !important}
 .notif-popup-body{font-size:13px;color:var(--ink-mute);padding:16px 13px;text-align:center}
 body.dark-mode .notif-popup{background:var(--paper);border-color:var(--line)}
 
-/* ── Paraphrase Bridge (Synonym Map) ── */
+/* в”Ђв”Ђ Paraphrase Bridge (Synonym Map) в”Ђв”Ђ */
 .paraphrase-bridge{margin-top:12px;background:rgba(255,255,255,.65);border-radius:8px;overflow:hidden;border:1px solid var(--primary);padding:2px}
 body.dark-mode .paraphrase-bridge{background:rgba(0,0,0,.2)}
 .pb-row{--base-size:13.5px;display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;padding:5px 10px;border-bottom:1px solid rgba(196,18,48,.18);font-size:inherit}
@@ -1145,26 +1131,26 @@ body.dark-mode .pb-q{color:var(--ink-mute)}
 body.dark-mode .pb-row{border-bottom-color:rgba(255,90,114,.28)}
 body.dark-mode .pb-header{color:var(--primary)}
 
-/* ════════════════════════════════════════════════════════════════════
-   WRAPPER THEME  —  applies ONLY to the non-test screens
-   (registration · reading-intro · completion · results).
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   WRAPPER THEME  вЂ”  applies ONLY to the non-test screens
+   (registration В· reading-intro В· completion В· results).
    The live exam (#stage-reading) is deliberately left as the plain
    Arial IELTS clone and is never touched here.
 
    V3 palette: white, near-white elevations, one red accent. No beige,
    no cream, no gradients-as-decoration, no paper grain. Fonts are a
-   system stack because this file runs from file:// with no network —
+   system stack because this file runs from file:// with no network вЂ”
    a webfont here renders as an unstyled fallback, not as a design.
-   ════════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 :root{
   --pw-display:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,'Helvetica Neue',Arial,sans-serif;
   --pw-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,'Helvetica Neue',Arial,sans-serif;
-  /* system serif — no network fonts (file runs from file://); Georgia/Times
+  /* system serif вЂ” no network fonts (file runs from file://); Georgia/Times
      ship on every OS and give the wrapper its own editorial voice, distinct
      from the exam's Arial-only skin. */
   /* One serif for the whole wrapper. Hoefler Text (macOS) / Constantia (Windows)
-     are transitional faces with LINING figures — Georgia's old-style figures made
-     the band score render as "3·5" at display size, the period reading as an
+     are transitional faces with LINING figures вЂ” Georgia's old-style figures made
+     the band score render as "3В·5" at display size, the period reading as an
      interpunct between two descending glyphs. Georgia stays only as a floor. */
   --serif-text:Athelas,"Iowan Old Style",Charter,Constantia,Georgia,serif;
   /* numerals ONLY: Palatino is lining + tabular out of the box, both OSes */
@@ -1172,7 +1158,7 @@ body.dark-mode .pb-header{color:var(--primary)}
                Constantia,Georgia,serif;
   --pw-serif:var(--serif-text);
 
-  /* surfaces — white and near-white only */
+  /* surfaces вЂ” white and near-white only */
   --pw-paper:#ffffff;
   --pw-surface:#ffffff;
   --pw-surface-2:#FAFAFA;
@@ -1225,26 +1211,26 @@ body.dark-mode .pb-header{color:var(--primary)}
 }
 :is(#stage-registration,#stage-reading-intro,#stage-completion,#stage-results) > *{position:relative;z-index:1}
 
-/* ── premium display headings ── */
+/* в”Ђв”Ђ premium display headings в”Ђв”Ђ */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) :is(.start-title,.trans-title,.complete-title){
   font-family:var(--pw-display);font-weight:600;letter-spacing:-.015em;color:var(--pw-ink);
   font-optical-sizing:auto;
 }
 
-/* ── eyebrows ── */
+/* в”Ђв”Ђ eyebrows в”Ђв”Ђ */
 :is(#stage-reading-intro,#stage-completion) .trans-eyebrow{
   font-family:var(--pw-ui);font-weight:800;font-size:11px;letter-spacing:.28em;color:var(--pw-red);
 }
 
-/* ════════ ENTRANCE / REGISTRATION — see base rules above for the
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ ENTRANCE / REGISTRATION вЂ” see base rules above for the
    full-bleed split layout (.reg-shell / .reg-cover / .reg-panel).
    Nothing here: the new layout doesn't reuse the card system the
-   other wrapper stages share, by design. ════════ */
+   other wrapper stages share, by design. в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 
-/* ════════ READING INTRO — the SAME composition as the entrance.
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ READING INTRO вЂ” the SAME composition as the entrance.
    Same rail grid, same left edge, same label device, same text-link
    action. The rail carries one more thing than it did on screen 1
-   ("Part 1 of 3") so the sequence escalates rather than restarts. ════════ */
+   ("Part 1 of 3") so the sequence escalates rather than restarts. в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-reading-intro{
   padding:0;align-items:center;justify-content:center;overflow-y:auto;
   background:#FBFBFC}
@@ -1265,7 +1251,7 @@ body.dark-mode .pb-header{color:var(--primary)}
 .ri-h4{font-family:var(--serif-text);font-size:10px;letter-spacing:.12em;
   text-transform:uppercase;color:#4A6E93;margin:0 0 14px}
 /* hanging figures: the numerals sit in the margin so the TEXT keeps the
-   same left edge as the title — Palatino's tabular figures make that edge
+   same left edge as the title вЂ” Palatino's tabular figures make that edge
    straight, which Athelas's proportional ones could not. */
 .ri-tips{list-style:none;margin:0 0 40px;padding:0}
 .ri-tips li{position:relative;padding:11px 0 11px 34px;font-family:var(--serif-text);
@@ -1292,9 +1278,9 @@ body.dark-mode .pb-header{color:var(--primary)}
 body.dark-mode #stage-reading-intro{background:#15171c}
 body.dark-mode .ri-title{color:#f3ede5}
 
-/* ════════ COMPLETION ════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ COMPLETION в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 /* Surfacing back into the light after the dark exam hour. No card, no
-   emoji — a signed note, which is the thing competitors cannot copy. */
+   emoji вЂ” a signed note, which is the thing competitors cannot copy. */
 #stage-completion{padding:0;overflow-y:auto;background:var(--pw-canvas)}
 .rc-wrap{margin:auto;width:100%;max-width:560px;padding:56px 40px;text-align:center;
   animation:pwRise .6s cubic-bezier(.2,.75,.2,1) both}
@@ -1329,7 +1315,7 @@ body.dark-mode .rc-title{color:#f3ede5}
 body.dark-mode .rc-note p{color:#cfcfcf}
 body.dark-mode .rc-sign b{color:#f3ede5}
 
-/* ════════ PREMIUM BUTTONS (wrapper only) ════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ PREMIUM BUTTONS (wrapper only) в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn-primary,
 #stage-results .topbar .btn-primary{
   background:#1F4782;
@@ -1350,7 +1336,7 @@ body.dark-mode .rc-sign b{color:#f3ede5}
   border-radius:14px;padding:14px 18px;box-shadow:var(--e2);
   background:#1F4782}
 
-/* ════════ RESULTS — premium score report ════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ RESULTS вЂ” premium score report в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-results .topbar{
   background:rgba(255,253,251,.85);backdrop-filter:saturate(1.4) blur(8px);
   border-bottom:1px solid var(--pw-line);padding:0 22px}
@@ -1361,7 +1347,7 @@ body.dark-mode .rc-sign b{color:#f3ede5}
 #stage-results{background:var(--pw-canvas)}
 #stage-results .results-content{padding:0 0 60px;max-width:none}
 
-/* ── the score is the hero, on the same navy as the cover screens ── */
+/* в”Ђв”Ђ the score is the hero, on the same navy as the cover screens в”Ђв”Ђ */
 .rs-hero{
   color:var(--pw-ink);padding:26px 0 0;
   background:radial-gradient(880px 460px at 72% -18%, rgba(65,142,200,.13), transparent 62%),
@@ -1402,7 +1388,7 @@ body.dark-mode .rc-sign b{color:#f3ede5}
 .rs-scale-ticks span{font-family:var(--pw-ui);font-size:11px;color:#5B7FA6;font-variant-numeric:tabular-nums}
 @keyframes rsGrow{from{width:0!important}}
 
-/* ── the light analysis body ── */
+/* в”Ђв”Ђ the light analysis body в”Ђв”Ђ */
 .rs-body{max-width:1000px;margin:0 auto;padding:32px 40px 0;animation:pwFade .5s .1s both}
 .rs-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
 .rs-panel{border:1px solid var(--pw-line);border-radius:14px;padding:20px 22px;background:var(--pw-paper)}
@@ -1447,7 +1433,7 @@ body.dark-mode .rc-sign b{color:#f3ede5}
   .rs-grid{grid-template-columns:1fr}
 }
 
-/* ════════ EXPLANATION BUTTONS + PANEL (review layer) ════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ EXPLANATION BUTTONS + PANEL (review layer) в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 body.review-mode .explain-btn,body.review-mode .explain-btn-sm{
   border:1px solid rgba(65,142,200,.35);border-radius:999px;background:rgba(65,142,200,.07);
   color:#1F4782;font-weight:700;box-shadow:0 1px 2px rgba(31,71,130,.06);
@@ -1464,7 +1450,7 @@ body.review-mode .explain-panel{
 body.dark-mode.review-mode .explain-panel{background:#242424}
 body.review-mode .explain-panel .ep-title{letter-spacing:.14em}
 
-/* ════════ load-stagger for entrance children ════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ load-stagger for entrance children в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-registration.active .reg-field{animation:pwFade .5s .30s both}
 #stage-registration.active .reg-cta{animation:pwFade .5s .36s both}
 
@@ -1475,7 +1461,7 @@ body.review-mode .explain-panel .ep-title{letter-spacing:.14em}
   #stage-registration *,#stage-reading-intro *,#stage-completion *,#stage-results *{animation:none!important}
 }
 
-/* ════════ dark-mode adaptation for wrapper ════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ dark-mode adaptation for wrapper в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion,#stage-results){
   background:
     radial-gradient(1100px 560px at 50% -12%,rgba(90,140,210,.14),transparent 60%),
@@ -1484,8 +1470,8 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
   color:#ece6df}
 body.dark-mode :is(#stage-reading-intro,#stage-completion) :is(.trans-title,.complete-title){color:#f3ede5}
 /* Removed: Reading's own dark card rule (#201b17, warm brown, opaque).
-   It was dead code until Listening's markup was transplanted in — .trans-card
-   did not exist here before — at which point it came alive and, at 1 id +
+   It was dead code until Listening's markup was transplanted in вЂ” .trans-card
+   did not exist here before вЂ” at which point it came alive and, at 1 id +
    2 classes, outranked the chamber rule's 1 id + 1 class. Result: the card
    rendered as an opaque brown slab instead of the navy translucent glass the
    Listening engine uses. The chamber skin owns these cards now. */
@@ -1509,14 +1495,14 @@ body.dark-mode .reg-input::placeholder{color:#7d7d7d}
 body.dark-mode .reg-foot{color:#7d7d7d}
 body.dark-mode .reg-cta{color:#8FB8E4}
 
-/* ════════ print: flatten premium effects for clean report ════════ */
-/* SUPERSEDED — kept only so nothing that still targets these selectors is
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ print: flatten premium effects for clean report в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+/* SUPERSEDED вЂ” kept only so nothing that still targets these selectors is
    surprised. The sheet that actually prints is #print-report, typeset by
    buildPrintReport(); the print block that owns the page geometry lives with
    it (search "@page{size:A4;margin:14mm 15mm 12mm}") and hides #stage-results
    with !important, so every rule below acts on a display:none element.
-   This block used to declare a SECOND, conflicting @page — size:A4 portrait
-   with a flat 12mm margin — while the live block declares 14mm/15mm/12mm and
+   This block used to declare a SECOND, conflicting @page вЂ” size:A4 portrait
+   with a flat 12mm margin вЂ” while the live block declares 14mm/15mm/12mm and
    measurePrintPages() computes its 265mm fit limit from THAT pair. Two @page
    rules in one stylesheet do not merge predictably per-descriptor across
    engines: whichever won, one of the two layouts was wrong, which is how the
@@ -1533,12 +1519,11 @@ body.dark-mode .reg-cta{color:#8FB8E4}
   .no-print,.cert-actions,#stage-results .topbar{display:none!important}
 }
 
-/* ============================================================
-   UNIVERSAL ENGINE — extra question types
-   (map / plan / diagram · table · flow-chart)
+/* ====
+   UNIVERSAL ENGINE вЂ” extra question types
+   (map / plan / diagram В· table В· flow-chart)
    Added, never editing the rules above.
-   ============================================================ */
-/* ── Map / plan / diagram labelling — measured on the official demo player 2026-09-02 ──
+/* в”Ђв”Ђ Map / plan / diagram labelling вЂ” measured on the official demo player 2026-09-02 в”Ђв”Ђ
    The image sits bare (no frame). A gap is placed ON the image at its coordinates: a typed
    box (mode:'input'), or a drop zone with the word list beside the image (mode:'drag'). The
    old mode:'select' dropdown is kept for files that use it, but the real player has none. */
@@ -1555,7 +1540,7 @@ body.dark-mode .reg-cta{color:#8FB8E4}
 .map-layout .word-bank-list{flex-direction:column;flex-wrap:nowrap;margin:0 0 16px 32px;flex:0 0 auto}
 .map-layout .word-bank-list .word-tile{margin:3px}
 
-/* ── Matching features: the real tableMatchInteraction grid ── */
+/* в”Ђв”Ђ Matching features: the real tableMatchInteraction grid в”Ђв”Ђ */
 .mg-wrap{overflow-x:auto;margin:4px 0 12px}
 .match-grid{width:100%;border-collapse:collapse;table-layout:auto}
 .match-grid th,.match-grid td{border:1px solid #D5D5D5;padding:0}
@@ -1586,16 +1571,16 @@ body.dark-mode .match-grid .mg-cell:hover{background:#243447}
    is (0,3,2) and would otherwise keep painting the blue "your pick" dot. */
 /* the answer key cell: green + tick, whether or not the student hit it */
 body.review-mode .match-grid .mg-cell.cell-correct{background:#f1fff4}
-body.review-mode .match-grid .mg-cell.cell-correct::after{content:"✓";width:auto;height:auto;
+body.review-mode .match-grid .mg-cell.cell-correct::after{content:"вњ“";width:auto;height:auto;
   border-radius:0;background:none;color:var(--emerald);font-weight:700;font-size:15px;line-height:1}
 /* the student's incorrect pick */
 body.review-mode .match-grid .mg-cell.cell-wrong{background:#fff5f5}
-body.review-mode .match-grid .mg-cell.cell-wrong::after{content:"✕";width:auto;height:auto;
+body.review-mode .match-grid .mg-cell.cell-wrong::after{content:"вњ•";width:auto;height:auto;
   border-radius:0;background:none;color:var(--crimson);font-weight:700;font-size:15px;line-height:1}
 body.review-mode.dark-mode .match-grid .mg-cell.cell-correct{background:rgba(46,125,50,.18)}
 body.review-mode.dark-mode .match-grid .mg-cell.cell-wrong{background:rgba(196,18,48,.18)}
 
-/* ── Table completion — official: 1px #000 grid, cells 4.8px 8px, 16px/24px ── */
+/* в”Ђв”Ђ Table completion вЂ” official: 1px #000 grid, cells 4.8px 8px, 16px/24px в”Ђв”Ђ */
 .rt-table{width:100%;border-collapse:collapse;font-size:16px;line-height:24px;margin:16px 0;border:1px solid #000;color:#000}
 .rt-table th,.rt-table td{border:1px solid #000;padding:4.8px 8px;text-align:left;vertical-align:top;color:#000;background:#fff}
 .rt-table th{font-weight:700}
@@ -1604,9 +1589,9 @@ body.review-mode.dark-mode .match-grid .mg-cell.cell-wrong{background:rgba(196,1
 body.dark-mode .rt-table,body.dark-mode .rt-table th,body.dark-mode .rt-table td{background:transparent;color:var(--ex-ink-2,#e6e6e6);border-color:var(--ex-ink-2,#e6e6e6)}
 body.theme-sepia .rt-table,body.theme-sepia .rt-table th,body.theme-sepia .rt-table td{background:transparent;color:var(--sp-ink-2,#3a2f22);border-color:var(--sp-ink-2,#3a2f22)}
 
-/* ── Flow-chart completion — official: Cambridge ships the chart as a picture (boxes 1px #000,
+/* в”Ђв”Ђ Flow-chart completion вЂ” official: Cambridge ships the chart as a picture (boxes 1px #000,
    13.6px/19px text, solid black arrows). This is that picture in CSS. Gaps are typed boxes, or
-   drop zones when the section carries a bank. ── */
+   drop zones when the section carries a bank. в”Ђв”Ђ */
 .flow-title{font-size:17.6px;line-height:21.12px;font-weight:700;color:#000;margin:0 0 12px}
 .flow-chart{display:flex;flex-direction:column;align-items:stretch;width:432px;max-width:100%;margin:0 0 16px}
 .flow-box{border:1px solid #000;background:#fff;color:#000;font-size:13.6px;line-height:19.04px;padding:6px 4px 8px;box-sizing:border-box;text-align:left}
@@ -1619,12 +1604,12 @@ body.theme-sepia .rt-table,body.theme-sepia .rt-table th,body.theme-sepia .rt-ta
 body.dark-mode .flow-box,body.dark-mode .flow-title{background:transparent;color:var(--ex-ink-2,#e6e6e6);border-color:var(--ex-ink-2,#e6e6e6)}
 body.dark-mode .flow-arrow svg path{fill:var(--ex-ink-2,#e6e6e6)}
 body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;color:var(--sp-ink-2,#3a2f22);border-color:var(--sp-ink-2,#3a2f22)}
-/* ═══════════════════════════════════════════════════════════════════
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
    V3 ADDITIONS
    Motion lives on the wrapper screens. The test screen (#stage-reading)
-   keeps the flat real-exam skin deliberately — see the research brief:
+   keeps the flat real-exam skin deliberately вЂ” see the research brief:
    authenticity is the gate, and animating the exam chrome breaks it.
-   ═══════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 
 /* (the note button is styled with the rest of the adder card above) */
 
@@ -1668,7 +1653,7 @@ body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;c
 .note-modal .nm-btn.solid{background:var(--primary);border:1px solid var(--primary);color:#fff}
 .note-modal .nm-btn.solid:hover{background:var(--primary-2)}
 
-/* ── pacing marker ── */
+/* в”Ђв”Ђ pacing marker в”Ђв”Ђ */
 .pace-note{
   position:fixed;right:18px;bottom:78px;z-index:9998;display:flex;align-items:stretch;gap:0;
   max-width:330px;background:var(--paper);border:1px solid var(--line-2);border-radius:9px;
@@ -1685,7 +1670,7 @@ body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;c
   padding:0 10px 0 6px;transition:color .12s}
 .pace-note .pn-x:hover{color:var(--ink)}
 
-/* ── results: mark-loss analysis + attempt history ── */
+/* в”Ђв”Ђ results: mark-loss analysis + attempt history в”Ђв”Ђ */
 #stage-results .v3-insight{
   border:1px solid var(--pw-line);border-radius:12px;padding:15px 17px 16px;margin:0 0 18px;
   background:linear-gradient(180deg,rgba(36,75,142,.035),transparent)}
@@ -1729,14 +1714,14 @@ body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;c
 #stage-results .cause-tag.spelling{background:#e0f0fb;color:#1c5e8a}
 #stage-results .cause-tag.limit{background:#fde8d6;color:#8a4a1e}
 
-/* ── stage transitions ── */
+/* в”Ђв”Ђ stage transitions в”Ђв”Ђ */
 @keyframes pwStageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes pwStageOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-6px)}}
 @keyframes pwSoftIn{from{opacity:0}to{opacity:1}}
 #stage-registration.active,#stage-reading-intro.active,
 #stage-completion.active,#stage-results.active{
   animation:pwStageIn .44s cubic-bezier(.2,.75,.2,1) both}
-/* the exam screen fades only — no movement, nothing to distract */
+/* the exam screen fades only вЂ” no movement, nothing to distract */
 #stage-reading.active{animation:pwSoftIn .22s ease both}
 .stage.stage-leaving{
   display:flex!important;animation:pwStageOut .24s cubic-bezier(.4,0,1,1) both;pointer-events:none}
@@ -1751,7 +1736,7 @@ body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;c
   #stage-results .v3-hbar i{transition:none!important}
 }
 
-/* ── V3 pass 2: filters, timing, trap notes ── */
+/* в”Ђв”Ђ V3 pass 2: filters, timing, trap notes в”Ђв”Ђ */
 #stage-results .v3-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
 #stage-results .v3-fchip{
   border:1px solid var(--pw-line);background:var(--pw-paper);border-radius:8px;
@@ -1773,21 +1758,21 @@ body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;c
 
 #stage-results .q-bubble{transition:transform .12s,opacity .2s}
 
-/* ═══════════════════════════════════════════════════════════════════
-   V3 — POLISH ON THE REPLICA
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   V3 вЂ” POLISH ON THE REPLICA
    Everything here is additive: motion, focus and feedback. No colour,
    size, position or wording that a student meets on exam day changes.
    The rule for anything in this block: if it would make someone
    surprised on the day, it does not belong here.
-   ═══════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 
 /* Options gain a hover and a press, which the real player lacks and which
-   nobody could be surprised by — it only ever confirms where the cursor is. */
+   nobody could be surprised by вЂ” it only ever confirms where the cursor is. */
 .option{transition:background .13s ease, box-shadow .13s ease}
 .option:hover{background:rgba(65,142,200,.07)}
 .option:active{background:rgba(65,142,200,.13)}
 
-/* Keyboard focus. Invisible to mouse users, essential for everyone else —
+/* Keyboard focus. Invisible to mouse users, essential for everyone else вЂ”
    the real player's focus states are close to unusable. */
 .option:focus-within{box-shadow:inset 0 0 0 2px rgba(65,142,200,.55);border-radius:3px}
 .gap-input:focus-visible,.dropdown:focus-visible,.q-pill:focus-visible,
@@ -1811,7 +1796,7 @@ body.theme-sepia .flow-box,body.theme-sepia .flow-title{background:transparent;c
   #passage-pane,#questions-pane{scroll-behavior:auto}
 }
 
-/* ── notes drawer (mirrors the real player's Notes panel) ── */
+/* в”Ђв”Ђ notes drawer (mirrors the real player's Notes panel) в”Ђв”Ђ */
 .notes-drawer{
   position:fixed;top:0;right:0;bottom:0;width:300px;max-width:86vw;z-index:9997;
   background:var(--panel);border-left:1px solid var(--line-2);
@@ -1885,11 +1870,11 @@ body.notes-open #stage-reading{padding-right:300px;transition:padding-right .28s
 
 /* ---- transplanted wrapper-stage CSS (source: the Listening engine) ----
    Excludes Listening's inlined scene.css (that lives in the banner-delimited
-   block below and is managed by sync_scene.py — duplicating it here would
+   block below and is managed by sync_scene.py вЂ” duplicating it here would
    silently diverge). Also excludes .btn*, .stage, .results-content and
    .theme-dot: Reading defines its own and they are shared with the exam
    surface, which must stay pixel-identical. ---- */
-/* ── WARNING OVERLAY + TOAST ── */
+/* в”Ђв”Ђ WARNING OVERLAY + TOAST в”Ђв”Ђ */
 .warning-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
 .warning-overlay.show{display:flex}
 .warning-card{background:var(--paper);border-radius:5px;padding:36px 40px;max-width:520px;text-align:center;box-shadow:var(--shadow-lg);border-top:5px solid var(--crimson)}
@@ -1936,7 +1921,7 @@ body.notes-open #stage-reading{padding-right:300px;transition:padding-right .28s
 .trans-card{width:100%;max-width:680px;background:var(--pw-paper);border:1px solid var(--pw-line);border-radius:20px;padding:48px 52px 42px;box-shadow:var(--pw-shadow);position:relative;overflow:hidden;animation:pwRise .65s cubic-bezier(.2,.75,.2,1) both;}
 .trans-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pw-red),var(--pw-burgundy) 55%,var(--pw-gold))}
 .trans-icon{font-size:0;margin:0 auto 14px;width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,rgba(36,75,142,.14),rgba(19,49,95,.07));border:1px solid var(--pw-line)}
-#stage-reading-intro .trans-icon::after{content:"🎧";font-size:30px}
+#stage-reading-intro .trans-icon::after{content:"рџЋ§";font-size:30px}
 .trans-eyebrow{font-family:var(--pw-ui);font-weight:800;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--pw-red);margin-bottom:12px}
 .trans-title{font-size:40px;margin:6px 0 12px}
 .trans-sub{color:var(--pw-ink-2);font-size:15px;max-width:520px;line-height:1.6;margin:0 auto 28px}
@@ -1944,13 +1929,13 @@ body.notes-open #stage-reading{padding-right:300px;transition:padding-right .28s
 .trans-rules h4{font-family:var(--pw-ui);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--pw-red);margin-bottom:14px}
 .trans-rules ul{list-style:none}
 .trans-rules li{color:var(--pw-ink-2);font-size:14px;margin:9px 0;padding-left:28px;position:relative;line-height:1.5}
-.trans-rules li::before{content:"✓";color:var(--pw-emerald);font-weight:800;font-size:13px;top:1px;position:absolute;left:0}
+.trans-rules li::before{content:"вњ“";color:var(--pw-emerald);font-weight:800;font-size:13px;top:1px;position:absolute;left:0}
 /* Completion */
 #stage-completion{padding:34px;align-items:center;justify-content:center;overflow-y:auto}
 .complete-card{width:100%;max-width:620px;background:var(--pw-paper);border:1px solid var(--pw-line);border-radius:20px;padding:50px 48px 42px;box-shadow:var(--pw-shadow);position:relative;overflow:hidden;animation:pwRise .65s cubic-bezier(.2,.75,.2,1) both;text-align:center;}
 .complete-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pw-red),var(--pw-burgundy) 55%,var(--pw-gold))}
 .complete-icon{font-size:0;margin:0 auto 16px;width:66px;height:66px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,rgba(193,154,75,.20),rgba(36,75,142,.10));border:1px solid var(--pw-line)}
-.complete-icon::after{content:"🎓";font-size:34px}
+.complete-icon::after{content:"рџЋ“";font-size:34px}
 .complete-title{font-size:38px;margin-bottom:12px}
 .complete-sub{color:var(--pw-ink-2);font-size:15px}
 /* Results */
@@ -2033,7 +2018,7 @@ body.notes-open #stage-reading{padding-right:300px;transition:padding-right .28s
 .channel-promo .channel-name{font-weight:800;font-size:14px}
 .channel-promo .channel-desc{font-size:11.5px;opacity:.9;font-weight:500;margin-top:1px}
 .channel-promo .channel-cta{font-size:12px;font-weight:800;padding:6px 12px;background:rgba(255,255,255,.18);border-radius:999px;flex-shrink:0}
-/* ── DARK MODE PREMIUM WRAPPER ── */
+/* в”Ђв”Ђ DARK MODE PREMIUM WRAPPER в”Ђв”Ђ */
 body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion,#stage-results){
   background:radial-gradient(1100px 560px at 50% -12%,rgba(90,140,210,.14),transparent 60%),radial-gradient(820px 520px at 108% 116%,rgba(19,49,95,.30),transparent 55%),linear-gradient(180deg,#15171c,#101218);color:#ece6df
 }
@@ -2151,10 +2136,10 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
 body.dark-mode .start-card,
 body.dark-mode .trans-card,
 body.dark-mode .complete-card{background:var(--ch-glass)}
-/* ── RESULTS TOPBAR — chamber glass ──────────────────────────────────────
+/* в”Ђв”Ђ RESULTS TOPBAR вЂ” chamber glass в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The certificate below stays paper on purpose; only the bar is re-skinned. */
 #stage-results .topbar{
-  /* the brand span pins `color:var(--ink)` INLINE, which beats any rule here —
+  /* the brand span pins `color:var(--ink)` INLINE, which beats any rule here вЂ”
      so re-point the token instead of trying to out-specify the attribute */
   --ink:var(--ch-ink);
   background:linear-gradient(180deg,rgba(20,32,56,.88),rgba(11,19,36,.92));
@@ -2209,7 +2194,7 @@ body.dark-mode .complete-card{background:var(--ch-glass)}
   border-color:var(--ch-gold);
   color:#f0d49a;
 }
-/* ── RESULTS CERTIFICATE — DARK ──────────────────────────────────────────
+/* в”Ђв”Ђ RESULTS CERTIFICATE вЂ” DARK в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The certificate is almost entirely built on --pw-* tokens, so re-pointing
    them inside this scope re-skins it. Only the literal cream backgrounds
    below need explicit overrides. */
@@ -2258,7 +2243,7 @@ body.cosmos-cert #stage-results .q-bubble.skipped{background:rgba(255,255,255,.0
 body.cosmos-cert #stage-results .stat-track,
 body.cosmos-cert #stage-results .scale-bar{background:rgba(255,255,255,.14)}
 body.cosmos-cert #stage-results .logo-mark{box-shadow:0 5px 14px -6px rgba(0,0,0,.8)}
-/* sepia keeps the paper certificate — only the ground shifts warm */
+/* sepia keeps the paper certificate вЂ” only the ground shifts warm */
 
 @media print{
 
@@ -2299,19 +2284,17 @@ body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
   animation:none;
 }
 
-/* ============================================================================
-   CHAMBER SKIN — superseded by the CDI V3 COSMIC SHELL at the foot of this
+/* ======
+   CHAMBER SKIN вЂ” superseded by the CDI V3 COSMIC SHELL at the foot of this
    stylesheet, which is the Writing master's shell ported whole. What stood
    here was the previous generation of the same idea (a --ch-* token set plus
    a per-element re-skin of the wrapper stages); keeping both meant two rule
    sets fighting over one card, so the older one is deleted rather than
    layered under. The --ch-* tokens the certificate and dark-mode blocks below
    still reference are declared by the shell.
-   ========================================================================== */
-/* ============================================================================
-   RESULTS TOPBAR — chamber glass with the pill buttons
+/* ======
+   RESULTS TOPBAR вЂ” chamber glass with the pill buttons
    crimson (primary) / glass (ghost) / gold hairline (new test)
-   ========================================================================== */
 #stage-results .topbar{
   background:linear-gradient(180deg,rgba(18,30,54,.86),rgba(9,16,30,.92));
   border-bottom:1px solid var(--ch-line);
@@ -2353,25 +2336,23 @@ body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
   background-size:contain;background-repeat:no-repeat;background-position:center;
 }
 
-/* ============================================================================
-   CERTIFICATE — dark layer + sepia + print reset
+/* ======
+   CERTIFICATE вЂ” dark layer + sepia + print reset
    Moved. The document, its dark and sepia palettes and the print reset are
-   now typeset together at the end of this sheet, under "CERTIFICATE — the CDI
+   now typeset together at the end of this sheet, under "CERTIFICATE вЂ” the CDI
    document", where they sit after every other #stage-results rule and no
    longer need to fight the cascade. Nothing is defined here.
-   ========================================================================== */
 
-/* ============================================================================
-   SEPIA — the chamber stays navy (it is a lit room, not paper), but every
+/* ======
+   SEPIA вЂ” the chamber stays navy (it is a lit room, not paper), but every
    surface Reading paints warm needs its counterpart here. Same root cause as
    dark mode: the fidelity work hard-codes literals a var flip cannot reach.
-   ========================================================================== */
 body.theme-sepia{
   --sp-ground:#f5f0e8; --sp-panel:#ece3d3; --sp-panel-2:#fffdf8;
   --sp-line:#d9cbb0; --sp-line-2:#b9a685;
   --sp-ink:#3a2c1a; --sp-ink-2:#5a4632; --sp-ink-3:#8d7a5f;
 }
-/* the wrapper stages keep the chamber in sepia too — only the accents warm */
+/* the wrapper stages keep the chamber in sepia too вЂ” only the accents warm */
 body.theme-sepia :is(#stage-registration,#stage-reading-intro,#stage-completion){
   --ch-blue:#e0b877;
   --ch-gold:#e6c489;
@@ -2384,26 +2365,25 @@ body.theme-sepia .warning-card .ic{color:var(--ch-red-2)}
    certificate no longer takes that fill, but the cards still expect it. */
 body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-card{background:#201b17;border-color:rgba(255,255,255,.08)}
 
-/* ============================================================================
-   CERTIFICATE — the CDI document        [ported from the CDI Writing test]
+/* ======
+   CERTIFICATE вЂ” the CDI document        [ported from the CDI Writing test]
    ----------------------------------------------------------------------------
    Same press as Writing's Test Report Form: the same paper, the same ink, the
    same band-tier chrome, the same rhythm down the page. What changes is what
    the document reports. Writing grades four examiner criteria against an AI
    band; Reading counts forty objective marks, so the criteria table becomes a
-   per-passage breakdown — raw score and band equivalent, one row per passage,
-   with the overall as the closing row — inside exactly the same table.
+   per-passage breakdown вЂ” raw score and band equivalent, one row per passage,
+   with the overall as the closing row вЂ” inside exactly the same table.
 
    Everything is scoped to #stage-results .cert (or to #print-report, built by
    buildPrintReport()) so it never reaches the exam screen, and the whole block
    sits last in the sheet so it beats the older #stage-results rules the
    wrapper skins left behind.
-   ========================================================================== */
 
-/* ── Document tokens + band-tier chrome ───────────────────────
+/* в”Ђв”Ђ Document tokens + band-tier chrome в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    data-tier is set from the overall band in renderResults(). Only the chrome
    (rule, glow, accent metal) changes; the paper, the ink and the layout stay
-   constant, so a 4.0 and a 9.0 are recognisably the same document — just lit
+   constant, so a 4.0 and a 9.0 are recognisably the same document вЂ” just lit
    differently.  Unlike Writing, every surface colour here is a token: Reading
    has a dark mode and a sepia mode, and both are one token flip below.       */
 #stage-results .cert,#print-report{
@@ -2440,13 +2420,13 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
   --rule:linear-gradient(90deg,#2a3648,#47566d 58%,#8095ad)}
 
 /* The scroll shell. Two older results designs further up the sheet still lay
-   .results-content out as a centred flex column — which silently shrank the
-   certificate to the viewport instead of letting it scroll — and reset the
+   .results-content out as a centred flex column вЂ” which silently shrank the
+   certificate to the viewport instead of letting it scroll вЂ” and reset the
    padding after it. Both are settled here, last. */
 #stage-results .results-content{display:block;flex:1 1 auto;width:100%;max-width:none;min-height:0;
   margin:0;padding:44px 24px 80px;gap:0;overflow-y:auto;overscroll-behavior:contain}
 
-/* ── The document ── */
+/* в”Ђв”Ђ The document в”Ђв”Ђ */
 #stage-results .cert{
   font-family:var(--cert-ui);
   width:auto;min-height:0;max-width:948px;margin:0 auto;display:block;
@@ -2481,7 +2461,7 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
 #stage-results .field-label{font-size:9px;font-weight:800;color:var(--c-ink-3);letter-spacing:.17em;text-transform:uppercase;margin-bottom:5px}
 #stage-results .field-value{font-size:14.5px;font-weight:700;color:var(--c-ink);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ── The score panel: the one thing they screenshot ── */
+/* в”Ђв”Ђ The score panel: the one thing they screenshot в”Ђв”Ђ */
 #stage-results .score-section{position:relative;display:grid;grid-template-columns:266px 1fr;gap:0;padding:0;border:none;
   background:linear-gradient(150deg,var(--hero-a),var(--hero-b) 52%,var(--hero-c));color:#fff;isolation:isolate;
   animation:certPart .55s .22s both}
@@ -2508,7 +2488,7 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
 
 #stage-results .band-side{padding:26px 38px 28px 30px;display:flex;flex-direction:column;gap:15px;min-width:0}
 
-/* 0–9 ruler */
+/* 0вЂ“9 ruler */
 #stage-results .band-scale{position:relative;display:block;flex-direction:row;gap:0}
 #stage-results .band-scale-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
 #stage-results .band-scale-cap{font-size:9px;font-weight:800;letter-spacing:.19em;text-transform:uppercase;color:rgba(255,255,255,.5)}
@@ -2533,7 +2513,7 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
   padding:10px 14px;border-radius:11px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11)}
 #stage-results .band-verdict b{color:#fff;font-weight:700}
 
-/* where the forty marks landed — Writing's two task cards, three-up */
+/* where the forty marks landed вЂ” Writing's two task cards, three-up */
 #stage-results .task-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 #stage-results .task-mini{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:13px;
   padding:12px 15px 13px;transition:background .18s ease,border-color .18s ease;min-width:0}
@@ -2553,12 +2533,12 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
 #stage-results .task-mini.mute .task-mini-fill{background:rgba(255,255,255,.34)}
 #stage-results .task-mini.mute .task-mini-band{color:rgba(255,255,255,.72)}
 
-/* ── Section rhythm ── */
+/* в”Ђв”Ђ Section rhythm в”Ђв”Ђ */
 #stage-results .section-heading{display:flex;align-items:center;gap:12px;margin:26px 38px 15px;animation:certPart .5s .3s both}
 #stage-results .section-heading::before,#stage-results .section-heading::after{content:'';flex:1;height:1px;background:var(--c-line)}
 #stage-results .section-heading span{font-family:var(--cert-ui);font-size:9.5px;font-weight:800;color:var(--acc-ink);letter-spacing:.2em;text-transform:uppercase}
 
-/* ── Per-passage breakdown — Writing's criteria table, re-scored ──
+/* в”Ђв”Ђ Per-passage breakdown вЂ” Writing's criteria table, re-scored в”Ђв”Ђ
    Rows are the three passages, closed by the whole test. Column one is the
    raw mark out of that passage's question count; column two is what that
    score is worth on the official Academic Reading conversion table.        */
@@ -2599,17 +2579,17 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
 #stage-results .cc-legend .key{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 #stage-results .cc-legend .key i{width:9px;height:9px;border-radius:3px;display:inline-block}
 
-/* what the band officially means — public descriptor, changes with the score */
+/* what the band officially means вЂ” public descriptor, changes with the score */
 #stage-results .band-desc{margin:18px 38px 0;padding:2px 0 2px 16px;border-left:3px solid var(--acc-ink);
   background:none;border-radius:0;animation:certPart .5s .43s both}
 #stage-results .band-desc-h{font-family:var(--cert-display);font-size:14px;font-weight:600;letter-spacing:-.012em;color:var(--c-ink)}
 #stage-results .band-desc p{margin:5px 0 0;font-size:12.5px;line-height:1.6;color:var(--c-ink-2);max-width:78ch}
 
-/* ── Where the marks went ──────────────────────────────────────
+/* в”Ђв”Ђ Where the marks went в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The diagnosis Reading can make and Writing cannot: a lost mark that was a
    plural, a spelling or a word-limit slip is a different problem from one
    that was a misread, and a blank is a clock problem. Same paper, same type
-   scale — it reads as another paragraph of the report, not as a dashboard. */
+   scale вЂ” it reads as another paragraph of the report, not as a dashboard. */
 #stage-results .ins-grid{padding:0 38px;animation:certPart .5s .46s both}
 #stage-results .ins-lead{font-family:var(--cert-display);font-size:16px;font-weight:600;letter-spacing:-.015em;
   color:var(--c-ink);line-height:1.45;margin:0 0 14px;max-width:74ch}
@@ -2642,7 +2622,7 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
 #stage-results .pace-val.over{color:var(--cv-mid)}
 #stage-results .pace-foot{margin-top:10px;font-size:11.5px;line-height:1.55;color:var(--c-ink-3)}
 
-/* ── Answer summary: filters, bubbles, the forty rows ── */
+/* в”Ђв”Ђ Answer summary: filters, bubbles, the forty rows в”Ђв”Ђ */
 #stage-results .answer-section{padding:0 38px;animation:certPart .5s .5s both}
 #stage-results .cert .v3-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 15px}
 #stage-results .cert .v3-fchip{
@@ -2695,7 +2675,7 @@ body.dark-mode .start-card,body.dark-mode .trans-card,body.dark-mode .complete-c
   font-size:8px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;vertical-align:middle;
   background:rgba(31,122,67,.10);color:#1c6b3c}
 
-/* ── Closing CTA + footer ── */
+/* в”Ђв”Ђ Closing CTA + footer в”Ђв”Ђ */
 #stage-results .review-cta{margin:26px 38px 0;padding:18px 22px;border:1px solid rgba(44,95,168,.16);border-radius:14px;text-align:left;
   background:linear-gradient(180deg,rgba(44,95,168,.055),rgba(44,95,168,.09));display:flex;align-items:center;justify-content:space-between;
   gap:20px;flex-wrap:wrap;animation:certPart .5s .54s both}
@@ -2723,7 +2703,7 @@ body.cosmos-cert #stage-results .review-cta .btn-primary{color:#0f141c}
 #stage-results .cert-footer span:first-child{font-family:var(--cert-display);font-weight:600;letter-spacing:.02em;color:var(--c-ink-2);font-size:11px}
 #stage-results .cert-footer .cert-id{font-variant-numeric:tabular-nums;letter-spacing:.09em}
 
-/* ── Motion ── */
+/* в”Ђв”Ђ Motion в”Ђв”Ђ */
 @keyframes certRise{from{opacity:0;transform:translateY(26px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes certPart{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
@@ -2733,7 +2713,7 @@ body.cosmos-cert #stage-results .review-cta .btn-primary{color:#0f141c}
   #stage-results .cert,#stage-results .cert *{animation:none!important}
 }
 
-/* ── Responsive ── */
+/* в”Ђв”Ђ Responsive в”Ђв”Ђ */
 @media (max-width:1000px){
   #stage-results .results-content{padding:28px 16px 60px}
   #stage-results .cert-header,#stage-results .band-side{padding-left:26px;padding-right:26px}
@@ -2779,10 +2759,10 @@ body.cosmos-cert #stage-results .review-cta .btn-primary{color:#0f141c}
   #stage-results .topbar{height:auto;min-height:56px;flex-wrap:wrap;gap:10px;padding:10px 16px}
 }
 
-/* ── DARK MODE ────────────────────────────────────────────────
+/* в”Ђв”Ђ DARK MODE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The chamber behind the document is already night; the document itself
    becomes warm ink on charcoal rather than a white slab burning a hole in
-   it. Only the tokens move — every rule above is written against them, so
+   it. Only the tokens move вЂ” every rule above is written against them, so
    the layout, the tier chrome and the navy score panel are untouched.     */
 body.cosmos-cert #stage-results .cert{
   --c-paper:#1c1815;--c-paper-2:#241e19;--c-paper-3:#221c18;--c-paper-4:#1e1915;
@@ -2822,19 +2802,19 @@ body.cosmos-cert #stage-results .cc-tag.focus{color:#e8c68d;background:rgba(224,
 body.cosmos-cert #stage-results .cert[data-tier="high"]{--acc-ink:#e2c48a}
 body.cosmos-cert #stage-results .cert[data-tier="mid"]{--acc-ink:#dcb87f}
 
-/* ── SEPIA ── the document warms to the same paper the reader is on */
+/* в”Ђв”Ђ SEPIA в”Ђв”Ђ the document warms to the same paper the reader is on */
 body.theme-sepia #stage-results .cert{
   --c-paper:#fffdf6;--c-paper-2:#f6eedb;--c-paper-3:#f9f2e2;--c-paper-4:#f3ead6;
   --c-ink:#31251a;--c-ink-2:#5c4c38;--c-ink-3:#8b7a62;
   --c-line:rgba(49,37,26,.12);--c-line-2:rgba(49,37,26,.20);--c-track:rgba(49,37,26,.09);
   background:var(--c-paper);border-color:#e0d3ba}
 
-/* ── The printable report ─────────────────────────────────────
+/* в”Ђв”Ђ The printable report в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Paper is the second product, and the screen certificate is never what gets
    printed: buildPrintReport() typesets a two-page ink version in #print-report
    (page 1 the Test Report Form, page 2 the Schedule of Answers) and this block
-   makes sure nothing else reaches the sheet — no dark panel, no chamber, no
-   overlay — whatever theme the screen happened to be in.                     */
+   makes sure nothing else reaches the sheet вЂ” no dark panel, no chamber, no
+   overlay вЂ” whatever theme the screen happened to be in.                     */
 #print-report{display:none}
 @media print{
   @page{size:A4;margin:14mm 15mm 12mm}
@@ -2855,7 +2835,7 @@ body.theme-sepia #stage-results .cert{
 }
 /* Off-screen measuring pass: buildPrintReport() lays the pages out at true A4
    content width, measures them, and tightens the schedule until each fits its
-   sheet — so the report is two pages for any real attempt. */
+   sheet вЂ” so the report is two pages for any real attempt. */
 #print-report.pr-measuring{display:block!important;position:fixed!important;left:-20000px!important;top:0!important;
   width:180mm!important;visibility:hidden!important;pointer-events:none!important;z-index:-1!important;background:#fff!important}
 #print-report.pr-measuring .print-page{min-height:0!important;height:auto!important;break-after:auto!important}
@@ -2863,7 +2843,7 @@ body.theme-sepia #stage-results .cert{
 
 
 
-/* --- ANSWER FEEDBACK CHIP — ported from the Listening engine --------------
+/* --- ANSWER FEEDBACK CHIP вЂ” ported from the Listening engine --------------
    The badge states the verdict; the field beside it is green because it holds
    the CORRECT answer. A wrong answer therefore reads as a crimson badge next
    to a green field, not as a red block. */
@@ -2902,7 +2882,7 @@ body.theme-sepia .feedback-pill .fb-no{background:#b03521}
 
 
 /* --- submit confirmation: armed state + the toast ------------------------
-   The ✓ button previously set inline background/colour, which no theme layer
+   The вњ“ button previously set inline background/colour, which no theme layer
    could reach. It now carries .sub-armed, and the toast picks up the chamber
    glass so the warning reads as part of the same system. */
 #sub-btn.sub-armed{
@@ -2932,8 +2912,8 @@ body.theme-sepia .feedback-pill .fb-no{background:#b03521}
 .toast.error{border-color:rgba(225,29,60,.6)}
 body.theme-sepia .toast{background:linear-gradient(180deg,#3a2c1a,#2b2013);border-color:rgba(255,255,255,.14);color:#f5efe4}
 
-/* ============================================================================
-   DARK MODE + SEPIA — the exam screen        [PORTED VERBATIM: Listening]
+/* ======
+   DARK MODE + SEPIA вЂ” the exam screen        [PORTED VERBATIM: Listening]
    ----------------------------------------------------------------------------
    The Inspera-fidelity work hard-codes literal colours (#fff, #000, rgb(241,
    242,236)...) which a variable flip cannot reach. This is Listening's matching
@@ -2942,15 +2922,13 @@ body.theme-sepia .toast{background:linear-gradient(180deg,#3a2c1a,#2b2013);borde
      .listening-content -> .passage-text    .ms-option -> .multi-opts .option
      .drag-chip -> .word-tile               .drag-drop -> .drop-zone
    Placed last so it wins over Reading's own dark rules at equal specificity.
-   ========================================================================== */
-/* ============================================================================
-   DARK MODE — the exam screen
+/* ======
+   DARK MODE вЂ” the exam screen
    ----------------------------------------------------------------------------
    The Inspera-fidelity work hard-codes literal colours (#fff, #000,
    rgb(241,242,236) ...) which a variable flip cannot reach. This is the
    matching dark layer for those literals. Light mode is untouched: every rule
    below is scoped under body.dark-mode.
-   ========================================================================== */
 body.dark-mode{
   --ex-ground:#121417;
   --ex-panel:#1c1f24;
@@ -3027,16 +3005,15 @@ body.dark-mode #sub-btn{background:var(--ex-panel-2);color:var(--ex-ink-2)}
 /* --- audio gate ---------------------------------------------------------- */
 body.dark-mode #ag-play-btn{background:var(--ex-panel-2)}
 
-/* the question body is flat in the real exam — no panel edge */
+/* the question body is flat in the real exam вЂ” no panel edge */
 body.dark-mode .q-card{background:transparent;border-color:var(--ex-line)}
 body.dark-mode .passage-text{background:transparent}
 
 
-/* ============================================================================
-   SEPIA — same root cause as dark mode.
+/* ======
+   SEPIA вЂ” same root cause as dark mode.
    It is one click away in the same Options menu, so it needs the same layer for
    the hard-coded Inspera literals, in a warm palette.
-   ========================================================================== */
 body.theme-sepia{
   --sp-ground:#f5f0e8; --sp-panel:#ece3d3; --sp-panel-2:#fffdf8;
   --sp-line:#d9cbb0; --sp-line-2:#b9a685;
@@ -3111,14 +3088,13 @@ body.theme-sepia .heading-tile:hover,body.theme-sepia .word-tile:hover{backgroun
 
 
 
-/* ============================================================================
-   READING-ONLY UI — brought onto the Listening design language
+/* ======
+   READING-ONLY UI вЂ” brought onto the Listening design language
    ----------------------------------------------------------------------------
    Listening has no notes drawer, note modal or vocab button, so there is no
-   markup to transplant: what is shared is the vocabulary — chamber glass for
+   markup to transplant: what is shared is the vocabulary вЂ” chamber glass for
    floating surfaces, and the crimson / glass / gold-hairline pill set for
    actions. Every literal here carries a dark-mode and a theme-sepia counterpart.
-   ========================================================================== */
 
 /* --- the pill set: crimson (primary) / glass (ghost) / gold hairline ------- */
 :is(.ca-btn,.nm-btn,.rsm-btn,.wc-btn){
@@ -3142,10 +3118,10 @@ body.theme-sepia .heading-tile:hover,body.theme-sepia .word-tile:hover{backgroun
    dark navy by design (Inspera fidelity), and its own .hdr-icon-btn rules
    already render the buttons light-on-dark. The pill treatment written here
    earlier assumed a light header and painted dark-blue text on a near-white
-   fill — invisible against the real header. Reverted. */
+   fill вЂ” invisible against the real header. Reverted. */
 /* --- notes drawer + note modal: floating surfaces read as glass ----------- */
 /* Measured: #annotations-sidebar is 300 x 900 at x=1140 on a flat #e8e8e8.
-   The shadow must not be painted while the drawer is parked off-screen — a
+   The shadow must not be painted while the drawer is parked off-screen вЂ” a
    52px blur on a fixed element bleeds a grey gradient down the whole right
    edge of the exam, which the official player does not have. */
 .notes-drawer{
@@ -3215,9 +3191,9 @@ body.theme-sepia #note-textarea{background:#fffdf8;border-color:#b9a685;color:#3
 
 /* --- .option: the base fill is a hard-coded #fff with no themed counterpart,
    so in dark mode the answer rows stayed white slabs and :hover flashed
-   #e8e8e8 — a near-white bar on a black page. Both need a themed pair. ----- */
+   #e8e8e8 вЂ” a near-white bar on a black page. Both need a themed pair. ----- */
 /* Literal colours, not var() references. NOTE: do not write the token family
-   names with a star-slash between them in a comment here — that sequence ends
+   names with a star-slash between them in a comment here вЂ” that sequence ends
    the comment early, which is exactly what silently killed these rules once:
    everything after it became stray CSS and the next rules were swallowed as
    the body of a bogus selector. Values match the dark/sepia token sets. */
@@ -3339,8 +3315,8 @@ body.theme-sepia .hl-popup::before{border-bottom-color:var(--sp-line-2)}
 body.theme-sepia .hl-popup .tool-btn,body.theme-sepia .hl-popup .tool-btn span{color:var(--sp-ink-2)}
 body.theme-sepia #sub-btn{background:var(--sp-panel);color:var(--sp-ink-2)}
 
-/* ============================================================================
-   OPTIONS / MESSAGES — the official full-screen pages
+/* ======
+   OPTIONS / MESSAGES вЂ” the official full-screen pages
    ----------------------------------------------------------------------------
    Measured on the live player: an 80px top bar with a 27.2px centred "Options"
    title and a 66.7px close button at x=1360; a 732px content area at x=354 with
@@ -3348,7 +3324,6 @@ body.theme-sepia #sub-btn{background:var(--sp-panel);color:var(--sp-ink-2)}
    with padding 26.4px 44px 26.4px 35.2px at 17.6px Arial. The first row is the
    red (#e31837) "Go to submission page"; Contrast and Text size open sub-pages.
    Ported from the shipped Writing build and re-scoped to #stage-reading.
-   ========================================================================== */
 #stage-reading .ex-sheet{
   position:fixed;inset:0;z-index:900;display:none;flex-direction:column;
   background:#fff;color:#000;font-family:Arial,sans-serif;overflow-y:auto}
@@ -3409,17 +3384,16 @@ body.theme-sepia #stage-reading .ex-opt-item{background:var(--sp-panel-2);color:
 body.theme-sepia #stage-reading .ex-opt-item:hover{background:var(--sp-panel)}
 body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
 
-/* ============================================================================
-   CDI V3 COSMIC SHELL — the CDI-branded wrapper that surrounds the live exam.
+/* ======
+   CDI V3 COSMIC SHELL вЂ” the CDI-branded wrapper that surrounds the live exam.
    [PORTED FROM: the Writing master. Same shell, Reading's content.]
    Owns #stage-registration, #stage-reading-intro, #stage-completion and the
    Three.js particle canvas. Nothing in here may leak into #stage-reading: the
    exam screen is 100% Arial and faithful to the Inspera measurements, and this
    block is the CDI half of that boundary (the reference spec is no longer in this folder).
-   It is the LAST block in the stylesheet on purpose — the dark-mode and sepia
+   It is the LAST block in the stylesheet on purpose вЂ” the dark-mode and sepia
    rules further up still name .start-card / .trans-card / .complete-card, and
    the shell has to win against them.
-   ========================================================================== */
 :root{
   --ch-ink:#f4f7ff;--ch-ink-2:#b0bdd4;--ch-ink-3:#7e8da3;--ch-ink-4:#5f6c82;
   --ch-line:rgba(152,184,236,.13);--ch-line-2:rgba(152,184,236,.24);--ch-line-3:rgba(152,184,236,.34);
@@ -3432,7 +3406,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
   --ch-shadow:0 2px 8px rgba(0,0,0,.42),0 30px 70px -22px rgba(0,0,0,.72),0 90px 160px -60px rgba(18,48,108,.85);
 }
 
-/* ── stage shell ─────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ stage shell в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 :is(#stage-registration,#stage-reading-intro,#stage-completion){
   font-family:var(--ch-ui);color:var(--ch-ink-2);
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
@@ -3449,14 +3423,14 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
 :is(#stage-registration,#stage-reading-intro,#stage-completion)::before{
   display:block;content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   opacity:.42;mix-blend-mode:soft-light}
-/* vignette — replaces the old decorative ring */
+/* vignette вЂ” replaces the old decorative ring */
 :is(#stage-registration,#stage-reading-intro,#stage-completion)::after{
   content:"";position:absolute;left:0;top:0;width:auto;height:auto;inset:0;z-index:0;pointer-events:none;
   border:0;border-radius:0;transform:none;box-shadow:none;
   background:radial-gradient(76% 60% at 50% 44%,transparent 38%,rgba(2,4,10,.30) 74%,rgba(1,2,6,.72) 100%)}
 :is(#stage-registration,#stage-reading-intro,#stage-completion) > *{position:relative;z-index:2}
 
-/* ── the glass card ──────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ the glass card в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) :is(.start-card,.trans-card,.complete-card){
   position:relative;z-index:2;overflow:hidden;
   background:var(--ch-glass);
@@ -3475,7 +3449,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
   background:radial-gradient(120% 76% at 8% -6%,rgba(143,184,255,.10),transparent 58%),
              radial-gradient(90% 60% at 104% 108%,rgba(225,29,60,.07),transparent 62%)}
 
-/* ── shared type ─────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ shared type в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) :is(.start-title,.trans-title,.complete-title){
   font-family:var(--ch-display);font-weight:600;letter-spacing:-.024em;color:var(--ch-ink);
   font-optical-sizing:auto;text-wrap:balance}
@@ -3493,7 +3467,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
   font-family:var(--ch-ui);font-size:10.5px;font-weight:700;color:var(--ch-ink-3);
   border:1px solid var(--ch-line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;margin:0 1px}
 
-/* ── buttons ─────────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ buttons в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn{
   font-family:var(--ch-ui);position:relative;overflow:hidden;isolation:isolate}
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn-primary{
@@ -3516,7 +3490,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn-primary:focus-visible{
   outline:2px solid rgba(180,208,255,.9);outline-offset:3px}
 /* Dormant = "not yet", never "danger". Neutral glass that ignites into the
-   full red the instant the name is valid — the button itself is the reward. */
+   full red the instant the name is valid вЂ” the button itself is the reward. */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn-primary:disabled,
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn-primary.is-dormant{
   background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.028));
@@ -3541,7 +3515,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn:hover .ch-arrow{transform:translateX(4px)}
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn.is-dormant .ch-arrow{opacity:.55}
 
-/* ── telegram strip ──────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ telegram strip в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 :is(#stage-registration,#stage-completion) .channel-promo{
   display:flex;align-items:center;gap:14px;margin:0;border-radius:0;
   padding:14px clamp(20px,3.2vw,38px);
@@ -3564,7 +3538,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
 :is(#stage-registration,#stage-completion) .channel-promo:hover .channel-cta{
   background:rgba(255,255,255,.13);color:var(--ch-ink);border-color:var(--ch-line-3)}
 
-/* ══════════════════ REGISTRATION ══════════════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ REGISTRATION в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-registration{padding:clamp(14px,3.4vh,36px) clamp(12px,3.2vw,40px);align-items:center;justify-content:center;overflow-y:auto}
 #stage-registration .start-card{width:100%;max-width:940px;padding:0;margin:auto}
 .ch-grid{display:grid;grid-template-columns:minmax(0,.84fr) minmax(0,1fr);position:relative;z-index:1}
@@ -3602,7 +3576,7 @@ body.theme-sepia #stage-reading .ex-opt-group{border-color:var(--sp-line)}
 #ch-strike{position:absolute;left:0;right:0;top:50%;height:0;z-index:1;pointer-events:none;
   display:flex;align-items:center;justify-content:center;opacity:0}
 /* Width is derived, not guessed. The WebGL filament is 12.7 world units long,
-   seen by a 50° camera at z=19.5 — which works out to exactly 0.699 × the
+   seen by a 50В° camera at z=19.5 вЂ” which works out to exactly 0.699 Г— the
    viewport HEIGHT on screen, at any aspect ratio. Matching that here means the
    CSS stroke and the particle stroke are the same object, and the hand-off
    between them is invisible on a phone as well as on a 5K display. */
@@ -3618,7 +3592,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 @keyframes chStrikeDraw{from{transform:scaleX(.02)}to{transform:scaleX(1)}}
 
 /* The boot's climax: the imploding core detonates and the light washes ACROSS
-   the card that is materialising out of it — screen-blended, above everything,
+   the card that is materialising out of it вЂ” screen-blended, above everything,
    inert to the pointer. This is the single frame the whole prelude aims at. */
 #ch-bloom{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:6;
   mix-blend-mode:screen;will-change:opacity,transform;
@@ -3689,7 +3663,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}100%{transform:none}}
 #stage-registration #start-btn{margin:18px 0 0;width:100%}
 
-/* ══════════════════ INSTRUCTIONS ══════════════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ INSTRUCTIONS в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-reading-intro{padding:clamp(14px,3.4vh,36px) clamp(12px,3.2vw,40px);align-items:center;justify-content:center;overflow-y:auto}
 /* 800 rather than Writing's 720: the briefing carries three passage cards
    where Writing carries two tasks, and at 720 each one wrapped to five lines. */
@@ -3727,7 +3701,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
   background:rgba(143,184,255,.5);box-shadow:0 0 8px rgba(143,184,255,.5)}
 #stage-reading-intro .btn-lg{margin-top:clamp(18px,2.4vw,26px)}
 
-/* ══════════════════ COMPLETION ══════════════════ */
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ COMPLETION в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-completion{padding:clamp(14px,3.4vh,36px) clamp(12px,3.2vw,40px);align-items:center;justify-content:center;overflow-y:auto}
 #stage-completion .complete-card{width:100%;max-width:680px;margin:auto;padding:0;text-align:left}
 .ch-comp-body{padding:clamp(26px,3.4vw,42px) clamp(22px,3.4vw,44px) clamp(22px,2.8vw,32px);position:relative;z-index:1}
@@ -3787,8 +3761,8 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 #stage-completion .ch-sign{margin-top:13px!important;padding-top:12px;border-top:1px solid var(--ch-line);
   font-size:11.5px;color:var(--ch-ink-4);letter-spacing:.01em}
 #stage-completion .ch-sign strong{color:var(--ch-ink-2);font-weight:700}
-/* The button's slot is reserved from the first frame — the card must not jump
-   when marking finishes — and the space is *used* while it waits, rather than
+/* The button's slot is reserved from the first frame вЂ” the card must not jump
+   when marking finishes вЂ” and the space is *used* while it waits, rather than
    sitting there as a hole under the copy. */
 .ch-cta-slot{position:relative;margin-top:20px;min-height:50px;display:flex;align-items:center}
 .ch-wait{position:absolute;inset:0;margin:0;display:flex;align-items:center;justify-content:center;
@@ -3805,7 +3779,7 @@ body.cdi-atmo #ch-strike,body.cdi-reveal #ch-strike{animation:none;opacity:0;tra
 .ch-steps li.now .ch-step-dot{border-color:rgba(143,184,255,.38);animation:chPulse 1.5s ease-out infinite}
 #stage-completion.is-sealed .ch-steps li.now .ch-step-dot{animation:none}
 
-/* ── boot & entrance choreography ────────────────────────────────────────── */
+/* в”Ђв”Ђ boot & entrance choreography в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 #cdi-webgl{transition:opacity .45s ease}
 body.cdi-exit #stage-reading-intro .trans-card{
   opacity:0;transform:translate3d(0,-8px,0) scale(.992);filter:blur(5px);
@@ -3861,13 +3835,13 @@ body.cdi-3d-on #stage-completion.cdi-enter .ch-note{animation-delay:.34s}
 body.cdi-3d-on #stage-completion.cdi-enter .channel-promo{animation-delay:.42s}
 body.cdi-3d-on :is(.start-card,.trans-card,.complete-card){box-shadow:var(--ch-shadow)}
 
-/* ── warning overlay keeps the cosmic glass ──────────────────────────────── */
+/* в”Ђв”Ђ warning overlay keeps the cosmic glass в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 .warning-overlay{background:rgba(3,6,12,.74);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .warning-card{background:var(--ch-glass);border:1px solid var(--ch-line-2);border-top:3px solid var(--ch-red);border-radius:18px;box-shadow:var(--ch-shadow);-webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3)}
 .warning-card h2{color:var(--ch-ink)}.warning-card p{color:var(--ch-ink-2)}.warning-card #warning-strikes-text{color:var(--ch-ink-3)!important}.warning-card .strike-counter .strike{border-color:var(--ch-line-2)}.warning-card .strike-counter .strike.on{background:var(--ch-red);border-color:var(--ch-red)}.warning-card .btn-primary{background:linear-gradient(180deg,#f4304f,#c9142f);border-radius:12px;border:none;color:#fff}
 body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion){background:radial-gradient(128% 78% at 50% 122%,rgba(31,74,150,.62),transparent 62%),linear-gradient(180deg,#070b16,#03060c)}
 
-/* ── responsive ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ responsive в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 @media (max-width:900px){
   .ch-grid{grid-template-columns:1fr}
   #stage-registration .start-card{max-width:540px}
@@ -3877,8 +3851,8 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion){b
   .ch-field{margin-top:20px}
   .ch-tasks{grid-template-columns:1fr}
 }
-/* Phones. The single thing that matters here is that the *action* — the name
-   field and the button, or Begin writing — is not pushed below the fold by
+/* Phones. The single thing that matters here is that the *action* вЂ” the name
+   field and the button, or Begin writing вЂ” is not pushed below the fold by
    the editorial half of the card. Everything above it gets compressed hard. */
 @media (max-width:600px){
   #stage-registration{padding:10px}
@@ -3929,7 +3903,7 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion){b
   .ch-credit{display:none}
   .ch-comp-head{flex-direction:column;align-items:flex-start;gap:12px}
 }
-/* Short laptops — 1280×720 and the like. */
+/* Short laptops вЂ” 1280Г—720 and the like. */
 @media (max-height:640px) and (min-width:601px){
   #stage-registration .ch-lede{display:none}
   #stage-reading-intro .trans-card{padding-top:24px;padding-bottom:22px}
@@ -3941,7 +3915,7 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion){b
   #stage-completion .complete-card{max-width:740px}
 }
 /* Ultra-wide / 5K. Almost every size in this shell is authored in px so it
-   holds its proportions against the exam's fixed Arial metrics — which means
+   holds its proportions against the exam's fixed Arial metrics вЂ” which means
    nothing grows on a 3440px display unless it is told to. Rather than let the
    card sit marooned in the middle of the screen, the whole scale steps up one
    notch. Widths still stop well short of the viewport: this is a dialogue,
@@ -4002,7 +3976,7 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion){b
   #stage-registration .start-rules li{margin-bottom:8px}
 }
 
-/* ── reduced motion ──────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ reduced motion в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 @media (prefers-reduced-motion:reduce){
   body.cdi-booting #stage-registration .start-card{opacity:1;transform:none;filter:none;pointer-events:auto}
   #cdi-webgl,#ch-strike,#ch-bloom{display:none!important}
@@ -4010,11 +3984,11 @@ body.dark-mode :is(#stage-registration,#stage-reading-intro,#stage-completion){b
   .ch-cta{opacity:1;transform:none;pointer-events:auto}
 }
 
-/* ── Reading's own adaptations of the shell ──────────────────────────────── */
+/* в”Ђв”Ђ Reading's own adaptations of the shell в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 /* Three passages, not two tasks: the briefing grid runs to three columns and
    the entrance stagger gains a third beat. Three cards also means three
    different body lengths, so the question-range footers are pushed to the
-   bottom of each card — otherwise they step down the row like a staircase. */
+   bottom of each card вЂ” otherwise they step down the row like a staircase. */
 .ch-tasks{grid-template-columns:repeat(3,minmax(0,1fr))}
 .ch-task{display:flex;flex-direction:column}
 .ch-task p{flex:1 1 auto}
@@ -4033,8 +4007,8 @@ body.cdi-3d-on #stage-reading-intro.cdi-enter .ch-fineprint{animation-delay:.60s
 }
 /* Phones. Writing's briefing has two task cards and its "Begin writing" button
    still lands above the fold; three passage cards push it under. So on a phone
-   each card collapses to one line — the passage, its budget and its question
-   range — and the strategy notes underneath carry what the descriptions said. */
+   each card collapses to one line вЂ” the passage, its budget and its question
+   range вЂ” and the strategy notes underneath carry what the descriptions said. */
 @media (max-width:600px){
   .ch-task{flex-direction:row;align-items:baseline;justify-content:space-between;
     gap:10px;padding:12px 14px}
@@ -4043,28 +4017,28 @@ body.cdi-3d-on #stage-reading-intro.cdi-enter .ch-fineprint{animation-delay:.60s
   .ch-task-f{border-top:0;padding-top:0;margin:0;white-space:nowrap}
 }
 
-/* ── the WebGL host, and how the three layers stack ──────────────────────── */
+/* в”Ђв”Ђ the WebGL host, and how the three layers stack в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 /* THE GROUND IS CSS, THE PARTICLES ARE GL, THE CARD IS ON TOP.
-   The particle field is additive light on a transparent canvas — it carries no
-   backdrop of its own — so the deep-space ground is painted by the stage's own
+   The particle field is additive light on a transparent canvas вЂ” it carries no
+   backdrop of its own вЂ” so the deep-space ground is painted by the stage's own
    gradient (see the stage shell above) and the canvas has to sit ABOVE that
    background and BELOW the card. That only works if the wrapper stages create
    no stacking context of their own, which is why the z-index:25 they are given
    further up (for the previous generation of this layer, whose canvas sat at
    z-index 2 *under* the stages, forcing every wrapper stage transparent and
    leaving the ground to a backdrop shader) is released here.
-   Paint order becomes: stage background → #cdi-webgl (1) → stage children (2).
+   Paint order becomes: stage background в†’ #cdi-webgl (1) в†’ stage children (2).
    #stage-reading is not involved: it has no z-index, and the canvas is
    display:none for the whole time it is on screen. */
 #cdi-webgl{position:fixed;inset:0;z-index:1;pointer-events:none;user-select:none;
   overflow:hidden;contain:strict;opacity:0;transition:opacity .45s ease}
 #cdi-webgl canvas{display:block;width:100%;height:100%;pointer-events:none}
-/* ── COSMIC DUST ──────────────────────────────────────────────────────────────
+/* в”Ђв”Ђ COSMIC DUST в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The field's own host, not a child of #cdi-webgl: that host is destroyed when
    THREE is missing, when WebGL is unavailable, and under prefers-reduced-motion,
    and the background has to survive all three. z-index 0 puts it under the
    wrapper stages (z-index:auto, now transparent) and so under their cards at
-   z-index 2. Shown only while a wrapper stage is .active — the same hard
+   z-index 2. Shown only while a wrapper stage is .active вЂ” the same hard
    cut-off the exam has always had. */
 #cdi-stars-host{position:fixed;inset:0;z-index:0;display:none;pointer-events:none;
   overflow:hidden;contain:strict;
@@ -4074,7 +4048,7 @@ body.cdi-3d-on #stage-reading-intro.cdi-enter .ch-fineprint{animation-delay:.60s
     radial-gradient(46% 40% at 58% 18%,rgba(86,52,38,.24),transparent 64%),
     radial-gradient(70% 55% at 62% 104%,rgba(120,78,44,.20),transparent 62%),
     linear-gradient(180deg,#0F111B 0%,#05070E 52%,#010006 100%)}
-/* The fine dust is one seamless tile drifting on a GPU transform — 400,000-odd
+/* The fine dust is one seamless tile drifting on a GPU transform вЂ” 400,000-odd
    points that never cost a repaint. Oversized and offset so the translate never
    exposes an edge; it travels exactly one tile period, so the loop is seamless. */
 #cdi-stars-host .cdi-dust{position:absolute;left:-512px;top:-512px;
@@ -4099,7 +4073,7 @@ body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#s
 body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#stage-results)::before{
   display:none !important;
 }
-/* #stage-results is B3's certificate and is left alone — but the chamber floor
+/* #stage-results is B3's certificate and is left alone вЂ” but the chamber floor
    it has always been printed on used to come from the old scene's backdrop
    shader, which this layer does not have. So the same ground is painted here
    in CSS, and the certificate lands on it unchanged. */
@@ -4119,7 +4093,7 @@ body.cdi-booting{overflow:hidden}
 body.cdi-booting #stage-registration .start-card,
 body.cdi-booting #ch-strike,body.cdi-booting #ch-bloom{pointer-events:none}
 
-/* ── the toast, id-scoped ────────────────────────────────────────────────── */
+/* в”Ђв”Ђ the toast, id-scoped в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 /* A later block in this stylesheet (owned by the exam-screen pass) restyles
    `.toast`; these are id-weighted so the CDI toast stays one object across
    every screen it can appear on. */
@@ -4144,7 +4118,7 @@ body.cdi-booting #ch-strike,body.cdi-booting #ch-bloom{pointer-events:none}
 #toast.warn{border-color:rgba(193,154,75,.42)}
 #toast.warn .t-ic{background:rgba(193,154,75,.24);color:#e8c88b}
 
-/* ── the resume sheet ────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ the resume sheet в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 /* Dormant in this build (init() always starts fresh, exactly as Writing and
    Listening do), but it is DOM that can be shown again in one line, so it is
    dressed in the shell's language rather than left as the old white card. */
@@ -4168,7 +4142,7 @@ body.cdi-booting #ch-strike,body.cdi-booting #ch-bloom{pointer-events:none}
 #resume-sheet .rsm-btn.ghost:hover{background:rgba(255,255,255,.10);color:var(--ch-ink)}
 #resume-sheet .rsm-warn{margin:14px 0 0;font-family:var(--ch-ui);font-size:11px;color:var(--ch-ink-4)}
 
-/* ── print: the report prints as flat paper, never as the chamber ───────── */
+/* в”Ђв”Ђ print: the report prints as flat paper, never as the chamber в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 @media print{
   #cdi-webgl,#cdi-stars-host,#ch-strike,#ch-bloom{display:none !important}
   body.cdi-3d-on :is(#stage-registration,#stage-reading-intro,#stage-completion,#stage-results){
@@ -4181,14 +4155,14 @@ body.cdi-booting #ch-strike,body.cdi-booting #ch-bloom{pointer-events:none}
 }
 
 
-/* ════════════════════════════════════════════════════════════════════
-   REVIEW LAYER — design pass
-   ════════════════════════════════════════════════════════════════════
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   REVIEW LAYER вЂ” design pass
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
    Review mode is the exam screen, unlocked. Nothing here changes where
    anything sits: the passage is still on the left, the questions still on
    the right, the reveal is still inline on the question the student
    answered, and the explanation still opens under its own button. What
-   changes is only the finish — the annotation furniture now speaks the
+   changes is only the finish вЂ” the annotation furniture now speaks the
    language of the certificate and the wrapper screens instead of the
    half-dozen unrelated accents it had accumulated.
 
@@ -4198,27 +4172,27 @@ body.cdi-booting #ch-strike,body.cdi-booting #ch-bloom{pointer-events:none}
       with `!important` (`body.dark-mode .option{background:#1c1f24!important}`,
       the sepia twin, and the same for gap inputs, drop zones, heading slots
       and the matching grid). Correct green and wrong crimson were therefore
-      erased outright in both themes — a student reviewing in dark saw ticks
+      erased outright in both themes вЂ” a student reviewing in dark saw ticks
       and crosses floating over rows that all looked identical. Every reveal
       below is restated at a specificity and importance that survives those
       skins, and every colour comes from a token that has a value in all
       three themes.
 
    2. Colour alone is a weak signal at these tints, so each revealed row also
-      carries a 3px inset rule in its verdict colour — the same device the
+      carries a 3px inset rule in its verdict colour вЂ” the same device the
       matching grid already used for its rows. It reads at a glance and it
       survives a low-contrast screen.
 
    SCOPE: every selector starts with body.review-mode. The exam screen is
    pixel-matched to the official player and must not shift by a subpixel;
    nothing here can reach it, because the class is only ever added by
-   reviewExam(). ═══════════════════════════════════════════════════════ */
+   reviewExam(). в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 
 body.review-mode{
   /* verdicts */
   --rvw-ok:#1F7A43;   --rvw-ok-wash:#F0F7F2;  --rvw-ok-line:rgba(31,122,67,.30);
   --rvw-no:#C41230;   --rvw-no-wash:#FDF3F4;  --rvw-no-line:rgba(196,18,48,.26);
-  /* the explanatory voice — the certificate's navy, never the exam's #418EC8 */
+  /* the explanatory voice вЂ” the certificate's navy, never the exam's #418EC8 */
   --rvw-key:#1F4782;  --rvw-key-wash:#F4F7FB;
   /* surfaces + ink, mirroring the wrapper's white / near-white / hairline set */
   --rvw-paper:#FFFFFF; --rvw-surface:#FAFAFA;
@@ -4253,12 +4227,12 @@ body.review-mode.theme-sepia{
   --rvw-e2:0 1px 2px rgba(90,70,50,.08),0 12px 30px -14px rgba(90,70,50,.28);
 }
 
-/* ── the header, in review ─────────────────────────────────────────────
+/* в”Ђв”Ђ the header, in review в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The clock is meaningless once the paper is marked, and "60 minutes left"
    above a finished script is simply untrue. The original hid it; the merged
    header's #hdr .timer (1 id) outranked that rule, so it came back. It is
-   hidden again, and the slot it occupied — same 8px/32px offsets, same
-   baseline — now names the mode instead of leaving a gap. */
+   hidden again, and the slot it occupied вЂ” same 8px/32px offsets, same
+   baseline вЂ” now names the mode instead of leaving a gap. */
 body.review-mode #hdr .timer{display:none !important}
 /* The header warms to #f2f2eb inside the last ten minutes of the paper. A
    script submitted with nine minutes left carries .ex-time-low into review,
@@ -4277,7 +4251,7 @@ body.review-mode #hdr-left::after{
   white-space:nowrap;
 }
 
-/* ── the revealed answer rows ──────────────────────────────────────────
+/* в”Ђв”Ђ the revealed answer rows в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The wash says which row is which; the inset rule says it again in a way
    that survives a dim screen and a colour-blind reader's green/red. Both
    are !important because the dark and sepia exam skins repaint .option
@@ -4295,7 +4269,7 @@ body.review-mode .option.correct .opt-letter{
 body.review-mode .option.wrong .opt-letter{
   background:var(--rvw-no) !important; border-color:var(--rvw-no) !important; color:#fff !important}
 /* A correct pick keeps .selected as well, and the exam's own
-   .tfn-opts/.multi-opts .selected fill is one class heavier than .correct —
+   .tfn-opts/.multi-opts .selected fill is one class heavier than .correct вЂ”
    which is why a question the student got RIGHT used to stay exam-blue while
    a wrong one turned pink. Verdict outranks selection in review. */
 body.review-mode .tfn-opts .option.correct,
@@ -4303,12 +4277,12 @@ body.review-mode .multi-opts .option.correct{background:var(--rvw-ok-wash) !impo
 body.review-mode .tfn-opts .option.wrong,
 body.review-mode .multi-opts .option.wrong{background:var(--rvw-no-wash) !important}
 
-/* ── the verdict chip ──────────────────────────────────────────────────
+/* в”Ђв”Ђ the verdict chip в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Was a green capsule carrying a crimson badge and green answer text: at a
    glance a wrong answer read as a right one, and the one genuinely coloured
    thing (the verdict) was the smallest. Now the verdict is the ONLY colour,
    and the key answer beside it is set in the certificate's data serif, in
-   ink — the same pairing the score report uses for a status dot and a figure.
+   ink вЂ” the same pairing the score report uses for a status dot and a figure.
    A correct answer needs no key, so it is the bare tick with no chrome. */
 body.review-mode .feedback-pill{
   margin-left:10px; padding:0; border-radius:999px;
@@ -4335,12 +4309,12 @@ body.review-mode .feedback-pill .fb-ans{
   white-space:normal; overflow-wrap:anywhere; max-width:30ch; text-align:left;
 }
 
-/* ── the explanation button ────────────────────────────────────────────
+/* в”Ђв”Ђ the explanation button в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    A control, so it takes the wrapper's control radius and its restrained
    white-on-hairline resting state; open, it fills with the certificate's
    navy. The label is the same letterspaced micro-caps the score report uses
    for CANDIDATE / MODULE / OVERALL BAND. The lightbulb is a drawn stroke
-   icon rather than the 💡 emoji it used to be — an emoji renders as a
+   icon rather than the рџ’Ў emoji it used to be вЂ” an emoji renders as a
    different picture on every OS and belongs to no design. */
 body.review-mode .explain-btn,
 body.review-mode .explain-btn-sm{
@@ -4374,13 +4348,13 @@ body.review-mode .explain-btn-sm:focus-visible{
 body.review-mode .explain-trigger-row{
   border-top:1px solid var(--rvw-line); margin-top:12px; padding:11px 0 2px; gap:5px}
 
-/* ── the explanation panel ─────────────────────────────────────────────
+/* в”Ђв”Ђ the explanation panel в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    A card in the wrapper's idiom: white paper, hairline, card radius, the
    two-step elevation, and one navy edge to tie it to the button that opened
    it. The title is a micro-cap rule; the body is the wrapper's UI face at
    reading size. NB font-size for .ep-text and .pb-row is owned by the
    text-zoom block near the top of this stylesheet, which writes it with
-   !important — --base-size is the only lever, so that is what is set here. */
+   !important вЂ” --base-size is the only lever, so that is what is set here. */
 body.review-mode .explain-panel{
   margin-top:10px;
   padding:14px 16px 15px;
@@ -4408,8 +4382,8 @@ body.review-mode .explain-panel .ep-text strong{color:var(--rvw-ink); font-weigh
 body.review-mode .explain-panel .ep-text em,
 body.review-mode .explain-panel .ep-text i{color:var(--rvw-ink); font-style:italic}
 
-/* ── the synonym map ───────────────────────────────────────────────────
-   Was outlined in IELTS red with red row rules — the accent this file
+/* в”Ђв”Ђ the synonym map в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+   Was outlined in IELTS red with red row rules вЂ” the accent this file
    reserves for the brand, spent on a table of word pairs. Now a plain
    hairline card: the question's wording on the left in ink, the passage's
    wording on the right in navy, one hairline between rows. */
@@ -4433,11 +4407,11 @@ body.review-mode .pb-q{color:var(--rvw-ink-2); font-weight:600; text-align:right
 body.review-mode .pb-icon{color:var(--rvw-ink-3); font-weight:400; text-align:center}
 body.review-mode .pb-p{color:var(--rvw-key); font-weight:700}
 
-/* ── typed answers, dropdowns, drops and slots ─────────────────────────
+/* в”Ђв”Ђ typed answers, dropdowns, drops and slots в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Same verdict pair everywhere, and a wrong entry is struck through: the
    student's word stays legible as the thing they wrote, while the key sits
    in the chip beside it. Written with !important for the same reason the
-   option rows are — the themed exam skins repaint these too. */
+   option rows are вЂ” the themed exam skins repaint these too. */
 body.review-mode .gap-input.correct,
 body.review-mode .prose-gap .gap-input.correct{
   background:var(--rvw-ok-wash) !important; border-color:var(--rvw-ok) !important;
@@ -4471,7 +4445,7 @@ body.review-mode .para-heading-slot .slot-correct{color:var(--rvw-ok); font-weig
 body.review-mode .para-heading-slot .slot-tick{color:var(--rvw-ok)}
 body.review-mode .heading-explain-wrap{margin:0 0 8px}
 
-/* ── the matching grid ─────────────────────────────────────────────────
+/* в”Ђв”Ђ the matching grid в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The key cell and the student's pick, in the same two colours as
    everything else. The dark and sepia skins had no counterpart at all, so
    the grid reviewed as a blank sheet in both. */
@@ -4482,10 +4456,10 @@ body.review-mode .match-grid .mg-cell.cell-wrong::after{color:var(--rvw-no)}
 body.review-mode .match-grid tr.row-correct .mg-q{box-shadow:inset 3px 0 0 var(--rvw-ok)}
 body.review-mode .match-grid tr.row-wrong .mg-q{box-shadow:inset 3px 0 0 var(--rvw-no)}
 
-/* ── the highlights in the passage ─────────────────────────────────────
+/* в”Ђв”Ђ the highlights in the passage в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The evidence highlight used the exact yellow of the student's own
    highlighter, so the two were indistinguishable in the one place it
-   mattered. It keeps the yellow — the student is used to it — and gains a
+   mattered. It keeps the yellow вЂ” the student is used to it вЂ” and gains a
    navy rule under it, the colour of the panel that put it there. */
 body.review-mode .ep-highlight-src{
   background:var(--rvw-hl);
@@ -4543,10 +4517,10 @@ body.dark-mode .syn-note,body.dark-mode .sy-uz,body.dark-mode .sy-n{color:#a9a9a
 @media print{.syn-card{break-inside:avoid}}
 
 /* ---------- 2. cosmos-registration ---------- */
-/* ── COSMOS · the registration console ──────────────────────────────────────
+/* в”Ђв”Ђ COSMOS В· the registration console в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Two columns of copy became one small console, low on the frame, carrying
    only what a candidate needs in the ten seconds before they type their name.
-   Everything cut from here is said again on the briefing screen that follows —
+   Everything cut from here is said again on the briefing screen that follows вЂ”
    except the strike rule, which is the one thing nobody may meet by surprise,
    so it stays, in the fine print.
    Nothing is removed from the DOM: every id, handler and class the engine
@@ -4570,7 +4544,7 @@ body.dark-mode .syn-note,body.dark-mode .sy-uz,body.dark-mode .sy-n{color:#a9a9a
 /* the words the sky, the briefing screen or the field itself says better */
 #stage-registration :is(.brand-tagline,.ch-lede,.start-rules,.ch-label,.input-label,
   .ch-credit,.channel-promo .channel-desc,.channel-promo .channel-cta){display:none}
-/* the hint is the field's error channel — hidden until it has something to say,
+/* the hint is the field's error channel вЂ” hidden until it has something to say,
    which is the one thing that must not be lost by hiding copy here */
 #stage-registration .ch-hint{display:none;margin:8px 2px 0}
 #stage-registration .ch-field.is-invalid .ch-hint{display:flex}
@@ -4583,7 +4557,7 @@ body.dark-mode .syn-note,body.dark-mode .sy-uz,body.dark-mode .sy-n{color:#a9a9a
 #stage-registration .ch-kicker{font-size:9.5px;letter-spacing:.2em}
 #stage-registration .start-title{font-size:clamp(20px,1.9vw,25px);margin:6px 0 0!important;max-width:none}
 
-/* 60 · 40 · 3 as one line of reading, not a scoreboard */
+/* 60 В· 40 В· 3 as one line of reading, not a scoreboard */
 #stage-registration .start-meta{
   display:flex;flex-wrap:wrap;align-items:baseline;justify-content:flex-start;gap:5px 14px;
   margin:9px 0 0;padding:0;border:0;background:none;box-shadow:none}
@@ -4602,7 +4576,7 @@ body.dark-mode .syn-note,body.dark-mode .sy-uz,body.dark-mode .sy-n{color:#a9a9a
 #stage-registration .ch-fineprint{grid-column:1/-1;grid-row:2;text-align:left;
   margin:11px 2px 0;font-size:11px;line-height:1.5}
 
-/* the completion screen's own credit — "Built from scratch by …" — is the
+/* the completion screen's own credit вЂ” "Built from scratch by вЂ¦" вЂ” is the
    third wording of a line the candidate has already read twice */
 #stage-completion .ch-sign{display:none}
 
@@ -4610,20 +4584,20 @@ body.dark-mode .syn-note,body.dark-mode .sy-uz,body.dark-mode .sy-n{color:#a9a9a
    saveReportPdf() stays bound so Cmd/Ctrl+P still works */
 #results-print-btn{display:none}
 
-/* ── review chrome ──────────────────────────────────────────────────────────
-   the explanation chip keeps its shape — only its blue is brought into line */
+/* в”Ђв”Ђ review chrome в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+   the explanation chip keeps its shape вЂ” only its blue is brought into line */
 body.review-mode .explain-btn-sm{border-color:#c9d6ea;color:#2c5fa8}
 
-/* ── the certificate, staged for export ─────────────────────────────────────
+/* в”Ђв”Ђ the certificate, staged for export в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    PDFX moves #results-content off-screen at the printed column width and reads
    computed styles off it. Two things have to be true at that moment.
 
-   1 · Nothing may still be animating. The sheet arrives in parts on a certPart
+   1 В· Nothing may still be animating. The sheet arrives in parts on a certPart
        keyframe with `both` fill, so a section caught before its delay elapses
-       is read at opacity 0 and exports blank — the band note was coming out a
+       is read at opacity 0 and exports blank вЂ” the band note was coming out a
        ghost. Killing the animations lets every part sit at its resting state.
 
-   2 · The answer summary must keep its two columns. 180mm is narrow enough to
+   2 В· The answer summary must keep its two columns. 180mm is narrow enough to
        trip the stacked rule, which doubles the sheet's height and forces PDFX's
        fit-to-page backstop to shrink the whole certificate to about half size. */
 #results-content.pdfx-stage *,
@@ -4635,16 +4609,16 @@ body.review-mode .explain-btn-sm{border-color:#c9d6ea;color:#2c5fa8}
    button, and nobody can press it there */
 #results-content.pdfx-stage .review-cta{display:none!important}
 
-/* The review button was taking --acc-ink, which is the BAND TIER's accent —
+/* The review button was taking --acc-ink, which is the BAND TIER's accent вЂ”
    at band 0 that is a muted slate, so the only action on the page rendered as
    though it were disabled. The tier keeps the rules, the glow and the meta;
    the action takes the document's action blue at every band. */
 #stage-results .review-cta .btn-primary{background:#2c5fa8;color:#fff}
 #stage-results .review-cta .btn-primary:hover{background:#2a5899}
 
-/* ── the hand-off into the exam ──────────────────────────────────────────────
-   beginReading() already raises a curtain — body.cdi-exit, held for 380ms
-   before the stage swap — but it was written for the three.js layer this build
+/* в”Ђв”Ђ the hand-off into the exam в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+   beginReading() already raises a curtain вЂ” body.cdi-exit, held for 380ms
+   before the stage swap вЂ” but it was written for the three.js layer this build
    retires, so CDIAtmosphere.dim() fades nothing and the field stayed lit until
    the frame the exam replaced it. These hang the curtain on the field instead. */
 #cdi-stars-host{transition:opacity .24s ease}
@@ -4657,13 +4631,13 @@ body.cdi-exit{background:#fff}
 
 /* the stage's vignette goes with them. It is painted over the field, not by
    it, so on its own it survived the dissolve and left the white reveal with
-   grey corners — the ring of a room the exam is not in. */
+   grey corners вЂ” the ring of a room the exam is not in. */
 #stage-reading-intro::after{transition:opacity .24s ease}
 body.cdi-exit #stage-reading-intro::after{opacity:0}
 
 /* the exam then fades up over that ground rather than appearing between two
-   frames. Opacity only — no transform, nothing that moves type a student is
-   about to read — and it ends at 1, so the exam looks exactly as it always did
+   frames. Opacity only вЂ” no transform, nothing that moves type a student is
+   about to read вЂ” and it ends at 1, so the exam looks exactly as it always did
    from the moment it has settled. */
 @keyframes cdiExamIn{from{opacity:0}to{opacity:1}}
 #stage-reading.active{animation:cdiExamIn .2s ease both}
@@ -4673,7 +4647,7 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
   #stage-reading.active{animation:none}
 }
 
-/* ── the certificate, in Cosmos ──────────────────────────────────────────────
+/* в”Ђв”Ђ the certificate, in Cosmos в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Paper, not a black rectangle. What ties it to the field is the temperature
    and the light: the cream goes cool, the brown ink goes navy, and the sheet
    carries a deep wide shadow so it reads as lit paper held in front of the
@@ -4726,7 +4700,7 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 /* a short viewport has no room for a gap under the card */
 @media (max-height:620px){#stage-registration .start-card{margin-bottom:16px}}
 
-/* ── COSMOS · the briefing ──────────────────────────────────────────────────
+/* в”Ђв”Ђ COSMOS В· the briefing в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The screen between the name and the paper. Nobody reads three paragraphs of
    pacing advice with the clock about to start, so what survives is what they
    would actually look for: which passage holds which questions, and roughly
@@ -4767,7 +4741,7 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 #stage-reading-intro .btn-lg{height:46px;padding:0 20px;font-size:13.5px;border-radius:12px;margin-top:0}
 #stage-reading-intro .ch-fineprint{margin-top:10px;font-size:11px;line-height:1.5}
 
-/* The action was the loudest red on a screen made of starlight — it read as a
+/* The action was the loudest red on a screen made of starlight вЂ” it read as a
    warning rather than an invitation. The warning card keeps its red, because
    there the colour is the message. */
 :is(#stage-registration,#stage-reading-intro,#stage-completion) .btn-primary{
@@ -4787,10 +4761,10 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 }
 @media (max-height:620px){#stage-reading-intro .trans-card{margin-bottom:16px}}
 
-/* ── COSMOS · the completion console ────────────────────────────────────────
+/* в”Ђв”Ђ COSMOS В· the completion console в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The third screen in the same frame: same 600px, same place, same glass. What
-   goes is the paragraph of encouragement — nobody reads a pep talk with a band
-   score two seconds away — and the box it sat in; the signature survives as a
+   goes is the paragraph of encouragement вЂ” nobody reads a pep talk with a band
+   score two seconds away вЂ” and the box it sat in; the signature survives as a
    plain line. The three marking steps stay: they are not copy, they tick as the
    paper is actually marked, and they are the only thing on screen while it is. */
 #stage-completion .complete-card{
@@ -4834,15 +4808,15 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 #stage-completion .channel-promo .channel-name{font-size:11.5px;font-weight:600}
 #stage-completion :is(.channel-promo .channel-desc,.channel-promo .channel-cta){display:none}
 
-/* The marking ring ran blue → blue → #ff5c78. That last stop was the only warm
+/* The marking ring ran blue в†’ blue в†’ #ff5c78. That last stop was the only warm
    red left on any wrapper screen, and it sat inside the one element the eye is
    actually watching while it fills. SVG stops take CSS, so it retunes here. */
 #stage-completion #chSealGrad stop:last-child{stop-color:#cfe6ff}
 
 @media (max-height:620px){#stage-completion .complete-card{margin-bottom:16px}}
 
-/* ── COSMOS · the results topbar ────────────────────────────────────────────
-   The report itself is a paper document and stays paper — it is what the PDF
+/* в”Ђв”Ђ COSMOS В· the results topbar в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+   The report itself is a paper document and stays paper вЂ” it is what the PDF
    export writes. Only the bar above it is chrome, and its primary action was
    the last red button in the shell. The gold "New test" hairline is left alone:
    a warm accent belongs on a field this warm, and it is the one control that
@@ -4853,16 +4827,16 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 #stage-results .topbar .btn-primary:hover{
   background:linear-gradient(180deg,#3a93e4,#17609f)}
 
-/* ── COSMOS · the integrity card ────────────────────────────────────────────
+/* в”Ђв”Ђ COSMOS В· the integrity card в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The one screen here that is not on the sky: it opens over the live exam when
    someone leaves full-screen or switches tabs. So this matches the CONSOLES'
-   material and rhythm — the same glass, the same radius, the same type sizes,
-   the same 12px button — while every red on it stays exactly where it was. On
+   material and rhythm вЂ” the same glass, the same radius, the same type sizes,
+   the same 12px button вЂ” while every red on it stays exactly where it was. On
    this card the colour is the message: the alert mark, the strike meter, the
    reason rail and the button are the alarm, and turning them azure like every
    other primary in the shell would make a violation look like an invitation.
    What does change is the wash behind it, which was tinted red over the whole
-   viewport — an alarm the size of the screen, for a first warning of three. */
+   viewport вЂ” an alarm the size of the screen, for a first warning of three. */
 #warning-overlay{
   background:radial-gradient(900px 600px at 50% 38%,rgba(10,18,36,.74),rgba(3,6,12,.92));
   -webkit-backdrop-filter:blur(10px) saturate(.9);backdrop-filter:blur(10px) saturate(.9)}
@@ -4896,12 +4870,12 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 .map-wrap .gap-input{width:96px;min-width:0;padding:2px 5px;text-align:center;font-size:.82rem;}
 
 /* ---------- 3. mono-skin ---------- */
-/* ══════════════════════════════════════════════════════════════════════════
-   READING_CDI SHELL — the login card and the report sheet, built to match the
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   READING_CDI SHELL вЂ” the login card and the report sheet, built to match the
    reference paper ("All in the Family") exactly. Appended last on purpose: it
    wins over the wrapper skins further up without touching #stage-reading,
    which is the Arial exam screen and stays as it is.
-   ══════════════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 :root{
   --rcx-ink:#000; --rcx-paper:#fff; --rcx-panel:#f2f2f2;
   --rcx-line:#d7d7d7; --rcx-line2:#b9b9b9;
@@ -4919,7 +4893,7 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 /* the login card means there IS a name to show in the exam header again */
 #hdr .ttid-name{display:block !important}
 
-/* ───────────────────────────── LOGIN ───────────────────────────── */
+/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ LOGIN в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 #stage-registration.active{display:flex !important}
 #stage-registration{
   align-items:center !important;justify-content:center !important;
@@ -4956,7 +4930,7 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 .rcx-btn:hover{background:#c2122f}
 .rcx-fine{margin:20px 0 0;font-size:12px;color:var(--rcx-muted);line-height:1.5}
 
-/* ───────────────────────────── REPORT ──────────────────────────── */
+/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ REPORT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 #stage-results.active{display:flex !important}
 #stage-results{
   background:#fff !important;flex-direction:column !important;
@@ -4994,10 +4968,10 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
 .rcx-sbox .num{font-size:30px;font-weight:800;color:var(--rcx-ink);line-height:1.1}
 .rcx-sbox .lbl{font-size:13px;color:#666;margin-top:4px}
 .rcx-scale{font-size:14px;color:#555;max-width:760px;margin:-14px 0 22px;line-height:1.55}
-/* ── ANSWER REVIEW + EXPLANATIONS ────────────────────────────────
+/* в”Ђв”Ђ ANSWER REVIEW + EXPLANATIONS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    The review list is the READING_CDI one, brought over as it stands:
    number / your answer / the key / a badge, then the English "Why"
-   panel and the Oʻzbekcha panel stacked underneath it. */
+   panel and the OК»zbekcha panel stacked underneath it. */
 #stage-results{
   --panel:#fafafa; --panel-solid:#fff; --text:#1c1c1e; --text2:#6e6e73; --text3:#98989d;
   --border:rgba(60,60,67,.13); --hairline:rgba(60,60,67,.08);
@@ -5079,7 +5053,7 @@ body.cdi-exit #stage-reading-intro::after{opacity:0}
   table.rcx-rev{font-size:14px}
 }
 
-/* ── results as a window over the passage ────────────────────────────
+/* в”Ђв”Ђ results as a window over the passage в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    Matches the Flower Power reference: the report opens as a card floating
    over a dimmed, blurred passage instead of replacing the screen. Sits last
    on purpose, so it outranks every earlier full-page #stage-results rule
@@ -5123,10 +5097,10 @@ body.dark-mode .results-modal-close:hover{background:rgba(255,255,255,.18)}
   .results-modal-box{max-width:100%;max-height:100vh;border-radius:0}
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   FLOWER POWER explanation style — red panels, yellow 💡 highlights
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   FLOWER POWER explanation style вЂ” red panels, yellow рџ’Ў highlights
    with the note opening inline in the passage itself.
-   ═══════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 body.review-mode{
   --fp-accent:#e31837; --fp-accent-dark:#c11530;
   --fp-light:rgba(227,24,55,.10); --fp-line:rgba(227,24,55,.22);
@@ -5138,7 +5112,7 @@ body.review-mode.dark-mode{
   --fp-ink:#f2f2f7; --fp-hl:#ffd426;
 }
 
-/* ── the per-question panel in the question pane ── */
+/* в”Ђв”Ђ the per-question panel in the question pane в”Ђв”Ђ */
 body.review-mode .explain-panel{
   background:var(--fp-light);
   border:0; border-left:3px solid var(--fp-accent);
@@ -5156,7 +5130,7 @@ body.review-mode .explain-panel .ep-text strong{color:var(--fp-accent);font-weig
 body.review-mode .explain-panel .ep-text em,
 body.review-mode .explain-panel .ep-text i{color:var(--fp-ink);font-style:italic}
 
-/* ── the lightbulb buttons ── */
+/* в”Ђв”Ђ the lightbulb buttons в”Ђв”Ђ */
 body.review-mode .explain-btn,
 body.review-mode .explain-btn-sm{
   border-color:var(--fp-line); color:var(--fp-accent); box-shadow:none}
@@ -5168,17 +5142,17 @@ body.review-mode.dark-mode .explain-btn-sm:hover, body.review-mode.dark-mode .ex
 body.review-mode .explain-btn:focus-visible,
 body.review-mode .explain-btn-sm:focus-visible{outline-color:var(--fp-accent)}
 
-/* ── the synonym map, in the same red key ── */
+/* в”Ђв”Ђ the synonym map, in the same red key в”Ђв”Ђ */
 body.review-mode .pb-header{color:var(--fp-accent)}
 body.review-mode .paraphrase-bridge{border-color:var(--fp-line)}
 body.review-mode .pb-p{color:var(--fp-accent)}
 
-/* ── evidence highlight raised by an explain button ── */
+/* в”Ђв”Ђ evidence highlight raised by an explain button в”Ђв”Ђ */
 body.review-mode .ep-highlight-src{
   background:var(--fp-hl); color:#000;
   box-shadow:inset 0 -2px 0 var(--fp-accent-dark)}
 
-/* ── FLOWER POWER: every answer sentence marked in the passage ── */
+/* в”Ђв”Ђ FLOWER POWER: every answer sentence marked in the passage в”Ђв”Ђ */
 body.review-mode .fp-hl{
   background:var(--fp-hl); color:#000; padding:1px 3px; border-radius:3px;
   font-weight:600; cursor:pointer; border-bottom:2px dotted var(--fp-accent-dark);
@@ -5197,7 +5171,7 @@ body.review-mode .fp-note .fp-en{margin-bottom:5px}
 body.review-mode .fp-note b{color:var(--fp-accent);font-weight:700}
 body.review-mode .fp-note em,body.review-mode .fp-note i{font-style:italic}
 
-/* ── Telegram button on the report ── */
+/* в”Ђв”Ђ Telegram button on the report в”Ђв”Ђ */
 .rcx-btnrow a.tgbtn{
   background:#0088cc;color:#fff;border:none;padding:11px 22px;border-radius:4px;
   cursor:pointer;font-size:15px;font-family:Arial,Helvetica,sans-serif;
@@ -5207,7 +5181,7 @@ body.review-mode .fp-note em,body.review-mode .fp-note i{font-style:italic}
 
 
 
-/* ---------- 4. header — compact title bar ----------
+/* ---------- 4. header вЂ” compact title bar ----------
    [logo]  [Demo] Test 8 - P3: Passage title            wifi  fullscreen  menu  notes
            11 minutes remaining
    Appended last on purpose so it wins over the older header rules above. */
@@ -5224,7 +5198,7 @@ body.review-mode .fp-note em,body.review-mode .fp-note i{font-style:italic}
 
 
 /* ---------- 5. matching grids (which paragraph / match each item) ----------
-   "Questions 14–17", the instruction, then a thin-bordered white box holding the
+   "Questions 14вЂ“17", the instruction, then a thin-bordered white box holding the
    table: bold letters over dark vertical rules, a dark rule under the header,
    grey rules between rows, number + statement on the left, hollow circles.
    Applies to matching-info AND matching-features (same widget, same look). */
@@ -5279,11 +5253,10 @@ body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype=
 body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype="matching-features"]) .match-grid .mg-cell{border-left-color:var(--sp-ink-2)}
 body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype="matching-features"]) .match-grid .mg-cell::before{background:transparent}
 body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype="matching-features"]) .match-grid .mg-label,body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype="matching-features"]) .match-grid .mg-q .q-pill{color:var(--sp-ink)}
-/* ============================================================
-   PASSAGE IMAGES — text wraps around the picture (real-exam look)
+/* ====
+   PASSAGE IMAGES вЂ” text wraps around the picture (real-exam look)
    Appended last on purpose. CSS only: no passage text, markup,
    question or answer logic is touched.
-   ============================================================ */
 #passage-pane .passage-text{container-type:inline-size}
 
 #passage-pane .passage-text .pass-img,
@@ -5319,11 +5292,10 @@ body.theme-sepia .section-block:is([data-sectype="matching-info"],[data-sectype=
   }
 }
 
-/* ============================================================
-   EXAM SETTINGS panel (hamburger button) — Theme / Text Size /
+/* ====
+   EXAM SETTINGS panel (hamburger button) вЂ” Theme / Text Size /
    Report Issue / Leave Test. Appended last; the old full-screen
    Options page markup is untouched but no longer opened.
-   ============================================================ */
 .xs-overlay{
   position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
   background:rgba(15,23,42,.45);padding:16px;
@@ -5395,12 +5367,11 @@ body.theme-sepia .xs-opt{background:var(--sp-panel-2);border-color:var(--sp-line
 body.theme-sepia .xs-opt.is-on{background:var(--sp-panel);border-color:var(--sp-line);color:var(--sp-ink)}
 body.theme-sepia .xs-leave{background:var(--sp-panel-2);border-color:var(--sp-line)}
 
-/* ============================================================
-   HIGHLIGHT POPUP — new icons / labels (markup rebuilt by
+/* ====
+   HIGHLIGHT POPUP вЂ” new icons / labels (markup rebuilt by
    exUpgradeHlPopup in reading.js). Appended last.
      resting      : Note | Highlight
      on a highlight: Remove | Add Note
-   ============================================================ */
 .hl-popup .tool-btn{min-width:62px;height:auto;min-height:62px;padding:8px 12px;gap:6px;color:#1b2234}
 .hl-popup .tool-btn::before{display:none !important}
 .hl-popup .tool-btn>svg.hp-ic{display:block;width:22px;height:22px;flex-shrink:0;color:#1b2234}
@@ -5422,14 +5393,14 @@ body.dark-mode .hl-popup .tool-btn .hp-dot{fill:var(--ex-panel-2)}
 body.theme-sepia .hl-popup .tool-btn>svg.hp-ic{color:var(--sp-ink)}
 body.theme-sepia .hl-popup .tool-btn.erase>svg.hp-ic{color:#c0392b}
 body.theme-sepia .hl-popup .tool-btn .hp-dot{fill:var(--sp-panel-2)}
-/* ── text size: Large / Extra Large fixes ───────────────────────────────
+/* в”Ђв”Ђ text size: Large / Extra Large fixes в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
    1) .option span (TRUE / FALSE / NOT GIVEN / YES / NO and single-choice
       answers) was missing from the text-zoom list, so those labels stayed 16px
       while everything around them grew.
    2) every line-height was a fixed 24px, so at 22.4px the lines were nearly
       touching. Each one now grows by the same 1.5 ratio the 16px/24px original
       uses. At Regular --text-zoom is 0px, so every value below equals the
-      original — nothing changes at the default size. */
+      original вЂ” nothing changes at the default size. */
 .option span{
   font-size:calc(var(--base-size,16px) + var(--text-zoom)) !important;
   transition:font-size .15s ease;
@@ -5451,13 +5422,13 @@ h2.passage-title,
   line-height:calc(18px + var(--text-zoom) * 1.125) !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   EXAM RESULTS — full-page report shown after Submit
-   Header (logo, passage title, clock) → grey "Exam Results" bar → band
-   score, incorrect questions, mistakes by passage / question type →
-   Report Issue · Review Mistakes · Finish. Sits last so it outranks the
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   EXAM RESULTS вЂ” full-page report shown after Submit
+   Header (logo, passage title, clock) в†’ grey "Exam Results" bar в†’ band
+   score, incorrect questions, mistakes by passage / question type в†’
+   Report Issue В· Review Mistakes В· Finish. Sits last so it outranks the
    older #stage-results rules above.
-   ═══════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-results{
   background:#fff !important;padding:0 !important;
   -webkit-backdrop-filter:none !important;backdrop-filter:none !important;
@@ -5531,11 +5502,11 @@ body.theme-sepia #stage-results .results-modal-box,body.theme-sepia #stage-resul
    button are gone from the results screen, even if an older HTML still has them */
 #stage-results .rcx-hdr,#stage-results .results-modal-close{display:none !important}
 
-/* ═══════════════════════════════════════════════════════════════════
-   ENTRY SCREEN — instructions, notes and the (free) Real Exam Mode card
-   Header → dotted page → white card (scrolls) with Start Test pinned at the
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+   ENTRY SCREEN вЂ” instructions, notes and the (free) Real Exam Mode card
+   Header в†’ dotted page в†’ white card (scrolls) with Start Test pinned at the
    bottom. Sits last so it outranks the older #stage-registration rules.
-   ═══════════════════════════════════════════════════════════════════ */
+   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 #stage-registration{
   --ei-ink:#111827; --ei-sub:#6b7280; --ei-line:#e5e7eb; --ei-card:#fff; --ei-page:#fafafa; --ei-dot:#d9dce1;
   padding:0 !important;align-items:stretch !important;justify-content:flex-start !important;overflow:hidden !important;

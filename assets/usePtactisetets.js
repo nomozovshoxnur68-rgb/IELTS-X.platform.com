@@ -1,6 +1,6 @@
-// ==============================================
+// ====
 // Full simple working JS – functions unchanged
-// ==============================================
+// ====
 
 // --- Stub implementations of external dependencies ---
 

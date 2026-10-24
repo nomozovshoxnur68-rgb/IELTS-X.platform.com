@@ -3,20 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IELTS Academic Reading — Full Reading Test 11</title>
+<title>IELTS Academic Reading вЂ” Full Reading Test 11</title>
 <link rel="stylesheet" href="../../reading.css">
-<<<<<<< HEAD
-=======
 <script src="/assets/js/access-gate.js"></script>
->>>>>>> fb33267 (Initial commit)
 </head>
 <body>
 
-<!-- ============================================================
+<!-- ====
      STAGE 1: REGISTRATION
-     ============================================================ -->
 <!-- COSMOS: the restart sheet is removed. A reload restarts the paper
-     silently — restartSheet() falls through to startFresh() with no
+     silently вЂ” restartSheet() falls through to startFresh() with no
      #resume-sheet in the document. -->
 
 <!-- The boot class is set here, before the registration markup is parsed, so
@@ -25,21 +21,18 @@
 <!-- The login / registration card and the instructions screen have been removed: the paper opens straight on Passage 1. -->
 
 
-<!-- ============================================================
+<!-- ====
      STAGE 2: READING INSTRUCTIONS
-     ============================================================ -->
 
-<!-- ============================================================
+<!-- ====
      STAGE 3: READING TEST  (real-exam chrome)
-     ============================================================ -->
 <!-- The CDI mark used to live on the registration card. That card is gone, so the
      one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
      and paints the completion screen and the certificate from it. -->
 <img class="brand-logo" alt="READING CDI" hidden style="display:none" src="data:image/png;base64,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">
 
-<!-- ============================================================
+<!-- ====
      STAGE 1: LOGIN / REGISTRATION
-     ============================================================ -->
 <div class="stage active" id="stage-registration">
   <div class="ei-top">
     <div class="ei-logo"><svg viewBox="0 0 32 32" role="img" aria-label="Logo" focusable="false"><rect width="32" height="32" fill="#b3121f"/><rect x="5.5" y="5.5" width="21" height="21" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 23L23 9" stroke="#fff" stroke-width="2"/></svg></div>
@@ -103,7 +96,7 @@
   <div id="pbar">
     <div id="pbar-inner">
       <span id="pbar-title">Part 1</span>
-      <span id="pbar-desc">Read the text and answer questions 1–13.</span>
+      <span id="pbar-desc">Read the text and answer questions 1вЂ“13.</span>
     </div>
   </div>
 
@@ -167,9 +160,8 @@
   </div>
 </div>
 
-<!-- ============================================================
+<!-- ====
      STAGE 4: COMPLETION
-     ============================================================ -->
 <div class="stage" id="stage-completion">
   <div class="complete-card">
     <div class="ch-comp-body">
@@ -199,7 +191,7 @@
 
       <div class="ch-note">
         <p>Sitting a full paper under real conditions is much harder than most people think &mdash; and analysing it afterwards is what separates the high scorers. You just did the hard half. Now go and read your mistakes.</p>
-        <!-- ===== EDIT PER TEST · AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
+        <!-- ===== EDIT PER TEST В· AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
         <p class="ch-sign">Built from scratch by <strong>Islom Kenjayev</strong> &middot; IELTS 8.5 (L&nbsp;9.0 &middot; R&nbsp;9.0)</p>
       </div>
 
@@ -225,18 +217,16 @@
   </div>
 </div>
 
-<!-- ============================================================
+<!-- ====
      STAGE 5: RESULTS
-     ============================================================ -->
 <div class="stage" id="stage-results">
   <div class="results-modal-box">
     <div class="results-content" id="results-content"></div>
   </div>
 </div>
 
-<!-- ============================================================
+<!-- ====
      OVERLAYS
-     ============================================================ -->
 <div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
   <div class="warning-card">
     <div class="wc-body">
@@ -304,7 +294,7 @@
   </div>
 </div>
 
-<!-- V3: notes drawer — mirrors the real player's right-hand Notes panel -->
+<!-- V3: notes drawer вЂ” mirrors the real player's right-hand Notes panel -->
 <aside id="notes-drawer" class="notes-drawer" aria-label="Notes" aria-hidden="true">
   <div class="nd-head">
     <span class="nd-title">Notes</span>
@@ -328,11 +318,10 @@
 <div id="print-report"></div>
 
 <script>
-/* ============================================================
-   TEST DATA — Full Reading Test 11
+/* ====
+   TEST DATA вЂ” Full Reading Test 11
    Passages, questions, answers and explanations for this test only.
    The functions live in reading.js (shared by every test).
-   ============================================================ */
 window.READING_TEST = (function () {
 const STORAGE_KEY = "cdi_reading_v3_full_reading_test_11";   // trailing digits also set CERT_TEST_NO
 
@@ -725,7 +714,7 @@ const VOCABULARY_DATA = {
 
 const READING_EXPLANATIONS = {
  "1": {
-  "explanation": "<b>FALSE.</b> The competition &ldquo;was won by J&oslash;rn Utzon, a relatively little-known architect from Denmark&rdquo; &ndash; the opposite of being famous.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; Tanlovda &laquo;Daniyalik nisbatan kam tanilgan arxitektor J&oslash;rn Utzon&raquo; g&rsquo;olib chiqqan &ndash; ya&rsquo;ni u mashhur emas edi.</div>",
+  "explanation": "<b>FALSE.</b> The competition &ldquo;was won by J&oslash;rn Utzon, a relatively little-known architect from Denmark&rdquo; &ndash; the opposite of being famous.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; Tanlovda &laquo;Daniyalik nisbatan kam tanilgan arxitektor J&oslash;rn Utzon&raquo; g&rsquo;olib chiqqan &ndash; ya&rsquo;ni u mashhur emas edi.</div>",
   "highlights": [
    "a relatively little-known architect from Denmark"
   ],
@@ -734,7 +723,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; Tanlovda &laquo;Daniyalik nisbatan kam tanilgan arxitektor J&oslash;rn Utzon&raquo; g&rsquo;olib chiqqan &ndash; ya&rsquo;ni u mashhur emas edi."
  },
  "2": {
-  "explanation": "<b>FALSE.</b> Three judges had already rejected his entry; Saarinen arrived late, &ldquo;looked through their rejected entries and stopped at the Utzon design&rdquo;. So it was not favoured from the beginning.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; Uch hakam uning loyihasini allaqachon rad etgan edi; kechikib kelgan Saarinen &laquo;rad etilgan ishlarni ko&rsquo;rib chiqib, Utzon loyihasida to&rsquo;xtagan&raquo;.</div>",
+  "explanation": "<b>FALSE.</b> Three judges had already rejected his entry; Saarinen arrived late, &ldquo;looked through their rejected entries and stopped at the Utzon design&rdquo;. So it was not favoured from the beginning.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; Uch hakam uning loyihasini allaqachon rad etgan edi; kechikib kelgan Saarinen &laquo;rad etilgan ishlarni ko&rsquo;rib chiqib, Utzon loyihasida to&rsquo;xtagan&raquo;.</div>",
   "highlights": [
    "He looked through their rejected entries and stopped at the Utzon design"
   ],
@@ -743,7 +732,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; Uch hakam uning loyihasini allaqachon rad etgan edi; kechikib kelgan Saarinen &laquo;rad etilgan ishlarni ko&rsquo;rib chiqib, Utzon loyihasida to&rsquo;xtagan&raquo;."
  },
  "3": {
-  "explanation": "<b>TRUE.</b> &ldquo;He used his maritime background to study naval charts of Sydney Harbour&rdquo; and &ldquo;his early exposure to shipbuilding provided the inspiration for the design of the roof&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; &laquo;U dengizchilik tajribasidan foydalanib, Sidney portining dengiz xaritalarini o&rsquo;rgangan&raquo; va kemasozlik bilan tanishligi tom dizayniga ilhom bergan.</div>",
+  "explanation": "<b>TRUE.</b> &ldquo;He used his maritime background to study naval charts of Sydney Harbour&rdquo; and &ldquo;his early exposure to shipbuilding provided the inspiration for the design of the roof&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; &laquo;U dengizchilik tajribasidan foydalanib, Sidney portining dengiz xaritalarini o&rsquo;rgangan&raquo; va kemasozlik bilan tanishligi tom dizayniga ilhom bergan.</div>",
   "highlights": [
    "he used his maritime background to study naval charts of Sydney Harbour"
   ],
@@ -752,7 +741,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; &laquo;U dengizchilik tajribasidan foydalanib, Sidney portining dengiz xaritalarini o&rsquo;rgangan&raquo; va kemasozlik bilan tanishligi tom dizayniga ilhom bergan."
  },
  "4": {
-  "explanation": "<b>NOT GIVEN.</b> Mexico gave him the idea of &ldquo;placing his building on a wide horizontal platform&rdquo;. Opera houses in Mexico are never mentioned.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; Meksika unga binoni &laquo;keng gorizontal platformaga joylashtirish&raquo; g&rsquo;oyasini bergan. Meksikadagi opera binolari haqida hech narsa aytilmagan.</div>",
+  "explanation": "<b>NOT GIVEN.</b> Mexico gave him the idea of &ldquo;placing his building on a wide horizontal platform&rdquo;. Opera houses in Mexico are never mentioned.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; Meksika unga binoni &laquo;keng gorizontal platformaga joylashtirish&raquo; g&rsquo;oyasini bergan. Meksikadagi opera binolari haqida hech narsa aytilmagan.</div>",
   "highlights": [
    "From his travels to Mexico, he had the idea of placing his building on a wide horizontal platform"
   ],
@@ -761,7 +750,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; Meksika unga binoni &laquo;keng gorizontal platformaga joylashtirish&raquo; g&rsquo;oyasini bergan. Meksikadagi opera binolari haqida hech narsa aytilmagan."
  },
  "5": {
-  "explanation": "<b>TRUE.</b> &ldquo;Construction of the platform began in 1959, and throughout the early 1960s Utzon amended his original designs.&rdquo; <i>Amended</i> = <i>changed</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; &laquo;Platforma qurilishi 1959-yilda boshlangan va 1960-yillar boshida Utzon dastlabki loyihalariga o&rsquo;zgartirish kiritgan.&raquo;</div>",
+  "explanation": "<b>TRUE.</b> &ldquo;Construction of the platform began in 1959, and throughout the early 1960s Utzon amended his original designs.&rdquo; <i>Amended</i> = <i>changed</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; &laquo;Platforma qurilishi 1959-yilda boshlangan va 1960-yillar boshida Utzon dastlabki loyihalariga o&rsquo;zgartirish kiritgan.&raquo;</div>",
   "highlights": [
    "throughout the early 1960s Utzon amended his original designs"
   ],
@@ -770,7 +759,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; &laquo;Platforma qurilishi 1959-yilda boshlangan va 1960-yillar boshida Utzon dastlabki loyihalariga o&rsquo;zgartirish kiritgan.&raquo;"
  },
  "6": {
-  "explanation": "<b>TRUE.</b> &ldquo;There were protests through the streets led by prominent architect Harry Seidler and others, demanding Utzon be reinstated as architect.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; &laquo;Mashhur arxitektor Harri Seydler va boshqalar boshchiligida ko&rsquo;chalarda norozilik namoyishlari bo&rsquo;lib, Utzonni qayta tiklashni talab qilishdi.&raquo;</div>",
+  "explanation": "<b>TRUE.</b> &ldquo;There were protests through the streets led by prominent architect Harry Seidler and others, demanding Utzon be reinstated as architect.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; &laquo;Mashhur arxitektor Harri Seydler va boshqalar boshchiligida ko&rsquo;chalarda norozilik namoyishlari bo&rsquo;lib, Utzonni qayta tiklashni talab qilishdi.&raquo;</div>",
   "highlights": [
    "there were protests through the streets led by prominent architect Harry Seidler"
   ],
@@ -779,7 +768,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; &laquo;Mashhur arxitektor Harri Seydler va boshqalar boshchiligida ko&rsquo;chalarda norozilik namoyishlari bo&rsquo;lib, Utzonni qayta tiklashni talab qilishdi.&raquo;"
  },
  "7": {
-  "explanation": "<b>FALSE.</b> Utzon &ldquo;left Australia in 1966. He never returned&rdquo; &ndash; so he was not there for the 1973 opening; his later design work was done &ldquo;from his base in Europe&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; Utzon &laquo;1966-yilda Avstraliyani tark etdi. U hech qachon qaytmadi&raquo; &ndash; demak 1973-yilgi ochilishda ham bo&rsquo;lmagan.</div>",
+  "explanation": "<b>FALSE.</b> Utzon &ldquo;left Australia in 1966. He never returned&rdquo; &ndash; so he was not there for the 1973 opening; his later design work was done &ldquo;from his base in Europe&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; Utzon &laquo;1966-yilda Avstraliyani tark etdi. U hech qachon qaytmadi&raquo; &ndash; demak 1973-yilgi ochilishda ham bo&rsquo;lmagan.</div>",
   "highlights": [
    "He never returned and new architects were appointed"
   ],
@@ -788,7 +777,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; Utzon &laquo;1966-yilda Avstraliyani tark etdi. U hech qachon qaytmadi&raquo; &ndash; demak 1973-yilgi ochilishda ham bo&rsquo;lmagan."
  },
  "8": {
-  "explanation": "<b>102 million.</b> &ldquo;The Opera House was not formally completed until 1973, having cost $<i>102 million</i>.&rdquo; The $7 million is the original estimate &ndash; the trap.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> 102 million &mdash; &laquo;Opera binosi 1973-yilgacha rasman tugallanmadi va 102 million dollarga tushdi.&raquo; 7 million &ndash; dastlabki taxmin, ya&rsquo;ni tuzoq.</div>",
+  "explanation": "<b>102 million.</b> &ldquo;The Opera House was not formally completed until 1973, having cost $<i>102 million</i>.&rdquo; The $7 million is the original estimate &ndash; the trap.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> 102 million &mdash; &laquo;Opera binosi 1973-yilgacha rasman tugallanmadi va 102 million dollarga tushdi.&raquo; 7 million &ndash; dastlabki taxmin, ya&rsquo;ni tuzoq.</div>",
   "highlights": [
    "having cost $102 million"
   ],
@@ -797,7 +786,7 @@ const READING_EXPLANATIONS = {
   "uz": "102 million &mdash; &laquo;Opera binosi 1973-yilgacha rasman tugallanmadi va 102 million dollarga tushdi.&raquo; 7 million &ndash; dastlabki taxmin, ya&rsquo;ni tuzoq."
  },
  "9": {
-  "explanation": "<b>Sweden.</b> The shells are covered with 1,056,006 tiles &ldquo;manufactured in a factory in <i>Sweden</i>&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> Sweden &mdash; Chig&rsquo;anoqlar &laquo;Shvetsiyadagi zavodda ishlab chiqarilgan&raquo; 1 056 006 ta plitka bilan qoplangan.</div>",
+  "explanation": "<b>Sweden.</b> The shells are covered with 1,056,006 tiles &ldquo;manufactured in a factory in <i>Sweden</i>&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> Sweden &mdash; Chig&rsquo;anoqlar &laquo;Shvetsiyadagi zavodda ishlab chiqarilgan&raquo; 1 056 006 ta plitka bilan qoplangan.</div>",
   "highlights": [
    "manufactured in a factory in Sweden"
   ],
@@ -806,7 +795,7 @@ const READING_EXPLANATIONS = {
   "uz": "Sweden &mdash; Chig&rsquo;anoqlar &laquo;Shvetsiyadagi zavodda ishlab chiqarilgan&raquo; 1 056 006 ta plitka bilan qoplangan."
  },
  "10": {
-  "explanation": "<b>granite.</b> &ldquo;Apart from the tiles covering the &lsquo;shells&rsquo;, the building&rsquo;s exterior is mostly clad with <i>granite</i> quarried in Australia.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> granite &mdash; &laquo;Chig&rsquo;anoqlardagi plitkalardan tashqari, binoning tashqi qismi asosan Avstraliyada qazib olingan granit bilan qoplangan.&raquo;</div>",
+  "explanation": "<b>granite.</b> &ldquo;Apart from the tiles covering the &lsquo;shells&rsquo;, the building&rsquo;s exterior is mostly clad with <i>granite</i> quarried in Australia.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> granite &mdash; &laquo;Chig&rsquo;anoqlardagi plitkalardan tashqari, binoning tashqi qismi asosan Avstraliyada qazib olingan granit bilan qoplangan.&raquo;</div>",
   "highlights": [
    "is mostly clad with granite quarried in Australia"
   ],
@@ -815,7 +804,7 @@ const READING_EXPLANATIONS = {
   "uz": "granite &mdash; &laquo;Chig&rsquo;anoqlardagi plitkalardan tashqari, binoning tashqi qismi asosan Avstraliyada qazib olingan granit bilan qoplangan.&raquo;"
  },
  "11": {
-  "explanation": "<b>four.</b> &ldquo;It hosts a large number of performing arts companies, including the <i>four</i> resident companies&rdquo; &ndash; <i>resident</i> = having their home base there.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> four &mdash; &laquo;Bu yerda ko&rsquo;plab truppalar, jumladan to&rsquo;rtta doimiy truppa faoliyat yuritadi&raquo; &ndash; <i>resident</i> = doimiy joylashgan.</div>",
+  "explanation": "<b>four.</b> &ldquo;It hosts a large number of performing arts companies, including the <i>four</i> resident companies&rdquo; &ndash; <i>resident</i> = having their home base there.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> four &mdash; &laquo;Bu yerda ko&rsquo;plab truppalar, jumladan to&rsquo;rtta doimiy truppa faoliyat yuritadi&raquo; &ndash; <i>resident</i> = doimiy joylashgan.</div>",
   "highlights": [
    "including the four resident companies"
   ],
@@ -824,7 +813,7 @@ const READING_EXPLANATIONS = {
   "uz": "four &mdash; &laquo;Bu yerda ko&rsquo;plab truppalar, jumladan to&rsquo;rtta doimiy truppa faoliyat yuritadi&raquo; &ndash; <i>resident</i> = doimiy joylashgan."
  },
  "12": {
-  "explanation": "<b>forecourt.</b> &ldquo;There is a sizeable outdoor <i>forecourt</i> from which people ascend to the main entrance&rdquo;, and the steps lead up from it.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> forecourt &mdash; &laquo;Kattagina ochiq maydoncha (forecourt) bor, undan odamlar asosiy kirish qismiga ko&rsquo;tariladi&raquo; va zinapoya shu yerdan boshlanadi.</div>",
+  "explanation": "<b>forecourt.</b> &ldquo;There is a sizeable outdoor <i>forecourt</i> from which people ascend to the main entrance&rdquo;, and the steps lead up from it.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> forecourt &mdash; &laquo;Kattagina ochiq maydoncha (forecourt) bor, undan odamlar asosiy kirish qismiga ko&rsquo;tariladi&raquo; va zinapoya shu yerdan boshlanadi.</div>",
   "highlights": [
    "There is a sizeable outdoor forecourt from which people ascend to the main entrance"
   ],
@@ -833,7 +822,7 @@ const READING_EXPLANATIONS = {
   "uz": "forecourt &mdash; &laquo;Kattagina ochiq maydoncha (forecourt) bor, undan odamlar asosiy kirish qismiga ko&rsquo;tariladi&raquo; va zinapoya shu yerdan boshlanadi."
  },
  "13": {
-  "explanation": "<b>harbour.</b> The 2006 colonnade project &ldquo;enabled theatre patrons to see the <i>harbour</i> for the first time from the theatre foyers&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> harbour &mdash; 2006-yilgi kolonnada loyihasi &laquo;teatr tashrifchilariga foyedan ilk bor portni ko&rsquo;rish imkonini berdi&raquo;.</div>",
+  "explanation": "<b>harbour.</b> The 2006 colonnade project &ldquo;enabled theatre patrons to see the <i>harbour</i> for the first time from the theatre foyers&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> harbour &mdash; 2006-yilgi kolonnada loyihasi &laquo;teatr tashrifchilariga foyedan ilk bor portni ko&rsquo;rish imkonini berdi&raquo;.</div>",
   "highlights": [
    "enabled theatre patrons to see the harbour for the first time from the theatre foyers"
   ],
@@ -842,7 +831,7 @@ const READING_EXPLANATIONS = {
   "uz": "harbour &mdash; 2006-yilgi kolonnada loyihasi &laquo;teatr tashrifchilariga foyedan ilk bor portni ko&rsquo;rish imkonini berdi&raquo;."
  },
  "14": {
-  "explanation": "<b>B.</b> Paragraph F says the <em>gabelle</em>, the salt tax levied by Charles of Anjou, caused such anger that &ldquo;Outrage over the gabelle fuelled the French Revolution&rdquo; &ndash; so salt played a part in bringing the Revolution about.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> B &mdash; F xatboshida Sharl Anjuyskiy joriy qilgan tuz solig&lsquo;i (<em>gabelle</em>) shunchalik norozilik tug&lsquo;dirgani va bu Fransuz inqilobiga turtki bo&lsquo;lgani aytiladi.</div>",
+  "explanation": "<b>B.</b> Paragraph F says the <em>gabelle</em>, the salt tax levied by Charles of Anjou, caused such anger that &ldquo;Outrage over the gabelle fuelled the French Revolution&rdquo; &ndash; so salt played a part in bringing the Revolution about.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> B &mdash; F xatboshida Sharl Anjuyskiy joriy qilgan tuz solig&lsquo;i (<em>gabelle</em>) shunchalik norozilik tug&lsquo;dirgani va bu Fransuz inqilobiga turtki bo&lsquo;lgani aytiladi.</div>",
   "highlights": [
    "Outrage over the gabelle fuelled the French Revolution"
   ],
@@ -851,7 +840,7 @@ const READING_EXPLANATIONS = {
   "uz": "B &mdash; F xatboshida Sharl Anjuyskiy joriy qilgan tuz solig&lsquo;i (<em>gabelle</em>) shunchalik norozilik tug&lsquo;dirgani va bu Fransuz inqilobiga turtki bo&lsquo;lgani aytiladi."
  },
  "15": {
-  "explanation": "<b>E.</b> Paragraph B states that salt &ldquo;is used in some 14,000 commercial applications&rdquo; &ndash; a direct match for &lsquo;many commercial applications&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> E &mdash; B xatboshida tuz &laquo;taxminan 14 000 tijorat sohasida&raquo; ishlatilishi aytilgan, bu esa variantdagi fikrni to&lsquo;g&lsquo;ridan-to&lsquo;g&lsquo;ri tasdiqlaydi.</div>",
+  "explanation": "<b>E.</b> Paragraph B states that salt &ldquo;is used in some 14,000 commercial applications&rdquo; &ndash; a direct match for &lsquo;many commercial applications&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> E &mdash; B xatboshida tuz &laquo;taxminan 14 000 tijorat sohasida&raquo; ishlatilishi aytilgan, bu esa variantdagi fikrni to&lsquo;g&lsquo;ridan-to&lsquo;g&lsquo;ri tasdiqlaydi.</div>",
   "highlights": [
    "this element is used in some 14,000 commercial applications"
   ],
@@ -860,7 +849,7 @@ const READING_EXPLANATIONS = {
   "uz": "E &mdash; B xatboshida tuz &laquo;taxminan 14 000 tijorat sohasida&raquo; ishlatilishi aytilgan, bu esa variantdagi fikrni to&lsquo;g&lsquo;ridan-to&lsquo;g&lsquo;ri tasdiqlaydi."
  },
  "16": {
-  "explanation": "<b>F.</b> Paragraph A estimates that the salt under Kansas alone &ldquo;could supply the entire world&rsquo;s needs for the next 250,000 years&rdquo; &ndash; that is what &lsquo;vast&rsquo; means here.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> F &mdash; A xatboshida faqat Kanzas ostidagi tuz zaxirasi &laquo;butun dunyoni 250 000 yilga yetarli ta&rsquo;minlashi&raquo; mumkinligi aytiladi, ya&rsquo;ni zaxira juda katta.</div>",
+  "explanation": "<b>F.</b> Paragraph A estimates that the salt under Kansas alone &ldquo;could supply the entire world&rsquo;s needs for the next 250,000 years&rdquo; &ndash; that is what &lsquo;vast&rsquo; means here.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> F &mdash; A xatboshida faqat Kanzas ostidagi tuz zaxirasi &laquo;butun dunyoni 250 000 yilga yetarli ta&rsquo;minlashi&raquo; mumkinligi aytiladi, ya&rsquo;ni zaxira juda katta.</div>",
   "highlights": [
    "it has been estimated that salt deposits under the state of Kansas alone could supply the entire world"
   ],
@@ -869,7 +858,7 @@ const READING_EXPLANATIONS = {
   "uz": "F &mdash; A xatboshida faqat Kanzas ostidagi tuz zaxirasi &laquo;butun dunyoni 250 000 yilga yetarli ta&rsquo;minlashi&raquo; mumkinligi aytiladi, ya&rsquo;ni zaxira juda katta."
  },
  "17": {
-  "explanation": "<b>essential element.</b> The summary says people could not live without salt; paragraph B opens &ldquo;But salt is also an essential element. Without it, life itself would be impossible&hellip;&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> essential element &mdash; B xatboshi &laquo;tuz muhim element, usiz hayotning o&lsquo;zi mumkin emas&raquo; deb boshlanadi.</div>",
+  "explanation": "<b>essential element.</b> The summary says people could not live without salt; paragraph B opens &ldquo;But salt is also an essential element. Without it, life itself would be impossible&hellip;&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> essential element &mdash; B xatboshi &laquo;tuz muhim element, usiz hayotning o&lsquo;zi mumkin emas&raquo; deb boshlanadi.</div>",
   "highlights": [
    "But salt is also an essential element"
   ],
@@ -878,7 +867,7 @@ const READING_EXPLANATIONS = {
   "uz": "essential element &mdash; B xatboshi &laquo;tuz muhim element, usiz hayotning o&lsquo;zi mumkin emas&raquo; deb boshlanadi."
  },
  "18": {
-  "explanation": "<b>applications.</b> &lsquo;Thousands of business applications&rsquo; paraphrases &ldquo;some 14,000 commercial applications&rdquo;, and the paper-to-soap list that follows is taken straight from paragraph B.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> applications &mdash; &laquo;minglab biznes sohalari&raquo; &ndash; bu matndagi &laquo;14 000 ga yaqin tijorat sohasi&raquo;; qog&lsquo;ozdan sovungacha bo&lsquo;lgan ro&lsquo;yxat ham o&lsquo;sha xatboshidan.</div>",
+  "explanation": "<b>applications.</b> &lsquo;Thousands of business applications&rsquo; paraphrases &ldquo;some 14,000 commercial applications&rdquo;, and the paper-to-soap list that follows is taken straight from paragraph B.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> applications &mdash; &laquo;minglab biznes sohalari&raquo; &ndash; bu matndagi &laquo;14 000 ga yaqin tijorat sohasi&raquo;; qog&lsquo;ozdan sovungacha bo&lsquo;lgan ro&lsquo;yxat ham o&lsquo;sha xatboshidan.</div>",
   "highlights": [
    "From manufacturing pulp and paper to setting dyes in textiles and fabric, from producing soaps and detergents"
   ],
@@ -887,7 +876,7 @@ const READING_EXPLANATIONS = {
   "uz": "applications &mdash; &laquo;minglab biznes sohalari&raquo; &ndash; bu matndagi &laquo;14 000 ga yaqin tijorat sohasi&raquo;; qog&lsquo;ozdan sovungacha bo&lsquo;lgan ro&lsquo;yxat ham o&lsquo;sha xatboshidan."
  },
  "19": {
-  "explanation": "<b>portable commodity.</b> Paragraph D begins &ldquo;As a precious and portable commodity, salt has long been a cornerstone of economies&rdquo;; &lsquo;prized&rsquo; in the summary replaces &lsquo;precious&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> portable commodity &mdash; D xatboshi &laquo;qimmatbaho va tashish oson tovar sifatida tuz iqtisodiyotlarning asosi bo&lsquo;lgan&raquo; deb boshlanadi; &laquo;prized&raquo; = &laquo;precious&raquo;.</div>",
+  "explanation": "<b>portable commodity.</b> Paragraph D begins &ldquo;As a precious and portable commodity, salt has long been a cornerstone of economies&rdquo;; &lsquo;prized&rsquo; in the summary replaces &lsquo;precious&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> portable commodity &mdash; D xatboshi &laquo;qimmatbaho va tashish oson tovar sifatida tuz iqtisodiyotlarning asosi bo&lsquo;lgan&raquo; deb boshlanadi; &laquo;prized&raquo; = &laquo;precious&raquo;.</div>",
   "highlights": [
    "As a precious and portable commodity, salt has long been a cornerstone of economies throughout history"
   ],
@@ -896,7 +885,7 @@ const READING_EXPLANATIONS = {
   "uz": "portable commodity &mdash; D xatboshi &laquo;qimmatbaho va tashish oson tovar sifatida tuz iqtisodiyotlarning asosi bo&lsquo;lgan&raquo; deb boshlanadi; &laquo;prized&raquo; = &laquo;precious&raquo;."
  },
  "20": {
-  "explanation": "<b>taxes.</b> Paragraph G notes that &ldquo;The British monarchy supported itself with high salt taxes&rdquo;, one of several governments in the passage that raised money this way.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> taxes &mdash; G xatboshida Britaniya monarxiyasi o&lsquo;zini yuqori tuz soliqlari hisobiga ta&rsquo;minlagani aytiladi; matnda bunday hukumatlar bir nechta.</div>",
+  "explanation": "<b>taxes.</b> Paragraph G notes that &ldquo;The British monarchy supported itself with high salt taxes&rdquo;, one of several governments in the passage that raised money this way.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> taxes &mdash; G xatboshida Britaniya monarxiyasi o&lsquo;zini yuqori tuz soliqlari hisobiga ta&rsquo;minlagani aytiladi; matnda bunday hukumatlar bir nechta.</div>",
   "highlights": [
    "The British monarchy supported itself with high salt taxes"
   ],
@@ -905,7 +894,7 @@ const READING_EXPLANATIONS = {
   "uz": "taxes &mdash; G xatboshida Britaniya monarxiyasi o&lsquo;zini yuqori tuz soliqlari hisobiga ta&rsquo;minlagani aytiladi; matnda bunday hukumatlar bir nechta."
  },
  "21": {
-  "explanation": "<b>spirits.</b> Paragraph H says that &ldquo;in Buddhist tradition, salt repels evil spirits&rdquo; &ndash; salt is used as a means of driving them away.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> spirits &mdash; H xatboshida buddaviylik an&rsquo;anasida tuz yovuz ruhlarni haydashi aytilgan.</div>",
+  "explanation": "<b>spirits.</b> Paragraph H says that &ldquo;in Buddhist tradition, salt repels evil spirits&rdquo; &ndash; salt is used as a means of driving them away.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> spirits &mdash; H xatboshida buddaviylik an&rsquo;anasida tuz yovuz ruhlarni haydashi aytilgan.</div>",
   "highlights": [
    "in Buddhist tradition, salt repels evil spirits"
   ],
@@ -914,7 +903,7 @@ const READING_EXPLANATIONS = {
   "uz": "spirits &mdash; H xatboshida buddaviylik an&rsquo;anasida tuz yovuz ruhlarni haydashi aytilgan."
  },
  "22": {
-  "explanation": "<b>TRUE.</b> Paragraph D: &ldquo;Bloch also believed that the first war&hellip; could have been fought over the city&rsquo;s precious supplies of the mineral.&rdquo; &lsquo;Believed&rsquo; and &lsquo;could have been&rsquo; match &lsquo;it has been suggested&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; D xatboshida Bloch birinchi urush aynan tuz zaxiralari uchun bo&lsquo;lgan bo&lsquo;lishi mumkin deb hisoblagani aytiladi; bu &laquo;taxmin qilingan&raquo; degani.</div>",
+  "explanation": "<b>TRUE.</b> Paragraph D: &ldquo;Bloch also believed that the first war&hellip; could have been fought over the city&rsquo;s precious supplies of the mineral.&rdquo; &lsquo;Believed&rsquo; and &lsquo;could have been&rsquo; match &lsquo;it has been suggested&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; D xatboshida Bloch birinchi urush aynan tuz zaxiralari uchun bo&lsquo;lgan bo&lsquo;lishi mumkin deb hisoblagani aytiladi; bu &laquo;taxmin qilingan&raquo; degani.</div>",
   "highlights": [
    "Bloch also believed that the first war"
   ],
@@ -923,7 +912,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; D xatboshida Bloch birinchi urush aynan tuz zaxiralari uchun bo&lsquo;lgan bo&lsquo;lishi mumkin deb hisoblagani aytiladi; bu &laquo;taxmin qilingan&raquo; degani."
  },
  "23": {
-  "explanation": "<b>NOT GIVEN.</b> Paragraph E says Hsia Yu levied &ldquo;one of the first known taxes&rdquo; and that he taxed salt. That makes it one of the earliest taxes of any kind &ndash; the passage never says it was the <em>first tax on salt</em>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; E xatboshida Sya Yu &laquo;ma&rsquo;lum bo&lsquo;lgan dastlabki soliqlardan birini&raquo; joriy qilgani aytiladi, lekin bu birinchi <em>tuz</em> solig&lsquo;i ekani hech qayerda aytilmagan.</div>",
+  "explanation": "<b>NOT GIVEN.</b> Paragraph E says Hsia Yu levied &ldquo;one of the first known taxes&rdquo; and that he taxed salt. That makes it one of the earliest taxes of any kind &ndash; the passage never says it was the <em>first tax on salt</em>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; E xatboshida Sya Yu &laquo;ma&rsquo;lum bo&lsquo;lgan dastlabki soliqlardan birini&raquo; joriy qilgani aytiladi, lekin bu birinchi <em>tuz</em> solig&lsquo;i ekani hech qayerda aytilmagan.</div>",
   "highlights": [
    "the Chinese emperor Hsia Yu levied one of the first known taxes"
   ],
@@ -932,7 +921,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; E xatboshida Sya Yu &laquo;ma&rsquo;lum bo&lsquo;lgan dastlabki soliqlardan birini&raquo; joriy qilgani aytiladi, lekin bu birinchi <em>tuz</em> solig&lsquo;i ekani hech qayerda aytilmagan."
  },
  "24": {
-  "explanation": "<b>FALSE.</b> Paragraph E says that &ldquo;to this day among the nomads of Ethiopia&rsquo;s Danakil Plains it is still used as money&rdquo; &ndash; so salt <em>is</em> still a currency somewhere.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; E xatboshida Efiopiyaning Danakil tekisligidagi ko&lsquo;chmanchilar orasida tuz bugungi kunda ham pul sifatida ishlatilishi aytiladi.</div>",
+  "explanation": "<b>FALSE.</b> Paragraph E says that &ldquo;to this day among the nomads of Ethiopia&rsquo;s Danakil Plains it is still used as money&rdquo; &ndash; so salt <em>is</em> still a currency somewhere.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; E xatboshida Efiopiyaning Danakil tekisligidagi ko&lsquo;chmanchilar orasida tuz bugungi kunda ham pul sifatida ishlatilishi aytiladi.</div>",
   "highlights": [
    "it is still used as money"
   ],
@@ -941,7 +930,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; E xatboshida Efiopiyaning Danakil tekisligidagi ko&lsquo;chmanchilar orasida tuz bugungi kunda ham pul sifatida ishlatilishi aytiladi."
  },
  "25": {
-  "explanation": "<b>FALSE.</b> Paragraph G: &ldquo;Salt tax revenues paid for <em>half</em> the cost of construction of the canal.&rdquo; Half is not &lsquo;most&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; G xatboshida tuz solig&lsquo;i kanal qurilishi xarajatining <em>yarmini</em> qoplagani aytilgan; yarmi &laquo;ko&lsquo;p qismi&raquo; emas.</div>",
+  "explanation": "<b>FALSE.</b> Paragraph G: &ldquo;Salt tax revenues paid for <em>half</em> the cost of construction of the canal.&rdquo; Half is not &lsquo;most&rsquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; G xatboshida tuz solig&lsquo;i kanal qurilishi xarajatining <em>yarmini</em> qoplagani aytilgan; yarmi &laquo;ko&lsquo;p qismi&raquo; emas.</div>",
   "highlights": [
    "Salt tax revenues paid for half the cost of construction of the canal"
   ],
@@ -950,7 +939,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; G xatboshida tuz solig&lsquo;i kanal qurilishi xarajatining <em>yarmini</em> qoplagani aytilgan; yarmi &laquo;ko&lsquo;p qismi&raquo; emas."
  },
  "26": {
-  "explanation": "<b>TRUE.</b> Paragraph J: thousands of Napoleon&rsquo;s troops &ldquo;died during the French retreat from Moscow due to inadequate wound healing and lowered resistance to disease &ndash; the results of salt deficiency&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; J xatboshida Napoleon askarlarining minglabi Moskvadan chekinish paytida tuz yetishmasligi oqibatida halok bo&lsquo;lgani aytiladi.</div>",
+  "explanation": "<b>TRUE.</b> Paragraph J: thousands of Napoleon&rsquo;s troops &ldquo;died during the French retreat from Moscow due to inadequate wound healing and lowered resistance to disease &ndash; the results of salt deficiency&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; J xatboshida Napoleon askarlarining minglabi Moskvadan chekinish paytida tuz yetishmasligi oqibatida halok bo&lsquo;lgani aytiladi.</div>",
   "highlights": [
    "died during the French retreat from Moscow due to inadequate wound healing"
   ],
@@ -959,7 +948,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; J xatboshida Napoleon askarlarining minglabi Moskvadan chekinish paytida tuz yetishmasligi oqibatida halok bo&lsquo;lgani aytiladi."
  },
  "27": {
-  "explanation": "<b>YES.</b> The passage opens: &ldquo;Sometimes ideas just pop up out of the blue. Or in Charlie Paton&rsquo;s case, out of the rain&rdquo; &ndash; the idea came from a chance experience on a bus, not from planned research.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; Matn shunday boshlanadi: &laquo;Ba&rsquo;zan g&lsquo;oyalar kutilmaganda paydo bo&lsquo;ladi. Charli Patonda esa &ndash; yomg&lsquo;irdan&raquo;. Ya&rsquo;ni g&lsquo;oya tasodifan tug&lsquo;ilgan.</div>",
+  "explanation": "<b>YES.</b> The passage opens: &ldquo;Sometimes ideas just pop up out of the blue. Or in Charlie Paton&rsquo;s case, out of the rain&rdquo; &ndash; the idea came from a chance experience on a bus, not from planned research.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> YES &mdash; Matn shunday boshlanadi: &laquo;Ba&rsquo;zan g&lsquo;oyalar kutilmaganda paydo bo&lsquo;ladi. Charli Patonda esa &ndash; yomg&lsquo;irdan&raquo;. Ya&rsquo;ni g&lsquo;oya tasodifan tug&lsquo;ilgan.</div>",
   "highlights": [
    "Sometimes ideas just pop up out of the blue"
   ],
@@ -968,7 +957,7 @@ const READING_EXPLANATIONS = {
   "uz": "YES &mdash; Matn shunday boshlanadi: &laquo;Ba&rsquo;zan g&lsquo;oyalar kutilmaganda paydo bo&lsquo;ladi. Charli Patonda esa &ndash; yomg&lsquo;irdan&raquo;. Ya&rsquo;ni g&lsquo;oya tasodifan tug&lsquo;ilgan."
  },
  "28": {
-  "explanation": "<b>NO.</b> &ldquo;The bus was full of hot, wet people. The windows steamed up&rdquo; &ndash; steamed-up windows and hot humid air show the bus was <i>not</i> well ventilated.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NO &mdash; &laquo;Avtobus issiq, ho&lsquo;l odamlar bilan to&lsquo;la edi. Derazalar terlab ketdi&raquo; &ndash; demak havo almashinuvi yaxshi emas edi.</div>",
+  "explanation": "<b>NO.</b> &ldquo;The bus was full of hot, wet people. The windows steamed up&rdquo; &ndash; steamed-up windows and hot humid air show the bus was <i>not</i> well ventilated.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NO &mdash; &laquo;Avtobus issiq, ho&lsquo;l odamlar bilan to&lsquo;la edi. Derazalar terlab ketdi&raquo; &ndash; demak havo almashinuvi yaxshi emas edi.</div>",
   "highlights": [
    "the bus was full of hot, wet people"
   ],
@@ -977,7 +966,7 @@ const READING_EXPLANATIONS = {
   "uz": "NO &mdash; &laquo;Avtobus issiq, ho&lsquo;l odamlar bilan to&lsquo;la edi. Derazalar terlab ketdi&raquo; &ndash; demak havo almashinuvi yaxshi emas edi."
  },
  "29": {
-  "explanation": "<b>YES.</b> &ldquo;I went to sleep with a towel against the glass. When I woke, the thing was soaking wet. I had to wring it out.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; &laquo;Sochiqni oynaga tirab uxlab qoldim. Uyg&lsquo;onganimda u shalabbo ho&lsquo;l edi &ndash; siqishimga to&lsquo;g&lsquo;ri keldi.&raquo;</div>",
+  "explanation": "<b>YES.</b> &ldquo;I went to sleep with a towel against the glass. When I woke, the thing was soaking wet. I had to wring it out.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> YES &mdash; &laquo;Sochiqni oynaga tirab uxlab qoldim. Uyg&lsquo;onganimda u shalabbo ho&lsquo;l edi &ndash; siqishimga to&lsquo;g&lsquo;ri keldi.&raquo;</div>",
   "highlights": [
    "When I woke, the thing was soaking wet"
   ],
@@ -986,7 +975,7 @@ const READING_EXPLANATIONS = {
   "uz": "YES &mdash; &laquo;Sochiqni oynaga tirab uxlab qoldim. Uyg&lsquo;onganimda u shalabbo ho&lsquo;l edi &ndash; siqishimga to&lsquo;g&lsquo;ri keldi.&raquo;"
  },
  "30": {
-  "explanation": "<b>NOT GIVEN.</b> We are told about the heat, the wet passengers and the steamed-up windows, but a fan on the bus is never mentioned at all.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; Issiqlik, ho&lsquo;l yo&lsquo;lovchilar va terlagan derazalar haqida aytiladi, ammo avtobusdagi ventilyator umuman tilga olinmagan.</div>",
+  "explanation": "<b>NOT GIVEN.</b> We are told about the heat, the wet passengers and the steamed-up windows, but a fan on the bus is never mentioned at all.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; Issiqlik, ho&lsquo;l yo&lsquo;lovchilar va terlagan derazalar haqida aytiladi, ammo avtobusdagi ventilyator umuman tilga olinmagan.</div>",
   "highlights": [
    "I went to sleep with a towel against the glass"
   ],
@@ -995,7 +984,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; Issiqlik, ho&lsquo;l yo&lsquo;lovchilar va terlagan derazalar haqida aytiladi, ammo avtobusdagi ventilyator umuman tilga olinmagan."
  },
  "31": {
-  "explanation": "<b>NO.</b> After the talk with Davies he first &ldquo;started rigging up his own equipment&rdquo; and made solar stills; the Gulf greenhouse came only &ldquo;today, a decade on&rdquo; &ndash; so not immediately.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NO &mdash; Devis bilan suhbatdan keyin u avval o&lsquo;z uskunasini yig&lsquo;a boshlagan; Fors ko&lsquo;rfazidagi issiqxona esa faqat &laquo;o&lsquo;n yil o&lsquo;tib&raquo; paydo bo&lsquo;lgan.</div>",
+  "explanation": "<b>NO.</b> After the talk with Davies he first &ldquo;started rigging up his own equipment&rdquo; and made solar stills; the Gulf greenhouse came only &ldquo;today, a decade on&rdquo; &ndash; so not immediately.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NO &mdash; Devis bilan suhbatdan keyin u avval o&lsquo;z uskunasini yig&lsquo;a boshlagan; Fors ko&lsquo;rfazidagi issiqxona esa faqat &laquo;o&lsquo;n yil o&lsquo;tib&raquo; paydo bo&lsquo;lgan.</div>",
   "highlights": [
    "Today, a decade on, his dream has taken shape"
   ],
@@ -1004,7 +993,7 @@ const READING_EXPLANATIONS = {
   "uz": "NO &mdash; Devis bilan suhbatdan keyin u avval o&lsquo;z uskunasini yig&lsquo;a boshlagan; Fors ko&lsquo;rfazidagi issiqxona esa faqat &laquo;o&lsquo;n yil o&lsquo;tib&raquo; paydo bo&lsquo;lgan."
  },
  "32": {
-  "explanation": "<b>hot dry air.</b> &ldquo;The front of the greenhouse faces into the prevailing wind so that <i>hot dry air</i> blows in through a front wall.&rdquo; That is the air arriving from the desert.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> hot dry air &mdash; &laquo;Issiqxonaning old tomoni shamolga qaratilgan, shunda issiq quruq havo old devor orqali kiradi.&raquo;</div>",
+  "explanation": "<b>hot dry air.</b> &ldquo;The front of the greenhouse faces into the prevailing wind so that <i>hot dry air</i> blows in through a front wall.&rdquo; That is the air arriving from the desert.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> hot dry air &mdash; &laquo;Issiqxonaning old tomoni shamolga qaratilgan, shunda issiq quruq havo old devor orqali kiradi.&raquo;</div>",
   "highlights": [
    "hot dry air blows in through a front wall"
   ],
@@ -1013,7 +1002,7 @@ const READING_EXPLANATIONS = {
   "uz": "hot dry air &mdash; &laquo;Issiqxonaning old tomoni shamolga qaratilgan, shunda issiq quruq havo old devor orqali kiradi.&raquo;"
  },
  "33": {
-  "explanation": "<b>moist.</b> &ldquo;The wall is made of perforated cardboard kept <i>moist</i> by a constant trickle of seawater pumped up from the ocean.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> moist &mdash; &laquo;Devor teshikli kartondan yasalgan bo&lsquo;lib, okeandan tortilgan dengiz suvining doimiy oqimi bilan nam saqlanadi.&raquo;</div>",
+  "explanation": "<b>moist.</b> &ldquo;The wall is made of perforated cardboard kept <i>moist</i> by a constant trickle of seawater pumped up from the ocean.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> moist &mdash; &laquo;Devor teshikli kartondan yasalgan bo&lsquo;lib, okeandan tortilgan dengiz suvining doimiy oqimi bilan nam saqlanadi.&raquo;</div>",
   "highlights": [
    "perforated cardboard kept moist by a constant trickle of seawater"
   ],
@@ -1022,7 +1011,7 @@ const READING_EXPLANATIONS = {
   "uz": "moist &mdash; &laquo;Devor teshikli kartondan yasalgan bo&lsquo;lib, okeandan tortilgan dengiz suvining doimiy oqimi bilan nam saqlanadi.&raquo;"
  },
  "34": {
-  "explanation": "<b>infrared radiation.</b> &ldquo;Heat from the <i>infrared radiation</i> is trapped in the space between the layers, and kept away from the plants.&rdquo; <i>Trapped</i> = <i>gets caught</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> infrared radiation &mdash; &laquo;Infraqizil nurlanishdan kelgan issiqlik qatlamlar orasidagi bo&lsquo;shliqda ushlanib qoladi.&raquo; <i>trapped</i> = <i>gets caught</i>.</div>",
+  "explanation": "<b>infrared radiation.</b> &ldquo;Heat from the <i>infrared radiation</i> is trapped in the space between the layers, and kept away from the plants.&rdquo; <i>Trapped</i> = <i>gets caught</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> infrared radiation &mdash; &laquo;Infraqizil nurlanishdan kelgan issiqlik qatlamlar orasidagi bo&lsquo;shliqda ushlanib qoladi.&raquo; <i>trapped</i> = <i>gets caught</i>.</div>",
   "highlights": [
    "heat from the infrared radiation is trapped in the space between the layers"
   ],
@@ -1031,7 +1020,7 @@ const READING_EXPLANATIONS = {
   "uz": "infrared radiation &mdash; &laquo;Infraqizil nurlanishdan kelgan issiqlik qatlamlar orasidagi bo&lsquo;shliqda ushlanib qoladi.&raquo; <i>trapped</i> = <i>gets caught</i>."
  },
  "35": {
-  "explanation": "<b>pure distilled water.</b> &ldquo;Drops of <i>pure distilled water</i> form on the condenser and flow into a tank for irrigating the crops.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> pure distilled water &mdash; &laquo;Kondensatorda sof distillangan suv tomchilari hosil bo&lsquo;lib, ekinlarni sug&lsquo;orish uchun idishga oqadi.&raquo;</div>",
+  "explanation": "<b>pure distilled water.</b> &ldquo;Drops of <i>pure distilled water</i> form on the condenser and flow into a tank for irrigating the crops.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> pure distilled water &mdash; &laquo;Kondensatorda sof distillangan suv tomchilari hosil bo&lsquo;lib, ekinlarni sug&lsquo;orish uchun idishga oqadi.&raquo;</div>",
   "highlights": [
    "Drops of pure distilled water form on the condenser"
   ],
@@ -1040,7 +1029,7 @@ const READING_EXPLANATIONS = {
   "uz": "pure distilled water &mdash; &laquo;Kondensatorda sof distillangan suv tomchilari hosil bo&lsquo;lib, ekinlarni sug&lsquo;orish uchun idishga oqadi.&raquo;"
  },
  "36": {
-  "explanation": "<b>condenser.</b> The air &ldquo;reaches the <i>condenser</i>, which finally collects from the hot humid air the moisture for irrigating the plants. The condenser is a metal surface kept cool by still more seawater.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> condenser &mdash; Havo &laquo;kondensatorga yetib boradi; u issiq nam havodan namlikni yig&lsquo;adi. Kondensator &ndash; dengiz suvi bilan sovutiladigan metall yuza.&raquo;</div>",
+  "explanation": "<b>condenser.</b> The air &ldquo;reaches the <i>condenser</i>, which finally collects from the hot humid air the moisture for irrigating the plants. The condenser is a metal surface kept cool by still more seawater.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> condenser &mdash; Havo &laquo;kondensatorga yetib boradi; u issiq nam havodan namlikni yig&lsquo;adi. Kondensator &ndash; dengiz suvi bilan sovutiladigan metall yuza.&raquo;</div>",
   "highlights": [
    "The condenser is a metal surface kept cool by still more seawater"
   ],
@@ -1049,7 +1038,7 @@ const READING_EXPLANATIONS = {
   "uz": "condenser &mdash; Havo &laquo;kondensatorga yetib boradi; u issiq nam havodan namlikni yig&lsquo;adi. Kondensator &ndash; dengiz suvi bilan sovutiladigan metall yuza.&raquo;"
  },
  "37": {
-  "explanation": "<b>fans.</b> &ldquo;On windless days, <i>fans</i> ensure a constant flow of air through the greenhouse.&rdquo; <i>Ensure a constant flow</i> = <i>help to retain the flow</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> fans &mdash; &laquo;Shamolsiz kunlarda ventilyatorlar issiqxona bo&lsquo;ylab havoning doimiy oqimini ta&rsquo;minlaydi.&raquo;</div>",
+  "explanation": "<b>fans.</b> &ldquo;On windless days, <i>fans</i> ensure a constant flow of air through the greenhouse.&rdquo; <i>Ensure a constant flow</i> = <i>help to retain the flow</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> fans &mdash; &laquo;Shamolsiz kunlarda ventilyatorlar issiqxona bo&lsquo;ylab havoning doimiy oqimini ta&rsquo;minlaydi.&raquo;</div>",
   "highlights": [
    "On windless days, fans ensure a constant flow of air through the greenhouse"
   ],
@@ -1058,7 +1047,7 @@ const READING_EXPLANATIONS = {
   "uz": "fans &mdash; &laquo;Shamolsiz kunlarda ventilyatorlar issiqxona bo&lsquo;ylab havoning doimiy oqimini ta&rsquo;minlaydi.&raquo;"
  },
  "38": {
-  "explanation": "<b>solar panels.</b> &ldquo;In the future we could make it entirely independent of the grid, powered from a few <i>solar panels</i>.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> solar panels &mdash; &laquo;Kelajakda uni tarmoqdan butunlay mustaqil qilib, bir nechta quyosh panellaridan quvvatlantirish mumkin.&raquo;</div>",
+  "explanation": "<b>solar panels.</b> &ldquo;In the future we could make it entirely independent of the grid, powered from a few <i>solar panels</i>.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> solar panels &mdash; &laquo;Kelajakda uni tarmoqdan butunlay mustaqil qilib, bir nechta quyosh panellaridan quvvatlantirish mumkin.&raquo;</div>",
   "highlights": [
    "powered from a few solar panels"
   ],
@@ -1067,7 +1056,7 @@ const READING_EXPLANATIONS = {
   "uz": "solar panels &mdash; &laquo;Kelajakda uni tarmoqdan butunlay mustaqil qilib, bir nechta quyosh panellaridan quvvatlantirish mumkin.&raquo;"
  },
  "39": {
-  "explanation": "<b>construction costs.</b> &ldquo;Critics point out that <i>construction costs</i> of around $4 a square foot are quite high.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> construction costs &mdash; &laquo;Tanqidchilar kvadrat futiga taxminan 4 dollarlik qurilish xarajatlari ancha yuqori ekanini ta&rsquo;kidlaydi.&raquo;</div>",
+  "explanation": "<b>construction costs.</b> &ldquo;Critics point out that <i>construction costs</i> of around $4 a square foot are quite high.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> construction costs &mdash; &laquo;Tanqidchilar kvadrat futiga taxminan 4 dollarlik qurilish xarajatlari ancha yuqori ekanini ta&rsquo;kidlaydi.&raquo;</div>",
   "highlights": [
    "construction costs of around $4 a square foot are quite high"
   ],
@@ -1076,7 +1065,7 @@ const READING_EXPLANATIONS = {
   "uz": "construction costs &mdash; &laquo;Tanqidchilar kvadrat futiga taxminan 4 dollarlik qurilish xarajatlari ancha yuqori ekanini ta&rsquo;kidlaydi.&raquo;"
  },
  "40": {
-  "explanation": "<b>environmentally-friendly.</b> The greenhouse &ldquo;really suggests an <i>environmentally-friendly</i> way of providing air conditioning on a scale large enough to cool large greenhouses&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> environmentally-friendly &mdash; Issiqxona &laquo;katta miqyosda havoni sovutishning ekologik toza usulini taklif qiladi&raquo;.</div>",
+  "explanation": "<b>environmentally-friendly.</b> The greenhouse &ldquo;really suggests an <i>environmentally-friendly</i> way of providing air conditioning on a scale large enough to cool large greenhouses&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> environmentally-friendly &mdash; Issiqxona &laquo;katta miqyosda havoni sovutishning ekologik toza usulini taklif qiladi&raquo;.</div>",
   "highlights": [
    "an environmentally-friendly way of providing air conditioning"
   ],
@@ -1092,18 +1081,18 @@ return { STORAGE_KEY: STORAGE_KEY, SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCAB
 </script>
 <script src="../../reading.js"></script>
 
-<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+<!-- в•ђв•ђ PDFX в•ђв•ђ the one-click PDF exporter, shared verbatim by the Writing,
      Listening and Reading tests. Inlined, so it works from a memory stick
      with the network off. See the header comment inside for what it does and
-     why it is not jsPDF + html2canvas. ══ -->
+     why it is not jsPDF + html2canvas. в•ђв•ђ -->
 
 
-<!-- ════════════════════════════════════════════════════════════════════════
-     MONOCHROME SKIN — grey / black / white only.
+<!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+     MONOCHROME SKIN вЂ” grey / black / white only.
      Appended last on purpose: it re-tokenises the login card, the completion
      screen and the certificate without touching #stage-reading, which is the
      Arial exam screen and already neutral. Nothing here introduces a hue.
-     ════════════════════════════════════════════════════════════════════════ -->
+     в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
 
 
 <script src="../../ieltsx-data.js"></script>
@@ -1111,3 +1100,5 @@ return { STORAGE_KEY: STORAGE_KEY, SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCAB
 <script type="module" src="../../site-access.js"></script>
 </body>
 </html>
+
+

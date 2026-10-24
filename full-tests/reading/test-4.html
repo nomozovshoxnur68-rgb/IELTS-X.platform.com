@@ -3,20 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IELTS Academic Reading — Full Reading Test 14</title>
+<title>IELTS Academic Reading вЂ” Full Reading Test 14</title>
 <link rel="stylesheet" href="../../reading.css">
-<<<<<<< HEAD
-=======
 <script src="/assets/js/access-gate.js"></script>
->>>>>>> fb33267 (Initial commit)
 </head>
 <body>
 
-<!-- ============================================================
+<!-- ====
      STAGE 1: REGISTRATION
-     ============================================================ -->
 <!-- COSMOS: the restart sheet is removed. A reload restarts the paper
-     silently — restartSheet() falls through to startFresh() with no
+     silently вЂ” restartSheet() falls through to startFresh() with no
      #resume-sheet in the document. -->
 
 <!-- The boot class is set here, before the registration markup is parsed, so
@@ -25,21 +21,18 @@
 <!-- The login / registration card and the instructions screen have been removed: the paper opens straight on Passage 1. -->
 
 
-<!-- ============================================================
+<!-- ====
      STAGE 2: READING INSTRUCTIONS
-     ============================================================ -->
 
-<!-- ============================================================
+<!-- ====
      STAGE 3: READING TEST  (real-exam chrome)
-     ============================================================ -->
 <!-- The CDI mark used to live on the registration card. That card is gone, so the
      one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
      and paints the completion screen and the certificate from it. -->
 <img class="brand-logo" alt="READING CDI" hidden style="display:none" src="data:image/png;base64,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">
 
-<!-- ============================================================
+<!-- ====
      STAGE 1: LOGIN / REGISTRATION
-     ============================================================ -->
 <div class="stage active" id="stage-registration">
   <div class="rcx-card">
     <span class="rcx-wordmark">READING_CDI</span>
@@ -82,7 +75,7 @@
   <div id="pbar">
     <div id="pbar-inner">
       <span id="pbar-title">Part 1</span>
-      <span id="pbar-desc">Read the text and answer questions 1–13.</span>
+      <span id="pbar-desc">Read the text and answer questions 1вЂ“13.</span>
     </div>
   </div>
 
@@ -146,9 +139,8 @@
   </div>
 </div>
 
-<!-- ============================================================
+<!-- ====
      STAGE 4: COMPLETION
-     ============================================================ -->
 <div class="stage" id="stage-completion">
   <div class="complete-card">
     <div class="ch-comp-body">
@@ -178,7 +170,7 @@
 
       <div class="ch-note">
         <p>Sitting a full paper under real conditions is much harder than most people think &mdash; and analysing it afterwards is what separates the high scorers. You just did the hard half. Now go and read your mistakes.</p>
-        <!-- ===== EDIT PER TEST · AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
+        <!-- ===== EDIT PER TEST В· AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
         <p class="ch-sign">Built from scratch by <strong>Islom Kenjayev</strong> &middot; IELTS 8.5 (L&nbsp;9.0 &middot; R&nbsp;9.0)</p>
       </div>
 
@@ -204,9 +196,8 @@
   </div>
 </div>
 
-<!-- ============================================================
+<!-- ====
      STAGE 5: RESULTS
-     ============================================================ -->
 <div class="stage" id="stage-results">
   <div class="results-modal-box">
     <button type="button" class="results-modal-close" aria-label="Close" onclick="ExamApp.closeResultsModal()">&times;</button>
@@ -223,9 +214,8 @@
   </div>
 </div>
 
-<!-- ============================================================
+<!-- ====
      OVERLAYS
-     ============================================================ -->
 <div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
   <div class="warning-card">
     <div class="wc-body">
@@ -293,7 +283,7 @@
   </div>
 </div>
 
-<!-- V3: notes drawer — mirrors the real player's right-hand Notes panel -->
+<!-- V3: notes drawer вЂ” mirrors the real player's right-hand Notes panel -->
 <aside id="notes-drawer" class="notes-drawer" aria-label="Notes" aria-hidden="true">
   <div class="nd-head">
     <span class="nd-title">Notes</span>
@@ -317,11 +307,10 @@
 <div id="print-report"></div>
 
 <script>
-/* ============================================================
-   TEST DATA — Full Reading Test 14
+/* ====
+   TEST DATA вЂ” Full Reading Test 14
    Passages, questions, answers and explanations for this test only.
    The functions live in reading.js (shared by every test).
-   ============================================================ */
 window.READING_TEST = (function () {
 const STORAGE_KEY = "cdi_reading_v3_full_reading_test_14";   // trailing digits also set CERT_TEST_NO
 
@@ -1100,7 +1089,7 @@ const VOCABULARY_DATA = {
 
 const READING_EXPLANATIONS = {
  "1": {
-  "explanation": "<b>NOT GIVEN.</b> The passage says Alex learned to imitate &ldquo;almost one hundred English words&rdquo;, but nothing is said about the <i>order</i> in which he learned things &ndash; &lsquo;firstly&rsquo; makes a claim about sequence that the text never makes.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; Matnda Alex yuzga yaqin inglizcha so&lsquo;zni takrorlashni o&lsquo;rganganini aytiladi, lekin u nimani <i>avval</i> o&lsquo;rgangani haqida hech narsa yo&lsquo;q. &laquo;Firstly&raquo; ketma-ketlik haqidagi da&rsquo;vo, matnda esa bunday ma&rsquo;lumot yo&lsquo;q.</div>",
+  "explanation": "<b>NOT GIVEN.</b> The passage says Alex learned to imitate &ldquo;almost one hundred English words&rdquo;, but nothing is said about the <i>order</i> in which he learned things &ndash; &lsquo;firstly&rsquo; makes a claim about sequence that the text never makes.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; Matnda Alex yuzga yaqin inglizcha so&lsquo;zni takrorlashni o&lsquo;rganganini aytiladi, lekin u nimani <i>avval</i> o&lsquo;rgangani haqida hech narsa yo&lsquo;q. &laquo;Firstly&raquo; ketma-ketlik haqidagi da&rsquo;vo, matnda esa bunday ma&rsquo;lumot yo&lsquo;q.</div>",
   "highlights": [
    "imitate almost one hundred English words"
   ],
@@ -1114,7 +1103,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; Matnda Alex yuzga yaqin inglizcha so&lsquo;zni takrorlashni o&lsquo;rganganini aytiladi, lekin u nimani <i>avval</i> o&lsquo;rgangani haqida hech narsa yo&lsquo;q. &laquo;Firstly&raquo; ketma-ketlik haqidagi da&rsquo;vo, matnda esa bunday ma&rsquo;lumot yo&lsquo;q."
  },
  "2": {
-  "explanation": "<b>NOT GIVEN.</b> Paragraph D describes Alex&rsquo;s moods &ndash; dominating the other parrots, acting huffy, falling to pieces over a male assistant &ndash; but never says he was frightened of humans at the start.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; D xatboshida Alexning xulqi tasvirlanadi, biroq u boshida odamlardan qo&lsquo;rqqani haqida hech narsa aytilmagan.</div>",
+  "explanation": "<b>NOT GIVEN.</b> Paragraph D describes Alex&rsquo;s moods &ndash; dominating the other parrots, acting huffy, falling to pieces over a male assistant &ndash; but never says he was frightened of humans at the start.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; D xatboshida Alexning xulqi tasvirlanadi, biroq u boshida odamlardan qo&lsquo;rqqani haqida hech narsa aytilmagan.</div>",
   "highlights": [
    "acted huffy at times around Pepperberg"
   ],
@@ -1123,7 +1112,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; D xatboshida Alexning xulqi tasvirlanadi, biroq u boshida odamlardan qo&lsquo;rqqani haqida hech narsa aytilmagan."
  },
  "3": {
-  "explanation": "<b>FALSE.</b> The opposite: &ldquo;many scientists believed animals were incapable of any thought. They were simply machines, robots programmed to react to stimuli.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; Aksincha: &laquo;ko&lsquo;p olimlar hayvonlar umuman fikrlay olmaydi deb hisoblashardi; ular shunchaki stimulga javob beradigan robotlar edi&raquo;.</div>",
+  "explanation": "<b>FALSE.</b> The opposite: &ldquo;many scientists believed animals were incapable of any thought. They were simply machines, robots programmed to react to stimuli.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; Aksincha: &laquo;ko&lsquo;p olimlar hayvonlar umuman fikrlay olmaydi deb hisoblashardi; ular shunchaki stimulga javob beradigan robotlar edi&raquo;.</div>",
   "highlights": [
    "many scientists believed animals were incapable of any thought"
   ],
@@ -1137,7 +1126,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; Aksincha: &laquo;ko&lsquo;p olimlar hayvonlar umuman fikrlay olmaydi deb hisoblashardi; ular shunchaki stimulga javob beradigan robotlar edi&raquo;."
  },
  "4": {
-  "explanation": "<b>TRUE.</b> Pepperberg worked with Alex for thirty years, and only &ldquo;because of their work, the notion that animals can think is no longer so fanciful&rdquo;. Change came slowly &ndash; &ldquo;bit by bit&rdquo;, as paragraph C puts it.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; Pepperberg Alex bilan o&lsquo;ttiz yil ishlagan va faqat shu ishlar tufayli hayvonlar fikrlaydi degan qarash g&lsquo;alati tuyulmay qoldi. C xatboshidagi &laquo;bit by bit&raquo; ham sekin o&lsquo;zgarishni ko&lsquo;rsatadi.</div>",
+  "explanation": "<b>TRUE.</b> Pepperberg worked with Alex for thirty years, and only &ldquo;because of their work, the notion that animals can think is no longer so fanciful&rdquo;. Change came slowly &ndash; &ldquo;bit by bit&rdquo;, as paragraph C puts it.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; Pepperberg Alex bilan o&lsquo;ttiz yil ishlagan va faqat shu ishlar tufayli hayvonlar fikrlaydi degan qarash g&lsquo;alati tuyulmay qoldi. C xatboshidagi &laquo;bit by bit&raquo; ham sekin o&lsquo;zgarishni ko&lsquo;rsatadi.</div>",
   "highlights": [
    "the notion that animals can think is no longer so fanciful"
   ],
@@ -1155,7 +1144,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; Pepperberg Alex bilan o&lsquo;ttiz yil ishlagan va faqat shu ishlar tufayli hayvonlar fikrlaydi degan qarash g&lsquo;alati tuyulmay qoldi. C xatboshidagi &laquo;bit by bit&raquo; ham sekin o&lsquo;zgarishni ko&lsquo;rsatadi."
  },
  "5": {
-  "explanation": "<b>TRUE.</b> Paragraph G: &ldquo;because Alex was able to produce a close approximation of the sounds of some English words, Pepperberg could ask him questions about a bird&rsquo;s basic understanding of the world.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> TRUE &mdash; G xatboshi: Alex ba&rsquo;zi inglizcha so&lsquo;zlarning tovushini taxminan chiqara olgani uchun Pepperberg undan dunyo haqidagi tushunchasi bo&lsquo;yicha savol berishi mumkin edi.</div>",
+  "explanation": "<b>TRUE.</b> Paragraph G: &ldquo;because Alex was able to produce a close approximation of the sounds of some English words, Pepperberg could ask him questions about a bird&rsquo;s basic understanding of the world.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> TRUE &mdash; G xatboshi: Alex ba&rsquo;zi inglizcha so&lsquo;zlarning tovushini taxminan chiqara olgani uchun Pepperberg undan dunyo haqidagi tushunchasi bo&lsquo;yicha savol berishi mumkin edi.</div>",
   "highlights": [
    "produce a close approximation of the sounds of some English words"
   ],
@@ -1173,7 +1162,7 @@ const READING_EXPLANATIONS = {
   "uz": "TRUE &mdash; G xatboshi: Alex ba&rsquo;zi inglizcha so&lsquo;zlarning tovushini taxminan chiqara olgani uchun Pepperberg undan dunyo haqidagi tushunchasi bo&lsquo;yicha savol berishi mumkin edi."
  },
  "6": {
-  "explanation": "<b>FALSE.</b> He did those things because he was <i>bored</i>, not to concentrate: &ldquo;he knows all this, and he gets bored, so he interrupts the others, or he gives the wrong answer just to be obstinate.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> FALSE &mdash; U buni diqqatini jamlash uchun emas, <i>zerikkani</i> uchun qilgan: &laquo;u hammasini biladi va zerikadi, shuning uchun boshqalarga xalaqit beradi yoki qaysarligidan ataylab noto&lsquo;g&lsquo;ri javob beradi&raquo;.</div>",
+  "explanation": "<b>FALSE.</b> He did those things because he was <i>bored</i>, not to concentrate: &ldquo;he knows all this, and he gets bored, so he interrupts the others, or he gives the wrong answer just to be obstinate.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> FALSE &mdash; U buni diqqatini jamlash uchun emas, <i>zerikkani</i> uchun qilgan: &laquo;u hammasini biladi va zerikadi, shuning uchun boshqalarga xalaqit beradi yoki qaysarligidan ataylab noto&lsquo;g&lsquo;ri javob beradi&raquo;.</div>",
   "highlights": [
    "he knows all this, and he gets bored"
   ],
@@ -1187,7 +1176,7 @@ const READING_EXPLANATIONS = {
   "uz": "FALSE &mdash; U buni diqqatini jamlash uchun emas, <i>zerikkani</i> uchun qilgan: &laquo;u hammasini biladi va zerikadi, shuning uchun boshqalarga xalaqit beradi yoki qaysarligidan ataylab noto&lsquo;g&lsquo;ri javob beradi&raquo;."
  },
  "7": {
-  "explanation": "<b>100 English words.</b> &ldquo;Alex learned how to use his vocal tract to imitate almost <i>one hundred English words</i>&rdquo; &ndash; the summary&rsquo;s &lsquo;vocal tract&rsquo; points you straight at the sentence.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> 100 English words &mdash; &laquo;Alex o&lsquo;z tovush a&rsquo;zolaridan foydalanib yuzga yaqin inglizcha so&lsquo;zni takrorlashni o&lsquo;rgandi&raquo;. Xulosadagi &laquo;vocal tract&raquo; aynan shu gapga olib boradi.</div>",
+  "explanation": "<b>100 English words.</b> &ldquo;Alex learned how to use his vocal tract to imitate almost <i>one hundred English words</i>&rdquo; &ndash; the summary&rsquo;s &lsquo;vocal tract&rsquo; points you straight at the sentence.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> 100 English words &mdash; &laquo;Alex o&lsquo;z tovush a&rsquo;zolaridan foydalanib yuzga yaqin inglizcha so&lsquo;zni takrorlashni o&lsquo;rgandi&raquo;. Xulosadagi &laquo;vocal tract&raquo; aynan shu gapga olib boradi.</div>",
   "highlights": [
    "learned how to use his vocal tract"
   ],
@@ -1201,7 +1190,7 @@ const READING_EXPLANATIONS = {
   "uz": "100 English words &mdash; &laquo;Alex o&lsquo;z tovush a&rsquo;zolaridan foydalanib yuzga yaqin inglizcha so&lsquo;zni takrorlashni o&lsquo;rgandi&raquo;. Xulosadagi &laquo;vocal tract&raquo; aynan shu gapga olib boradi."
  },
  "8": {
-  "explanation": "<b>chimpanzees.</b> &ldquo;Scientists thought that <i>chimpanzees</i> were better subjects, although, of course, chimps can&rsquo;t speak.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> chimpanzees &mdash; &laquo;Olimlar shimpanzelarni yaxshiroq tadqiqot ob&rsquo;ekti deb bilishardi, garchi ular gapira olmasa ham&raquo;.</div>",
+  "explanation": "<b>chimpanzees.</b> &ldquo;Scientists thought that <i>chimpanzees</i> were better subjects, although, of course, chimps can&rsquo;t speak.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> chimpanzees &mdash; &laquo;Olimlar shimpanzelarni yaxshiroq tadqiqot ob&rsquo;ekti deb bilishardi, garchi ular gapira olmasa ham&raquo;.</div>",
   "highlights": [
    "Scientists thought that chimpanzees were better subjects"
   ],
@@ -1215,7 +1204,7 @@ const READING_EXPLANATIONS = {
   "uz": "chimpanzees &mdash; &laquo;Olimlar shimpanzelarni yaxshiroq tadqiqot ob&rsquo;ekti deb bilishardi, garchi ular gapira olmasa ham&raquo;."
  },
  "9": {
-  "explanation": "<b>avian cognition.</b> Pepperberg&rsquo;s own words in paragraph F: &ldquo;My plan always was to use his imitative skills to get a better understanding of <i>avian cognition</i>.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> avian cognition &mdash; F xatboshida Pepperbergning o&lsquo;z so&lsquo;zlari: &laquo;Rejam har doim uning taqlid qobiliyatidan qushlar idroki haqida chuqurroq tushuncha olish uchun foydalanish edi&raquo;.</div>",
+  "explanation": "<b>avian cognition.</b> Pepperberg&rsquo;s own words in paragraph F: &ldquo;My plan always was to use his imitative skills to get a better understanding of <i>avian cognition</i>.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> avian cognition &mdash; F xatboshida Pepperbergning o&lsquo;z so&lsquo;zlari: &laquo;Rejam har doim uning taqlid qobiliyatidan qushlar idroki haqida chuqurroq tushuncha olish uchun foydalanish edi&raquo;.</div>",
   "highlights": [
    "to get a better understanding of avian cognition"
   ],
@@ -1229,7 +1218,7 @@ const READING_EXPLANATIONS = {
   "uz": "avian cognition &mdash; F xatboshida Pepperbergning o&lsquo;z so&lsquo;zlari: &laquo;Rejam har doim uning taqlid qobiliyatidan qushlar idroki haqida chuqurroq tushuncha olish uchun foydalanish edi&raquo;."
  },
  "10": {
-  "explanation": "<b>particularly chosen.</b> She let the shop assistant pick the bird &ldquo;because she didn&rsquo;t want other scientists saying later that she&rsquo;d <i>particularly chosen</i> an especially smart bird for her work&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> particularly chosen &mdash; Qushni sotuvchi tanlagan, chunki Pepperberg keyinchalik olimlar &laquo;u ataylab juda aqlli qushni tanlagan&raquo; deyishini istamagan.</div>",
+  "explanation": "<b>particularly chosen.</b> She let the shop assistant pick the bird &ldquo;because she didn&rsquo;t want other scientists saying later that she&rsquo;d <i>particularly chosen</i> an especially smart bird for her work&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> particularly chosen &mdash; Qushni sotuvchi tanlagan, chunki Pepperberg keyinchalik olimlar &laquo;u ataylab juda aqlli qushni tanlagan&raquo; deyishini istamagan.</div>",
   "highlights": [
    "particularly chosen an especially smart bird for her work"
   ],
@@ -1243,7 +1232,7 @@ const READING_EXPLANATIONS = {
   "uz": "particularly chosen &mdash; Qushni sotuvchi tanlagan, chunki Pepperberg keyinchalik olimlar &laquo;u ataylab juda aqlli qushni tanlagan&raquo; deyishini istamagan."
  },
  "11": {
-  "explanation": "<b>color.</b> She held up a green key and a green cup and asked &ldquo;What&rsquo;s same?&rdquo; &ndash; &ldquo;Without hesitation, Alex&rsquo;s beak opened: <i>Co-lor</i>.&rdquo; (&lsquo;Shape&rsquo; was his answer to what was <i>different</i>.)<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> color &mdash; Pepperberg yashil kalit va yashil kosani ko&lsquo;rsatib &laquo;What&rsquo;s same?&raquo; deb so&lsquo;raganda Alex darhol &laquo;Co-lor&raquo; degan. (&laquo;Shape&raquo; esa farqi haqidagi javob.)</div>",
+  "explanation": "<b>color.</b> She held up a green key and a green cup and asked &ldquo;What&rsquo;s same?&rdquo; &ndash; &ldquo;Without hesitation, Alex&rsquo;s beak opened: <i>Co-lor</i>.&rdquo; (&lsquo;Shape&rsquo; was his answer to what was <i>different</i>.)<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> color &mdash; Pepperberg yashil kalit va yashil kosani ko&lsquo;rsatib &laquo;What&rsquo;s same?&raquo; deb so&lsquo;raganda Alex darhol &laquo;Co-lor&raquo; degan. (&laquo;Shape&raquo; esa farqi haqidagi javob.)</div>",
   "highlights": [
    "Without hesitation, Alex"
   ],
@@ -1257,7 +1246,7 @@ const READING_EXPLANATIONS = {
   "uz": "color &mdash; Pepperberg yashil kalit va yashil kosani ko&lsquo;rsatib &laquo;What&rsquo;s same?&raquo; deb so&lsquo;raganda Alex darhol &laquo;Co-lor&raquo; degan. (&laquo;Shape&raquo; esa farqi haqidagi javob.)"
  },
  "12": {
-  "explanation": "<b>wrong pronunciation.</b> Alex shouted &ldquo;Talk clearly!&rdquo; when one of the younger birds &ldquo;talked with <i>wrong pronunciation</i>&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> wrong pronunciation &mdash; Yosh qushlardan biri noto&lsquo;g&lsquo;ri talaffuz bilan gapirganda Alex &laquo;Talk clearly!&raquo; deb baqirgan.</div>",
+  "explanation": "<b>wrong pronunciation.</b> Alex shouted &ldquo;Talk clearly!&rdquo; when one of the younger birds &ldquo;talked with <i>wrong pronunciation</i>&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> wrong pronunciation &mdash; Yosh qushlardan biri noto&lsquo;g&lsquo;ri talaffuz bilan gapirganda Alex &laquo;Talk clearly!&raquo; deb baqirgan.</div>",
   "highlights": [
    "talked with wrong pronunciation"
   ],
@@ -1271,7 +1260,7 @@ const READING_EXPLANATIONS = {
   "uz": "wrong pronunciation &mdash; Yosh qushlardan biri noto&lsquo;g&lsquo;ri talaffuz bilan gapirganda Alex &laquo;Talk clearly!&raquo; deb baqirgan."
  },
  "13": {
-  "explanation": "<b>teenager.</b> Pepperberg&rsquo;s own comparison: &ldquo;At this stage, he&rsquo;s like a <i>teenager</i>; he&rsquo;s moody, and I&rsquo;m never sure what he&rsquo;ll do.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> teenager &mdash; Pepperbergning taqqoslashi: &laquo;Bu bosqichda u o&lsquo;smirga o&lsquo;xshaydi; kayfiyati o&lsquo;zgaruvchan va nima qilishini bilmayman&raquo;.</div>",
+  "explanation": "<b>teenager.</b> Pepperberg&rsquo;s own comparison: &ldquo;At this stage, he&rsquo;s like a <i>teenager</i>; he&rsquo;s moody, and I&rsquo;m never sure what he&rsquo;ll do.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> teenager &mdash; Pepperbergning taqqoslashi: &laquo;Bu bosqichda u o&lsquo;smirga o&lsquo;xshaydi; kayfiyati o&lsquo;zgaruvchan va nima qilishini bilmayman&raquo;.</div>",
   "highlights": [
    "At this stage, he"
   ],
@@ -1285,7 +1274,7 @@ const READING_EXPLANATIONS = {
   "uz": "teenager &mdash; Pepperbergning taqqoslashi: &laquo;Bu bosqichda u o&lsquo;smirga o&lsquo;xshaydi; kayfiyati o&lsquo;zgaruvchan va nima qilishini bilmayman&raquo;."
  },
  "14": {
-  "explanation": "<b>i.</b> Paragraph A is about how far Drucker&rsquo;s ideas reached: &ldquo;The range of his influence was extraordinary&hellip; from big organisations to small ones, from the public sector to the private&hellip; you can find Drucker&rsquo;s fingerprints.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> i &mdash; A xatboshi Drukker g&lsquo;oyalarining qanchalik keng tarqalgani haqida: &laquo;Uning ta&rsquo;sir doirasi favqulodda keng edi&hellip; hamma joyda uning izlarini topasiz&raquo;.</div>",
+  "explanation": "<b>i.</b> Paragraph A is about how far Drucker&rsquo;s ideas reached: &ldquo;The range of his influence was extraordinary&hellip; from big organisations to small ones, from the public sector to the private&hellip; you can find Drucker&rsquo;s fingerprints.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> i &mdash; A xatboshi Drukker g&lsquo;oyalarining qanchalik keng tarqalgani haqida: &laquo;Uning ta&rsquo;sir doirasi favqulodda keng edi&hellip; hamma joyda uning izlarini topasiz&raquo;.</div>",
   "highlights": [
    "The range of his influence was extraordinary"
   ],
@@ -1303,7 +1292,7 @@ const READING_EXPLANATIONS = {
   "uz": "i &mdash; A xatboshi Drukker g&lsquo;oyalarining qanchalik keng tarqalgani haqida: &laquo;Uning ta&rsquo;sir doirasi favqulodda keng edi&hellip; hamma joyda uning izlarini topasiz&raquo;."
  },
  "15": {
-  "explanation": "<b>v.</b> Paragraph B is a list of his earliest books &ndash; <i>The End of Economic Man</i> (1939), <i>The Future of Industrial Man</i> (1942) and <i>The Concept of the Corporation</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> v &mdash; B xatboshida uning dastlabki kitoblari sanaladi: 1939, 1942-yilgi asarlar va <i>The Concept of the Corporation</i>.</div>",
+  "explanation": "<b>v.</b> Paragraph B is a list of his earliest books &ndash; <i>The End of Economic Man</i> (1939), <i>The Future of Industrial Man</i> (1942) and <i>The Concept of the Corporation</i>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> v &mdash; B xatboshida uning dastlabki kitoblari sanaladi: 1939, 1942-yilgi asarlar va <i>The Concept of the Corporation</i>.</div>",
   "highlights": [
    "His first two books"
   ],
@@ -1317,7 +1306,7 @@ const READING_EXPLANATIONS = {
   "uz": "v &mdash; B xatboshida uning dastlabki kitoblari sanaladi: 1939, 1942-yilgi asarlar va <i>The Concept of the Corporation</i>."
  },
  "16": {
-  "explanation": "<b>ix.</b> Paragraph C is about the worker changing from a cost into a resource and from an industrial proletariat into a knowledge worker who is &ldquo;neither bosses nor workers, but something in between&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> ix &mdash; C xatboshi ishchining xarajatdan resursga, sanoat proletariatidan esa &laquo;na boshliq, na ishchi&raquo; bo&lsquo;lgan bilim xodimiga aylanishi haqida.</div>",
+  "explanation": "<b>ix.</b> Paragraph C is about the worker changing from a cost into a resource and from an industrial proletariat into a knowledge worker who is &ldquo;neither bosses nor workers, but something in between&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> ix &mdash; C xatboshi ishchining xarajatdan resursga, sanoat proletariatidan esa &laquo;na boshliq, na ishchi&raquo; bo&lsquo;lgan bilim xodimiga aylanishi haqida.</div>",
   "highlights": [
    "The second argument had to do with the rise of knowledge workers"
   ],
@@ -1335,7 +1324,7 @@ const READING_EXPLANATIONS = {
   "uz": "ix &mdash; C xatboshi ishchining xarajatdan resursga, sanoat proletariatidan esa &laquo;na boshliq, na ishchi&raquo; bo&lsquo;lgan bilim xodimiga aylanishi haqida."
  },
  "17": {
-  "explanation": "<b>vi.</b> Paragraph D is the balance itself: &ldquo;if you rely too much on empowerment you risk anarchy, whereas if you rely too much on command-and-control you sacrifice creativity.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> vi &mdash; D xatboshi muvozanat haqida: &laquo;erkinlikka ortiqcha tayansangiz &ndash; anarxiya, buyruqbozlikka ortiqcha tayansangiz &ndash; ijodkorlikdan voz kechasiz&raquo;.</div>",
+  "explanation": "<b>vi.</b> Paragraph D is the balance itself: &ldquo;if you rely too much on empowerment you risk anarchy, whereas if you rely too much on command-and-control you sacrifice creativity.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> vi &mdash; D xatboshi muvozanat haqida: &laquo;erkinlikka ortiqcha tayansangiz &ndash; anarxiya, buyruqbozlikka ortiqcha tayansangiz &ndash; ijodkorlikdan voz kechasiz&raquo;.</div>",
   "highlights": [
    "if you rely too much on empowerment you risk anarchy"
   ],
@@ -1349,7 +1338,7 @@ const READING_EXPLANATIONS = {
   "uz": "vi &mdash; D xatboshi muvozanat haqida: &laquo;erkinlikka ortiqcha tayansangiz &ndash; anarxiya, buyruqbozlikka ortiqcha tayansangiz &ndash; ijodkorlikdan voz kechasiz&raquo;."
  },
  "18": {
-  "explanation": "<b>ii.</b> Paragraph E opens &ldquo;There are three persistent criticisms of Drucker&rsquo;s work&rdquo; and then lists all three.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> ii &mdash; E xatboshi &laquo;Drukker ishiga nisbatan uchta doimiy tanqid bor&raquo; deb boshlanadi va uchalasini sanaydi.</div>",
+  "explanation": "<b>ii.</b> Paragraph E opens &ldquo;There are three persistent criticisms of Drucker&rsquo;s work&rdquo; and then lists all three.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> ii &mdash; E xatboshi &laquo;Drukker ishiga nisbatan uchta doimiy tanqid bor&raquo; deb boshlanadi va uchalasini sanaydi.</div>",
   "highlights": [
    "There are three persistent criticisms"
   ],
@@ -1363,7 +1352,7 @@ const READING_EXPLANATIONS = {
   "uz": "ii &mdash; E xatboshi &laquo;Drukker ishiga nisbatan uchta doimiy tanqid bor&raquo; deb boshlanadi va uchalasini sanaydi."
  },
  "19": {
-  "explanation": "<b>viii.</b> Paragraph F weighs the criticisms: &ldquo;There is some truth in the first two arguments&hellip; But the third argument is short-sighted and unfair.&rdquo; That is both sides &ndash; the pros and cons.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> viii &mdash; F xatboshi tanqidlarni tarozida tortadi: birinchi ikkitasida jon bor, uchinchisi esa adolatsiz. Ya&rsquo;ni ijobiy va salbiy tomonlar.</div>",
+  "explanation": "<b>viii.</b> Paragraph F weighs the criticisms: &ldquo;There is some truth in the first two arguments&hellip; But the third argument is short-sighted and unfair.&rdquo; That is both sides &ndash; the pros and cons.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> viii &mdash; F xatboshi tanqidlarni tarozida tortadi: birinchi ikkitasida jon bor, uchinchisi esa adolatsiz. Ya&rsquo;ni ijobiy va salbiy tomonlar.</div>",
   "highlights": [
    "There is some truth in the first two arguments"
   ],
@@ -1377,7 +1366,7 @@ const READING_EXPLANATIONS = {
   "uz": "viii &mdash; F xatboshi tanqidlarni tarozida tortadi: birinchi ikkitasida jon bor, uchinchisi esa adolatsiz. Ya&rsquo;ni ijobiy va salbiy tomonlar."
  },
  "20": {
-  "explanation": "<b>NOT GIVEN.</b> Drucker wanted workers treated as resources and as brain workers, but the passage never claims they should have the <i>same status</i> as their employers.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; Drukker ishchilarni resurs va aqliy mehnat egasi sifatida ko&lsquo;rishni istagan, lekin ular ish beruvchilar bilan <i>teng maqomda</i> bo&lsquo;lishi kerak deyilmagan.</div>",
+  "explanation": "<b>NOT GIVEN.</b> Drucker wanted workers treated as resources and as brain workers, but the passage never claims they should have the <i>same status</i> as their employers.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; Drukker ishchilarni resurs va aqliy mehnat egasi sifatida ko&lsquo;rishni istagan, lekin ular ish beruvchilar bilan <i>teng maqomda</i> bo&lsquo;lishi kerak deyilmagan.</div>",
   "highlights": [
    "they were neither"
   ],
@@ -1391,7 +1380,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; Drukker ishchilarni resurs va aqliy mehnat egasi sifatida ko&lsquo;rishni istagan, lekin ular ish beruvchilar bilan <i>teng maqomda</i> bo&lsquo;lishi kerak deyilmagan."
  },
  "21": {
-  "explanation": "<b>YES.</b> Paragraph C: knowledge workers were &ldquo;neither &lsquo;bosses&rsquo; nor &lsquo;workers&rsquo;, but something in between: entrepreneurs who had responsibility for developing their most important resource, brainpower&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; C xatboshi: bilim xodimlari &laquo;na boshliq, na ishchi, balki oraliq &ndash; o&lsquo;zining eng muhim resursi, ya&rsquo;ni aqlini rivojlantirish mas&rsquo;uliyatini olgan tadbirkorlar&raquo;.</div>",
+  "explanation": "<b>YES.</b> Paragraph C: knowledge workers were &ldquo;neither &lsquo;bosses&rsquo; nor &lsquo;workers&rsquo;, but something in between: entrepreneurs who had responsibility for developing their most important resource, brainpower&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> YES &mdash; C xatboshi: bilim xodimlari &laquo;na boshliq, na ishchi, balki oraliq &ndash; o&lsquo;zining eng muhim resursi, ya&rsquo;ni aqlini rivojlantirish mas&rsquo;uliyatini olgan tadbirkorlar&raquo;.</div>",
   "highlights": [
    "entrepreneurs who had responsibility for developing their most important resource, brainpower"
   ],
@@ -1405,7 +1394,7 @@ const READING_EXPLANATIONS = {
   "uz": "YES &mdash; C xatboshi: bilim xodimlari &laquo;na boshliq, na ishchi, balki oraliq &ndash; o&lsquo;zining eng muhim resursi, ya&rsquo;ni aqlini rivojlantirish mas&rsquo;uliyatini olgan tadbirkorlar&raquo;."
  },
  "22": {
-  "explanation": "<b>NO.</b> The opposite: his ideas &ldquo;have passed into conventional wisdom&hellip; he is the victim of his own success&rdquo;, and his work on voluntary organisations &ldquo;remained at the cutting edge&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NO &mdash; Aksincha: uning g&lsquo;oyalari umumqabul haqiqatga aylangan, ya&rsquo;ni u o&lsquo;z muvaffaqiyatining qurboni; ixtiyoriy tashkilotlar haqidagi ishlari esa hamon eng ilg&lsquo;or.</div>",
+  "explanation": "<b>NO.</b> The opposite: his ideas &ldquo;have passed into conventional wisdom&hellip; he is the victim of his own success&rdquo;, and his work on voluntary organisations &ldquo;remained at the cutting edge&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NO &mdash; Aksincha: uning g&lsquo;oyalari umumqabul haqiqatga aylangan, ya&rsquo;ni u o&lsquo;z muvaffaqiyatining qurboni; ixtiyoriy tashkilotlar haqidagi ishlari esa hamon eng ilg&lsquo;or.</div>",
   "highlights": [
    "remained at the cutting edge"
   ],
@@ -1419,7 +1408,7 @@ const READING_EXPLANATIONS = {
   "uz": "NO &mdash; Aksincha: uning g&lsquo;oyalari umumqabul haqiqatga aylangan, ya&rsquo;ni u o&lsquo;z muvaffaqiyatining qurboni; ixtiyoriy tashkilotlar haqidagi ishlari esa hamon eng ilg&lsquo;or."
  },
  "23": {
-  "explanation": "<b>A.</b> Paragraph C: &ldquo;Managers had to stop treating workers like cogs in a huge inhuman machine and start treating them as brain workers&rdquo; &ndash; executives and workers brought into balance.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> A &mdash; C xatboshi: &laquo;Menejerlar ishchilarga ulkan mashinaning tishli g&lsquo;ildiragi kabi emas, aqliy mehnat egalari kabi munosabatda bo&lsquo;lishi kerak edi&raquo;.</div>",
+  "explanation": "<b>A.</b> Paragraph C: &ldquo;Managers had to stop treating workers like cogs in a huge inhuman machine and start treating them as brain workers&rdquo; &ndash; executives and workers brought into balance.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> A &mdash; C xatboshi: &laquo;Menejerlar ishchilarga ulkan mashinaning tishli g&lsquo;ildiragi kabi emas, aqliy mehnat egalari kabi munosabatda bo&lsquo;lishi kerak edi&raquo;.</div>",
   "highlights": [
    "Managers had to stop treating workers like cogs in a huge inhuman machine"
   ],
@@ -1433,7 +1422,7 @@ const READING_EXPLANATIONS = {
   "uz": "A &mdash; C xatboshi: &laquo;Menejerlar ishchilarga ulkan mashinaning tishli g&lsquo;ildiragi kabi emas, aqliy mehnat egalari kabi munosabatda bo&lsquo;lishi kerak edi&raquo;."
  },
  "24": {
-  "explanation": "<b>E.</b> Paragraph D: he &ldquo;emphasised the importance of managers and corporations setting clear long-term objectives&rdquo; and then letting employees &ldquo;work out ways of achieving those goals&rdquo; &ndash; leaders set goals, not details.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> E &mdash; D xatboshi: rahbarlar aniq uzoq muddatli maqsadlarni belgilaydi, xodimlar esa ularga erishish yo&lsquo;lini o&lsquo;zlari topadi.</div>",
+  "explanation": "<b>E.</b> Paragraph D: he &ldquo;emphasised the importance of managers and corporations setting clear long-term objectives&rdquo; and then letting employees &ldquo;work out ways of achieving those goals&rdquo; &ndash; leaders set goals, not details.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> E &mdash; D xatboshi: rahbarlar aniq uzoq muddatli maqsadlarni belgilaydi, xodimlar esa ularga erishish yo&lsquo;lini o&lsquo;zlari topadi.</div>",
   "highlights": [
    "setting clear long-term objectives and then translating those long-term objectives into more immediate goals"
   ],
@@ -1451,7 +1440,7 @@ const READING_EXPLANATIONS = {
   "uz": "E &mdash; D xatboshi: rahbarlar aniq uzoq muddatli maqsadlarni belgilaydi, xodimlar esa ularga erishish yo&lsquo;lini o&lsquo;zlari topadi."
  },
  "25": {
-  "explanation": "<b>A.</b> The first criticism in paragraph E: &ldquo;he focused on big organisations rather than small ones&rdquo;, confirmed in F &ndash; he &ldquo;never wrote anything as good&hellip; on entrepreneurial start-ups&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> A &mdash; E xatboshidagi birinchi tanqid: u yirik tashkilotlarga e&rsquo;tibor qaratib, kichiklarini chetlab o&lsquo;tgan; F xatboshi buni tasdiqlaydi.</div>",
+  "explanation": "<b>A.</b> The first criticism in paragraph E: &ldquo;he focused on big organisations rather than small ones&rdquo;, confirmed in F &ndash; he &ldquo;never wrote anything as good&hellip; on entrepreneurial start-ups&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> A &mdash; E xatboshidagi birinchi tanqid: u yirik tashkilotlarga e&rsquo;tibor qaratib, kichiklarini chetlab o&lsquo;tgan; F xatboshi buni tasdiqlaydi.</div>",
   "highlights": [
    "The first is that he focused on big organisations rather than small ones"
   ],
@@ -1465,7 +1454,7 @@ const READING_EXPLANATIONS = {
   "uz": "A &mdash; E xatboshidagi birinchi tanqid: u yirik tashkilotlarga e&rsquo;tibor qaratib, kichiklarini chetlab o&lsquo;tgan; F xatboshi buni tasdiqlaydi."
  },
  "26": {
-  "explanation": "<b>C.</b> The second criticism: management by objectives &ldquo;helped to lead business down a dead end&rdquo;, because his critics would rather have ideas &ldquo;bubble up from the bottom and middle of organisations rather than being imposed from on high&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> C &mdash; Ikkinchi tanqid: maqsadlar bo&lsquo;yicha boshqaruv biznesni boshi berk ko&lsquo;chaga olib borgan, chunki tanqidchilar g&lsquo;oyalar yuqoridan emas, quyi va o&lsquo;rta bo&lsquo;g&lsquo;indan ko&lsquo;tarilishini afzal ko&lsquo;radi.</div>",
+  "explanation": "<b>C.</b> The second criticism: management by objectives &ldquo;helped to lead business down a dead end&rdquo;, because his critics would rather have ideas &ldquo;bubble up from the bottom and middle of organisations rather than being imposed from on high&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> C &mdash; Ikkinchi tanqid: maqsadlar bo&lsquo;yicha boshqaruv biznesni boshi berk ko&lsquo;chaga olib borgan, chunki tanqidchilar g&lsquo;oyalar yuqoridan emas, quyi va o&lsquo;rta bo&lsquo;g&lsquo;indan ko&lsquo;tarilishini afzal ko&lsquo;radi.</div>",
   "highlights": [
    "to bubble up from the bottom and middle of organisations rather than being imposed from on high"
   ],
@@ -1479,7 +1468,7 @@ const READING_EXPLANATIONS = {
   "uz": "C &mdash; Ikkinchi tanqid: maqsadlar bo&lsquo;yicha boshqaruv biznesni boshi berk ko&lsquo;chaga olib borgan, chunki tanqidchilar g&lsquo;oyalar yuqoridan emas, quyi va o&lsquo;rta bo&lsquo;g&lsquo;indan ko&lsquo;tarilishini afzal ko&lsquo;radi."
  },
  "27": {
-  "explanation": "<b>C.</b> Paragraph 1: Ekman &ldquo;was addressing a group of young psychiatrists <i>in training</i> when he was asked a question&rdquo;. Psychiatrists in training are students &ndash; not his peers, his patients or his teachers.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> C &mdash; 1-xatboshi: Ekman o&lsquo;qib yurgan yosh psixiatrlar guruhiga ma&rsquo;ruza qilayotganda savol berilgan. O&lsquo;qiyotganlar &ndash; talabalar, hamkasb yoki bemor emas.</div>",
+  "explanation": "<b>C.</b> Paragraph 1: Ekman &ldquo;was addressing a group of young psychiatrists <i>in training</i> when he was asked a question&rdquo;. Psychiatrists in training are students &ndash; not his peers, his patients or his teachers.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> C &mdash; 1-xatboshi: Ekman o&lsquo;qib yurgan yosh psixiatrlar guruhiga ma&rsquo;ruza qilayotganda savol berilgan. O&lsquo;qiyotganlar &ndash; talabalar, hamkasb yoki bemor emas.</div>",
   "highlights": [
    "was addressing a group of young psychiatrists in training when he was asked a question"
   ],
@@ -1493,7 +1482,7 @@ const READING_EXPLANATIONS = {
   "uz": "C &mdash; 1-xatboshi: Ekman o&lsquo;qib yurgan yosh psixiatrlar guruhiga ma&rsquo;ruza qilayotganda savol berilgan. O&lsquo;qiyotganlar &ndash; talabalar, hamkasb yoki bemor emas."
  },
  "28": {
-  "explanation": "<b>B.</b> Paragraph 2 tells how, by slowing the interview film down, Ekman first spotted a micro-expression and named it. It explains where his theory came from.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> B &mdash; 2-xatboshida Ekman intervyu yozuvini sekinlashtirib ko&lsquo;rib, birinchi mikro-ifodani qanday payqagani hikoya qilinadi, ya&rsquo;ni nazariyaning kelib chiqishi.</div>",
+  "explanation": "<b>B.</b> Paragraph 2 tells how, by slowing the interview film down, Ekman first spotted a micro-expression and named it. It explains where his theory came from.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> B &mdash; 2-xatboshida Ekman intervyu yozuvini sekinlashtirib ko&lsquo;rib, birinchi mikro-ifodani qanday payqagani hikoya qilinadi, ya&rsquo;ni nazariyaning kelib chiqishi.</div>",
   "highlights": [
    "he had already filmed a series of 12-minute interviews with psychiatric patients"
   ],
@@ -1507,7 +1496,7 @@ const READING_EXPLANATIONS = {
   "uz": "B &mdash; 2-xatboshida Ekman intervyu yozuvini sekinlashtirib ko&lsquo;rib, birinchi mikro-ifodani qanday payqagani hikoya qilinadi, ya&rsquo;ni nazariyaning kelib chiqishi."
  },
  "29": {
-  "explanation": "<b>A.</b> Paragraph 3: the facial muscles triggered by the seven basic emotions are &ldquo;essentially standard, regardless of language and culture&rdquo;, and such expressions &ldquo;are impossible to suppress&rdquo;. They are universal.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> A &mdash; 3-xatboshi: yettita asosiy tuyg&lsquo;uni ifodalovchi mimika til va madaniyatdan qat&rsquo;i nazar bir xil va uni bostirib bo&lsquo;lmaydi, ya&rsquo;ni barchaga xos.</div>",
+  "explanation": "<b>A.</b> Paragraph 3: the facial muscles triggered by the seven basic emotions are &ldquo;essentially standard, regardless of language and culture&rdquo;, and such expressions &ldquo;are impossible to suppress&rdquo;. They are universal.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> A &mdash; 3-xatboshi: yettita asosiy tuyg&lsquo;uni ifodalovchi mimika til va madaniyatdan qat&rsquo;i nazar bir xil va uni bostirib bo&lsquo;lmaydi, ya&rsquo;ni barchaga xos.</div>",
   "highlights": [
    "essentially standard, regardless of language and culture"
   ],
@@ -1521,7 +1510,7 @@ const READING_EXPLANATIONS = {
   "uz": "A &mdash; 3-xatboshi: yettita asosiy tuyg&lsquo;uni ifodalovchi mimika til va madaniyatdan qat&rsquo;i nazar bir xil va uni bostirib bo&lsquo;lmaydi, ya&rsquo;ni barchaga xos."
  },
  "30": {
-  "explanation": "<b>B.</b> Paragraph 4: &ldquo;Of the 15,000 Ekman has tested, only 50 people&hellip; have been able to do it.&rdquo; Almost nobody spots the signals without training.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> B &mdash; 4-xatboshi: sinovdan o&lsquo;tgan 15 000 kishidan atigi 50 nafari buni uddalagan; tayyorgarliksiz deyarli hech kim payqay olmaydi.</div>",
+  "explanation": "<b>B.</b> Paragraph 4: &ldquo;Of the 15,000 Ekman has tested, only 50 people&hellip; have been able to do it.&rdquo; Almost nobody spots the signals without training.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> B &mdash; 4-xatboshi: sinovdan o&lsquo;tgan 15 000 kishidan atigi 50 nafari buni uddalagan; tayyorgarliksiz deyarli hech kim payqay olmaydi.</div>",
   "highlights": [
    "Of the 15,000 Ekman has tested, only 50 people"
   ],
@@ -1535,7 +1524,7 @@ const READING_EXPLANATIONS = {
   "uz": "B &mdash; 4-xatboshi: sinovdan o&lsquo;tgan 15 000 kishidan atigi 50 nafari buni uddalagan; tayyorgarliksiz deyarli hech kim payqay olmaydi."
  },
  "31": {
-  "explanation": "<b>B.</b> Paragraph 4 lists who has wanted the training: the FBI, the CIA, &ldquo;countless more law-enforcement and other agencies around the world&rdquo;, lawyers, health professionals, even jealous spouses. That is great demand, and it also rules out <b>D</b>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> B &mdash; 4-xatboshida kim uning usulini so&lsquo;ragani sanaladi: FBI, MRB, dunyo bo&lsquo;ylab son-sanoqsiz idoralar, advokatlar, shifokorlar va hatto rashkchilar. Talab juda katta &ndash; bu D variantni ham inkor qiladi.</div>",
+  "explanation": "<b>B.</b> Paragraph 4 lists who has wanted the training: the FBI, the CIA, &ldquo;countless more law-enforcement and other agencies around the world&rdquo;, lawyers, health professionals, even jealous spouses. That is great demand, and it also rules out <b>D</b>.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> B &mdash; 4-xatboshida kim uning usulini so&lsquo;ragani sanaladi: FBI, MRB, dunyo bo&lsquo;ylab son-sanoqsiz idoralar, advokatlar, shifokorlar va hatto rashkchilar. Talab juda katta &ndash; bu D variantni ham inkor qiladi.</div>",
   "highlights": [
    "he has been called in by the FBI and CIA"
   ],
@@ -1553,7 +1542,7 @@ const READING_EXPLANATIONS = {
   "uz": "B &mdash; 4-xatboshida kim uning usulini so&lsquo;ragani sanaladi: FBI, MRB, dunyo bo&lsquo;ylab son-sanoqsiz idoralar, advokatlar, shifokorlar va hatto rashkchilar. Talab juda katta &ndash; bu D variantni ham inkor qiladi."
  },
  "32": {
-  "explanation": "<b>C &ndash; false beliefs.</b> Paragraph 5: he feared the show &ldquo;would exaggerate the effectiveness of his techniques and create the quite <i>inaccurate impression</i> among audiences&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> C (false beliefs) &mdash; 5-xatboshi: u ko&lsquo;rsatuv usullar samarasini bo&lsquo;rttirib, tomoshabinlarda mutlaqo noto&lsquo;g&lsquo;ri tasavvur uyg&lsquo;otishidan qo&lsquo;rqqan.</div>",
+  "explanation": "<b>C &ndash; false beliefs.</b> Paragraph 5: he feared the show &ldquo;would exaggerate the effectiveness of his techniques and create the quite <i>inaccurate impression</i> among audiences&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> C (false beliefs) &mdash; 5-xatboshi: u ko&lsquo;rsatuv usullar samarasini bo&lsquo;rttirib, tomoshabinlarda mutlaqo noto&lsquo;g&lsquo;ri tasavvur uyg&lsquo;otishidan qo&lsquo;rqqan.</div>",
   "highlights": [
    "create the quite inaccurate impression among audiences"
   ],
@@ -1567,7 +1556,7 @@ const READING_EXPLANATIONS = {
   "uz": "C (false beliefs) &mdash; 5-xatboshi: u ko&lsquo;rsatuv usullar samarasini bo&lsquo;rttirib, tomoshabinlarda mutlaqo noto&lsquo;g&lsquo;ri tasavvur uyg&lsquo;otishidan qo&lsquo;rqqan."
  },
  "33": {
-  "explanation": "<b>E &ndash; justice.</b> Paragraph 5: &ldquo;he was concerned about <i>unfair convictions</i>&hellip; might be sitting on a jury and wrongly find someone guilty.&rdquo; An unfair conviction is justice not being carried out.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> E (justice) &mdash; 5-xatboshi: u nohaq hukmlardan, tayyorgarliksiz odam hakamlar hay&rsquo;atida birovni nohaq aybdor deb topishidan xavotirlangan, ya&rsquo;ni adolat amalga oshmaydi.</div>",
+  "explanation": "<b>E &ndash; justice.</b> Paragraph 5: &ldquo;he was concerned about <i>unfair convictions</i>&hellip; might be sitting on a jury and wrongly find someone guilty.&rdquo; An unfair conviction is justice not being carried out.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> E (justice) &mdash; 5-xatboshi: u nohaq hukmlardan, tayyorgarliksiz odam hakamlar hay&rsquo;atida birovni nohaq aybdor deb topishidan xavotirlangan, ya&rsquo;ni adolat amalga oshmaydi.</div>",
   "highlights": [
    "he was concerned about unfair convictions"
   ],
@@ -1581,7 +1570,7 @@ const READING_EXPLANATIONS = {
   "uz": "E (justice) &mdash; 5-xatboshi: u nohaq hukmlardan, tayyorgarliksiz odam hakamlar hay&rsquo;atida birovni nohaq aybdor deb topishidan xavotirlangan, ya&rsquo;ni adolat amalga oshmaydi."
  },
  "34": {
-  "explanation": "<b>H &ndash; research.</b> Paragraph 6: &ldquo;It is the first time&hellip; that a commercial TV drama has been based on the <i>work of just one scientist</i>.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> H (research) &mdash; 6-xatboshi: bu tijoriy teledramaning faqat bitta olim ishiga asoslangan birinchi holati; bir olimning ishi &ndash; uning tadqiqoti.</div>",
+  "explanation": "<b>H &ndash; research.</b> Paragraph 6: &ldquo;It is the first time&hellip; that a commercial TV drama has been based on the <i>work of just one scientist</i>.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> H (research) &mdash; 6-xatboshi: bu tijoriy teledramaning faqat bitta olim ishiga asoslangan birinchi holati; bir olimning ishi &ndash; uning tadqiqoti.</div>",
   "highlights": [
    "a commercial TV drama has been based on the work of just one scientist"
   ],
@@ -1595,7 +1584,7 @@ const READING_EXPLANATIONS = {
   "uz": "H (research) &mdash; 6-xatboshi: bu tijoriy teledramaning faqat bitta olim ishiga asoslangan birinchi holati; bir olimning ishi &ndash; uning tadqiqoti."
  },
  "35": {
-  "explanation": "<b>D &ndash; motives.</b> Paragraph 6: &ldquo;He was also impressed with the producer&rsquo;s manifestly serious and well-intentioned <i>reasons for making the programme</i>.&rdquo; Reasons for doing something = motives.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> D (motives) &mdash; 6-xatboshi: prodyuserning ko&lsquo;rsatuv yaratishdagi jiddiy va ezgu niyatlari uni hayratlantirgan. Sabab-niyat = motives.</div>",
+  "explanation": "<b>D &ndash; motives.</b> Paragraph 6: &ldquo;He was also impressed with the producer&rsquo;s manifestly serious and well-intentioned <i>reasons for making the programme</i>.&rdquo; Reasons for doing something = motives.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> D (motives) &mdash; 6-xatboshi: prodyuserning ko&lsquo;rsatuv yaratishdagi jiddiy va ezgu niyatlari uni hayratlantirgan. Sabab-niyat = motives.</div>",
   "highlights": [
    "manifestly serious and well-intentioned reasons for making the programme"
   ],
@@ -1609,7 +1598,7 @@ const READING_EXPLANATIONS = {
   "uz": "D (motives) &mdash; 6-xatboshi: prodyuserning ko&lsquo;rsatuv yaratishdagi jiddiy va ezgu niyatlari uni hayratlantirgan. Sabab-niyat = motives."
  },
  "36": {
-  "explanation": "<b>F &ndash; accuracy.</b> Paragraph 6: &ldquo;he believes probably 80&ndash;90 per cent of the show is <i>based on fact</i> and that&rsquo;s good enough&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> F (accuracy) &mdash; 6-xatboshi: uning fikricha ko&lsquo;rsatuvning 80&ndash;90 foizi faktlarga asoslangan va bu yetarli, ya&rsquo;ni aniqlik darajasidan mamnun.</div>",
+  "explanation": "<b>F &ndash; accuracy.</b> Paragraph 6: &ldquo;he believes probably 80&ndash;90 per cent of the show is <i>based on fact</i> and that&rsquo;s good enough&rdquo;.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> F (accuracy) &mdash; 6-xatboshi: uning fikricha ko&lsquo;rsatuvning 80&ndash;90 foizi faktlarga asoslangan va bu yetarli, ya&rsquo;ni aniqlik darajasidan mamnun.</div>",
   "highlights": [
    "per cent of the show is based on fact"
   ],
@@ -1623,7 +1612,7 @@ const READING_EXPLANATIONS = {
   "uz": "F (accuracy) &mdash; 6-xatboshi: uning fikricha ko&lsquo;rsatuvning 80&ndash;90 foizi faktlarga asoslangan va bu yetarli, ya&rsquo;ni aniqlik darajasidan mamnun."
  },
  "37": {
-  "explanation": "<b>NOT GIVEN.</b> Paragraph 7 says he &ldquo;professes to have been a terrible liar ever since he was a small boy&rdquo;, but nothing at all is said about regret.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; 7-xatboshida u bolaligidan yomon yolg&lsquo;onchi bo&lsquo;lganini aytadi, biroq afsuslanishi haqida hech narsa yo&lsquo;q.</div>",
+  "explanation": "<b>NOT GIVEN.</b> Paragraph 7 says he &ldquo;professes to have been a terrible liar ever since he was a small boy&rdquo;, but nothing at all is said about regret.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; 7-xatboshida u bolaligidan yomon yolg&lsquo;onchi bo&lsquo;lganini aytadi, biroq afsuslanishi haqida hech narsa yo&lsquo;q.</div>",
   "highlights": [
    "professes to have been a terrible liar ever since he was a small boy"
   ],
@@ -1637,7 +1626,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; 7-xatboshida u bolaligidan yomon yolg&lsquo;onchi bo&lsquo;lganini aytadi, biroq afsuslanishi haqida hech narsa yo&lsquo;q."
  },
  "38": {
-  "explanation": "<b>NO.</b> Paragraph 7: he &ldquo;observes that the ability to detect a lie and the ability to lie successfully are <i>completely unrelated</i>&rdquo;. The statement claims the opposite.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NO &mdash; 7-xatboshi: yolg&lsquo;onni payqash va muvaffaqiyatli yolg&lsquo;on gapirish qobiliyatlari bir-biriga umuman bog&lsquo;liq emas. Bayonot esa aksini aytadi.</div>",
+  "explanation": "<b>NO.</b> Paragraph 7: he &ldquo;observes that the ability to detect a lie and the ability to lie successfully are <i>completely unrelated</i>&rdquo;. The statement claims the opposite.<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NO &mdash; 7-xatboshi: yolg&lsquo;onni payqash va muvaffaqiyatli yolg&lsquo;on gapirish qobiliyatlari bir-biriga umuman bog&lsquo;liq emas. Bayonot esa aksini aytadi.</div>",
   "highlights": [
    "the ability to detect a lie and the ability to lie successfully are completely unrelated"
   ],
@@ -1651,7 +1640,7 @@ const READING_EXPLANATIONS = {
   "uz": "NO &mdash; 7-xatboshi: yolg&lsquo;onni payqash va muvaffaqiyatli yolg&lsquo;on gapirish qobiliyatlari bir-biriga umuman bog&lsquo;liq emas. Bayonot esa aksini aytadi."
  },
  "39": {
-  "explanation": "<b>NOT GIVEN.</b> Poker players appear only as an example of people who are not &lsquo;true&rsquo; liars. There is no mention of Ekman working with them. (He refused to coach politicians &ndash; a different group.)<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> NOT GIVEN &mdash; Poker o&lsquo;yinchilari faqat &laquo;haqiqiy yolg&lsquo;onchi emas&raquo; misoli sifatida tilga olingan; Ekman ular bilan ishlagani aytilmagan.</div>",
+  "explanation": "<b>NOT GIVEN.</b> Poker players appear only as an example of people who are not &lsquo;true&rsquo; liars. There is no mention of Ekman working with them. (He refused to coach politicians &ndash; a different group.)<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> NOT GIVEN &mdash; Poker o&lsquo;yinchilari faqat &laquo;haqiqiy yolg&lsquo;onchi emas&raquo; misoli sifatida tilga olingan; Ekman ular bilan ishlagani aytilmagan.</div>",
   "highlights": [
    "an actor or a poker player"
   ],
@@ -1665,7 +1654,7 @@ const READING_EXPLANATIONS = {
   "uz": "NOT GIVEN &mdash; Poker o&lsquo;yinchilari faqat &laquo;haqiqiy yolg&lsquo;onchi emas&raquo; misoli sifatida tilga olingan; Ekman ular bilan ishlagani aytilmagan."
  },
  "40": {
-  "explanation": "<b>YES.</b> Paragraph 7: &ldquo;He prefers to focus on the kinds of lies where the liar would be in <i>grave trouble</i> if they were found out, and where the target would feel properly aggrieved.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>Oʻzbekcha:</b> YES &mdash; 7-xatboshi: u fosh bo&lsquo;lsa jiddiy muammoga olib keladigan va aldangan odam chinakam xafa bo&lsquo;ladigan yolg&lsquo;onlarga e&rsquo;tibor qaratadi.</div>",
+  "explanation": "<b>YES.</b> Paragraph 7: &ldquo;He prefers to focus on the kinds of lies where the liar would be in <i>grave trouble</i> if they were found out, and where the target would feel properly aggrieved.&rdquo;<div style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\"><b>OК»zbekcha:</b> YES &mdash; 7-xatboshi: u fosh bo&lsquo;lsa jiddiy muammoga olib keladigan va aldangan odam chinakam xafa bo&lsquo;ladigan yolg&lsquo;onlarga e&rsquo;tibor qaratadi.</div>",
   "highlights": [
    "He prefers to focus on the kinds of lies where the liar would be in grave trouble"
   ],
@@ -1686,18 +1675,18 @@ return { STORAGE_KEY: STORAGE_KEY, SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCAB
 </script>
 <script src="../../reading.js"></script>
 
-<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+<!-- в•ђв•ђ PDFX в•ђв•ђ the one-click PDF exporter, shared verbatim by the Writing,
      Listening and Reading tests. Inlined, so it works from a memory stick
      with the network off. See the header comment inside for what it does and
-     why it is not jsPDF + html2canvas. ══ -->
+     why it is not jsPDF + html2canvas. в•ђв•ђ -->
 
 
-<!-- ════════════════════════════════════════════════════════════════════════
-     MONOCHROME SKIN — grey / black / white only.
+<!-- в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+     MONOCHROME SKIN вЂ” grey / black / white only.
      Appended last on purpose: it re-tokenises the login card, the completion
      screen and the certificate without touching #stage-reading, which is the
      Arial exam screen and already neutral. Nothing here introduces a hue.
-     ════════════════════════════════════════════════════════════════════════ -->
+     в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ -->
 
 
 <script src="../../ieltsx-data.js"></script>
@@ -1705,3 +1694,4 @@ return { STORAGE_KEY: STORAGE_KEY, SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCAB
 <script type="module" src="../../site-access.js"></script>
 </body>
 </html>
+

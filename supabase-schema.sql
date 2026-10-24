@@ -98,8 +98,6 @@ alter table public.ieltsx_materials add column if not exists data jsonb not null
 alter table public.ieltsx_materials add column if not exists published boolean not null default true;
 alter table public.ieltsx_materials add column if not exists "updatedAt" timestamptz not null default now();
 -- the panel creates the public "ieltsx-media" Storage bucket (audio + images) by itself on the first upload.
-<<<<<<< HEAD
-=======
 
 -- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
 -- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
@@ -116,4 +114,3 @@ create table if not exists public.ieltsx_settings (
   "updatedAt" timestamptz not null default now()
 );
 alter table public.ieltsx_settings enable row level security;
->>>>>>> fb33267 (Initial commit)
