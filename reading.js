@@ -200,6 +200,7 @@ function exFinish(){
   try{ localStorage.removeItem(window.READING_TEST.STORAGE_KEY); }catch(e){}
   window.__cdiIntentionalReload=true;
   var url=FINISH_URL;
+  if((!url||url==='#') && window.READING_TEST && window.READING_TEST.FINISH_URL) url=window.READING_TEST.FINISH_URL;   /* set by the admin-made pages (reading-router.js) */
   if(!url||url==='#'){
     /* default: full reading tests go back to the Full Reading Tests window, practice passages to Reading Passages */
     var p=location.pathname;

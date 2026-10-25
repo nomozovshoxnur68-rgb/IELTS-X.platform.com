@@ -89,6 +89,7 @@
 
     function mergeAdminTests(packs, items) {
         (items || []).forEach(function (m) {
+            if (SKILL === 'reading' && m.mode !== 'full') return;   // Part (1 passage) tests live on the Reading practice page; only Full (3 passages) tests belong here
             var name = String(m.pack || '').trim() || 'Practice';
             var slug = slugify(name);
             var pack = packs.filter(function (p) { return p.slug === slug || slugify(p.title) === slug; })[0];
@@ -99,7 +100,7 @@
             }
             pack.tests.push({
                 source: m.description || 'Added by IELTSX',
-                tags: [], href: '/test?id=' + encodeURIComponent(m.id), premium: !!m.premium, plan: '',
+                tags: [], href: m.href || ('/test?id=' + encodeURIComponent(m.id)), premium: !!m.premium, plan: '',
                 adminTitle: m.title, material: true, key: 'mat:' + m.id,
                 rule: { locked: !!m.premium, plan: A.planOf(m.plan) || 'standard' }, allowed: !m.locked
             });

@@ -481,16 +481,30 @@ function cleanUrl(v) {
   if (/^https:\/\/[^\s"'<>]+$/i.test(u)) return u;
   return '';
 }
+/* Reading tests get a stable number (test-22, test-23 ... for Part; test-7, test-8 ... for Full) that continues the hand-made pages. */
+async function keepReadingNo(type, data, cur) {
+  if (type !== 'reading') return data;
+  const R = require('./reading-router'); const kind = R.kindOf({ data });
+  if (cur && cur.data && Number(cur.data.no) && R.kindOf(cur) === kind) { data.no = Number(cur.data.no); return data; }
+  data.no = R.nextNumber(ROOT, kind, (await store.listMaterials('reading')).filter((x) => !cur || x.id !== cur.id));
+  return data;
+}
 function cleanMaterialData(type, d) {
   d = d && typeof d === 'object' ? d : {};
   const out = { durationMin: Math.max(0, Math.min(300, Math.floor(Number(d.durationMin) || 0))), instructions: cut(d.instructions, 3000) };
-  out.images = (Array.isArray(d.images) ? d.images : []).slice(0, 12).map((i) => ({ url: cleanUrl(i && i.url), caption: cut(i && i.caption, 200) })).filter((i) => i.url);
-  if (type === 'reading') out.passage = cut(d.passage, 60000);
+  out.images = (Array.isArray(d.images) ? d.images : []).slice(0, 12).map((i) => ({ url: cleanUrl(i && i.url), caption: cut(i && i.caption, 200), passage: [1, 2, 3].includes(Number(i && i.passage)) ? Number(i.passage) : 1 })).filter((i) => i.url);
+  if (type === 'reading') {
+    // Reading comes in two formats: "part" = one passage (like pessages/test-19), "full" = three passages (like full-tests/reading/test-1)
+    out.mode = d.mode === 'full' ? 'full' : 'part';
+    out.passage = out.mode === 'full' ? '' : cut(d.passage, 60000);
+    if (out.mode === 'full') out.passages = [0, 1, 2].map((i) => { const x = (Array.isArray(d.passages) ? d.passages[i] : null) || {}; return { title: cut(x.title, 200).trim(), passage: cut(x.passage, 60000) }; });
+    out.no = Math.max(0, Math.floor(Number(d.no) || 0));   // the test-N number; the server sets it, see keepReadingNo()
+  }
   if (type === 'listening') { out.audioUrl = cleanUrl(d.audioUrl); out.transcript = cut(d.transcript, 60000); }
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : 'short';
-      return { id: 'q' + (i + 1), type: t, group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
+      return { id: 'q' + (i + 1), type: t, passage: [1, 2, 3].includes(Number(q.passage)) ? Number(q.passage) : 1, group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500) };
     }).filter((q) => q.prompt);
@@ -553,6 +567,7 @@ const publicMaterial = (m, withData) => {
   const d = m.data || {};
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
+  if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); }
   if (m.type === 'article') Object.assign(base, { topic: d.topic || 'General', passageLabel: d.passageLabel || 'Passage 1', source: d.source || '', readMinutes: d.readMinutes || 0, coverUrl: d.coverUrl || '' });
   if (m.type === 'vocab') {   // the list never carries the cards; they are sent only by the single-item call, after the Premium check
     base.wordCount = (d.words || []).length; base.kind = d.kind || 'collection'; base.level = d.level || 'Intermediate'; base.source = d.source || ''; base.icon = d.icon || 'reading';
@@ -1189,7 +1204,7 @@ async function api(req, res, url) {
       const title = cleanName(b.title); if (!title) throw new HttpError(400, 'Title is required.');
       const now = new Date().toISOString();
       const item = await store.insertMaterial({ id: newId(), type, title, pack: cleanName(b.pack), description: cut(b.description, 2000), content: '', premium: !!b.premium,
-        published: b.published !== false, data: cleanMaterialData(type, b.data), createdAt: now, updatedAt: now });
+        published: b.published !== false, data: await keepReadingNo(type, cleanMaterialData(type, b.data), null), createdAt: now, updatedAt: now });
       await audit(admin, 'material.add', title, { type });
       return send(res, 201, { item });
     }
@@ -1206,7 +1221,7 @@ async function api(req, res, url) {
       if (b.description !== undefined) patch.description = cut(b.description, 2000);
       if (b.premium !== undefined) { patch.premium = !!b.premium; try { const r0 = { ...(await accessRules(true)) }; if (r0['mat:' + id]) { delete r0['mat:' + id]; await store.setSetting('access-rules', { rules: cleanRules(r0), updatedAt: new Date().toISOString() }); rulesCache = { t: 0, v: {} }; } } catch (e) { /* the flag still applies */ } }
       if (b.published !== undefined) patch.published = !!b.published;
-      if (b.data !== undefined) patch.data = cleanMaterialData(cur.type, b.data);
+      if (b.data !== undefined) patch.data = await keepReadingNo(cur.type, cleanMaterialData(cur.type, b.data), cur);
       const item = await store.updateMaterial(id, patch); if (!item) throw new HttpError(404, 'Material not found.');
       await audit(admin, 'material.edit', item.title, b.premium !== undefined ? { premium: patch.premium } : undefined);
       return send(res, 200, { item });
@@ -1415,16 +1430,7 @@ const requestHandler = async (req, res) => {
     if (url.pathname === '/sitemap.xml' || url.pathname === '/api/sitemap') {
       return send(res, 200, sitemap(siteUrl(req)), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     }
-    if (url.pathname.startsWith('/exam/reading/') && (req.method === 'GET' || req.method === 'HEAD')) {   // admin-made Reading tests, shown in the real-exam player (same look as pessages/test-19)
-      const id = decodeURIComponent(url.pathname.slice('/exam/reading/'.length).replace(/\/$/, ''));
-      const m = id ? await store.getMaterial(id) : null;
-      const u = await currentUser(req);
-      if (!m || m.type !== 'reading' || (m.published === false && !isAdmin(u))) return send(res, 404, 'Test not found.');
-      const rule = materialRule(m, await accessRules());
-      if (!allowsLevel(rule, userLevel(u))) { res.statusCode = 302; res.setHeader('Location', u ? '/Price?premium=required' : '/login?next=' + encodeURIComponent(url.pathname)); return res.end(); }
-      const html = require('./reading-exam').buildExamHtml(m, fs.readFileSync(path.join(ROOT, 'pessages', 'test-19.html'), 'utf8'));
-      return send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex' });
-    }
+    if (await require('./reading-router').route(req, res, url, { root: ROOT, store, currentUser, isAdmin, materialRule, accessRules, allowsLevel, userLevel, send })) return;   // Reading tests made in the admin panel (Part = 1 passage, Full = 3 passages)
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed');
     if (/\.html$/i.test(url.pathname) && !url.pathname.toLowerCase().startsWith('/uploads/')) {

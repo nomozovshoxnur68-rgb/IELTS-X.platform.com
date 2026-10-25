@@ -25,7 +25,7 @@
     if (r.status === 403) return state(`<h2>🔒 Locked</h2><p>${esc(d.error || 'This content is for paid members.')}</p><a class="tp-btn" href="/Price?premium=required&next=${encodeURIComponent(location.pathname + location.search)}">Get Access</a>`);
     if (!r.ok) return state(`<h2>Test not found</h2><p>${esc(d.error || 'It may have been removed.')}</p><a class="tp-btn" href="/part/practice/reading">Browse tests</a>`);
     item = d.item; document.title = item.title + ' — IELTSX';
-    if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace('/exam/reading/' + encodeURIComponent(item.id)); return; }   // Reading opens in the real-exam player
+    if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace(item.href || ('/exam/reading/' + encodeURIComponent(item.id))); return; }   // Reading opens in the real-exam player
     $('#tp-title').textContent = item.title; const isArticle = item.type === 'article';
     $('#tp-back').href = isArticle ? '/study/Tools/Articles' : '/part/practice/' + item.type;
     $('#tp-back').textContent = isArticle ? '← Articles' : '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';

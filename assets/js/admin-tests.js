@@ -17,7 +17,7 @@
     function run() {
         var box = mount(); if (!box) return;
         fetch('/api/materials?type=' + type, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
-            var items = d.items || []; if (!items.length) return;
+            var items = (d.items || []).filter(function (i) { return !(type === 'reading' && i.mode === 'full'); }); if (!items.length) return;   // Full readings are listed on the Full Reading page
             var meta = function (i) {
                 if (type === 'speaking') return (i.parts || 0) + ' part' + (i.parts === 1 ? '' : 's');
                 if (type === 'writing') return (i.tasks || 0) + ' task' + (i.tasks === 1 ? '' : 's');
@@ -25,7 +25,7 @@
             };
             box.innerHTML = '<div class="bg-card border rounded-lg p-4"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px"><h2 class="text-lg font-semibold">New ' + type + ' tests</h2><span class="text-xs text-muted-foreground">' + items.length + ' added</span></div>' +
                 '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">' + items.map(function (i) {
-                    return '<a href="/test?id=' + encodeURIComponent(i.id) + '" class="bg-card border rounded-lg p-4" style="display:block;text-decoration:none;color:inherit;transition:box-shadow .15s" onmouseover="this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'\'">' +
+                    return '<a href="' + (i.href ? esc(i.href) : '/test?id=' + encodeURIComponent(i.id)) + '" class="bg-card border rounded-lg p-4" style="display:block;text-decoration:none;color:inherit;transition:box-shadow .15s" onmouseover="this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'\'">' +
                         (i.pack ? '<div class="text-xs text-muted-foreground">' + esc(i.pack) + '</div>' : '') +
                         '<div class="font-medium" style="margin:2px 0 6px">' + esc(i.title) + '</div>' +
                         (i.description ? '<div class="text-sm text-muted-foreground" style="margin-bottom:6px">' + esc(i.description) + '</div>' : '') +

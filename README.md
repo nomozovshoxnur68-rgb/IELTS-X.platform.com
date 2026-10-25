@@ -150,3 +150,14 @@ See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUB
 ## Repair notes
 * A wrongly resolved git merge had removed the Access (lock) routes from `server.js` and parts of several admin/page files; they are restored. Admin-made tests now follow the Access rules (before, only the old Premium flag was checked).
 * Garbled characters (`в–¦`, `вњ“`) fixed in 79 files. Articles page: cards that led to non-existing pages were removed.
+
+## Reading router: Part and Full tests from the admin panel (October 2026)
+
+`/admin#reading` -> **+ New test** -> **Reading format**:
+
+* **Part - 1 passage** (default, 20 min): opens in the same page as `pessages/test-19, 20, 21` (`reading.js` + `reading.css`). Listed in **New reading tests** on the Reading practice page. Address: `/pessages/test-22`, `test-23`, ...
+* **Full - 3 passages** (60 min): opens in the same page as `full-tests/reading/test-1` (`reading.js` + `reading.css`). Listed on the Full Reading page (in the pack you type in *Pack*). Address: `/full-tests/reading/test-7`, `test-8`, ...
+
+Paste the passage(s), add the questions (every IELTS type; in a Full test each question and picture has a **Passage 1/2/3** selector), press Create: the page is generated on every visit by `reading-router.js` + `reading-exam.js`, so nothing else has to be copied. The number `test-N` is given once and never changes; `/exam/reading/<id>` always works too. Free / Premium / plan locks from `/admin#access` apply, Draft tests are visible to admins only. **Finish** goes back to the Reading practice page (Part) or the Full Reading page (Full).
+
+On Vercel the new paths are rewritten to the API in `vercel.json` (and the two template pages are bundled with the function), so no redeploy per test is needed.

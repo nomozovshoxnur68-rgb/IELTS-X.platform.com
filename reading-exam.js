@@ -33,8 +33,8 @@ const tfWord = (v, yn) => {
 };
 const optTok = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})[.):]\s+([\s\S]*)$/.exec(String(o || '')); return m ? { l: m[1], t: m[2] } : { l: String.fromCharCode(65 + i), t: String(o || '') }; };
 
-function buildSections(questions, answerCount) {
-  const sections = []; let n = 1; let cur = null; let key = '';
+function buildSections(questions, startN) {
+  const sections = []; let n = startN || 1; let cur = null; let key = '';
   const headings = []; const slots = [];
   const defaultTitle = { notes: 'Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
   const defaultInstr = {
@@ -89,32 +89,62 @@ function buildSections(questions, answerCount) {
   return { sections, headings, slots, total: n - 1 };
 }
 
+const isFull = (material) => !!(material && material.data && material.data.mode === 'full');
+
+/* The passages of a test: one for a "part" test, three for a "full" test. Pictures and questions
+   carry the number of the passage they belong to (default 1). */
+function passagesOf(material) {
+  const d = material.data || {};
+  const imgs = Array.isArray(d.images) ? d.images : [];
+  if (!isFull(material)) return [{ no: 1, title: material.title, text: d.passage, images: imgs }];
+  const ps = Array.isArray(d.passages) ? d.passages : [];
+  return [1, 2, 3].map((i) => {
+    const p = ps[i - 1] || {};
+    return { no: i, title: String(p.title || '').trim() || (String(p.passage || '').trim() ? material.title + ' \u2014 Passage ' + i : ''),
+      text: p.passage, images: imgs.filter((im) => (Number(im && im.passage) || 1) === i) };
+  });
+}
+
 function buildData(material) {
   const d = material.data || {};
+  const full = isFull(material);
   const qs = Array.isArray(d.questions) ? d.questions : [];
-  const { sections, headings, slots, total } = buildSections(qs);
-  const passage = { title: esc(material.title), content: passageHtml(d, material.title) };
-  if (headings.length) { passage.headings = headings; passage.headingSlots = slots; }
-  // explanation per question number
+  const SECTIONS = { 1: [], 2: [], 3: [] }; const PASSAGES = {}; const VOCAB = {}; const ordered = [];
+  let last = 0;
+  passagesOf(material).forEach((ps) => {
+    const mine = qs.filter((q) => (full ? (Number(q.passage) || 1) : 1) === ps.no);
+    if (full && !mine.length && !String(ps.text || '').trim()) return;           // an empty passage is simply left out
+    const b = buildSections(mine, last + 1); last = b.total;
+    SECTIONS[ps.no] = b.sections; ordered.push(...mine);
+    const passage = { title: esc(ps.title || material.title), content: passageHtml({ images: ps.images, passage: ps.text }, ps.title || material.title) };
+    if (b.headings.length) { passage.headings = b.headings; passage.headingSlots = b.slots; }
+    PASSAGES[ps.no] = passage;
+    VOCAB[ps.no] = { passageTitle: passage.title, words: [] };
+  });
+  // explanation per question number (numbers follow passage order, exactly as the sections above)
   const expl = {}; let n = 1;
-  for (const q of qs) {
+  for (const q of ordered) {
     const span = q.type === 'mcq-multi' ? Math.max(1, String(q.answer || '').split(/[^A-Za-z]+/).filter(Boolean).length) : 1;
     for (let i = 0; i < span; i++, n++) if (q.explanation) expl[n] = { explanation: esc(q.explanation), highlights: [], paraphraseMap: [], en: esc(q.explanation), uz: '' };
   }
-  return { sections, passage, expl, total: total || 1, minutes: Math.max(1, Math.min(180, d.durationMin || 20)) };
+  const dflt = full ? 60 : 20;
+  return { full, SECTIONS, PASSAGES, VOCAB, expl, total: last || 1, minutes: Math.max(1, Math.min(180, Number(d.durationMin) || dflt)) };
 }
 
-function buildExamHtml(material, template) {
+function buildExamHtml(material, templates) {
   const b = buildData(material);
+  const tpl = typeof templates === 'string' ? { part: templates, full: templates } : (templates || {});
+  const template = b.full ? tpl.full : tpl.part;
+  if (!template) throw new Error('Reading template is missing (' + (b.full ? 'full' : 'part') + ').');
   const key = 'ieltsx_reading_' + String(material.id).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
   const json = (o) => JSON.stringify(o, null, 1).replace(/</g, '\\u003c').replace(/\u2028|\u2029/g, '');
   const script = 'window.READING_TEST = (function () {\n'
     + 'const STORAGE_KEY = ' + JSON.stringify(key) + ';\nconst QTOTAL = ' + b.total + ';\nconst PONLY = 1;\n'
-    + 'const SECTIONS = ' + json({ 1: b.sections, 2: [], 3: [] }) + ';\n'
-    + 'const PASSAGES = ' + json({ 1: b.passage }) + ';\n'
-    + 'const VOCABULARY_DATA = ' + json({ 1: { passageTitle: b.passage.title, words: [] } }) + ';\n'
+    + 'const SECTIONS = ' + json(b.SECTIONS) + ';\n'
+    + 'const PASSAGES = ' + json(b.PASSAGES) + ';\n'
+    + 'const VOCABULARY_DATA = ' + json(b.VOCAB) + ';\n'
     + 'const READING_EXPLANATIONS = ' + json(b.expl) + ';\n'
-    + 'return { STORAGE_KEY: STORAGE_KEY, QTOTAL: QTOTAL, PONLY: PONLY, MINUTES: ' + b.minutes + ', SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCABULARY_DATA: VOCABULARY_DATA,\n'
+    + 'return { STORAGE_KEY: STORAGE_KEY, QTOTAL: QTOTAL, PONLY: PONLY, MINUTES: ' + b.minutes + ', FINISH_URL: ' + JSON.stringify(b.full ? '/full-tests/reading/' : '/part/practice/reading') + ', SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCABULARY_DATA: VOCABULARY_DATA,\n'
     + '         READING_EXPLANATIONS: READING_EXPLANATIONS };\n})();\n';
   let html = String(template);
   const start = html.indexOf('window.READING_TEST = (function');
@@ -122,9 +152,14 @@ function buildExamHtml(material, template) {
   if (start < 0 || end < 0) throw new Error('Reading template is missing its data script.');
   html = html.slice(0, start) + script + html.slice(end);
   const title = esc(material.title);
-  html = html.split('Dark Chocolate&rsquo;s Health-giving Benefits').join(title).split('Dark Chocolate\u2019s Health-giving Benefits').join(title);
-  html = html.replace(/(href|src)="\.\.\//g, '$1="/');
+  if (b.full) {   // pessages-style full paper (template: full-tests/reading/test-1.html)
+    html = html.split('Full Reading Test 8').join(title).split('[Demo] Test 8 - ').join('[Demo] ' + title + ' - ');
+  } else {        // single passage (template: pessages/test-19.html)
+    html = html.split('Dark Chocolate&rsquo;s Health-giving Benefits - P2').join(title + ' - P1')
+      .split('Dark Chocolate&rsquo;s Health-giving Benefits').join(title).split('Dark Chocolate\u2019s Health-giving Benefits').join(title);
+  }
+  html = html.replace(/(href|src)="(?:\.\.\/)+/g, '$1="/');
   return html;
 }
 
-module.exports = { buildExamHtml, buildData };
+module.exports = { buildExamHtml, buildData, isFull };

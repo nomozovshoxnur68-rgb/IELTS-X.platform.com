@@ -279,6 +279,28 @@ server.listen(0, async () => {
     assert.equal(gr.json.correct, 3); assert.equal(gr.json.saved, false);
     const gr2 = await call('POST', '/api/materials/' + rid + '/grade', { jar: freeU, body: { answers: { q1: 'wax' } } });
     assert.equal(gr2.json.correct, 0); assert.equal(gr2.json.saved, true);
+    { // reading router: PART (1 passage) and FULL (3 passages) tests made in the admin panel open in the real-exam pages
+      const partNo = rd.json.item.data.no; assert.ok(partNo >= 22, 'part tests continue after pessages/test-21');
+      const ex = await call('GET', '/exam/reading/' + rid); assert.equal(ex.status, 200);
+      assert.ok(ex.text.includes('window.READING_TEST') && ex.text.includes('reading.js') && ex.text.includes('reading.css') && ex.text.includes('Bees test') && ex.text.includes('/part/practice/reading'));
+      assert.ok(!/(href|src)="\.\.\//.test(ex.text), 'relative ../ paths are made absolute');
+      const viaNo = await call('GET', '/pessages/test-' + partNo); assert.equal(viaNo.status, 200); assert.ok(viaNo.text.includes('Bees test'));
+      assert.equal((await call('GET', '/pessages/test-' + (partNo + 50))).status, 404, 'unknown number is a 404');
+      const fl = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Full demo paper', data: { mode: 'full', durationMin: 60,
+        passages: [{ title: 'One', passage: 'First text.' }, { title: 'Two', passage: 'Second text.' }, { title: '', passage: '' }],
+        images: [{ url: '/uploads/images/y.png', passage: 2 }],
+        questions: [{ type: 'short', passage: 1, prompt: 'qa', answer: 'x' }, { type: 'tfng', passage: 2, prompt: 'qb', answer: 'TRUE' }, { type: 'short', passage: 2, prompt: 'qc', answer: 'y' }] } } });
+      assert.equal(fl.status, 201); const fno = fl.json.item.data.no; assert.ok(fno >= 7, 'full tests continue after full-tests/reading/test-6');
+      assert.equal(fl.json.item.data.mode, 'full'); assert.equal(fl.json.item.data.questions[2].passage, 2);
+      const fp = await call('GET', '/full-tests/reading/test-' + fno); assert.equal(fp.status, 200);
+      assert.ok(fp.text.includes('QTOTAL = 3') && fp.text.includes('MINUTES: 60') && fp.text.includes('Full demo paper') && fp.text.includes('/full-tests/reading/'));
+      assert.ok(fp.text.includes('Second text.') && fp.text.includes('"id": 3') && fp.text.includes('y.png'));
+      const pl = (await call('GET', '/api/materials?type=reading')).json.items;
+      assert.ok(pl.some((x) => x.id === fl.json.item.id && x.mode === 'full' && x.href === '/full-tests/reading/test-' + fno) && pl.some((x) => x.id === rid && x.mode === 'part' && x.href === '/pessages/test-' + partNo));
+      const back = await call('PATCH', '/api/admin/materials/' + fl.json.item.id, { jar: boss, body: { data: { ...fl.json.item.data, title: 'x' } } });
+      assert.equal(back.json.item.data.no, fno, 'the number never changes when a test is edited');
+      assert.equal((await call('DELETE', '/api/admin/materials/' + fl.json.item.id, { jar: boss })).status, 200);
+    }
     { // every IELTS question type is stored and graded
       const qs = [
         { type: 'completion', prompt: 'Name: ____', answer: 'smith|smyth' }, { type: 'tfng', prompt: 'a', answer: 'NOT GIVEN' }, { type: 'ynng', prompt: 'b', answer: 'NO' },

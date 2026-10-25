@@ -35,12 +35,13 @@
     speaking: 'Part 1 questions, Part 2 cue card, Part 3 discussion. Timers, pictures, model-answer audio.',
     article: 'Reading articles with a cover picture, pictures inside the text, topic and source.'
   };
-  const WHERE = { reading: 'the Reading practice page', listening: 'the Listening practice page', writing: 'the Writing practice page', speaking: 'the Speaking practice page', article: 'the Articles page' };
+  const WHERE = { reading: 'the Reading practice page (Part) or the Full Reading page (Full)', listening: 'the Listening practice page', writing: 'the Writing practice page', speaking: 'the Speaking practice page', article: 'the Articles page' };
   function countText(type, m) {
     const d = m.data || {}; const nq = (d.questions || []).length;
     if (type === 'writing') return (d.tasks || []).length + ' task(s)';
     if (type === 'speaking') { const ps = d.parts || []; return ps.length + ' part(s) · ' + ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''); }
     if (type === 'article') return esc(d.passageLabel || 'Passage 1') + ' · ' + esc(d.topic || 'General') + (d.coverUrl ? ' · 🖼 cover' : ' · <span class="warn-text">no cover</span>');
+    if (type === 'reading') return (d.mode === 'full' ? 'FULL · 3 passages · ' : 'PART · 1 passage · ') + nq + ' questions' + (d.no ? ' · test-' + d.no : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
     return nq + ' questions' + (type === 'listening' ? (d.audioUrl ? ' · 🔊 audio' : ' · <span class="warn-text">no audio</span>') : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
   }
   function renderType(type) {
@@ -97,10 +98,11 @@
   function syncSave() { const b = $('#cb-save'); if (b) { b.disabled = uploading > 0; b.textContent = uploading ? 'Uploading…' : (editingId ? 'Save changes' : 'Create'); } }
 
   /* ───────── builder ───────── */
-  const blankQ = (type) => ({ type: type || 'short', group: '', prompt: '', options: [], answer: '', explanation: '' });
+  const blankQ = (type, passage) => ({ type: type || 'short', passage: passage || 1, group: '', prompt: '', options: [], answer: '', explanation: '' });
+  const blankPassages = () => [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }];
   function blank(type) {
-    const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : 60, instructions: '', images: [] };
-    if (type === 'reading') Object.assign(data, { passage: '', questions: [blankQ()] });
+    const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : type === 'reading' ? 20 : 60, instructions: '', images: [] };
+    if (type === 'reading') Object.assign(data, { mode: 'part', passage: '', passages: blankPassages(), questions: [blankQ()] });
     if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', questions: [blankQ()] });
     if (type === 'speaking') Object.assign(data, { parts: [
       { title: 'Part 1 · Introduction and interview', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' },
@@ -120,6 +122,7 @@
     editingId = item ? item.id : null;
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type);
     draft.data = draft.data || {}; draft.data.images = draft.data.images || [];
+    if (draft.type === 'reading') { draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part'; const ps = Array.isArray(draft.data.passages) ? draft.data.passages : []; draft.data.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); }
     if (draft.type === 'reading' || draft.type === 'listening') draft.data.questions = draft.data.questions && draft.data.questions.length ? draft.data.questions : [blankQ()];
     if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking').data.parts;
     if (draft.type === 'writing' && !(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
@@ -132,8 +135,20 @@
   function imagesBlock(label, help) {
     const imgs = draft.data.images || [];
     return `<div class="cb-block"><div class="cb-head"><div><strong>${label}</strong><div class="muted sm">${help}</div></div><button class="btn btn-sm" data-cb="img-add" type="button">⬆ Upload picture</button></div><div class="muted sm" id="img-status"></div>
-      <div class="cb-images">${imgs.map((im, i) => `<div class="cb-img"><img src="${esc(im.url)}" alt=""><input class="field" placeholder="Caption (optional)" data-p="data.images.${i}.caption" value="${esc(im.caption)}"><button class="btn btn-sm btn-danger" data-cb="img-del" data-i="${i}" type="button">Remove</button></div>`).join('')}</div></div>`;
+      <div class="cb-images">${imgs.map((im, i) => `<div class="cb-img"><img src="${esc(im.url)}" alt=""><input class="field" placeholder="Caption (optional)" data-p="data.images.${i}.caption" value="${esc(im.caption)}">${draft.type === 'reading' && draft.data.mode === 'full' ? passSelect(`data.images.${i}.passage`, im.passage) : ''}<button class="btn btn-sm btn-danger" data-cb="img-del" data-i="${i}" type="button">Remove</button></div>`).join('')}</div></div>`;
   }
+  function readingFormatBlock() {
+    const full = draft.data.mode === 'full';
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Reading format</strong><div class="muted sm">${full ? 'FULL = three passages and one 60-minute paper, in the same style as Full Reading Test pages. It appears on the Full Reading pages.' : 'PART = one passage, in the same style as pessages/test-19, 20, 21. It appears on the Reading practice page.'} Both open in the real-exam player and get their own test-N link automatically.</div></div>
+      <select class="field" style="width:auto" data-p="data.mode" data-rerender="1"><option value="part" ${full ? '' : 'selected'}>Part · 1 passage</option><option value="full" ${full ? 'selected' : ''}>Full · 3 passages</option></select></div></div>`;
+  }
+  function passagesBlock() {
+    const ps = draft.data.passages || [];
+    return [0, 1, 2].map((k) => `<div class="cb-block"><div class="cb-head"><div><strong>Passage ${k + 1}${k === 0 ? ' *' : ''}</strong><div class="muted sm">${k === 0 ? 'Required.' : 'Leave empty if the test has fewer passages.'} Empty line between paragraphs. Start a line with A. / B. / C. to label paragraphs.</div></div></div>
+      <input class="field" placeholder="Passage ${k + 1} title (optional)" data-p="data.passages.${k}.title" value="${esc((ps[k] || {}).title)}" maxlength="200">
+      <textarea class="field cb-passage" rows="12" data-p="data.passages.${k}.passage" placeholder="Paste passage ${k + 1} here">${esc((ps[k] || {}).passage)}</textarea></div>`).join('');
+  }
+  const passSelect = (path, cur) => `<select class="field" style="width:auto" data-p="${path}" data-num="1" title="Which passage?">${[1, 2, 3].map((n) => `<option value="${n}" ${Number(cur || 1) === n ? 'selected' : ''}>Passage ${n}</option>`).join('')}</select>`;
   function questionsBlock() {
     const qs = draft.data.questions || [];
     return `<div class="cb-block"><div class="cb-head"><div><strong>Questions & answers (${qs.length})</strong><div class="muted sm">For several accepted answers separate them with <code>|</code> (e.g. <code>colour|color</code>). True/False/Not Given: write TRUE, FALSE or NOT GIVEN. Multiple choice: write the letter (A, B, C…) of the right option.</div></div>
@@ -142,6 +157,7 @@
       <div class="btn-row"><select class="field" id="bulk-type" style="width:auto">${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select><button class="btn btn-sm btn-primary" data-cb="q-bulk-do" type="button">Add them</button></div></div>
       ${qs.map((q, i) => `<div class="cb-q"><div class="cb-qn">${i + 1}</div><div class="cb-qbody">
         <div class="cb-row"><select class="field" data-p="data.questions.${i}.type" data-rerender="1">${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}" ${q.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+        ${draft.type === 'reading' && draft.data.mode === 'full' ? passSelect(`data.questions.${i}.passage`, q.passage) : ''}
         <input class="field" placeholder="Heading before this question (optional), e.g. Questions 1–5: Complete the notes" data-p="data.questions.${i}.group" value="${esc(q.group)}"></div>
         <textarea class="field" rows="2" placeholder="Question text" data-p="data.questions.${i}.prompt">${esc(q.prompt)}</textarea>
         ${OPT_TYPES.includes(q.type) ? `<textarea class="field" rows="5" placeholder="${q.type === 'mcq' || q.type === 'mcq-multi' ? 'Options, one per line (A, B, C… in this order)' : 'Options, one per line, each starting with its letter or number, e.g.  A. Paragraph A   or   i. The cost of change'}" data-p="data.questions.${i}.options" data-lines="1">${esc((q.options || []).join('\n'))}</textarea>` : ''}
@@ -185,7 +201,7 @@
       <div class="cb-grid">${t === 'article' || t === 'speaking' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <div class="cb-checks"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
-      ${t === 'reading' ? `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>` : ''}
+      ${t === 'reading' ? readingFormatBlock() + (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB).</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}</div>` : ''}
       ${t === 'article' ? articleBlock() : ''}${t === 'speaking' ? partsBlock() : ''}
       ${t === 'writing' ? tasksBlock() : t === 'speaking' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
@@ -205,6 +221,11 @@
     let v = el.type === 'checkbox' ? el.checked : el.value;
     if (el.dataset.lines) v = v.split('\n').map((x) => x.trim()).filter(Boolean);
     if (el.type === 'number') v = Number(v) || 0;
+    if (el.dataset.num) v = Number(v) || 1;
+    if (p === 'data.mode' && draft.type === 'reading') {   // switching format: sensible clock + three passage slots
+      const dd = draft.data; if (!Array.isArray(dd.passages) || dd.passages.length < 3) dd.passages = blankPassages();
+      if (v === 'full' && (!dd.durationMin || dd.durationMin === 20)) dd.durationMin = 60; if (v === 'part' && dd.durationMin === 60) dd.durationMin = 20;
+    }
     setPath(draft, p, v);
     if (el.dataset.rerender && e.type === 'change') renderBuilder();
   }
@@ -213,7 +234,13 @@
     if (uploading) return;
     const d = draft.data;
     if (!draft.title.trim()) return toast('Please enter a title.', true);
-    if (draft.type === 'reading' && !String(d.passage || '').trim()) return toast('Please paste the passage text.', true);
+    if (draft.type === 'reading' && d.mode === 'full') {
+      d.passages = (d.passages || blankPassages()).map((x) => ({ title: String((x && x.title) || '').trim(), passage: String((x && x.passage) || '') }));
+      if (!d.passages[0].passage.trim()) return toast('Please paste the text of Passage 1.', true);
+      const used = (d.questions || []).filter((q) => String(q.prompt || '').trim()).map((q) => Number(q.passage) || 1);
+      const bad = [1, 2, 3].find((n) => used.includes(n) && !d.passages[n - 1].passage.trim());
+      if (bad) return toast('Passage ' + bad + ' has questions but no text.', true);
+    } else if (draft.type === 'reading' && !String(d.passage || '').trim()) return toast('Please paste the passage text.', true);
     if (draft.type === 'listening' && !d.audioUrl) return toast('Please upload the audio file.', true);
     if (draft.type === 'article') {
       if (!String(d.body || '').trim()) return toast('Please paste the article text.', true);
@@ -264,13 +291,13 @@
       if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { draft.data.images.push({ url, caption: '' }); renderBuilder(); } }
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
-      else if (a === 'q-add') { const last = draft.data.questions[draft.data.questions.length - 1]; const nq = blankQ(last && last.type); if (last && OPT_TYPES.includes(last.type)) nq.options = (last.options || []).slice(); draft.data.questions.push(nq); renderBuilder(); const qs = document.querySelectorAll('.cb-q'); qs[qs.length - 1].scrollIntoView({ block: 'center' }); }
+      else if (a === 'q-add') { const last = draft.data.questions[draft.data.questions.length - 1]; const nq = blankQ(last && last.type, last && last.passage); if (last && OPT_TYPES.includes(last.type)) nq.options = (last.options || []).slice(); draft.data.questions.push(nq); renderBuilder(); const qs = document.querySelectorAll('.cb-q'); qs[qs.length - 1].scrollIntoView({ block: 'center' }); }
       else if (a === 'q-del') { draft.data.questions.splice(i, 1); if (!draft.data.questions.length) draft.data.questions.push(blankQ()); renderBuilder(); }
       else if (a === 'q-bulk') { const b = $('#bulk-box'); b.hidden = !b.hidden; }
       else if (a === 'q-bulk-do') {
         const type = $('#bulk-type').value; const lines = $('#bulk-text').value.split('\n').map((x) => x.trim()).filter(Boolean);
         if (!lines.length) return;
-        const add = lines.map((l) => { const [p, ...r] = l.split('=>'); return { ...blankQ(type), prompt: p.trim(), answer: r.join('=>').trim() }; });
+        const add = lines.map((l) => { const [p, ...r] = l.split('=>'); return { ...blankQ(type, (draft.data.questions[draft.data.questions.length - 1] || {}).passage), prompt: p.trim(), answer: r.join('=>').trim() }; });
         draft.data.questions = draft.data.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder(); toast(add.length + ' questions added');
       }
       else if (a === 'cover') { const url = await pickAndUpload('image/*', $('#cover-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
