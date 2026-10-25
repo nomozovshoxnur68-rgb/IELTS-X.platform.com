@@ -300,6 +300,24 @@ server.listen(0, async () => {
       const back = await call('PATCH', '/api/admin/materials/' + fl.json.item.id, { jar: boss, body: { data: { ...fl.json.item.data, title: 'x' } } });
       assert.equal(back.json.item.data.no, fno, 'the number never changes when a test is edited');
       assert.equal((await call('DELETE', '/api/admin/materials/' + fl.json.item.id, { jar: boss })).status, 200);
+      // cards of the Reading practice page: picture, passage tag, question-type chips come with the test
+      const cd = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Card demo', pack: 'Starter Pack', data: { mode: 'part', coverUrl: '/uploads/images/c.png', passageLabel: 'Passage 2', cardTypes: ['Matching Headings', 'Summary Completion'], passage: 'Text.', questions: [{ type: 'tfng', prompt: 'a', answer: 'TRUE' }] } } });
+      const cdPub = (await call('GET', '/api/materials?type=reading')).json.items.find((x) => x.id === cd.json.item.id);
+      assert.equal(cdPub.coverUrl, '/uploads/images/c.png'); assert.equal(cdPub.passageLabel, 'Passage 2'); assert.deepEqual(cdPub.types, ['Matching Headings', 'Summary Completion']);
+      const cd2 = await call('PATCH', '/api/admin/materials/' + cd.json.item.id, { jar: boss, body: { data: { ...cd.json.item.data, cardTypes: [] } } });
+      assert.deepEqual((await call('GET', '/api/materials?type=reading')).json.items.find((x) => x.id === cd.json.item.id).types, ['True False Not Given'], 'chips come from the questions when none are typed');
+      await call('DELETE', '/api/admin/materials/' + cd.json.item.id, { jar: boss });
+      // packs made in the admin panel
+      assert.ok([401, 403].includes((await call('POST', '/api/admin/packs', { body: { skill: 'reading', title: 'Hack' } })).status));
+      const pk = await call('POST', '/api/admin/packs', { jar: boss, body: { skill: 'reading', title: 'Pack 9', tier: 'Tier 2', plan: 'max', group: 'Recent Exams', premium: true } });
+      assert.equal(pk.status, 201); assert.equal(pk.json.pack.slug, 'pack-9'); assert.equal(pk.json.pack.plan, 'MAX');
+      assert.equal((await call('POST', '/api/admin/packs', { jar: boss, body: { skill: 'reading', title: 'Pack 9' } })).status, 409);
+      assert.ok((await call('GET', '/api/packs?skill=reading')).json.packs.some((x) => x.title === 'Pack 9' && x.group === 'Recent Exams'));
+      assert.equal((await call('GET', '/api/packs?skill=listening')).json.packs.length, 0);
+      assert.ok((await call('GET', '/api/admin/access', { jar: boss })).json.skills.find((x) => x.skill === 'reading').packs.some((x) => x.slug === 'pack-9'), 'the pack can be locked / unlocked in Access');
+      await call('PATCH', '/api/admin/packs/' + pk.json.pack.id, { jar: boss, body: { published: false } });
+      assert.ok(!(await call('GET', '/api/packs?skill=reading')).json.packs.some((x) => x.title === 'Pack 9'), 'hidden packs are not public');
+      assert.equal((await call('DELETE', '/api/admin/packs/' + pk.json.pack.id, { jar: boss })).status, 200);
     }
     { // every IELTS question type is stored and graded
       const qs = [

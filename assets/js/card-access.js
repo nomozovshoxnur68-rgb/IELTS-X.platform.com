@@ -63,7 +63,8 @@
         cardRoots(grid).forEach(function (root) { var i = infoFor(root); if (i) decorateCard(root, i); });
     }
 
-    A.load().then(function (st) {
+    Promise.all([A.load(), window.IELTSX_ADMIN_CARDS_READY || Promise.resolve()]).then(function (res) {
+        var st = res[0];
         var rules = st.rules || {};
         var pkey = 'pack:' + SKILL + '/practice-cards';
         set.cards.forEach(function (c) {
@@ -73,6 +74,12 @@
             c.info = info;
             if (c.href) byHref[path(c.href)] = info;
             byTitle[norm(c.title)] = info;
+        });
+        // cards of tests made in the admin panel: the server already decided who may open them (locked / plan)
+        (window.IELTSX_ADMIN_CARDS || []).forEach(function (c) {
+            var rule = A.rule(null, null, { locked: !!c.premium, plan: A.planOf(c.plan) || 'standard' });
+            var info = { rule: rule, allowed: !c.locked, go: c.href, sig: rule.locked + ':' + rule.plan + ':' + (!c.locked) };
+            byHref[path(c.href)] = info; byTitle[norm(c.title)] = info;
         });
         // the Plan filter of app.js asks for the real plan of a card
         IX.cardPlanKey = function (item, free) {

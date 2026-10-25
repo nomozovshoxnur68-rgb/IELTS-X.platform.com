@@ -1770,10 +1770,37 @@
             initSidebarAndAvatar();
         }
 
+        /* Part tests made in the admin panel (Reading - Part) become cards in this same grid:
+           same card, same filters, same pagination. Card-access.js reads window.IELTSX_ADMIN_CARDS for the lock. */
+        function addAdminCards() {
+            if (!window.fetch) return Promise.resolve();
+            var ctl = window.AbortController ? new AbortController() : null;
+            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
+            return fetch('/api/materials?type=reading', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+                .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+                .catch(function () { return { items: [] }; })
+                .then(function (d) {
+                    clearTimeout(timer);
+                    var items = (d.items || []).filter(function (m) { return m.mode !== 'full'; });
+                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: m.href || ('/test?id=' + encodeURIComponent(m.id)), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    items.forEach(function (m, n) {
+                        var c = {
+                            id: 1000 + n, title: m.title, status: m.premium ? 'PREMIUM' : 'FREE', types: m.types || [], plan: m.pack || 'Starter Pack', pack: m.pack || 'Starter Pack',
+                            passage: m.passageLabel || 'Passage 1', href: m.href || ('/test?id=' + encodeURIComponent(m.id)), img: m.coverUrl || '',
+                            desc: (m.description || (m.premium ? 'Premium' : 'Free Sample') + ' | ' + (m.pack || 'Starter Pack')), badge: m.premium ? 'PREMIUM' : 'FREE', admin: true
+                        };
+                        c.key = c.href; c.freeCard = !m.premium;
+                        c.typeKeys = (c.types || []).reduce(function (a, t) { return a.concat(IELTSX.canonicalQuestionTypes(t, 'reading')); }, []);
+                        cardData.push(c);
+                    });
+                });
+        }
+        window.IELTSX_ADMIN_CARDS_READY = addAdminCards();
+        function start() { window.IELTSX_ADMIN_CARDS_READY.then(init, init); }
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+            document.addEventListener('DOMContentLoaded', start);
         } else {
-            init();
+            start();
         }
 
     })();

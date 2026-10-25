@@ -498,7 +498,11 @@ function cleanMaterialData(type, d) {
     out.mode = d.mode === 'full' ? 'full' : 'part';
     out.passage = out.mode === 'full' ? '' : cut(d.passage, 60000);
     if (out.mode === 'full') out.passages = [0, 1, 2].map((i) => { const x = (Array.isArray(d.passages) ? d.passages[i] : null) || {}; return { title: cut(x.title, 200).trim(), passage: cut(x.passage, 60000) }; });
-    out.no = Math.max(0, Math.floor(Number(d.no) || 0));   // the test-N number; the server sets it, see keepReadingNo()
+    out.no = Math.max(0, Math.floor(Number(d.no) || 0));
+    // the card on the Reading practice page: picture, "Passage 1/2/3" tag, question-type chips (empty = taken from the questions)
+    out.coverUrl = cleanUrl(d.coverUrl);
+    out.passageLabel = ['Passage 1', 'Passage 2', 'Passage 3'].includes(d.passageLabel) ? d.passageLabel : 'Passage 1';
+    out.cardTypes = (Array.isArray(d.cardTypes) ? d.cardTypes : String(d.cardTypes || '').split(/[,\n]/)).slice(0, 8).map((x) => cut(x, 40).trim()).filter(Boolean);   // the test-N number; the server sets it, see keepReadingNo()
   }
   if (type === 'listening') { out.audioUrl = cleanUrl(d.audioUrl); out.transcript = cut(d.transcript, 60000); }
   if (type === 'reading' || type === 'listening') {
@@ -563,11 +567,23 @@ function isCorrect(q, given) {
   if (q.type === 'mcq-multi') { const set = (v) => String(v || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).sort().join(','); return set(given) === set(q.answer); }
   return String(q.answer || '').split('|').some((a) => { const n = norm(a); return n && n === g; });
 }
+/* the question-type chips of a card: what the admin typed, or taken from the questions */
+function cardTypesOf(d) {
+  if (Array.isArray(d.cardTypes) && d.cardTypes.length) return d.cardTypes;
+  const L = { short: 'Sentence Completion', completion: 'Completion', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling' };
+  const out = [];
+  for (const q of d.questions || []) {
+    let t = L[q.type];
+    if (q.type === 'matching') t = (q.options || []).length && (q.options || []).every((o) => /^\s*(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)[.)]/i.test(o)) ? 'Matching Headings' : 'Matching Information';
+    if (t && !out.includes(t)) out.push(t);
+  }
+  return out.slice(0, 6);
+}
 const publicMaterial = (m, withData) => {
   const d = m.data || {};
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
-  if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); }
+  if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
   if (m.type === 'article') Object.assign(base, { topic: d.topic || 'General', passageLabel: d.passageLabel || 'Passage 1', source: d.source || '', readMinutes: d.readMinutes || 0, coverUrl: d.coverUrl || '' });
   if (m.type === 'vocab') {   // the list never carries the cards; they are sent only by the single-item call, after the Premium check
     base.wordCount = (d.words || []).length; base.kind = d.kind || 'collection'; base.level = d.level || 'Intermediate'; base.source = d.source || ''; base.icon = d.icon || 'reading';
@@ -747,6 +763,19 @@ async function gateForPath(tl) {
 }
 const priceUrl = (plan, next) => `/Price?premium=required&plan=${plan || 'standard'}` + (next ? `&next=${encodeURIComponent(next)}` : '');
 
+/* ---- packs made in the admin panel (cards of the Full Tests pages), kept in settings ---- */
+const PACK_SKILLS = ['reading', 'listening', 'writing', 'speaking'];
+async function getAdminPacks() {
+  try { const v = await store.getSetting('admin-packs'); return Array.isArray(v && v.packs) ? v.packs : []; } catch (e) { return []; }
+}
+const savePacks = (packs) => store.setSetting('admin-packs', { packs, updatedAt: new Date().toISOString() });
+function cleanPack(b, cur) {
+  b = b || {}; const title = cleanName(b.title !== undefined ? b.title : (cur && cur.title)); if (!title) throw new HttpError(400, 'Pack name is required.');
+  const skill = PACK_SKILLS.includes(b.skill) ? b.skill : (cur && cur.skill) || 'reading';
+  const pick = (k, n) => (b[k] !== undefined ? cut(b[k], n).trim() : (cur && cur[k]) || '');
+  return { id: (cur && cur.id) || newId(), skill, title, slug: slugOf(title), tier: pick('tier', 20), plan: pick('plan', 12).toUpperCase(), group: pick('group', 60), description: pick('description', 200),
+    premium: b.premium !== undefined ? !!b.premium : !!(cur && cur.premium), published: b.published !== undefined ? b.published !== false : !cur || cur.published !== false, createdAt: (cur && cur.createdAt) || new Date().toISOString() };
+}
 async function adminAccessView() {
   const rules = await accessRules(true);
   const cat = loadCatalog();
@@ -756,6 +785,12 @@ async function adminAccessView() {
     packs: sk.packs.map((pk) => ({ key: pk.key, slug: pk.slug, title: pk.title, tier: pk.tier, practice: !!pk.practice, rule: view(rules[pk.key], null, pk.def), def: pk.def,
       tests: pk.tests.map((t) => ({ key: t.key, id: t.id, title: t.title, source: t.source, href: t.href, rule: view(rules[t.key], rules[pk.key], t.def), def: t.def })) }))
   }));
+  for (const ap of await getAdminPacks()) {
+    const sk = skills.find((x) => x.skill === ap.skill); if (!sk) continue;
+    let pk = sk.packs.find((p) => p.slug === ap.slug || slugOf(p.title) === ap.slug);
+    if (pk) { pk.title = ap.title; pk.tier = ap.tier || pk.tier; continue; }
+    pk = { key: `pack:${ap.skill}/${ap.slug}`, slug: ap.slug, title: ap.title, tier: ap.tier, extra: true, def: { locked: !!ap.premium, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk);
+  }
   const mats = (await store.listMaterials()).filter((m) => m.type !== 'vocab');
   for (const m of mats) {
     const sk = skills.find((x) => x.skill === m.type); if (!sk) continue;
@@ -997,6 +1032,10 @@ async function api(req, res, url) {
   }
 
   /* ---- public materials (tests the admins added) ---- */
+  if (method === 'GET' && p === '/api/packs') {   // the packs the admins made (cards of the Full Tests pages)
+    const sk = url.searchParams.get('skill');
+    return send(res, 200, { packs: (await getAdminPacks()).filter((x) => x.published !== false && (!sk || x.skill === sk)) }, { 'Cache-Control': 'no-store, private' });
+  }
   if (method === 'GET' && p === '/api/materials') {
     const type = MATERIAL_TYPES.includes(url.searchParams.get('type')) ? url.searchParams.get('type') : '';
     const u = await currentUser(req); const level = userLevel(u); const rules = await accessRules();
@@ -1176,6 +1215,21 @@ async function api(req, res, url) {
       await store.deleteUser(u.id);
       await audit(admin, 'user.delete', u.email);
       return send(res, 200, { ok: true });
+    }
+    if (method === 'GET' && p === '/api/admin/packs') return send(res, 200, { packs: await getAdminPacks() }, { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/packs') {
+      const all = await getAdminPacks(); const pk = cleanPack(await readJson(req, 64 * 1024));
+      if (all.some((x) => x.skill === pk.skill && x.slug === pk.slug)) throw new HttpError(409, 'A pack with this name already exists.');
+      all.push(pk); await savePacks(all); await audit(admin, 'pack.add', pk.title, { skill: pk.skill });
+      return send(res, 201, { pack: pk });
+    }
+    m = p.match(/^\/api\/admin\/packs\/([^/]+)$/);
+    if (m && (method === 'PATCH' || method === 'DELETE')) {
+      const all = await getAdminPacks(); const id = decodeURIComponent(m[1]); const idx = all.findIndex((x) => x.id === id); if (idx < 0) throw new HttpError(404, 'Pack not found.');
+      if (method === 'DELETE') { const [gone] = all.splice(idx, 1); await savePacks(all); await audit(admin, 'pack.delete', gone.title); return send(res, 200, { ok: true }); }
+      const pk = cleanPack(await readJson(req, 64 * 1024), all[idx]);
+      if (all.some((x, i) => i !== idx && x.skill === pk.skill && x.slug === pk.slug)) throw new HttpError(409, 'A pack with this name already exists.');
+      all[idx] = pk; await savePacks(all); await audit(admin, 'pack.edit', pk.title); return send(res, 200, { pack: pk });
     }
     if (method === 'GET' && p === '/api/admin/access') return send(res, 200, await adminAccessView(), { 'Cache-Control': 'no-store' });
     if (method === 'POST' && p === '/api/admin/access') {

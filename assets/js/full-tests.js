@@ -87,6 +87,25 @@
         return packs;
     }
 
+    /* packs made in the admin panel: a new pack card, or the same slug as a catalog pack (then name / tier / section are taken from the admin) */
+    function mergeAdminPacks(packs, adminPacks) {
+        (adminPacks || []).forEach(function (ap) {
+            var slug = ap.slug || slugify(ap.title);
+            var pack = packs.filter(function (p) { return p.slug === slug || slugify(p.title) === slug; })[0];
+            if (!pack) {
+                pack = { slug: slug, title: ap.title, tier: '', plan: '', description: DATA.description, defLocked: !!ap.premium, defPlan: 'standard', tests: [], extra: true };
+                A.assignKeys(SKILL, pack);
+                packs.push(pack);
+            }
+            pack.title = ap.title || pack.title;
+            if (ap.tier) pack.tier = ap.tier;
+            if (ap.plan) pack.plan = ap.plan;
+            if (ap.description) pack.description = ap.description;
+            if (ap.group) pack.group = ap.group;
+        });
+        return packs;
+    }
+
     function mergeAdminTests(packs, items) {
         (items || []).forEach(function (m) {
             if (SKILL === 'reading' && m.mode !== 'full') return;   // Part (1 passage) tests live on the Reading practice page; only Full (3 passages) tests belong here
@@ -125,10 +144,18 @@
     }
 
     function groupPacks(packs) {
+        var moved = {};   // packs whose section was chosen in the admin panel
+        packs.forEach(function (p) { if (p.group) moved[p.slug] = true; });
         var groups = (DATA.groups[SKILL] || []).map(function (g) {
-            return { title: g.title, packs: g.packs.map(function (slug) {
+            return { title: g.title, packs: g.packs.filter(function (slug) { return !moved[slug]; }).map(function (slug) {
                 return packs.filter(function (p) { return p.slug === slug; })[0];
             }).filter(Boolean) };
+        });
+        packs.forEach(function (p) {
+            if (!p.group) return;
+            var g = groups.filter(function (x) { return x.title.toLowerCase() === p.group.toLowerCase(); })[0];
+            if (!g) { g = { title: p.group, packs: [] }; groups.push(g); }
+            g.packs.push(p);
         });
         var placed = {};
         groups.forEach(function (g) { g.packs.forEach(function (p) { placed[p.slug] = true; }); });
@@ -139,6 +166,14 @@
             else groups.push({ title: 'More packs', packs: rest });
         }
         return groups.filter(function (g) { return g.packs.length; });
+    }
+
+    function loadAdminPacks() {
+        if (!window.fetch) return Promise.resolve([]);
+        return fetch('/api/packs?skill=' + encodeURIComponent(SKILL), { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : { packs: [] }; })
+            .then(function (d) { return Array.isArray(d.packs) ? d.packs : []; })
+            .catch(function () { return []; });
     }
 
     function loadAdmin() {
@@ -312,8 +347,8 @@
     document.title = 'IELTSX — ' + info.title;
     root.innerHTML = '<div class="ft-wrap"><div class="ft-skeleton" aria-busy="true"><span></span><span></span><span></span></div></div>';
 
-    Promise.all([loadAdmin(), A.load()]).then(function (res) {
-        var packs = applyAccess(mergeAdminTests(buildPacks(), res[0]), res[1]);
+    Promise.all([loadAdmin(), A.load(), loadAdminPacks()]).then(function (res) {
+        var packs = applyAccess(mergeAdminTests(mergeAdminPacks(buildPacks(), res[2]), res[0]), res[1]);
         if (VIEW === 'pack') renderPack(packs); else renderList(packs);
     });
 })();

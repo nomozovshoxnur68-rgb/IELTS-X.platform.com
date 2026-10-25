@@ -161,3 +161,13 @@ See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUB
 Paste the passage(s), add the questions (every IELTS type; in a Full test each question and picture has a **Passage 1/2/3** selector), press Create: the page is generated on every visit by `reading-router.js` + `reading-exam.js`, so nothing else has to be copied. The number `test-N` is given once and never changes; `/exam/reading/<id>` always works too. Free / Premium / plan locks from `/admin#access` apply, Draft tests are visible to admins only. **Finish** goes back to the Reading practice page (Part) or the Full Reading page (Full).
 
 On Vercel the new paths are rewritten to the API in `vercel.json` (and the two template pages are bundled with the function), so no redeploy per test is needed.
+
+## Admin: Part practice, Full tests and Packs are separate (October 2026)
+
+The admin menu now has three separate places for Reading:
+
+* **Reading · Part practice** (`/admin#reading`): one passage. Besides the passage and questions you set the **card**: picture, *Passage 1/2/3* tag, question-type chips (empty = taken from the questions) and the pack line. The card appears in the **same grid** of `/part/practice/reading` (same look, filters, search and pagination), and the test opens at `/pessages/test-22`, `test-23` ... like test-19, 20, 21.
+* **Reading · Full tests** (`/admin#readingfull`): three passages, 60 minutes. Choose the **Pack** and the test appears inside that pack card on the Full Reading page, opening at `/full-tests/reading/test-7`, `test-8` ...
+* **Packs (Full Tests cards)** (`/admin#packs`): create the pack cards of the Full Reading / Listening / Writing / Speaking pages: name, tier, plan label, **section** on the page (Recent Exams / Practice / a new name), description, locked by default, visible. A pack with the same name as a built-in one (e.g. *Pack 4*) takes over that card. Lock / unlock a whole pack or one test in **Access** (new packs are listed there too).
+
+Packs are stored in the settings table (`admin-packs`), so no new SQL is needed.

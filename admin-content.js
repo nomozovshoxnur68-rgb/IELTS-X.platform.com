@@ -44,9 +44,15 @@
     if (type === 'reading') return (d.mode === 'full' ? 'FULL · 3 passages · ' : 'PART · 1 passage · ') + nq + ' questions' + (d.no ? ' · test-' + d.no : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
     return nq + ' questions' + (type === 'listening' ? (d.audioUrl ? ' · 🔊 audio' : ' · <span class="warn-text">no audio</span>') : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
   }
-  function renderType(type) {
-    const mount = $('#content-' + type); if (!mount) return;
-    const items = lists[type]; const noun = NOUN[type];
+  const READING_VIEWS = { reading: 'part', readingfull: 'full' };
+  function renderType(type) { if (type === 'reading') Object.entries(READING_VIEWS).forEach(([v, m]) => renderList('reading', v, m)); else renderList(type, type, null); }
+  function renderList(type, view, mode) {
+    const mount = $('#content-' + view); if (!mount) return;
+    const all = lists[type]; const items = all && mode ? all.filter((m) => ((m.data || {}).mode === 'full') === (mode === 'full')) : all;
+    const noun = mode === 'full' ? 'full test' : mode === 'part' ? 'part test' : NOUN[type];
+    const title = mode === 'full' ? 'Reading · Full tests' : mode === 'part' ? 'Reading · Part practice' : TYPES[type];
+    const help = mode === 'full' ? 'Three passages, one 60-minute paper (like the Full Reading Test pages). Put each test in a pack with the Pack field; create the packs in “Packs”.' : mode === 'part' ? 'One passage with its own card on the Reading practice page (like pessages/test-19, 20, 21).' : HELP[type];
+    const where = mode === 'full' ? 'the Full Reading pages, inside the pack' : mode === 'part' ? 'the Reading practice page, in the same card grid' : WHERE[type];
     const rows = (items || []).map((m) => {
       const hay = esc((m.title + ' ' + (m.pack || '') + ' ' + (m.description || '')).toLowerCase());
       return `<tr data-hay="${hay}" data-state="${m.published === false ? 'draft' : 'live'}${m.premium ? ' locked' : ' free'}"><td><strong>${esc(m.title)}</strong><div class="muted sm">${esc(m.pack || '')}</div></td><td>${countText(type, m)}</td>
@@ -56,11 +62,11 @@
         <td><div class="btn-row"><button class="btn btn-sm" data-ct="edit" data-id="${esc(m.id)}" data-type="${type}" type="button">Edit</button><button class="btn btn-sm" data-ct="dup" data-id="${esc(m.id)}" data-type="${type}" type="button" title="Make a copy (saved as Draft)">Copy</button><a class="btn btn-sm" href="/test?id=${encodeURIComponent(m.id)}" target="_blank" rel="noopener">Open ↗</a><button class="btn btn-sm btn-danger" data-ct="delete" data-id="${esc(m.id)}" data-type="${type}" data-title="${esc(m.title)}" type="button">Delete</button></div></td></tr>`;
     }).join('');
     const live = (items || []).filter((m) => m.published !== false).length;
-    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${TYPES[type]}</div>
-      <div class="muted sm">${HELP[type]} Students see them on ${WHERE[type]}.${items ? ` <b>${items.length}</b> total · <b>${live}</b> published.` : ''}</div></div>
-      <button class="btn btn-primary" data-ct="new" data-type="${type}" type="button">+ New ${noun}</button></div>
-      ${items && items.length ? `<div class="toolbar"><input class="field grow" type="search" placeholder="Search by title or pack" data-ct-search="${type}" autocomplete="off">
-        <select class="field" data-ct-filter="${type}" aria-label="Filter"><option value="">All</option><option value="live">Published</option><option value="draft">Drafts</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
+    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${title}</div>
+      <div class="muted sm">${help} Students see them on ${where}.${items ? ` <b>${items.length}</b> total · <b>${live}</b> published.` : ''}</div></div>
+      <button class="btn btn-primary" data-ct="new" data-type="${type}" data-mode="${mode || ''}" type="button">+ New ${noun}</button></div>
+      ${items && items.length ? `<div class="toolbar"><input class="field grow" type="search" placeholder="Search by title or pack" data-ct-search="${view}" autocomplete="off">
+        <select class="field" data-ct-filter="${view}" aria-label="Filter"><option value="">All</option><option value="live">Published</option><option value="draft">Drafts</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
       ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Content</th><th>Access</th><th>Status</th><th>Added</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><div class="muted sm" style="margin-top:8px">Lock / unlock by plan (Standard, Max, Ultra) in <a href="#access">Access</a>.</div>` : `<div class="empty">Nothing here yet. Press “+ New ${noun}” to add the first one.</div>`}</div>`;
   }
   function applyFilter(type) {
@@ -100,9 +106,9 @@
   /* ───────── builder ───────── */
   const blankQ = (type, passage) => ({ type: type || 'short', passage: passage || 1, group: '', prompt: '', options: [], answer: '', explanation: '' });
   const blankPassages = () => [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }];
-  function blank(type) {
-    const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : type === 'reading' ? 20 : 60, instructions: '', images: [] };
-    if (type === 'reading') Object.assign(data, { mode: 'part', passage: '', passages: blankPassages(), questions: [blankQ()] });
+  function blank(type, mode) {
+    const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : type === 'reading' ? (mode === 'full' ? 60 : 20) : 60, instructions: '', images: [] };
+    if (type === 'reading') Object.assign(data, { mode: mode === 'full' ? 'full' : 'part', coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()] });
     if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', questions: [blankQ()] });
     if (type === 'speaking') Object.assign(data, { parts: [
       { title: 'Part 1 · Introduction and interview', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' },
@@ -117,16 +123,16 @@
   async function loadPacks() {   // pack names that already exist on the Full Tests pages, for the Pack field
     try { const d = await api('/api/admin/access'); PACKS = {}; (d.skills || []).forEach((sk) => { PACKS[sk.skill] = (sk.packs || []).filter((p) => !p.practice).map((p) => p.title); }); } catch (e) { /* the field still accepts any name */ }
   }
-  function openBuilder(type, item) {
+  function openBuilder(type, item, mode) {
     loadPacks().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); });
     editingId = item ? item.id : null;
-    draft = item ? JSON.parse(JSON.stringify(item)) : blank(type);
+    draft = item ? JSON.parse(JSON.stringify(item)) : blank(type, mode);
     draft.data = draft.data || {}; draft.data.images = draft.data.images || [];
     if (draft.type === 'reading') { draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part'; const ps = Array.isArray(draft.data.passages) ? draft.data.passages : []; draft.data.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); }
     if (draft.type === 'reading' || draft.type === 'listening') draft.data.questions = draft.data.questions && draft.data.questions.length ? draft.data.questions : [blankQ()];
     if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking').data.parts;
     if (draft.type === 'writing' && !(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
-    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + NOUN[draft.type];
+    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + (draft.type === 'reading' ? (draft.data.mode === 'full' ? 'full reading test' : 'part reading test') : NOUN[draft.type]);
     renderBuilder(); $('#builder').classList.add('open'); $('#builder-body').scrollTop = 0;
   }
   function closeBuilder() { if (uploading && !confirm('A file is still uploading. Close anyway?')) return; $('#builder').classList.remove('open'); draft = null; editingId = null; }
@@ -139,8 +145,13 @@
   }
   function readingFormatBlock() {
     const full = draft.data.mode === 'full';
-    return `<div class="cb-block"><div class="cb-head"><div><strong>Reading format</strong><div class="muted sm">${full ? 'FULL = three passages and one 60-minute paper, in the same style as Full Reading Test pages. It appears on the Full Reading pages.' : 'PART = one passage, in the same style as pessages/test-19, 20, 21. It appears on the Reading practice page.'} Both open in the real-exam player and get their own test-N link automatically.</div></div>
-      <select class="field" style="width:auto" data-p="data.mode" data-rerender="1"><option value="part" ${full ? '' : 'selected'}>Part · 1 passage</option><option value="full" ${full ? 'selected' : ''}>Full · 3 passages</option></select></div></div>`;
+    if (full) return `<div class="cb-block"><strong>Full reading test · 3 passages · 60 minutes</strong><div class="muted sm">Shown on the Full Reading page inside the pack you choose below (create packs in “Packs”). Opens like the Full Reading Test pages, at <code>/full-tests/reading/test-${esc(draft.data.no || 'N')}</code>.</div></div>`;
+    const d = draft.data;
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Card on the Reading practice page</strong><div class="muted sm">The card looks exactly like the other cards: picture, passage tag, question-type chips and the pack line. The test opens like pessages/test-19, 20, 21, at <code>/pessages/test-${esc(d.no || 'N')}</code>.</div></div>
+      <button class="btn btn-sm" data-cb="card-img" type="button">⬆ ${d.coverUrl ? 'Replace picture' : 'Upload picture'}</button></div><div class="muted sm" id="card-img-status"></div>
+      ${d.coverUrl ? `<div class="cb-images"><div class="cb-img"><img src="${esc(d.coverUrl)}" alt=""><button class="btn btn-sm btn-danger" data-cb="card-img-del" type="button">Remove</button></div></div>` : ''}
+      <div class="cb-grid"><label class="lbl">Passage tag on the card<select class="field" data-p="data.passageLabel">${['Passage 1', 'Passage 2', 'Passage 3'].map((x) => `<option ${d.passageLabel === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+      <label class="lbl">Question types on the card (comma separated; empty = taken from the questions)<input class="field" data-p="data.cardTypes" data-csv="1" value="${esc((d.cardTypes || []).join(', '))}" placeholder="True False Not Given, Sentence Completion"></label></div></div>`;
   }
   function passagesBlock() {
     const ps = draft.data.passages || [];
@@ -196,7 +207,7 @@
   function renderBuilder() {
     const t = draft.type, d = draft.data;
     $('#builder-body').innerHTML = `
-      <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field('Pack / group — pick one, or type a new name to create a new pack card', 'pack', draft.pack, 'list="ix-pack-list" placeholder="e.g. Pack 5" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>
+      <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(t === 'reading' && d.mode !== 'full' ? 'Pack shown on the card (e.g. Starter Pack)' : 'Pack — pick one, or type a new name to create a new pack card', 'pack', draft.pack, 'list="ix-pack-list" placeholder="e.g. Pack 5" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
       <div class="cb-grid">${t === 'article' || t === 'speaking' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <div class="cb-checks"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
@@ -222,6 +233,7 @@
     if (el.dataset.lines) v = v.split('\n').map((x) => x.trim()).filter(Boolean);
     if (el.type === 'number') v = Number(v) || 0;
     if (el.dataset.num) v = Number(v) || 1;
+    if (el.dataset.csv) v = v.split(',').map((x) => x.trim()).filter(Boolean);
     if (p === 'data.mode' && draft.type === 'reading') {   // switching format: sensible clock + three passage slots
       const dd = draft.data; if (!Array.isArray(dd.passages) || dd.passages.length < 3) dd.passages = blankPassages();
       if (v === 'full' && (!dd.durationMin || dd.durationMin === 20)) dd.durationMin = 60; if (v === 'part' && dd.durationMin === 60) dd.durationMin = 20;
@@ -273,7 +285,7 @@
     try {
       if (t.dataset.ct) {
         const { ct, type, id } = t.dataset;
-        if (ct === 'new') return openBuilder(type);
+        if (ct === 'new') return openBuilder(type, null, t.dataset.mode);
         const item = (lists[type] || []).find((x) => x.id === id);
         if (ct === 'edit') { const full = await api('/api/admin/materials/' + encodeURIComponent(id)); return openBuilder(type, full.item); }
         if (ct === 'premium' && item) { await api('/api/admin/materials/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ premium: !item.premium }) }); toast(item.premium ? 'Now free' : 'Now Premium only'); return loadType(type); }
@@ -301,6 +313,8 @@
         draft.data.questions = draft.data.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder(); toast(add.length + ' questions added');
       }
       else if (a === 'cover') { const url = await pickAndUpload('image/*', $('#cover-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
+      else if (a === 'card-img') { const url = await pickAndUpload('image/*', $('#card-img-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
+      else if (a === 'card-img-del') { draft.data.coverUrl = ''; renderBuilder(); }
       else if (a === 'cover-del') { draft.data.coverUrl = ''; renderBuilder(); }
       else if (a === 'body-img') {
         const url = await pickAndUpload('image/*', $('#body-status')); if (!url) return;
@@ -321,11 +335,54 @@
     } catch (err) { fail(err); }
   }
 
+
+  /* ───────── packs: the cards of the Full Tests pages ───────── */
+  let packList = null, packEdit = null;
+  const SK_NAME = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking' };
+  async function loadPackList() { try { packList = (await api('/api/admin/packs')).packs; } catch (e) { fail(e); packList = packList || []; } renderPacks(); }
+  function renderPacks() {
+    const mount = $('#content-packs'); if (!mount) return;
+    const f = packEdit || { skill: 'reading', title: '', tier: 'Tier 1', plan: 'MAX', group: 'Practice', description: '', premium: true, published: true };
+    const opt = (list, cur) => list.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(l)}</option>`).join('');
+    const rows = (packList || []).map((p) => `<tr><td><strong>${esc(p.title)}</strong><div class="muted sm">${esc(p.description || '')}</div></td><td>${esc(SK_NAME[p.skill] || p.skill)}</td><td>${esc(p.tier || '—')}</td><td>${esc(p.group || 'Practice')}</td>
+      <td><span class="chip ${p.premium ? 'chip-premium' : ''}">${p.premium ? '★ ' + esc(p.plan || 'Premium') : 'Free'}</span></td>
+      <td><button class="chip ${p.published === false ? '' : 'chip-ok'}" data-pk="pub" data-id="${esc(p.id)}" type="button" title="Click to change">${p.published === false ? 'Hidden' : 'Visible'}</button></td>
+      <td><div class="btn-row"><button class="btn btn-sm" data-pk="edit" data-id="${esc(p.id)}" type="button">Edit</button><button class="btn btn-sm btn-danger" data-pk="del" data-id="${esc(p.id)}" type="button">Delete</button></div></td></tr>`).join('');
+    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">Packs · cards of the Full Tests pages</div>
+      <div class="muted sm">A pack is a card on the Full Reading / Listening / Writing / Speaking page. Create it here, then choose its name in the <b>Pack</b> field of a full test and the test appears inside it. A pack with the same name as a built-in one (e.g. “Pack 4”) takes over its card.</div></div></div>
+      <div class="cb-block"><strong>${packEdit ? 'Edit pack' : 'New pack'}</strong>
+        <div class="cb-grid"><label class="lbl">Skill<select class="field" id="pk-skill">${opt(Object.entries(SK_NAME), f.skill)}</select></label><label class="lbl">Pack name *<input class="field" id="pk-title" maxlength="80" value="${esc(f.title)}" placeholder="e.g. Pack 7"></label></div>
+        <div class="cb-grid"><label class="lbl">Tier<select class="field" id="pk-tier">${opt([['', 'No tier'], ['Tier 1', 'Tier 1'], ['Tier 2', 'Tier 2'], ['Tier 3', 'Tier 3']], f.tier || '')}</select></label>
+          <label class="lbl">Plan label<select class="field" id="pk-plan">${opt([['', 'None'], ['STANDARD', 'Standard'], ['MAX', 'Max'], ['ULTRA', 'Ultra']], (f.plan || '').toUpperCase())}</select></label></div>
+        <div class="cb-grid"><label class="lbl">Section on the page<input class="field" id="pk-group" list="pk-groups" maxlength="60" value="${esc(f.group)}" placeholder="Recent Exams / Practice / a new name"><datalist id="pk-groups"><option value="Recent Exams"></option><option value="Practice"></option></datalist></label>
+          <label class="lbl">Short description (optional)<input class="field" id="pk-desc" maxlength="200" value="${esc(f.description)}" placeholder="Practice tests to improve your skills"></label></div>
+        <div class="cb-checks"><label><input type="checkbox" id="pk-premium" ${f.premium ? 'checked' : ''}> Locked (paid plan) by default</label><label><input type="checkbox" id="pk-published" ${f.published !== false ? 'checked' : ''}> Visible to students</label></div>
+        <div class="btn-row"><button class="btn btn-primary" data-pk="save" type="button">${packEdit ? 'Save changes' : 'Create pack'}</button>${packEdit ? '<button class="btn" data-pk="cancel" type="button">Cancel</button>' : ''}</div></div>
+      ${packList === null ? '<div class="empty">Loading…</div>' : packList.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Pack</th><th>Skill</th><th>Tier</th><th>Section</th><th>Access</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><div class="muted sm" style="margin-top:8px">Free / Standard / Max for a whole pack or one test: <a href="#access">Access</a>.</div>` : '<div class="empty">No packs made here yet. The built-in packs (Pack 1–6, Volume 8–9 …) are managed in <a href="#access">Access</a>.</div>'}</div>`;
+  }
+  async function onPackClick(e) {
+    const t = e.target.closest('[data-pk]'); if (!t) return;
+    try {
+      const a = t.dataset.pk, id = t.dataset.id; const item = (packList || []).find((x) => x.id === id);
+      if (a === 'edit' && item) { packEdit = { ...item }; renderPacks(); $('#content-packs').scrollIntoView(); }
+      else if (a === 'cancel') { packEdit = null; renderPacks(); }
+      else if (a === 'pub' && item) { await api('/api/admin/packs/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ published: item.published === false }) }); await loadPackList(); }
+      else if (a === 'del' && item) { if (!confirm('Delete the pack “' + item.title + '”? Its tests stay, but the pack card disappears.')) return; await api('/api/admin/packs/' + encodeURIComponent(id), { method: 'DELETE' }); packEdit = null; toast('Pack deleted'); await loadPackList(); }
+      else if (a === 'save') {
+        const body = { skill: $('#pk-skill').value, title: $('#pk-title').value, tier: $('#pk-tier').value, plan: $('#pk-plan').value, group: $('#pk-group').value, description: $('#pk-desc').value, premium: $('#pk-premium').checked, published: $('#pk-published').checked };
+        if (!body.title.trim()) return toast('Please enter the pack name.', true);
+        if (packEdit) await api('/api/admin/packs/' + encodeURIComponent(packEdit.id), { method: 'PATCH', body: JSON.stringify(body) });
+        else await api('/api/admin/packs', { method: 'POST', body: JSON.stringify(body) });
+        toast(packEdit ? 'Pack saved' : 'Pack created'); packEdit = null; await loadPackList(); PACKS = {};
+      }
+    } catch (err) { fail(err); }
+  }
+
   const NAMES = Object.keys(TYPES);
-  function onHash() { let v = (location.hash || '').slice(1).split('?')[0]; v = VIEW_FOR[v] || v; if (NAMES.includes(v) && lists[v] === null) loadType(v); }
+  function onHash() { let v = (location.hash || '').slice(1).split('?')[0]; v = VIEW_FOR[v] || v; if (v === 'packs' && packList === null) loadPackList(); if (v === 'readingfull') v = 'reading'; if (NAMES.includes(v) && lists[v] === null) loadType(v); }
   window.addEventListener('DOMContentLoaded', () => {
     NAMES.forEach((t) => renderType(t));
-    document.addEventListener('click', onClick);
+    document.addEventListener('click', onClick); document.addEventListener('click', onPackClick); renderPacks();
     document.addEventListener('input', onInput); document.addEventListener('change', onInput);
     $('#cb-save').addEventListener('click', save);
     document.querySelectorAll('[data-cb-close]').forEach((b) => b.addEventListener('click', closeBuilder));
