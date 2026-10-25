@@ -151,3 +151,8 @@ alter table public.ieltsx_settings enable row level security;
 -- ───────────── added in v7: Speaking tests and Articles made in the admin panel (run once) ─────────────
 alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
 alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab','speaking','article'));
+
+-- ───────────── added in v7: every type the admin panel can create (run once on an existing database; safe to run again) ─────────────
+-- Adds speaking, article and pdf (PDF library) to the allowed types. Without it Supabase refuses to save those.
+alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','speaking','article','vocab','pdf'));

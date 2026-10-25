@@ -3,11 +3,11 @@
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-  const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles' };
+  const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles', pdf: 'PDF materials' };
   const TOPICS = ['General', 'History', 'Science', 'Technology', 'Environment', 'Health', 'Education', 'Society', 'Business', 'Culture', 'Nature', 'Psychology'];
   const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / table / flow-chart / summary completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
   const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map'];
-  const lists = { reading: null, listening: null, writing: null, speaking: null, article: null };
+  const lists = { reading: null, listening: null, writing: null, speaking: null, article: null, pdf: null };
   const VIEW_FOR = { articles: 'article' };            // #articles in the address bar = the article list
   let draft = null, editingId = null, uploading = 0;
 
@@ -24,22 +24,24 @@
 
   /* ───────── list views ───────── */
   async function loadType(type) {
-    try { lists[type] = (await api('/api/admin/materials?type=' + type)).items; } catch (e) { fail(e); lists[type] = lists[type] || []; }
+    try { lists[type] = (await api('/api/admin/materials?type=' + type)).items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))); } catch (e) { fail(e); lists[type] = lists[type] || []; }
     renderType(type);
   }
-  const NOUN = { reading: 'test', listening: 'test', writing: 'task set', speaking: 'speaking test', article: 'article' };
+  const NOUN = { reading: 'test', listening: 'listening card', writing: 'writing card', speaking: 'speaking card', article: 'article card', pdf: 'PDF material' };
   const HELP = {
     reading: 'Passage, pictures and questions with answers. Graded automatically.',
     listening: 'Audio file, map/diagram pictures and questions with answers. Graded automatically.',
     writing: 'Task 1 / Task 2 prompts with an optional chart picture and model answer.',
     speaking: 'Part 1 questions, Part 2 cue card, Part 3 discussion. Timers, pictures, model-answer audio.',
-    article: 'Reading articles with a cover picture, pictures inside the text, topic and source.'
+    article: 'Reading articles with a cover picture, pictures inside the text, topic and source.',
+    pdf: 'A PDF file with its own card (picture, title, tags) on the PDF Library page. Students download it from the card.'
   };
-  const WHERE = { reading: 'the Reading practice page (Part) or the Full Reading page (Full)', listening: 'the Listening practice page', writing: 'the Writing practice page', speaking: 'the Speaking practice page', article: 'the Articles page' };
+  const WHERE = { reading: 'the Reading practice page (Part) or the Full Reading page (Full)', listening: 'the Listening practice page', writing: 'the Writing practice page', speaking: 'the Speaking practice page', article: 'the Articles page', pdf: 'the PDF Library page' };
   function countText(type, m) {
     const d = m.data || {}; const nq = (d.questions || []).length;
     if (type === 'writing') return (d.tasks || []).length + ' task(s)';
     if (type === 'speaking') { const ps = d.parts || []; return ps.length + ' part(s) · ' + ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''); }
+    if (type === 'pdf') return (d.fileUrl ? '📄 file' : '<span class="warn-text">no file</span>') + (d.pages ? ' · ' + d.pages + ' pages' : '');
     if (type === 'article') return esc(d.passageLabel || 'Passage 1') + ' · ' + esc(d.topic || 'General') + (d.coverUrl ? ' · 🖼 cover' : ' · <span class="warn-text">no cover</span>');
     if (type === 'reading') return (d.mode === 'full' ? 'FULL · 3 passages · ' : 'PART · 1 passage · ') + nq + ' questions' + (d.no ? ' · test-' + d.no : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
     return nq + ' questions' + (type === 'listening' ? (d.audioUrl ? ' · 🔊 audio' : ' · <span class="warn-text">no audio</span>') : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
@@ -49,7 +51,7 @@
   function renderList(type, view, mode) {
     const mount = $('#content-' + view); if (!mount) return;
     const all = lists[type]; const items = all && mode ? all.filter((m) => ((m.data || {}).mode === 'full') === (mode === 'full')) : all;
-    if (type === 'reading' && mode === 'part') return renderPartCards(mount, items);
+    if (!(type === 'reading' && mode === 'full')) return renderCardGrid(type, mount, items);
     const noun = mode === 'full' ? 'full test' : mode === 'part' ? 'part practice card' : NOUN[type];
     const title = mode === 'full' ? 'Reading · Full tests' : mode === 'part' ? 'Reading · Part practice' : TYPES[type];
     const help = mode === 'full' ? 'Three passages, one 60-minute paper (like the Full Reading Test pages). Put each test in a pack with the Pack field; create the packs in “Packs”.' : mode === 'part' ? 'One passage with its own card on the Reading practice page (like pessages/test-19, 20, 21).' : HELP[type];
@@ -70,27 +72,43 @@
         <select class="field" data-ct-filter="${view}" aria-label="Filter"><option value="">All</option><option value="live">Published</option><option value="draft">Drafts</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
       ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Content</th><th>Access</th><th>Status</th><th>Added</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><div class="muted sm" style="margin-top:8px">Lock / unlock by plan (Standard, Max, Ultra) in <a href="#access">Access</a>.</div>` : `<div class="empty">Nothing here yet. Press “+ New ${noun}” to add the first one.</div>`}</div>`;
   }
-  /* Part practice: every card of the Reading practice page, shown as a card (picture, pack, passage tag) with Edit / Remove */
-  function renderPartCards(mount, items) {
-    const live = (items || []).filter((m) => m.published !== false).length;
-    const cards = (items || []).map((m) => {
-      const d = m.data || {}; const nq = (d.questions || []).length; const noExp = (d.questions || []).filter((q) => !String(q.explanation || '').trim()).length;
-      const href = d.no ? '/pessages/test-' + d.no : '/test?id=' + encodeURIComponent(m.id);
+  /* Every kind of content is shown as cards (picture, tag, pack) with Edit / Copy / Open / Remove. Newest first. */
+  const GRID = {
+    reading: { title: 'Part practice cards', noun: 'part practice card', help: 'Each card is one passage on the Reading practice page, in the same grid as the other cards.' },
+    listening: { title: 'Listening cards', noun: 'listening card', help: 'Each card is one section on the Listening practice page: audio, questions with answers and explanations, card picture.' },
+    writing: { title: 'Writing cards', noun: 'writing card', help: 'Each card is a Task 1 / Task 2 set on the Writing practice page, with its chart picture and model answer.' },
+    speaking: { title: 'Speaking cards', noun: 'speaking card', help: 'Each card is a speaking test: Part 1, Part 2 cue card, Part 3.' },
+    article: { title: 'Article cards', noun: 'article card', help: 'Each card is an article on the Articles page, with its cover picture.' },
+    pdf: { title: 'PDF material cards', noun: 'PDF material', help: 'Each card is a PDF on the PDF Library page. Upload the file and a card picture; students press Download.' }
+  };
+  function cardInfo(type, m) {
+    const d = m.data || {}; const nq = (d.questions || []).length; const exp = (d.questions || []).filter((q) => String(q.explanation || '').trim()).length;
+    const expTxt = nq ? (exp === nq ? ' · 💡 all explained' : exp ? ' · ' + exp + '/' + nq + ' explained' : '') : '';
+    if (type === 'reading') return { img: d.coverUrl, tag: d.passageLabel || 'Passage 1', sub: nq + ' questions · ' + (d.durationMin ? d.durationMin + ' min' : 'no timer') + expTxt, href: d.no ? '/pessages/test-' + d.no : '/test?id=' + encodeURIComponent(m.id) };
+    if (type === 'listening') return { img: d.coverUrl, tag: d.sectionLabel || 'Section 1', sub: nq + ' questions' + (d.audioUrl ? ' · 🔊 audio' : ' · ⚠ no audio') + expTxt, href: '/test?id=' + encodeURIComponent(m.id) };
+    if (type === 'writing') { const ts = d.tasks || []; return { img: d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl, tag: d.tier || 'Tier 1', sub: ts.length + ' task(s)' + (ts.some((t) => t.sample) ? ' · model answer' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
+    if (type === 'speaking') { const ps = d.parts || []; return { img: (ps.find((t) => t.imageUrl) || {}).imageUrl, tag: ps.length + ' part(s)', sub: ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
+    if (type === 'article') return { img: d.coverUrl, tag: d.passageLabel || 'Passage 1', sub: (d.topic || 'General') + (d.readMinutes ? ' · ' + d.readMinutes + ' min read' : ''), href: '/test?id=' + encodeURIComponent(m.id) };
+    return { img: d.coverUrl, tag: ({ reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', magazine: 'Magazine', other: 'PDF' })[d.category] || 'PDF', sub: (d.fileUrl ? '📄 PDF uploaded' : '⚠ no PDF file') + (d.pages ? ' · ' + d.pages + ' pages' : ''), href: d.fileUrl || '' };
+  }
+  function renderCardGrid(type, mount, items) {
+    const G = GRID[type]; const live = (items || []).filter((m) => m.published !== false).length; const mode = type === 'reading' ? 'part' : '';
+    const cards = (items || []).map((m, n) => {
+      const c = cardInfo(type, m); const ids = `data-id="${esc(m.id)}" data-type="${type}"`;
       const hay = esc((m.title + ' ' + (m.pack || '') + ' ' + (m.description || '')).toLowerCase());
-      const ids = `data-id="${esc(m.id)}" data-type="reading"`;
       return `<div class="pc-card" data-hay="${hay}" data-state="${m.published === false ? 'draft' : 'live'}${m.premium ? ' locked' : ' free'}">
-        <div class="pc-img">${d.coverUrl ? `<img src="${esc(d.coverUrl)}" alt="" loading="lazy">` : '<div class="pc-noimg">No picture yet<br><span>Edit → upload card picture</span></div>'}<span class="pc-tag">${esc(d.passageLabel || 'Passage 1')}</span>${m.published === false ? '<span class="pc-draft">Draft</span>' : ''}</div>
-        <div class="pc-body"><div class="muted sm">${esc(m.pack || 'Starter Pack')}</div><div class="pc-title">${esc(m.title)}</div>
-          <div class="muted sm">${nq} questions · ${d.durationMin ? d.durationMin + ' min' : 'no timer'}${nq && !noExp ? ' · 💡 explanations' : nq ? ' · ' + (nq - noExp) + '/' + nq + ' explained' : ''}</div>
+        <div class="pc-img">${c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy">` : '<div class="pc-noimg">No picture yet<br><span>Edit → upload card picture</span></div>'}<span class="pc-tag">${esc(c.tag)}</span>${n === 0 && items.length > 1 ? '<span class="pc-new">NEW</span>' : ''}${m.published === false ? '<span class="pc-draft">Hidden</span>' : ''}</div>
+        <div class="pc-body"><div class="muted sm">${esc(m.pack || (type === 'reading' ? 'Starter Pack' : '—'))} · ${fmt(m.createdAt)}</div><div class="pc-title">${esc(m.title)}</div>
+          <div class="muted sm">${esc(c.sub)}</div>
           <div class="btn-row" style="margin:8px 0"><button class="chip ${m.premium ? 'chip-premium' : ''}" data-ct="premium" ${ids} type="button" title="Click to change">${m.premium ? '★ Premium' : 'Free'}</button><button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" ${ids} type="button" title="Click to change">${m.published === false ? 'Hidden' : 'Visible'}</button></div>
-          <div class="btn-row"><button class="btn btn-sm" data-ct="edit" ${ids} type="button">Edit</button><button class="btn btn-sm" data-ct="dup" ${ids} type="button" title="Make a copy (saved as Hidden)">Copy</button><a class="btn btn-sm" href="${esc(href)}" target="_blank" rel="noopener">Open ↗</a><button class="btn btn-sm btn-danger" data-ct="delete" ${ids} data-title="${esc(m.title)}" type="button">Remove</button></div></div></div>`;
+          <div class="btn-row"><button class="btn btn-sm" data-ct="edit" ${ids} type="button">Edit</button><button class="btn btn-sm" data-ct="dup" ${ids} type="button" title="Make a copy (saved as Hidden)">Copy</button>${c.href ? `<a class="btn btn-sm" href="${esc(c.href)}" target="_blank" rel="noopener">Open ↗</a>` : ''}<button class="btn btn-sm btn-danger" data-ct="delete" ${ids} data-title="${esc(m.title)}" type="button">Remove</button></div></div></div>`;
     }).join('');
-    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">Part practice cards</div>
-      <div class="muted sm">Each card is one passage on the Reading practice page, in the same grid as the other cards (picture, passage tag, pack). Add the card picture, the passage, and all questions with answers and explanations in one window.${items ? ` <b>${items.length}</b> total · <b>${live}</b> visible.` : ''}</div></div>
-      <button class="btn btn-primary" data-ct="new" data-type="reading" data-mode="part" type="button">+ New part practice card</button></div>
-      ${items && items.length ? `<div class="toolbar"><input class="field grow" type="search" placeholder="Search by title or pack" data-ct-search="reading" autocomplete="off">
-        <select class="field" data-ct-filter="reading" aria-label="Filter"><option value="">All</option><option value="live">Visible</option><option value="draft">Hidden</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
-      ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="pc-grid">${cards}</div><div class="muted sm" style="margin-top:10px">Lock / unlock by plan (Standard, Max, Ultra) in <a href="#access">Access</a>.</div>` : '<div class="empty">No cards yet. Press “+ New part practice card” to add the first one.</div>'}</div>`;
+    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${G.title}</div>
+      <div class="muted sm">${G.help} The newest card is shown first, here and on the website.${items ? ` <b>${items.length}</b> total · <b>${live}</b> visible.` : ''}</div></div>
+      <button class="btn btn-primary" data-ct="new" data-type="${type}" data-mode="${mode}" type="button">+ New ${G.noun}</button></div>
+      ${items && items.length ? `<div class="toolbar"><input class="field grow" type="search" placeholder="Search by title or pack" data-ct-search="${type}" autocomplete="off">
+        <select class="field" data-ct-filter="${type}" aria-label="Filter"><option value="">All</option><option value="live">Visible</option><option value="draft">Hidden</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
+      ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="pc-grid">${cards}</div><div class="muted sm" style="margin-top:10px">Lock / unlock by plan (Standard, Max, Ultra) in <a href="#access">Access</a>.</div>` : `<div class="empty">No cards yet. Press “+ New ${G.noun}” to add the first one.</div>`}</div>`;
   }
   function applyFilter(type) {
     const mount = $('#content-' + type); if (!mount) return;
@@ -102,7 +120,7 @@
   async function uploadFile(file) {
     const meta = await api('/api/admin/upload-url', { method: 'POST', body: JSON.stringify({ filename: file.name, size: file.size }) });
     if (meta.local) {
-      const fd = new FormData(); fd.append('type', /\.(mp3|wav|m4a|ogg|aac)$/i.test(file.name) ? 'audio' : 'image'); fd.append('file', file, file.name);
+      const fd = new FormData(); fd.append('type', /\.(mp3|wav|m4a|ogg|aac)$/i.test(file.name) ? 'audio' : /\.pdf$/i.test(file.name) ? 'pdf' : 'image'); fd.append('file', file, file.name);
       return (await api('/api/admin/uploads', { method: 'POST', body: fd })).url;
     }
     const fd = new FormData(); fd.append('cacheControl', '3600'); fd.append('', file);
@@ -132,13 +150,14 @@
   function blank(type, mode) {
     const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : type === 'reading' ? (mode === 'full' ? 60 : 20) : 60, instructions: '', images: [] };
     if (type === 'reading') Object.assign(data, { mode: mode === 'full' ? 'full' : 'part', coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()] });
-    if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', questions: [blankQ()] });
+    if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ()] });
+    if (type === 'pdf') { Object.assign(data, { fileUrl: '', coverUrl: '', category: 'reading', badge: 'PDF', corner: '', pages: 0, tags: [] }); delete data.instructions; delete data.images; }
     if (type === 'speaking') Object.assign(data, { parts: [
       { title: 'Part 1 · Introduction and interview', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' },
       { title: 'Part 2 · Long turn (cue card)', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 60, speakSeconds: 120, sample: '' },
       { title: 'Part 3 · Discussion', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' }] });
     if (type === 'article') Object.assign(data, { topic: 'General', passageLabel: 'Passage 1', source: '', readMinutes: 5, coverUrl: '', body: '' });
-    if (type === 'writing') Object.assign(data, { tasks: [{ title: 'Task 1', prompt: '', imageUrl: '', minWords: 150, minutes: 20, sample: '' }, { title: 'Task 2', prompt: '', imageUrl: '', minWords: 250, minutes: 40, sample: '' }] });
+    if (type === 'writing') Object.assign(data, { coverUrl: '', tier: 'Tier 1', cardTypes: [], tasks: [{ title: 'Task 1', prompt: '', imageUrl: '', minWords: 150, minutes: 20, sample: '' }, { title: 'Task 2', prompt: '', imageUrl: '', minWords: 250, minutes: 40, sample: '' }] });
     return { type, title: '', pack: '', description: '', premium: false, published: true, data };
   }
   let PACKS = {};
@@ -175,6 +194,25 @@
       ${d.coverUrl ? `<div class="cb-images"><div class="cb-img"><img src="${esc(d.coverUrl)}" alt=""><button class="btn btn-sm btn-danger" data-cb="card-img-del" type="button">Remove</button></div></div>` : ''}
       <div class="cb-grid"><label class="lbl">Passage tag on the card<select class="field" data-p="data.passageLabel">${['Passage 1', 'Passage 2', 'Passage 3'].map((x) => `<option ${d.passageLabel === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
       <label class="lbl">Question types on the card (comma separated; empty = taken from the questions)<input class="field" data-p="data.cardTypes" data-csv="1" value="${esc((d.cardTypes || []).join(', '))}" placeholder="True False Not Given, Sentence Completion"></label></div></div>`;
+  }
+  /* the card picture + chips of a Listening / Writing / PDF card (the Reading card block is readingFormatBlock) */
+  function cardBlock(t, d) {
+    if (t !== 'listening' && t !== 'writing' && t !== 'pdf') return '';
+    const pic = `<div class="cb-head"><div><strong>Card on the ${t === 'pdf' ? 'PDF Library' : t === 'listening' ? 'Listening practice' : 'Writing practice'} page</strong><div class="muted sm">${t === 'writing' ? 'Card picture (leave empty to use the picture of Task 1). ' : 'This picture is the card image. '}png, jpg, webp, avif.</div></div>
+      <button class="btn btn-sm btn-primary" data-cb="card-img" type="button">⬆ ${d.coverUrl ? 'Replace picture' : 'Upload picture'}</button></div><div class="muted sm" id="card-img-status"></div>
+      ${d.coverUrl ? `<div class="cb-images"><div class="cb-img"><img src="${esc(d.coverUrl)}" alt=""><button class="btn btn-sm btn-danger" data-cb="card-img-del" type="button">Remove</button></div></div>` : ''}`;
+    const sel = (path, list, cur) => `<select class="field" data-p="${path}">${list.map(([v, l]) => `<option value="${esc(v)}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
+    let extra = '';
+    if (t === 'listening') extra = `<div class="cb-grid"><label class="lbl">Section tag on the card${sel('data.sectionLabel', ['Section 1', 'Section 2', 'Section 3', 'Section 4'].map((x) => [x, x]), d.sectionLabel || 'Section 1')}</label>
+      <label class="lbl">Question types on the card (comma separated; empty = taken from the questions)<input class="field" data-p="data.cardTypes" data-csv="1" value="${esc((d.cardTypes || []).join(', '))}" placeholder="Multiple choice, Table completion"></label></div>`;
+    if (t === 'writing') extra = `<div class="cb-grid"><label class="lbl">Tier tag on the card${sel('data.tier', ['Tier 1', 'Tier 2', 'Tier 3'].map((x) => [x, x]), d.tier || 'Tier 1')}</label>
+      <label class="lbl">Type chip on the card (e.g. Bar Chart, Agree Disagree)<input class="field" data-p="data.cardTypes" data-csv="1" value="${esc((d.cardTypes || []).join(', '))}" placeholder="Bar Chart"></label></div>`;
+    if (t === 'pdf') extra = `<div class="cb-grid"><label class="lbl">Category${sel('data.category', [['reading', 'Reading'], ['listening', 'Listening'], ['writing', 'Writing'], ['speaking', 'Speaking'], ['magazine', 'Magazine'], ['other', 'Other']], d.category || 'reading')}</label>
+        <label class="lbl">Number of pages (optional)<input class="field" type="number" min="0" data-p="data.pages" value="${esc(d.pages || 0)}"></label></div>
+      <div class="cb-grid"><label class="lbl">Left tag on the card<input class="field" data-p="data.badge" maxlength="30" value="${esc(d.badge)}" placeholder="PDF"></label><label class="lbl">Right tag on the card<input class="field" data-p="data.corner" maxlength="30" value="${esc(d.corner)}" placeholder="Academic & GT"></label></div>
+      <label class="lbl">Chips under the title (comma separated)<input class="field" data-p="data.tags" data-csv="1" value="${esc((d.tags || []).join(', '))}" placeholder="Matching Headings, True/False/NG"></label>`;
+    const file = t === 'pdf' ? `<div class="cb-block"><div class="cb-head"><div><strong>PDF file *</strong><div class="muted sm">The file students download (up to 100 MB).</div></div><div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="pdf-file" type="button">⬆ ${d.fileUrl ? 'Replace PDF' : 'Upload PDF'}</button>${d.fileUrl ? '<button class="btn btn-sm btn-danger" data-cb="pdf-file-del" type="button">Remove file</button>' : ''}</div></div><div class="muted sm" id="pdf-status"></div>${d.fileUrl ? `<div class="muted sm">📄 <a href="${esc(d.fileUrl)}" target="_blank" rel="noopener">${esc(decodeURIComponent(String(d.fileUrl).split('/').pop()))}</a></div>` : ''}</div>` : '';
+    return file + `<div class="cb-block">${pic}${extra}</div>`;
   }
   function passagesBlock() {
     const ps = draft.data.passages || [];
@@ -280,16 +318,16 @@
   function renderBuilder() {
     const t = draft.type, d = draft.data;
     $('#builder-body').innerHTML = `
-      ${t === 'reading' && d.mode !== 'full' ? readingFormatBlock() : ''}
+      ${t === 'reading' && d.mode !== 'full' ? readingFormatBlock() : cardBlock(t, d)}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(t === 'reading' && d.mode !== 'full' ? 'Pack shown on the card (e.g. Starter Pack)' : 'Pack — pick one, or type a new name to create a new pack card', 'pack', draft.pack, 'list="ix-pack-list" placeholder="e.g. Pack 5" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
-      <div class="cb-grid">${t === 'article' || t === 'speaking' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
+      <div class="cb-grid">${t === 'article' || t === 'speaking' || t === 'pdf' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <div class="cb-checks"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
       ${t === 'reading' ? (d.mode === 'full' ? readingFormatBlock() : '') + (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB).</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}</div>` : ''}
       ${t === 'article' ? articleBlock() : ''}${t === 'speaking' ? partsBlock() : ''}
-      ${t === 'writing' ? tasksBlock() : t === 'speaking' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
+      ${t === 'writing' ? tasksBlock() : t === 'speaking' || t === 'pdf' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
       ${t === 'reading' || t === 'listening' ? questionsBlock() : ''}
       ${t === 'listening' ? `<label class="lbl">Transcript (optional, shown only after the student submits)<textarea class="field" rows="5" data-p="data.transcript">${esc(d.transcript)}</textarea></label>` : ''}`;
     syncSave();
@@ -330,6 +368,8 @@
     if (draft.type === 'listening' && !d.audioUrl) return toast('Please upload the audio file.', true);
     if (draft.type === 'article') {
       if (!String(d.body || '').trim()) return toast('Please paste the article text.', true);
+    } else if (draft.type === 'pdf') {
+      if (!d.fileUrl) return toast('Please upload the PDF file.', true);
     } else if (draft.type === 'speaking') {
       d.parts = (d.parts || []).filter((t) => String(t.prompt || '').trim() || (t.questions || []).length || t.imageUrl);
       if (!d.parts.length) return toast('Add a cue card or at least one question.', true);
@@ -388,6 +428,8 @@
         draft.data.questions = draft.data.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder();
         const withExp = add.filter((q) => q.explanation).length; toast(add.length + ' questions added' + (withExp ? ' · ' + withExp + ' with explanations' : ''));
       }
+      else if (a === 'pdf-file') { const url = await pickAndUpload('.pdf,application/pdf', $('#pdf-status')); if (url) { draft.data.fileUrl = url; renderBuilder(); } }
+      else if (a === 'pdf-file-del') { draft.data.fileUrl = ''; renderBuilder(); }
       else if (a === 'cover') { const url = await pickAndUpload('image/*', $('#cover-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
       else if (a === 'card-img') { const url = await pickAndUpload('image/*', $('#card-img-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
       else if (a === 'card-img-del') { draft.data.coverUrl = ''; renderBuilder(); }

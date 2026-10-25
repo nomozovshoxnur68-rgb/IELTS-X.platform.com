@@ -1027,7 +1027,7 @@
                     status: status,
                     types: types,
                     plan: plan,
-                    pack: pack,
+                    pack: el.getAttribute('data-pack') || pack,
                     section: section,
                     href: href,
                     key: href,
@@ -1238,10 +1238,44 @@
             initSidebarAndAvatar();
         }
 
+        /* Listening sections made in the admin panel become cards at the START of this same grid (newest first):
+           same card, same filters, same pagination. Card-access.js reads window.IELTSX_ADMIN_CARDS for the lock. */
+        function addAdminCards() {
+            if (!window.fetch) return Promise.resolve();
+            var ctl = window.AbortController ? new AbortController() : null;
+            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
+            var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+            return fetch('/api/materials?type=listening', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+                .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+                .catch(function () { return { items: [] }; })
+                .then(function (d) {
+                    clearTimeout(timer);
+                    var items = d.items || [];
+                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: '/test?id=' + encodeURIComponent(m.id), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    var grid = document.getElementById('card-grid'); if (!grid || !items.length) return;
+                    grid.insertAdjacentHTML('afterbegin', items.map(function (m) {
+                        var href = '/test?id=' + encodeURIComponent(m.id);
+                        var media = m.coverUrl
+                            ? '<img loading="lazy" decoding="async" src="' + esc(m.coverUrl) + '" alt="' + esc(m.title) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" /><div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>'
+                            : '<div class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-500/80 via-teal-500/70 to-green-600/80 dark:from-emerald-600/60 dark:via-teal-600/50 dark:to-green-700/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones w-8 h-8 text-white/90"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg><span class="mt-2 text-white/90 font-medium text-sm text-center px-4 line-clamp-2">' + esc(m.pack || 'Listening') + '</span></div>';
+                        var chips = (m.types || []).slice(0, 3).map(function (t) { return '<div class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold border-transparent bg-secondary text-secondary-foreground text-xs">' + esc(t) + '</div>'; }).join('');
+                        return '<div class="h-full" data-pack="' + esc(m.pack || 'Starter Pack') + '" style="opacity: 1; transform: none;"><div class="rounded-xl bg-card text-card-foreground shadow group overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border h-full flex flex-col">' +
+                            '<div class="relative w-full aspect-[4/3] overflow-hidden bg-muted">' + media +
+                            '<div class="absolute top-3 left-3 z-10"><span class="inline-flex items-center justify-center rounded-md font-medium border px-2.5 py-0.5 text-xs bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400">' + (m.premium ? 'Premium' : 'Free') + '</span></div>' +
+                            '<div class="absolute top-3 right-3 z-10"><div class="inline-flex items-center rounded-md border px-2.5 py-0.5 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 text-xs font-medium shadow-md">' + esc(m.sectionLabel || 'Section 1') + '</div></div></div>' +
+                            '<div class="p-4 flex flex-col flex-1 gap-3"><div class="flex flex-col gap-3 flex-1"><h3 class="font-semibold text-base leading-6 break-words text-foreground group-hover:text-primary transition-colors" title="' + esc(m.title) + '">' + esc(m.title) + '</h3>' +
+                            '<div class="text-xs text-muted-foreground"><span class="flex items-center gap-1"><span class="truncate">' + esc(m.description || ((m.premium ? 'Premium' : 'Free Practice') + (m.pack ? ' | ' + m.pack : ''))) + '</span></span></div>' +
+                            '<div class="flex flex-wrap gap-1">' + chips + '</div></div>' +
+                            '<div class="flex gap-2 pt-1"><a href="' + esc(href) + '" class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all h-8 rounded-md px-3 text-xs w-full">' + (m.premium ? 'Start' : 'Start Free') + '</a></div></div></div></div>';
+                    }).join(''));
+                });
+        }
+        window.IELTSX_ADMIN_CARDS_READY = addAdminCards();
+        function start() { window.IELTSX_ADMIN_CARDS_READY.then(init, init); }
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+            document.addEventListener('DOMContentLoaded', start);
         } else {
-            init();
+            start();
         }
 
     })();
@@ -1783,6 +1817,7 @@
                     clearTimeout(timer);
                     var items = (d.items || []).filter(function (m) { return m.mode !== 'full'; });
                     window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: m.href || ('/test?id=' + encodeURIComponent(m.id)), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    var made = [];
                     items.forEach(function (m, n) {
                         var c = {
                             id: 1000 + n, title: m.title, status: m.premium ? 'PREMIUM' : 'FREE', types: m.types || [], plan: m.pack || 'Starter Pack', pack: m.pack || 'Starter Pack',
@@ -1791,8 +1826,9 @@
                         };
                         c.key = c.href; c.freeCard = !m.premium;
                         c.typeKeys = (c.types || []).reduce(function (a, t) { return a.concat(IELTSX.canonicalQuestionTypes(t, 'reading')); }, []);
-                        cardData.push(c);
+                        made.push(c);
                     });
+                    Array.prototype.unshift.apply(cardData, made);   // newest first
                 });
         }
         window.IELTSX_ADMIN_CARDS_READY = addAdminCards();
@@ -2229,6 +2265,25 @@
         })();
 
         // ─── Init ───
+        /* Writing tasks made in the admin panel become cards at the START of the grid (newest first). */
+        window.IELTSX_ADMIN_CARDS_READY = (function () {
+            if (!window.fetch) return Promise.resolve();
+            var ctl = window.AbortController ? new AbortController() : null;
+            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
+            return fetch('/api/materials?type=writing', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+                .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+                .catch(function () { return { items: [] }; })
+                .then(function (d) {
+                    clearTimeout(timer);
+                    var items = d.items || [];
+                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: '/test?id=' + encodeURIComponent(m.id), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    var made = items.map(function (m, n) {
+                        return { id: 1000 + n, title: m.title, task: m.taskLabel || 'Task 1', tier: m.tier || 'Tier 1', type: (m.types || [])[0] || 'Writing task', pack: m.pack || 'Practice', plan: 'Plan A', img: m.coverUrl || null, href: '/test?id=' + encodeURIComponent(m.id), admin: true };
+                    });
+                    Array.prototype.unshift.apply(writingData, made);
+                    if (made.length) { currentPage = 1; renderCards(); }
+                });
+        })();
         renderCards();
     
   };
@@ -2382,7 +2437,7 @@
         for (var ai = articlesData.length - 1; ai >= 0; ai--) { if (!/^\/collections\//.test(String(articlesData[ai].href || ''))) articlesData.splice(ai, 1); }
         fetch('/api/materials?type=article', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
             (d.items || []).forEach(function (m, i) {
-                articlesData.push({ id: 1000 + i, title: m.title, passage: m.passageLabel || 'Passage 1', topic: m.topic || 'General', date: String(m.createdAt || '').slice(0, 10) || '2026-01-01',
+                articlesData.push({ id: 1000 + ((d.items || []).length - i), title: m.title, passage: m.passageLabel || 'Passage 1', topic: m.topic || 'General', date: String(m.createdAt || '').slice(0, 10) || '2026-01-01',
                     image: m.coverUrl || '', description: m.description || m.source || '', href: '/test?id=' + encodeURIComponent(m.id), locked: !!m.locked });
             });
             if (document.getElementById('articlesGrid')) renderArticles();

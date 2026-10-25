@@ -451,12 +451,14 @@ setInterval(() => { const n = Date.now(); for (const [k, v] of attempts) if (v.r
 /* ───────────────────────── multipart upload (admin) ───────────────────────── */
 const AUDIO_EXT = ['.mp3', '.wav', '.m4a', '.ogg', '.aac'];
 const IMAGE_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif'];
+const PDF_EXT = ['.pdf'];
 const UPLOAD_TYPES = {
   reading: ['.html', '.htm', '.txt', '.pdf', ...IMAGE_EXT],
   listening: [...AUDIO_EXT, ...IMAGE_EXT],
   writing: [...IMAGE_EXT],
   audio: AUDIO_EXT,
-  image: IMAGE_EXT
+  image: IMAGE_EXT,
+  pdf: PDF_EXT
 };
 const MEDIA_BUCKET = 'ieltsx-media';
 let bucketReady = false;
@@ -470,7 +472,7 @@ async function ensureBucket() {
 }
 
 /* ───────────────────────── tests created in the admin panel ───────────────────────── */
-const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab'];
+const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab', 'pdf'];
 const Q_TYPES = ['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map'];
 const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
@@ -504,7 +506,23 @@ function cleanMaterialData(type, d) {
     out.passageLabel = ['Passage 1', 'Passage 2', 'Passage 3'].includes(d.passageLabel) ? d.passageLabel : 'Passage 1';
     out.cardTypes = (Array.isArray(d.cardTypes) ? d.cardTypes : String(d.cardTypes || '').split(/[,\n]/)).slice(0, 8).map((x) => cut(x, 40).trim()).filter(Boolean);   // the test-N number; the server sets it, see keepReadingNo()
   }
-  if (type === 'listening') { out.audioUrl = cleanUrl(d.audioUrl); out.transcript = cut(d.transcript, 60000); }
+  if (type === 'listening') {
+    out.audioUrl = cleanUrl(d.audioUrl); out.transcript = cut(d.transcript, 60000);
+    // the card on the Listening practice page: picture, "Section N" tag, question-type chips (empty = taken from the questions)
+    out.coverUrl = cleanUrl(d.coverUrl);
+    out.sectionLabel = ['Section 1', 'Section 2', 'Section 3', 'Section 4'].includes(d.sectionLabel) ? d.sectionLabel : 'Section 1';
+    out.cardTypes = (Array.isArray(d.cardTypes) ? d.cardTypes : String(d.cardTypes || '').split(/[,\n]/)).slice(0, 8).map((x) => cut(x, 40).trim()).filter(Boolean);
+  }
+  if (type === 'writing') {   // the card on the Writing practice page: picture (empty = the picture of Task 1), tier tag and type chip
+    out.coverUrl = cleanUrl(d.coverUrl); out.tier = cut(d.tier, 20).trim() || 'Tier 1'; out.cardTypes = (Array.isArray(d.cardTypes) ? d.cardTypes : String(d.cardTypes || '').split(/[,\n]/)).slice(0, 4).map((x) => cut(x, 40).trim()).filter(Boolean);
+  }
+  if (type === 'pdf') {       // a downloadable PDF with its own card on the PDF Library page
+    out.fileUrl = cleanUrl(d.fileUrl); out.coverUrl = cleanUrl(d.coverUrl);
+    out.category = ['reading', 'listening', 'writing', 'speaking', 'magazine', 'other'].includes(d.category) ? d.category : 'reading';
+    out.badge = cut(d.badge, 30).trim(); out.corner = cut(d.corner, 30).trim(); out.pages = Math.max(0, Math.min(5000, Math.floor(Number(d.pages) || 0)));
+    out.tags = (Array.isArray(d.tags) ? d.tags : String(d.tags || '').split(/[,\n]/)).slice(0, 6).map((x) => cut(x, 40).trim()).filter(Boolean);
+    delete out.images; delete out.instructions; delete out.durationMin;
+  }
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : 'short';
@@ -584,6 +602,10 @@ const publicMaterial = (m, withData) => {
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
   if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
+  if (m.type === 'listening') { base.coverUrl = d.coverUrl || ''; base.sectionLabel = d.sectionLabel || 'Section 1'; base.types = cardTypesOf(d); }
+  if (m.type === 'writing') { const ts = d.tasks || []; base.coverUrl = d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl || ''; base.tier = d.tier || 'Tier 1'; base.types = d.cardTypes || [];
+    base.taskLabel = ts.length > 1 ? 'Task 1 & 2' : ((ts[0] && ts[0].title) || 'Task 1'); }
+  if (m.type === 'pdf') Object.assign(base, { coverUrl: d.coverUrl || '', category: d.category || 'reading', badge: d.badge || '', corner: d.corner || '', pages: d.pages || 0, tags: d.tags || [] });
   if (m.type === 'article') Object.assign(base, { topic: d.topic || 'General', passageLabel: d.passageLabel || 'Passage 1', source: d.source || '', readMinutes: d.readMinutes || 0, coverUrl: d.coverUrl || '' });
   if (m.type === 'vocab') {   // the list never carries the cards; they are sent only by the single-item call, after the Premium check
     base.wordCount = (d.words || []).length; base.kind = d.kind || 'collection'; base.level = d.level || 'Intermediate'; base.source = d.source || ''; base.icon = d.icon || 'reading';
@@ -1043,6 +1065,7 @@ async function api(req, res, url) {
       const r = materialRule(m, rules);
       return { ...publicMaterial(m, false), premium: r.locked, plan: r.plan, locked: !allowsLevel(r, level) };
     });
+    items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));   // newest first
     return send(res, 200, { items }, { 'Cache-Control': 'no-store, private' });
   }
   let mm = p.match(/^\/api\/materials\/([^/]+)(\/grade|\/sample)?$/);
@@ -1283,8 +1306,8 @@ async function api(req, res, url) {
     if (m && method === 'DELETE') { await store.deleteMaterial(decodeURIComponent(m[1])); await audit(admin, 'material.delete', decodeURIComponent(m[1])); return send(res, 200, { ok: true }); }
     if (method === 'POST' && p === '/api/admin/upload-url') {            // big files go straight to Supabase Storage (Vercel has no disk)
       const b = await readJson(req); const ext = path.extname(String(b.filename || '')).toLowerCase();
-      const kind = AUDIO_EXT.includes(ext) ? 'audio' : IMAGE_EXT.includes(ext) ? 'images' : '';
-      if (!kind) throw new HttpError(400, `Allowed files: ${[...AUDIO_EXT, ...IMAGE_EXT].join(', ')}`);
+      const kind = AUDIO_EXT.includes(ext) ? 'audio' : IMAGE_EXT.includes(ext) ? 'images' : PDF_EXT.includes(ext) ? 'pdf' : '';
+      if (!kind) throw new HttpError(400, `Allowed files: ${[...AUDIO_EXT, ...IMAGE_EXT, ...PDF_EXT].join(', ')}`);
       if (!USE_SUPABASE) return send(res, 200, { local: true });
       await ensureBucket();
       const safe = path.basename(String(b.filename)).replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80);
@@ -1305,7 +1328,7 @@ async function api(req, res, url) {
       if (!UPLOAD_TYPES[type].includes(ext)) throw new HttpError(400, `Allowed ${type} files: ${UPLOAD_TYPES[type].join(', ')}`);
       if (file.data.length > MAX_UPLOAD_BYTES) throw new HttpError(413, 'File is too large (50 MB max).');
       const safe = path.basename(file.filename).replace(/[^a-zA-Z0-9._-]/g, '_');
-      const folder = AUDIO_EXT.includes(ext) ? 'audio' : IMAGE_EXT.includes(ext) ? 'images' : type;
+      const folder = AUDIO_EXT.includes(ext) ? 'audio' : IMAGE_EXT.includes(ext) ? 'images' : PDF_EXT.includes(ext) ? 'pdf' : type;
       const dir = path.join(UPLOAD_DIR, folder); fs.mkdirSync(dir, { recursive: true });
       const stored = Date.now() + '-' + safe; fs.writeFileSync(path.join(dir, stored), file.data);
       await audit(admin, 'upload', stored, { type: folder });
