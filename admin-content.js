@@ -49,7 +49,8 @@
   function renderList(type, view, mode) {
     const mount = $('#content-' + view); if (!mount) return;
     const all = lists[type]; const items = all && mode ? all.filter((m) => ((m.data || {}).mode === 'full') === (mode === 'full')) : all;
-    const noun = mode === 'full' ? 'full test' : mode === 'part' ? 'part test' : NOUN[type];
+    if (type === 'reading' && mode === 'part') return renderPartCards(mount, items);
+    const noun = mode === 'full' ? 'full test' : mode === 'part' ? 'part practice card' : NOUN[type];
     const title = mode === 'full' ? 'Reading · Full tests' : mode === 'part' ? 'Reading · Part practice' : TYPES[type];
     const help = mode === 'full' ? 'Three passages, one 60-minute paper (like the Full Reading Test pages). Put each test in a pack with the Pack field; create the packs in “Packs”.' : mode === 'part' ? 'One passage with its own card on the Reading practice page (like pessages/test-19, 20, 21).' : HELP[type];
     const where = mode === 'full' ? 'the Full Reading pages, inside the pack' : mode === 'part' ? 'the Reading practice page, in the same card grid' : WHERE[type];
@@ -69,10 +70,32 @@
         <select class="field" data-ct-filter="${view}" aria-label="Filter"><option value="">All</option><option value="live">Published</option><option value="draft">Drafts</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
       ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Content</th><th>Access</th><th>Status</th><th>Added</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><div class="muted sm" style="margin-top:8px">Lock / unlock by plan (Standard, Max, Ultra) in <a href="#access">Access</a>.</div>` : `<div class="empty">Nothing here yet. Press “+ New ${noun}” to add the first one.</div>`}</div>`;
   }
+  /* Part practice: every card of the Reading practice page, shown as a card (picture, pack, passage tag) with Edit / Remove */
+  function renderPartCards(mount, items) {
+    const live = (items || []).filter((m) => m.published !== false).length;
+    const cards = (items || []).map((m) => {
+      const d = m.data || {}; const nq = (d.questions || []).length; const noExp = (d.questions || []).filter((q) => !String(q.explanation || '').trim()).length;
+      const href = d.no ? '/pessages/test-' + d.no : '/test?id=' + encodeURIComponent(m.id);
+      const hay = esc((m.title + ' ' + (m.pack || '') + ' ' + (m.description || '')).toLowerCase());
+      const ids = `data-id="${esc(m.id)}" data-type="reading"`;
+      return `<div class="pc-card" data-hay="${hay}" data-state="${m.published === false ? 'draft' : 'live'}${m.premium ? ' locked' : ' free'}">
+        <div class="pc-img">${d.coverUrl ? `<img src="${esc(d.coverUrl)}" alt="" loading="lazy">` : '<div class="pc-noimg">No picture yet<br><span>Edit → upload card picture</span></div>'}<span class="pc-tag">${esc(d.passageLabel || 'Passage 1')}</span>${m.published === false ? '<span class="pc-draft">Draft</span>' : ''}</div>
+        <div class="pc-body"><div class="muted sm">${esc(m.pack || 'Starter Pack')}</div><div class="pc-title">${esc(m.title)}</div>
+          <div class="muted sm">${nq} questions · ${d.durationMin ? d.durationMin + ' min' : 'no timer'}${nq && !noExp ? ' · 💡 explanations' : nq ? ' · ' + (nq - noExp) + '/' + nq + ' explained' : ''}</div>
+          <div class="btn-row" style="margin:8px 0"><button class="chip ${m.premium ? 'chip-premium' : ''}" data-ct="premium" ${ids} type="button" title="Click to change">${m.premium ? '★ Premium' : 'Free'}</button><button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" ${ids} type="button" title="Click to change">${m.published === false ? 'Hidden' : 'Visible'}</button></div>
+          <div class="btn-row"><button class="btn btn-sm" data-ct="edit" ${ids} type="button">Edit</button><button class="btn btn-sm" data-ct="dup" ${ids} type="button" title="Make a copy (saved as Hidden)">Copy</button><a class="btn btn-sm" href="${esc(href)}" target="_blank" rel="noopener">Open ↗</a><button class="btn btn-sm btn-danger" data-ct="delete" ${ids} data-title="${esc(m.title)}" type="button">Remove</button></div></div></div>`;
+    }).join('');
+    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">Part practice cards</div>
+      <div class="muted sm">Each card is one passage on the Reading practice page, in the same grid as the other cards (picture, passage tag, pack). Add the card picture, the passage, and all questions with answers and explanations in one window.${items ? ` <b>${items.length}</b> total · <b>${live}</b> visible.` : ''}</div></div>
+      <button class="btn btn-primary" data-ct="new" data-type="reading" data-mode="part" type="button">+ New part practice card</button></div>
+      ${items && items.length ? `<div class="toolbar"><input class="field grow" type="search" placeholder="Search by title or pack" data-ct-search="reading" autocomplete="off">
+        <select class="field" data-ct-filter="reading" aria-label="Filter"><option value="">All</option><option value="live">Visible</option><option value="draft">Hidden</option><option value="free">Free</option><option value="locked">Premium</option></select></div>` : ''}
+      ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="pc-grid">${cards}</div><div class="muted sm" style="margin-top:10px">Lock / unlock by plan (Standard, Max, Ultra) in <a href="#access">Access</a>.</div>` : '<div class="empty">No cards yet. Press “+ New part practice card” to add the first one.</div>'}</div>`;
+  }
   function applyFilter(type) {
     const mount = $('#content-' + type); if (!mount) return;
     const q = ($('[data-ct-search="' + type + '"]', mount) || {}).value || ''; const f = ($('[data-ct-filter="' + type + '"]', mount) || {}).value || '';
-    mount.querySelectorAll('tbody tr').forEach((tr) => { tr.hidden = !!((q && !tr.dataset.hay.includes(q.toLowerCase())) || (f && !tr.dataset.state.split(' ').includes(f))); });
+    mount.querySelectorAll('tbody tr, .pc-card').forEach((tr) => { tr.hidden = !!((q && !tr.dataset.hay.includes(q.toLowerCase())) || (f && !tr.dataset.state.split(' ').includes(f))); });
   }
 
   /* ───────── uploads (local disk, or straight to Supabase Storage on Vercel) ───────── */
@@ -132,7 +155,7 @@
     if (draft.type === 'reading' || draft.type === 'listening') draft.data.questions = draft.data.questions && draft.data.questions.length ? draft.data.questions : [blankQ()];
     if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking').data.parts;
     if (draft.type === 'writing' && !(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
-    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + (draft.type === 'reading' ? (draft.data.mode === 'full' ? 'full reading test' : 'part reading test') : NOUN[draft.type]);
+    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + (draft.type === 'reading' ? (draft.data.mode === 'full' ? 'full reading test' : 'part practice card') : NOUN[draft.type]);
     renderBuilder(); $('#builder').classList.add('open'); $('#builder-body').scrollTop = 0;
   }
   function closeBuilder() { if (uploading && !confirm('A file is still uploading. Close anyway?')) return; $('#builder').classList.remove('open'); draft = null; editingId = null; }
@@ -164,8 +187,12 @@
     const qs = draft.data.questions || [];
     return `<div class="cb-block"><div class="cb-head"><div><strong>Questions & answers (${qs.length})</strong><div class="muted sm">For several accepted answers separate them with <code>|</code> (e.g. <code>colour|color</code>). True/False/Not Given: write TRUE, FALSE or NOT GIVEN. Multiple choice: write the letter (A, B, C…) of the right option.</div></div>
       <div class="btn-row"><button class="btn btn-sm" data-cb="q-bulk" type="button">Paste many</button><button class="btn btn-sm btn-primary" data-cb="q-add" type="button">+ Question</button></div></div>
-      <div id="bulk-box" class="cb-bulk" hidden><textarea class="field" id="bulk-text" rows="6" placeholder="One question per line:  question text => answer&#10;Example:  The bees live in a => hive"></textarea>
-      <div class="btn-row"><select class="field" id="bulk-type" style="width:auto">${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select><button class="btn btn-sm btn-primary" data-cb="q-bulk-do" type="button">Add them</button></div></div>
+      <div id="bulk-box" class="cb-bulk" hidden><div class="muted sm"><b>Questions + answers + explanations in one go.</b> Two ways to paste:<br>
+        <b>1)</b> one question per line, parts separated by <code>=&gt;</code>:<br><code>The bees live in a =&gt; hive =&gt; Paragraph B says bees live in a hive.</code><br>
+        <b>2)</b> blocks with labels (the explanation line is optional):<br><code>1. Glass was first made in Egypt.<br>Answer: TRUE<br>Explanation: Paragraph A, line 2 says so.</code><br>
+        For multiple choice put the options (<code>A. …</code>, <code>B. …</code>) under the question. A line like <code>Questions 1–5: Complete the notes</code> becomes the heading of the next question.</div>
+      <textarea class="field" id="bulk-text" rows="12" placeholder="1. Glass was first made in Egypt.&#10;Answer: TRUE&#10;Explanation: Paragraph A, line 2 says so.&#10;&#10;2. The bees live in a ____&#10;Answer: hive&#10;Explanation: Paragraph B.&#10;&#10;or:  The bees live in a => hive => Paragraph B."></textarea>
+      <div class="btn-row"><select class="field" id="bulk-type" style="width:auto"><option value="auto">Auto-detect the question type</option>${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>${draft.type === 'reading' && draft.data.mode === 'full' ? `<select class="field" id="bulk-pass" style="width:auto"><option value="">Passage: as the last question</option><option value="1">Passage 1</option><option value="2">Passage 2</option><option value="3">Passage 3</option></select>` : ''}<button class="btn btn-sm btn-primary" data-cb="q-bulk-do" type="button">Add them</button></div></div>
       ${qs.map((q, i) => `<div class="cb-q"><div class="cb-qn">${i + 1}</div><div class="cb-qbody">
         <div class="cb-row"><select class="field" data-p="data.questions.${i}.type" data-rerender="1">${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}" ${q.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
         ${draft.type === 'reading' && draft.data.mode === 'full' ? passSelect(`data.questions.${i}.passage`, q.passage) : ''}
@@ -173,8 +200,54 @@
         <textarea class="field" rows="2" placeholder="Question text" data-p="data.questions.${i}.prompt">${esc(q.prompt)}</textarea>
         ${OPT_TYPES.includes(q.type) ? `<textarea class="field" rows="5" placeholder="${q.type === 'mcq' || q.type === 'mcq-multi' ? 'Options, one per line (A, B, C… in this order)' : 'Options, one per line, each starting with its letter or number, e.g.  A. Paragraph A   or   i. The cost of change'}" data-p="data.questions.${i}.options" data-lines="1">${esc((q.options || []).join('\n'))}</textarea>` : ''}
         <div class="cb-row"><input class="field" placeholder="${q.type === 'tfng' ? 'TRUE / FALSE / NOT GIVEN' : q.type === 'ynng' ? 'YES / NO / NOT GIVEN' : q.type === 'mcq' ? 'Correct letter, e.g. B' : q.type === 'mcq-multi' ? 'Correct letters, e.g. A,C' : q.type === 'matching' || q.type === 'map' ? 'Correct letter or number, e.g. D or iv' : 'Correct answer (use | for alternatives)'}" data-p="data.questions.${i}.answer" value="${esc(q.answer)}">
-        <input class="field" placeholder="Explanation shown after submitting (optional)" data-p="data.questions.${i}.explanation" value="${esc(q.explanation)}"></div></div>
+        <textarea class="field" rows="2" placeholder="Explanation shown after submitting (optional)" data-p="data.questions.${i}.explanation">${esc(q.explanation)}</textarea></div></div>
         <button class="btn btn-sm btn-danger" data-cb="q-del" data-i="${i}" type="button" title="Delete question">✕</button></div>`).join('')}</div>`;
+  }
+  /* "Paste many": turns pasted text into questions with answers and explanations */
+  function parseBulk(text, forced, passage) {
+    const src = String(text || '').replace(/\r/g, '').trim(); if (!src) return [];
+    const ANS = /^(?:answer|ans|javob|correct(?: answer)?)\s*[:=\-–]\s*(.*)$/i, EXP = /^(?:explanation|explain|exp|izoh|tushuntirish)\s*[:=\-–]\s*(.*)$/i;
+    const OPT = /^\(?([A-Ha-h]|[ivxIVX]{1,4})[.)]\s+(.+)$/, NUMQ = /^(?:Q\s*)?(\d{1,3})\s*[.)\-:]\s*(.+)$/i, HEAD = /^questions?\s+\d+\s*[-–—]\s*\d+/i;
+    const out = []; let group = '';
+    if (!src.split('\n').some((l) => ANS.test(l.trim()))) {            // one line = question => answer => explanation
+      src.split('\n').map((x) => x.trim()).filter(Boolean).forEach((l) => {
+        if (HEAD.test(l) && !l.includes('=>')) { group = l; return; }
+        const [p, a, ...e] = l.split('=>'); if (!a || !a.trim()) return;
+        out.push({ prompt: p.replace(/^\d{1,3}\s*[.)\-:]\s*/, '').trim(), options: [], answer: a.trim(), explanation: e.join('=>').trim(), group });
+        group = '';
+      });
+    } else {                                                            // labelled blocks
+      let cur = null, lastField = '';
+      const push = () => { if (cur && cur.prompt && cur.answer) out.push(cur); cur = null; };
+      src.split('\n').forEach((raw) => {
+        const l = raw.trim(); if (!l) return;
+        let m;
+        if (HEAD.test(l) && (!cur || cur.answer)) { push(); group = l; return; }
+        if ((m = ANS.exec(l))) { if (cur) { cur.answer = m[1].trim(); lastField = 'answer'; } return; }
+        if ((m = EXP.exec(l))) { if (cur) { cur.explanation = m[1].trim(); lastField = 'explanation'; } return; }
+        if (cur && !cur.answer && (m = OPT.exec(l))) { cur.options.push(m[1] + '. ' + m[2]); return; }
+        const numbered = NUMQ.exec(l);
+        if (cur && cur.answer && lastField === 'explanation' && !numbered) { cur.explanation += ' ' + l; return; }
+        if (cur && !cur.answer) { cur.prompt += ' ' + (numbered ? numbered[2] : l); return; }
+        push(); cur = { prompt: (numbered ? numbered[2] : l).trim(), options: [], answer: '', explanation: '', group }; group = ''; lastField = '';
+      });
+      push();
+    }
+    return out.map((q) => {
+      let type = forced; const a = q.answer.trim(), A = a.toUpperCase();
+      if (type === 'auto' || !type) {
+        if (['TRUE', 'FALSE', 'T', 'F'].includes(A) || (A === 'NOT GIVEN' && !/\byes|no\b/i.test(q.prompt))) type = 'tfng';
+        else if (['YES', 'NO', 'Y', 'N'].includes(A)) type = 'ynng';
+        else if (q.options.length >= 2 && /^[A-H](\s*[,&/ ]\s*[A-H])+$/.test(A)) type = 'mcq-multi';
+        else if (q.options.length >= 2 && /^[A-H]$/.test(A)) type = q.options.every((o) => /^(i|ii|iii|iv|v|vi|vii|viii|ix|x)\./i.test(o)) ? 'matching' : 'mcq';
+        else if (q.options.length >= 2) type = 'matching';
+        else type = 'short';
+      }
+      let ans = a;
+      if (type === 'tfng') ans = ({ T: 'TRUE', F: 'FALSE', NG: 'NOT GIVEN' })[A] || A;
+      if (type === 'ynng') ans = ({ Y: 'YES', N: 'NO', NG: 'NOT GIVEN' })[A] || A;
+      return { ...blankQ(type, passage), group: q.group || '', prompt: q.prompt, options: OPT_TYPES.includes(type) ? q.options : [], answer: ans, explanation: q.explanation };
+    });
   }
   function tasksBlock() {
     const ts = draft.data.tasks || [];
@@ -207,12 +280,13 @@
   function renderBuilder() {
     const t = draft.type, d = draft.data;
     $('#builder-body').innerHTML = `
+      ${t === 'reading' && d.mode !== 'full' ? readingFormatBlock() : ''}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(t === 'reading' && d.mode !== 'full' ? 'Pack shown on the card (e.g. Starter Pack)' : 'Pack — pick one, or type a new name to create a new pack card', 'pack', draft.pack, 'list="ix-pack-list" placeholder="e.g. Pack 5" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
       <div class="cb-grid">${t === 'article' || t === 'speaking' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <div class="cb-checks"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
-      ${t === 'reading' ? readingFormatBlock() + (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
+      ${t === 'reading' ? (d.mode === 'full' ? readingFormatBlock() : '') + (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB).</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}</div>` : ''}
       ${t === 'article' ? articleBlock() : ''}${t === 'speaking' ? partsBlock() : ''}
       ${t === 'writing' ? tasksBlock() : t === 'speaking' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
@@ -307,10 +381,12 @@
       else if (a === 'q-del') { draft.data.questions.splice(i, 1); if (!draft.data.questions.length) draft.data.questions.push(blankQ()); renderBuilder(); }
       else if (a === 'q-bulk') { const b = $('#bulk-box'); b.hidden = !b.hidden; }
       else if (a === 'q-bulk-do') {
-        const type = $('#bulk-type').value; const lines = $('#bulk-text').value.split('\n').map((x) => x.trim()).filter(Boolean);
-        if (!lines.length) return;
-        const add = lines.map((l) => { const [p, ...r] = l.split('=>'); return { ...blankQ(type, (draft.data.questions[draft.data.questions.length - 1] || {}).passage), prompt: p.trim(), answer: r.join('=>').trim() }; });
-        draft.data.questions = draft.data.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder(); toast(add.length + ' questions added');
+        const type = $('#bulk-type').value; const ps = $('#bulk-pass'); const last = draft.data.questions[draft.data.questions.length - 1] || {};
+        const passage = ps && ps.value ? Number(ps.value) : (last.passage || 1);
+        const add = parseBulk($('#bulk-text').value, type, passage);
+        if (!add.length) return toast('Nothing to add — put at least one question and its answer.', true);
+        draft.data.questions = draft.data.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder();
+        const withExp = add.filter((q) => q.explanation).length; toast(add.length + ' questions added' + (withExp ? ' · ' + withExp + ' with explanations' : ''));
       }
       else if (a === 'cover') { const url = await pickAndUpload('image/*', $('#cover-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
       else if (a === 'card-img') { const url = await pickAndUpload('image/*', $('#card-img-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }

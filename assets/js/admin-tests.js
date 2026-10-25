@@ -4,6 +4,7 @@
     var m = /\/part\/practice\/(reading|listening|writing|speaking)/i.exec(location.pathname);
     if (!m) return;
     var type = m[1].toLowerCase();
+    if (type === 'reading') return;   // Part tests are cards in the Reading practice grid itself (see addAdminCards in app.js): no separate "New reading tests" box
     var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
     function mount() {
         var h1 = document.querySelector('h1.text-2xl');
