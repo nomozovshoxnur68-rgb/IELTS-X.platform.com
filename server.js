@@ -540,7 +540,7 @@ function cleanMaterialData(type, d) {
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
-      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: [1, 2, 3].includes(Number(q.passage)) ? Number(q.passage) : 1, group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: [1, 2, 3].includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500) };
     }).filter((q) => q.prompt);
@@ -602,9 +602,9 @@ function isCorrect(q, given) {
 /* the question-type chips of a card: what the admin typed, or taken from the questions */
 function cardTypesOf(d) {
   if (Array.isArray(d.cardTypes) && d.cardTypes.length) return d.cardTypes;
-  const L = { short: 'Sentence Completion', completion: 'Completion', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling' };
+  const L = { short: 'Sentence Completion', completion: 'Completion', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
   const out = [];
-  for (const q of d.questions || []) {
+  for (const q of require('./reading-exam').inheritGroups(d.questions)) {
     let t = L[q.type];
     if (q.type === 'matching') t = (q.options || []).length && (q.options || []).every((o) => /^\s*(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)[.)]/i.test(o)) ? 'Matching Headings' : 'Matching Information';
     if (t && !out.includes(t)) out.push(t);

@@ -1,3 +1,5 @@
+/* Built-in (old) cards of the Part practice pages. false = only the cards made in the admin panel are shown. Set to true to bring the old ones back. */
+window.IELTSX_SHOW_BUILTIN_CARDS = false;
 /*
  * IELTSX — single JavaScript bundle (assets/js/app.js)
  * 1) shared constants & helpers  2) page modules (original code, unchanged)  3) router
@@ -1549,6 +1551,7 @@
             badge: 'FREE'
         }];
 
+        if (!window.IELTSX_SHOW_BUILTIN_CARDS) cardData.length = 0;   // only the cards made in the admin panel
         cardData.forEach(function (c) {
             c.key = c.href;
             c.freeCard = /^free$/i.test(String(c.status || c.badge || ''));
@@ -2083,6 +2086,7 @@
             { id: 11, title: "Test 4 - T2: Employers Dress Code Quality Work Matters", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
             { id: 12, title: "Test 4 - Task 1: Task 1", task: "Task 1", tier: "Tier 1", type: "Map", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t4.png" }
         ];
+        if (!window.IELTSX_SHOW_BUILTIN_CARDS) writingData.length = 0;   // only the cards made in the admin panel
 
         // ─── Render ───
         let currentPage = 1;

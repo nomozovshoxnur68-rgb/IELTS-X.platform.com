@@ -14,6 +14,25 @@ const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</
 const safeUrl = (u) => (/^(\/(uploads|assets)\/[^"'<>\s]*|https:\/\/[^"'<>\s]+)$/i.test(String(u || '')) ? String(u) : '');
 const ROMAN = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
 
+/* A block of questions ("Questions 1-5 ...") is typed once in the admin panel. Older tests repeated the heading and the option list on every
+   question; newer ones carry a group number (gi). Either way: a question that has no heading / no options of its own continues the block above
+   when it is the same type, so one block never falls apart into several. */
+function inheritGroups(list) {
+  const SHARED = ['matching', 'map', 'box'];
+  const out = []; let prev = null;
+  (Array.isArray(list) ? list : []).forEach((q0) => {
+    const q = Object.assign({}, q0 || {});
+    const hasGi = q.gi !== undefined && q.gi !== null && q.gi !== '';
+    if (prev && prev.type === q.type && (!hasGi || prev.gi === q.gi)) {
+      if (!String(q.group || '').trim()) q.group = prev.group || '';
+      if (!String(q.blockTitle || '').trim()) q.blockTitle = prev.blockTitle || '';
+      if (SHARED.includes(q.type) && !(Array.isArray(q.options) && q.options.length)) q.options = (prev.options || []).slice();
+    }
+    out.push(q); prev = q;
+  });
+  return out;
+}
+
 function passageHtml(d, title) {
   const imgs = (d.images || []).map((i) => safeUrl(i.url)).filter(Boolean)
     .map((u) => `<p><img class='pass-img' alt='' src='${esc(u)}'></p>`).join('');
@@ -34,6 +53,7 @@ const tfWord = (v, yn) => {
 const optTok = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})[.):]\s+([\s\S]*)$/.exec(String(o || '')); return m ? { l: m[1], t: m[2] } : { l: String.fromCharCode(65 + i), t: String(o || '') }; };
 
 function buildSections(questions, startN) {
+  questions = inheritGroups(questions);
   const sections = []; let n = startN || 1; let cur = null; let key = '';
   const headings = []; const slots = [];
   const defaultTitle = { notes: 'Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
@@ -47,7 +67,8 @@ function buildSections(questions, startN) {
     'matching-headings': 'Choose the correct heading for each paragraph from the list of headings below.'
   };
   const open = (type, q, extra) => {
-    const k = type + '|' + (q.group || '') + '|' + (extra || '');
+    const gi = (q.gi === undefined || q.gi === null || q.gi === '') ? '' : String(q.gi);
+    const k = type + '|' + gi + '|' + (q.group || '') + '|' + (extra || '');
     if (cur && k === key) return cur;
     cur = { type, num: '', title: defaultTitle[type] || 'Questions', instruction: q.group ? esc(q.group) : (defaultInstr[type] || ''), items: [] };
     key = k; sections.push(cur); return cur;
@@ -57,7 +78,7 @@ function buildSections(questions, startN) {
     if (t === 'tfng' || t === 'ynng') {
       open(t, q).items.push({ id: n, answer: tfWord(q.answer, t === 'ynng'), label: esc(q.prompt) }); n += 1;
     } else if (t === 'mcq') {
-      open('mcq', q, 'x' + n).items.push({ id: n, answer: String(q.answer || 'A').trim().charAt(0).toUpperCase(), label: esc(q.prompt), options: (q.options || []).map((o, i) => { const k = optTok(o, i); return k.l + '. ' + esc(k.t); }) }); n += 1;
+      open('mcq', q).items.push({ id: n, answer: String(q.answer || 'A').trim().charAt(0).toUpperCase(), label: esc(q.prompt), options: (q.options || []).map((o, i) => { const k = optTok(o, i); return k.l + '. ' + esc(k.t); }) }); n += 1;
     } else if (t === 'mcq-multi') {
       const letters = String(q.answer || '').toUpperCase().split(/[^A-Z]+/).filter(Boolean);
       const sec = { type: 'mcq-multi', gid: 'g' + n, num: '', title: 'Choose ' + (letters.length === 2 ? 'TWO' : letters.length) + ' answers', instruction: q.group ? esc(q.group) : 'Choose the correct letters.', prompt: esc(q.prompt),
@@ -162,4 +183,4 @@ function buildExamHtml(material, templates) {
   return html;
 }
 
-module.exports = { buildExamHtml, buildData, isFull };
+module.exports = { buildExamHtml, buildData, isFull, inheritGroups };

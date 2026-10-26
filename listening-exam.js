@@ -5,6 +5,7 @@
    map (letter matrix over a picture), box (drag words into the text). */
 const fs = require('fs')
 const path = require('path')
+const { inheritGroups } = require('./reading-exam')
 
 const KINDS = ['gap', 'mcq', 'multi', 'matching', 'map', 'box']
 const KIND_FROM_TYPE = { gap: 'gap', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box' }
@@ -42,12 +43,13 @@ function buildBlocks(material) {
   const answers = {}
   const blocks = []
   let cur = null
-  ;(d.questions || []).forEach((q) => {
+  inheritGroups(d.questions).forEach((q) => {
     const kind = KIND_FROM_TYPE[q.type] || 'gap'
     const opts = parseOptions(q.options)
-    const key = kind + '|' + (q.group || '') + (kind === 'matching' || kind === 'map' || kind === 'box' ? '|' + JSON.stringify(opts) : '')
+    const gi = (q.gi === undefined || q.gi === null || q.gi === '') ? null : String(q.gi)
+    const key = kind + '|' + (gi === null ? '' : gi) + '|' + (q.group || '') + (kind === 'matching' || kind === 'map' || kind === 'box' ? '|' + JSON.stringify(opts) : '')
     const grp = String(q.group || '').trim()
-    const joinable = cur && kind !== 'multi' && (cur.key === key || (!grp && cur.kind === kind && (kind === 'gap' || kind === 'mcq' || JSON.stringify(cur.options) === JSON.stringify(opts))))
+    const joinable = cur && kind !== 'multi' && (cur.key === key || (gi === null && !grp && cur.kind === kind && (kind === 'gap' || kind === 'mcq' || JSON.stringify(cur.options) === JSON.stringify(opts))))
     if (!joinable) {
       cur = { key, kind, from: n, to: n, instruction: String(q.group || '').trim() || DEFAULT_INSTR[kind], title: String(q.blockTitle || ''), options: opts, items: [] }
       if (kind === 'map') cur.images = (d.images || []).map((im) => ({ url: im.url, caption: im.caption || '' }))
