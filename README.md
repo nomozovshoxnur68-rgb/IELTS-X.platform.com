@@ -13,9 +13,9 @@ npm test             # 23 checks: accounts, premium, orders, results, file prote
 | What | URL | Notes |
 | --- | --- | --- |
 | Reading passages (practice cards) | `/pessages/test-1.html` ... `test-21.html` | same order as the cards; 1, 2, 7, 17-21 have content, the rest show "coming soon" |
-| Listening sections (practice cards) | `/sections/test-1.html` ... `test-5.html` | 1 and 5 have content |
+| Listening sections (practice cards) | `/sections/test-1.html` ... `test-4.html` | Volume 10 Test 3, Part 1-4 (new listening engine) |
 | Reading full tests (premium) | `/full-tests/reading/test-1.html` ... `test-4.html` | list: `/full-tests/reading/` |
-| Listening full test (premium) | `/full-tests/listening/test-1.html` | list: `/full-tests/listening/` |
+| Listening full test | (the old full test was removed with the old listening engine) | list: `/full-tests/listening/` |
 
 To add a test: drop the real page over the matching placeholder file (keep the file name), and set the card text
 in `assets/js/app.js` (reading, `cardData`) or `part/practice/listening.html` (listening). Old links such as
@@ -55,6 +55,20 @@ One page, six views (hash links `#dashboard #users #premium #orders #activity #a
 On Supabase run the **v3 part** of `supabase-schema.sql` once (last-login, suspend, notes). Without it everything
 else keeps working.
 
+## Listening (new engine) and Listening tests made in the admin panel
+
+* Engine: `listening/js/listening.js` + `listening/css/listening.css` (one Part per page). The four hand-made parts are
+  `sections/test-1..4.html`; each defines `window.PART_PRACTICE` (answers, transcript, `build()`).
+* Admin listening tests are generated on every visit by `listening-router.js` + `listening-exam.js` from
+  `listening/exam-template.html` and `listening/js/listening-render.js` (the same idea as the Reading router).
+  They open at `/sections/test-5`, `test-6` ... (or `/exam/listening/<id>`); the number is stored in `data.no`.
+* Question types in the admin Listening form: `gap` (typed completion), `mcq`, `mcq-multi` (choose TWO/THREE), `matching`
+  (drag a lettered option), `map` (letter matrix over the pictures), `box` (drag a word from a word box into the text).
+  Consecutive questions with the same type and instruction form one block; write `____` where the answer goes.
+* Audio: upload or paste a link; "starts at / ends at" cut one section out of a long recording.
+* Pictures: uploads work on disk (local) or Supabase Storage. On Vercel without Storage, pictures are kept in the database
+  (`/api/media/<id>`, up to 3 MB, large photos are shrunk in the browser); audio and PDF still need Storage or a pasted link.
+
 ## Adding tests from the admin panel (Reading / Listening / Writing)
 
 `/admin#reading`, `#listening`, `#writing` -> **+ New test**. Fill in the title, (reading) the passage, (listening) upload the **audio**,
@@ -88,7 +102,7 @@ The Node server refuses locked test pages itself; on Vercel the static test page
 `assets/js/access-gate.js` (the API is still enforced).
 ## Premium and payments
 
-* Premium pages: `Mock tests.html`, the full tests, `/listening/index.html`, anything under `/premium-audio/`
+* Premium pages: `Mock tests.html`, the full tests, anything under `/premium-audio/`
   (put paid audio there; the server checks premium before sending it). More: `PREMIUM_PATHS=/a.html,/b/*`.
 * **Buying**: on `Price.html` the buttons open a dialog (plan + months) -> an **order with a code** (e.g. `IX-4F2A91`) ->
   the student pays and sends the code to Telegram -> an admin presses **Confirm payment** in the panel and the plan

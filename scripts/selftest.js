@@ -201,7 +201,7 @@ server.listen(0, async () => {
     assert.equal((await call('GET', '/api/admin/audit', { jar: user })).status, 403); ok('admin audit log');
 
     // --- numbered tests: /pessages/test-N, /sections/test-N, /full-tests/...
-    for (const u of ['/pessages/test-1.html', '/pessages/test-3.html', '/pessages/test-21.html', '/sections/test-1.html', '/sections/test-5.html', '/full-tests/reading/', '/full-tests/listening/', '/pessage6.html', '/free/section-2/library-services', '/full-tests/reading.html']) {
+    for (const u of ['/pessages/test-1.html', '/pessages/test-3.html', '/pessages/test-21.html', '/sections/test-1.html', '/sections/test-4.html', '/full-tests/reading/', '/full-tests/listening/', '/pessage6.html', '/free/section-2/library-services', '/full-tests/reading.html']) {
       const x = await call('GET', u); assert.equal(x.status, 200, u + ' -> ' + x.status);
     }
     assert.ok((await call('GET', '/pessages/test-3.html')).text.includes('being prepared'));
@@ -443,7 +443,7 @@ server.listen(0, async () => {
       const av = (await call('GET', '/api/admin/access', { jar: boss })).json;
       assert.deepEqual(av.plans, ['standard', 'max', 'ultra']);
       const counts = Object.fromEntries(av.skills.map((x) => [x.skill, (x.packs.find((p) => p.practice) || { tests: [] }).tests.length]));
-      delete counts.article; assert.deepEqual(counts, { reading: 21, listening: 5, writing: 12, speaking: 18 }, 'all practice cards are listed');
+      delete counts.article; assert.deepEqual(counts, { reading: 21, listening: 4, writing: 12, speaking: 18 }, 'all practice cards are listed');
       assert.equal((await call('GET', '/pessages/test-1.html')).status, 200, 'free by default');
       assert.equal((await call('GET', '/pessages/test-1 explanations.html')).status, 200, 'explanations untouched');
       await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'ultra' }] }, jar: boss });
@@ -451,10 +451,10 @@ server.listen(0, async () => {
       assert.equal((await call('GET', '/pessages/test-1.html', { jar: ultraU.j })).status, 200);
       assert.equal((await call('GET', '/pessages/test-2.html')).status, 200, 'other card untouched');
       assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/pessages/test-1'), { jar: stdU.j })).json.allowed, false);
-      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:listening/practice-cards', mode: 'standard' }] }, jar: boss });
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:listening/practice-cards/test-3', mode: 'standard' }] }, jar: boss });
       assert.equal((await call('GET', '/sections/test-3.html', { jar: nobody.j })).status, 302);
       assert.equal((await call('GET', '/sections/test-3.html', { jar: stdU.j })).status, 200);
-      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'default' }, { key: 'pack:listening/practice-cards', mode: 'default' }] }, jar: boss });
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'default' }, { key: 'test:listening/practice-cards/test-3', mode: 'default' }] }, jar: boss });
       assert.equal((await call('GET', '/sections/test-3.html')).status, 200);
       ok('Ultra plan + practice cards (Reading/Listening pages are enforced, Writing/Speaking listed)');
 
@@ -559,7 +559,7 @@ server.listen(0, async () => {
       const av = (await call('GET', '/api/admin/access', { jar: boss })).json;
       assert.deepEqual(av.plans, ['standard', 'max', 'ultra']);
       const counts = Object.fromEntries(av.skills.map((x) => [x.skill, (x.packs.find((p) => p.practice) || { tests: [] }).tests.length]));
-      delete counts.article; assert.deepEqual(counts, { reading: 21, listening: 5, writing: 12, speaking: 18 }, 'all practice cards are listed');
+      delete counts.article; assert.deepEqual(counts, { reading: 21, listening: 4, writing: 12, speaking: 18 }, 'all practice cards are listed');
       assert.equal((await call('GET', '/pessages/test-1.html')).status, 200, 'free by default');
       assert.equal((await call('GET', '/pessages/test-1 explanations.html')).status, 200, 'explanations untouched');
       await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'ultra' }] }, jar: boss });
@@ -567,10 +567,10 @@ server.listen(0, async () => {
       assert.equal((await call('GET', '/pessages/test-1.html', { jar: ultraU.j })).status, 200);
       assert.equal((await call('GET', '/pessages/test-2.html')).status, 200, 'other card untouched');
       assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/pessages/test-1'), { jar: stdU.j })).json.allowed, false);
-      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:listening/practice-cards', mode: 'standard' }] }, jar: boss });
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:listening/practice-cards/test-3', mode: 'standard' }] }, jar: boss });
       assert.equal((await call('GET', '/sections/test-3.html', { jar: nobody.j })).status, 302);
       assert.equal((await call('GET', '/sections/test-3.html', { jar: stdU.j })).status, 200);
-      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'default' }, { key: 'pack:listening/practice-cards', mode: 'default' }] }, jar: boss });
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-1', mode: 'default' }, { key: 'test:listening/practice-cards/test-3', mode: 'default' }] }, jar: boss });
       assert.equal((await call('GET', '/sections/test-3.html')).status, 200);
       ok('Ultra plan + practice cards (Reading/Listening pages are enforced, Writing/Speaking listed)');
 

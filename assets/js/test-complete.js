@@ -11,7 +11,6 @@
   var path = decodeURIComponent(location.pathname).replace(/\/index(\.html)?$/, '/');
   // clean URLs (no .html in the address bar): keep the stored key identical to the real file name
   if (!/\/$/.test(path) && !/\.[a-z0-9]+$/i.test(path)) path += '.html';
-  if (path === '/listening/') path = '/full-tests/listening/test-1.html';        // same paper, one key
   var isReading = /^\/(pessages|full-tests\/reading)\//.test(path);
   var isListening = /^\/(sections|listening|full-tests\/listening)\//.test(path);
   if (!isReading && !isListening) return;

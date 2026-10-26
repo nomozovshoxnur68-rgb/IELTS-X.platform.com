@@ -6,7 +6,10 @@
   const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles', pdf: 'PDF materials' };
   const TOPICS = ['General', 'History', 'Science', 'Technology', 'Environment', 'Health', 'Education', 'Society', 'Business', 'Culture', 'Nature', 'Psychology'];
   const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / table / flow-chart / summary completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
-  const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map'];
+  /* Listening has its own question types: they are the types of the listening engine (listening/js/listening.js) */
+  const LQ_LABEL = { gap: 'Completion, typed: notes / form / table / sentence / flow-chart', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice, choose TWO / THREE letters', matching: 'Matching: drag the lettered option into the gap', map: 'Map / plan / diagram labelling (tick one letter)', box: 'Completion with a word box (drag a word into the text)' };
+  const qLabels = () => (draft && draft.type === 'listening' ? LQ_LABEL : Q_LABEL);
+  const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
   const lists = { reading: null, listening: null, writing: null, speaking: null, article: null, pdf: null };
   const VIEW_FOR = { articles: 'article' };            // #articles in the address bar = the article list
   let draft = null, editingId = null, uploading = 0;
@@ -85,7 +88,7 @@
     const d = m.data || {}; const nq = (d.questions || []).length; const exp = (d.questions || []).filter((q) => String(q.explanation || '').trim()).length;
     const expTxt = nq ? (exp === nq ? ' · 💡 all explained' : exp ? ' · ' + exp + '/' + nq + ' explained' : '') : '';
     if (type === 'reading') return { img: d.coverUrl, tag: d.passageLabel || 'Passage 1', sub: nq + ' questions · ' + (d.durationMin ? d.durationMin + ' min' : 'no timer') + expTxt, href: d.no ? '/pessages/test-' + d.no : '/test?id=' + encodeURIComponent(m.id) };
-    if (type === 'listening') return { img: d.coverUrl, tag: d.sectionLabel || 'Section 1', sub: nq + ' questions' + (d.audioUrl ? ' · 🔊 audio' : ' · ⚠ no audio') + expTxt, href: '/test?id=' + encodeURIComponent(m.id) };
+    if (type === 'listening') return { img: d.coverUrl, tag: d.sectionLabel || 'Section 1', sub: nq + ' questions' + (d.audioUrl ? ' · 🔊 audio' : ' · ⚠ no audio') + expTxt, href: d.no ? '/sections/test-' + d.no : '/exam/listening/' + encodeURIComponent(m.id) };
     if (type === 'writing') { const ts = d.tasks || []; return { img: d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl, tag: d.tier || 'Tier 1', sub: ts.length + ' task(s)' + (ts.some((t) => t.sample) ? ' · model answer' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
     if (type === 'speaking') { const ps = d.parts || []; return { img: (ps.find((t) => t.imageUrl) || {}).imageUrl, tag: ps.length + ' part(s)', sub: ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
     if (type === 'article') return { img: d.coverUrl, tag: d.passageLabel || 'Passage 1', sub: (d.topic || 'General') + (d.readMinutes ? ' · ' + d.readMinutes + ' min read' : ''), href: '/test?id=' + encodeURIComponent(m.id) };
@@ -117,26 +120,48 @@
   }
 
   /* ───────── uploads (local disk, or straight to Supabase Storage on Vercel) ───────── */
-  async function uploadFile(file) {
-    const meta = await api('/api/admin/upload-url', { method: 'POST', body: JSON.stringify({ filename: file.name, size: file.size }) });
-    if (meta.local) {
-      const fd = new FormData(); fd.append('type', /\.(mp3|wav|m4a|ogg|aac)$/i.test(file.name) ? 'audio' : /\.pdf$/i.test(file.name) ? 'pdf' : 'image'); fd.append('file', file, file.name);
-      return (await api('/api/admin/uploads', { method: 'POST', body: fd })).url;
-    }
-    const fd = new FormData(); fd.append('cacheControl', '3600'); fd.append('', file);
-    const r = await fetch(meta.uploadUrl, { method: 'PUT', body: fd, headers: { 'x-upsert': 'false' } });
-    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error('Upload failed: ' + (j.message || j.error || r.status)); }
-    return meta.publicUrl;
+  const isImg = (f) => /\.(png|jpe?g|webp|gif|avif)$/i.test(f.name);
+  /* big photos are shrunk in the browser first: a 6 MB phone photo becomes a ~300 KB JPG, which uploads fast everywhere */
+  async function shrinkImage(file) {
+    if (!/\.(png|jpe?g|webp)$/i.test(file.name) || file.size < 900 * 1024 || !window.createImageBitmap) return file;
+    try {
+      const bmp = await createImageBitmap(file); const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.86));
+      return blob && blob.size < file.size ? new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' }) : file;
+    } catch (e) { return file; }
   }
-  async function pickAndUpload(accept, status) {
+  async function uploadToServer(file) {   // local disk, or (on Vercel) the database for pictures
+    const fd = new FormData(); fd.append('type', /\.(mp3|wav|m4a|ogg|aac)$/i.test(file.name) ? 'audio' : /\.pdf$/i.test(file.name) ? 'pdf' : 'image'); fd.append('file', file, file.name);
+    return (await api('/api/admin/uploads', { method: 'POST', body: fd })).url;
+  }
+  async function uploadFile(file) {
+    if (isImg(file)) file = await shrinkImage(file);
+    let meta;
+    try { meta = await api('/api/admin/upload-url', { method: 'POST', body: JSON.stringify({ filename: file.name, size: file.size }) }); }
+    catch (e) { if (isImg(file)) return uploadToServer(file); throw e; }   // storage not ready: pictures still work
+    if (meta.local) return uploadToServer(file);
+    const fd = new FormData(); fd.append('cacheControl', '3600'); fd.append('', file);
+    let r = null, msg = '';
+    try { r = await fetch(meta.uploadUrl, { method: 'PUT', body: fd, headers: { 'x-upsert': 'false' } }); if (!r.ok) { const j = await r.json().catch(() => ({})); msg = j.message || j.error || ('HTTP ' + r.status); } }
+    catch (e) { msg = 'the browser could not reach Supabase Storage (' + (e.message || 'network') + ')'; }
+    if (r && r.ok) return meta.publicUrl;
+    if (isImg(file)) return uploadToServer(file);                         // fall back to the database
+    throw new Error('Upload failed: ' + msg + '. You can also paste a link to the file instead.');
+  }
+  function pickAndUpload(accept, status) {
     return new Promise((resolve) => {
-      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = accept;
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = accept; inp.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+      document.body.appendChild(inp);                                      // a detached input can lose its change event in some browsers
+      const done = (v) => { try { inp.remove(); } catch (e) { /* gone */ } resolve(v); };
+      inp.addEventListener('cancel', () => done(null));
       inp.onchange = async () => {
-        const f = inp.files[0]; if (!f) return resolve(null);
-        if (f.size > 100 * 1024 * 1024) { toast('File is larger than 100 MB.', true); return resolve(null); }
+        const f = inp.files && inp.files[0]; if (!f) return done(null);
+        if (f.size > 100 * 1024 * 1024) { toast('File is larger than 100 MB.', true); return done(null); }
         uploading++; if (status) status.textContent = 'Uploading ' + f.name + ' …'; syncSave();
-        try { const url = await uploadFile(f); if (status) status.textContent = ''; toast('Uploaded ' + f.name); resolve(url); }
-        catch (e) { if (status) status.textContent = ''; fail(e); resolve(null); }
+        try { const url = await uploadFile(f); if (status) status.textContent = ''; toast('Uploaded ' + f.name); done(url); }
+        catch (e) { if (status) status.textContent = ''; fail(e); done(null); }
         finally { uploading--; syncSave(); }
       };
       inp.click();
@@ -145,12 +170,12 @@
   function syncSave() { const b = $('#cb-save'); if (b) { b.disabled = uploading > 0; b.textContent = uploading ? 'Uploading…' : (editingId ? 'Save changes' : 'Create'); } }
 
   /* ───────── builder ───────── */
-  const blankQ = (type, passage) => ({ type: type || 'short', passage: passage || 1, group: '', prompt: '', options: [], answer: '', explanation: '' });
+  const blankQ = (type, passage) => ({ type: type || (draft && draft.type === 'listening' ? 'gap' : 'short'), passage: passage || 1, group: '', blockTitle: '', title: '', prompt: '', options: [], answer: '', explanation: '' });
   const blankPassages = () => [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }];
   function blank(type, mode) {
     const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : type === 'reading' ? (mode === 'full' ? 60 : 20) : 60, instructions: '', images: [] };
     if (type === 'reading') Object.assign(data, { mode: mode === 'full' ? 'full' : 'part', coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()] });
-    if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ()] });
+    if (type === 'listening') Object.assign(data, { audioUrl: '', audioStart: 0, audioEnd: 0, durationMin: 10, transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ('gap')] });
     if (type === 'pdf') { Object.assign(data, { fileUrl: '', coverUrl: '', category: 'reading', badge: 'PDF', corner: '', pages: 0, tags: [] }); delete data.instructions; delete data.images; }
     if (type === 'speaking') Object.assign(data, { parts: [
       { title: 'Part 1 · Introduction and interview', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' },
@@ -230,14 +255,15 @@
         <b>2)</b> blocks with labels (the explanation line is optional):<br><code>1. Glass was first made in Egypt.<br>Answer: TRUE<br>Explanation: Paragraph A, line 2 says so.</code><br>
         For multiple choice put the options (<code>A. …</code>, <code>B. …</code>) under the question. A line like <code>Questions 1–5: Complete the notes</code> becomes the heading of the next question.</div>
       <textarea class="field" id="bulk-text" rows="12" placeholder="1. Glass was first made in Egypt.&#10;Answer: TRUE&#10;Explanation: Paragraph A, line 2 says so.&#10;&#10;2. The bees live in a ____&#10;Answer: hive&#10;Explanation: Paragraph B.&#10;&#10;or:  The bees live in a => hive => Paragraph B."></textarea>
-      <div class="btn-row"><select class="field" id="bulk-type" style="width:auto"><option value="auto">Auto-detect the question type</option>${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>${draft.type === 'reading' && draft.data.mode === 'full' ? `<select class="field" id="bulk-pass" style="width:auto"><option value="">Passage: as the last question</option><option value="1">Passage 1</option><option value="2">Passage 2</option><option value="3">Passage 3</option></select>` : ''}<button class="btn btn-sm btn-primary" data-cb="q-bulk-do" type="button">Add them</button></div></div>
+      <div class="btn-row"><select class="field" id="bulk-type" style="width:auto"><option value="auto">Auto-detect the question type</option>${Object.entries(qLabels()).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>${draft.type === 'reading' && draft.data.mode === 'full' ? `<select class="field" id="bulk-pass" style="width:auto"><option value="">Passage: as the last question</option><option value="1">Passage 1</option><option value="2">Passage 2</option><option value="3">Passage 3</option></select>` : ''}<button class="btn btn-sm btn-primary" data-cb="q-bulk-do" type="button">Add them</button></div></div>
       ${qs.map((q, i) => `<div class="cb-q"><div class="cb-qn">${i + 1}</div><div class="cb-qbody">
-        <div class="cb-row"><select class="field" data-p="data.questions.${i}.type" data-rerender="1">${Object.entries(Q_LABEL).map(([k, v]) => `<option value="${k}" ${q.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+        <div class="cb-row"><select class="field" data-p="data.questions.${i}.type" data-rerender="1">${Object.entries(qLabels()).map(([k, v]) => `<option value="${k}" ${q.type === k || (draft.type === 'listening' && k === 'gap' && !LQ_LABEL[q.type]) ? 'selected' : ''}>${v}</option>`).join('')}</select>
         ${draft.type === 'reading' && draft.data.mode === 'full' ? passSelect(`data.questions.${i}.passage`, q.passage) : ''}
-        <input class="field" placeholder="Heading before this question (optional), e.g. Questions 1–5: Complete the notes" data-p="data.questions.${i}.group" value="${esc(q.group)}"></div>
-        <textarea class="field" rows="2" placeholder="Question text" data-p="data.questions.${i}.prompt">${esc(q.prompt)}</textarea>
-        ${OPT_TYPES.includes(q.type) ? `<textarea class="field" rows="5" placeholder="${q.type === 'mcq' || q.type === 'mcq-multi' ? 'Options, one per line (A, B, C… in this order)' : 'Options, one per line, each starting with its letter or number, e.g.  A. Paragraph A   or   i. The cost of change'}" data-p="data.questions.${i}.options" data-lines="1">${esc((q.options || []).join('\n'))}</textarea>` : ''}
-        <div class="cb-row"><input class="field" placeholder="${q.type === 'tfng' ? 'TRUE / FALSE / NOT GIVEN' : q.type === 'ynng' ? 'YES / NO / NOT GIVEN' : q.type === 'mcq' ? 'Correct letter, e.g. B' : q.type === 'mcq-multi' ? 'Correct letters, e.g. A,C' : q.type === 'matching' || q.type === 'map' ? 'Correct letter or number, e.g. D or iv' : 'Correct answer (use | for alternatives)'}" data-p="data.questions.${i}.answer" value="${esc(q.answer)}">
+        <input class="field" placeholder="${draft.type === 'listening' ? 'Instruction for this block (only on its first question), e.g. Complete the notes below. Write ONE WORD for each answer.' : 'Heading before this question (optional), e.g. Questions 1–5: Complete the notes'}" data-p="data.questions.${i}.group" value="${esc(q.group)}"></div>
+        ${draft.type === 'listening' ? `<div class="cb-row"><input class="field" placeholder="Title above the block (only on its first question), e.g. Barrington Historical Buildings Tours" data-p="data.questions.${i}.blockTitle" value="${esc(q.blockTitle)}">${q.type === 'gap' || q.type === 'box' || !LQ_LABEL[q.type] ? `<input class="field" placeholder="Small sub-heading before this line (optional), e.g. Prices" data-p="data.questions.${i}.title" value="${esc(q.title)}">` : ''}</div>` : ''}
+        <textarea class="field" rows="2" placeholder="${draft.type === 'listening' ? (q.type === 'gap' || q.type === 'box' || !LQ_LABEL[q.type] ? 'The line of the notes. Write ____ where the answer goes, e.g.  The tour starts in ____ Street' : q.type === 'matching' || q.type === 'map' ? 'The item to match, e.g. Anna  /  Library' : 'Question text') : 'Question text'}" data-p="data.questions.${i}.prompt">${esc(q.prompt)}</textarea>
+        ${OPT_TYPES.includes(q.type) ? `<textarea class="field" rows="5" placeholder="${q.type === 'mcq' || q.type === 'mcq-multi' ? 'Options, one per line (A, B, C… in this order)' : q.type === 'box' ? 'The words of the box, one per line (the same list on every line of the block)' : q.type === 'map' ? 'The letters on the map, one per line: A, B, C, D … (the same list on every line of the block)' : 'Options, one per line, each starting with its letter or number, e.g.  A. Paragraph A   or   i. The cost of change'}" data-p="data.questions.${i}.options" data-lines="1">${esc((q.options || []).join('\n'))}</textarea>` : ''}
+        <div class="cb-row"><input class="field" placeholder="${q.type === 'tfng' ? 'TRUE / FALSE / NOT GIVEN' : q.type === 'ynng' ? 'YES / NO / NOT GIVEN' : q.type === 'mcq' ? 'Correct letter, e.g. B' : q.type === 'mcq-multi' ? 'Correct letters, e.g. A,C' : q.type === 'matching' || q.type === 'map' ? 'Correct letter, e.g. D' : q.type === 'box' ? 'The correct word from the box' : 'Correct answer (use | for alternatives)'}" data-p="data.questions.${i}.answer" value="${esc(q.answer)}">
         <textarea class="field" rows="2" placeholder="Explanation shown after submitting (optional)" data-p="data.questions.${i}.explanation">${esc(q.explanation)}</textarea></div></div>
         <button class="btn btn-sm btn-danger" data-cb="q-del" data-i="${i}" type="button" title="Delete question">✕</button></div>`).join('')}</div>`;
   }
@@ -284,6 +310,7 @@
       let ans = a;
       if (type === 'tfng') ans = ({ T: 'TRUE', F: 'FALSE', NG: 'NOT GIVEN' })[A] || A;
       if (type === 'ynng') ans = ({ Y: 'YES', N: 'NO', NG: 'NOT GIVEN' })[A] || A;
+      if (draft && draft.type === 'listening') type = ({ short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap' })[type] || type;
       return { ...blankQ(type, passage), group: q.group || '', prompt: q.prompt, options: OPT_TYPES.includes(type) ? q.options : [], answer: ans, explanation: q.explanation };
     });
   }
@@ -325,11 +352,14 @@
         <div class="cb-checks"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
       ${t === 'reading' ? (d.mode === 'full' ? readingFormatBlock() : '') + (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
-      ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB).</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}</div>` : ''}
+      ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
+        <label class="lbl">Audio link (https://… or /uploads/…)<input class="field" data-p="data.audioUrl" value="${esc(d.audioUrl)}" placeholder="https://…/recording.mp3"></label>
+        <div class="cb-grid"><label class="lbl">Starts at (seconds, 0 = from the beginning)<input class="field" type="number" min="0" data-p="data.audioStart" data-num="1" value="${esc(d.audioStart || 0)}"></label><label class="lbl">Ends at (seconds, 0 = until the end)<input class="field" type="number" min="0" data-p="data.audioEnd" data-num="1" value="${esc(d.audioEnd || 0)}"></label></div>
+        <div class="muted sm">Use these two numbers when one long recording holds all four sections and this test is only one of them.</div></div>` : ''}
       ${t === 'article' ? articleBlock() : ''}${t === 'speaking' ? partsBlock() : ''}
       ${t === 'writing' ? tasksBlock() : t === 'speaking' || t === 'pdf' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
       ${t === 'reading' || t === 'listening' ? questionsBlock() : ''}
-      ${t === 'listening' ? `<label class="lbl">Transcript (optional, shown only after the student submits)<textarea class="field" rows="5" data-p="data.transcript">${esc(d.transcript)}</textarea></label>` : ''}`;
+      ${t === 'listening' ? `<label class="lbl">Transcript (optional, shown only after the student submits). One line per speaker turn, e.g. <code>Tom: Good morning…</code>. The line that contains an answer is highlighted automatically<textarea class="field" rows="8" data-p="data.transcript">${esc(d.transcript)}</textarea></label>` : ''}`;
     syncSave();
   }
 

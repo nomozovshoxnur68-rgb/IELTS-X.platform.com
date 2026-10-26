@@ -138,32 +138,26 @@ window.IELTSX_PRACTICE = {
   "cards": [
    {
     "id": "test-1",
-    "title": "Free Mini: Climate Change and Allergies",
+    "title": "Barrington Historical Buildings Tours",
     "href": "/sections/test-1",
     "free": true
    },
    {
     "id": "test-2",
-    "title": "Library Services Orientation",
+    "title": "Buying holiday accommodation",
     "href": "/sections/test-2",
     "free": true
    },
    {
     "id": "test-3",
-    "title": "Academic Discussion: Recycling",
+    "title": "Autonomous underwater vehicles",
     "href": "/sections/test-3",
     "free": true
    },
    {
     "id": "test-4",
-    "title": "Ancient Civilizations Lecture",
+    "title": "Life on the International Space Station",
     "href": "/sections/test-4",
-    "free": true
-   },
-   {
-    "id": "test-5",
-    "title": "Burnside Fitness Centre",
-    "href": "/sections/test-5",
     "free": true
    }
   ]

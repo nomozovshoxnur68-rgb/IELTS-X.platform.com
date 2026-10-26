@@ -1251,10 +1251,10 @@
                 .then(function (d) {
                     clearTimeout(timer);
                     var items = d.items || [];
-                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: '/test?id=' + encodeURIComponent(m.id), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: m.href || ('/test?id=' + encodeURIComponent(m.id)), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
                     var grid = document.getElementById('card-grid'); if (!grid || !items.length) return;
                     grid.insertAdjacentHTML('afterbegin', items.map(function (m) {
-                        var href = '/test?id=' + encodeURIComponent(m.id);
+                        var href = m.href || ('/test?id=' + encodeURIComponent(m.id));
                         var media = m.coverUrl
                             ? '<img loading="lazy" decoding="async" src="' + esc(m.coverUrl) + '" alt="' + esc(m.title) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" /><div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>'
                             : '<div class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-500/80 via-teal-500/70 to-green-600/80 dark:from-emerald-600/60 dark:via-teal-600/50 dark:to-green-700/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones w-8 h-8 text-white/90"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg><span class="mt-2 text-white/90 font-medium text-sm text-center px-4 line-clamp-2">' + esc(m.pack || 'Listening') + '</span></div>';

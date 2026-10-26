@@ -85,9 +85,7 @@
             { slug: 'pack-3', title: 'Pack 3', tier: 'Tier 1', plan: 'MAX', premium: true, tests: [] }
         ],
         listening: [
-            { slug: 'pack-5', title: 'Pack 5', tier: 'Tier 3', premium: true, tests: [
-                { source: 'Listening Test 7', tags: ['Gap Filling', 'Multiple Choice', 'Map Labeling'], href: '/full-tests/listening/test-1', premium: true }
-            ] },
+            { slug: 'pack-5', title: 'Pack 5', tier: 'Tier 3', premium: true, tests: [] },
             { slug: 'pack-6', title: 'Pack 6', tier: 'Tier 3', premium: true, tests: [] },
             { slug: 'pack-1', title: 'Pack 1', tier: 'Tier 1', premium: true, tests: [] },
             { slug: 'pack-2', title: 'Pack 2', tier: 'Tier 1', premium: true, tests: [] },

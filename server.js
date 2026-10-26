@@ -59,7 +59,7 @@ const ADMIN_EMAILS = new Set(
 // pages that need an active Premium plan (lower-case paths); extend with PREMIUM_PATHS=/a.html,/b.html
 // (a * matches anything; put premium-only audio / files under /premium-audio/ to protect them too)
 // (the full test pages /full-tests/<skill>/test-N.html are decided by the Access rules below: admin panel -> Access)
-const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/listening/index.html', '/premium-audio/*']
+const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/premium-audio/*']
   .concat(String(process.env.PREMIUM_PATHS || '').split(',').map((p) => p.trim().toLowerCase()).filter(Boolean))
   .map((p) => new RegExp('^' + p.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'));
 const isPremiumPath = (p) => PREMIUM_PATHS.some((re) => re.test(p));
@@ -464,27 +464,38 @@ const MEDIA_BUCKET = 'ieltsx-media';
 let bucketReady = false;
 async function ensureBucket() {
   if (bucketReady) return;
-  const r = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, { method: 'POST', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: MEDIA_BUCKET, name: MEDIA_BUCKET, public: true, file_size_limit: 100 * 1024 * 1024 }) }).catch(() => null);
+  const H = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+  /* No file_size_limit: asking for more than the project's global limit (50 MB on the free plan) makes Supabase refuse the bucket. */
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, { method: 'POST', headers: H, body: JSON.stringify({ id: MEDIA_BUCKET, name: MEDIA_BUCKET, public: true }) }).catch(() => null);
   if (!r) throw new HttpError(503, 'Cannot reach Supabase Storage. Check SUPABASE_URL.');
   if (r.ok || r.status === 409 || r.status === 400) { bucketReady = true; return; }   // 400/409 = already exists
-  throw new HttpError(503, 'Supabase Storage refused to create the media bucket (use the service_role key).');
+  if (r.status === 401 || r.status === 403) throw new HttpError(503, 'Supabase Storage rejected the key. Use the service_role key in SUPABASE_SERVICE_ROLE_KEY (not the anon key).');
+  const j = await r.json().catch(() => ({}));
+  console.error('ensureBucket:', r.status, JSON.stringify(j).slice(0, 200));
+  /* the bucket may exist already (made by hand in the dashboard): carry on, the signed-upload call below says if it really is missing */
 }
 
 /* ───────────────────────── tests created in the admin panel ───────────────────────── */
 const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab', 'pdf'];
-const Q_TYPES = ['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map'];
-const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map'];
+const Q_TYPES = ['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
+const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 function cleanUrl(v) {
   const u = String(v || '').trim().slice(0, 1000);
   if (!u) return '';
+  if (/^\/api\/media\/[A-Za-z0-9_-]{8,40}$/.test(u)) return u;   // a picture kept in the database (Vercel without Storage)
   if (/^\/(uploads|assets)\//.test(u) && !u.includes('..')) return u;
   if (/^https:\/\/[^\s"'<>]+$/i.test(u)) return u;
   return '';
 }
 /* Reading tests get a stable number (test-22, test-23 ... for Part; test-7, test-8 ... for Full) that continues the hand-made pages. */
 async function keepReadingNo(type, data, cur) {
+  if (type === 'listening') {   // Listening tests get test-5, test-6 ... after the four hand-made /sections/test-N pages
+    const L = require('./listening-router');
+    if (cur && cur.data && Number(cur.data.no)) { data.no = Number(cur.data.no); return data; }
+    data.no = L.nextNumber(ROOT, (await store.listMaterials('listening')).filter((x) => !cur || x.id !== cur.id));
+    return data;
+  }
   if (type !== 'reading') return data;
   const R = require('./reading-router'); const kind = R.kindOf({ data });
   if (cur && cur.data && Number(cur.data.no) && R.kindOf(cur) === kind) { data.no = Number(cur.data.no); return data; }
@@ -508,6 +519,9 @@ function cleanMaterialData(type, d) {
   }
   if (type === 'listening') {
     out.audioUrl = cleanUrl(d.audioUrl); out.transcript = cut(d.transcript, 60000);
+    // the part of a longer recording this test uses (seconds; 0/0 = the whole file), and the test-N number (set by keepReadingNo)
+    out.audioStart = Math.max(0, Math.min(36000, Math.floor(Number(d.audioStart) || 0))); out.audioEnd = Math.max(0, Math.min(36000, Math.floor(Number(d.audioEnd) || 0)));
+    out.no = Math.max(0, Math.floor(Number(d.no) || 0));
     // the card on the Listening practice page: picture, "Section N" tag, question-type chips (empty = taken from the questions)
     out.coverUrl = cleanUrl(d.coverUrl);
     out.sectionLabel = ['Section 1', 'Section 2', 'Section 3', 'Section 4'].includes(d.sectionLabel) ? d.sectionLabel : 'Section 1';
@@ -525,8 +539,8 @@ function cleanMaterialData(type, d) {
   }
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
-      q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : 'short';
-      return { id: 'q' + (i + 1), type: t, passage: [1, 2, 3].includes(Number(q.passage)) ? Number(q.passage) : 1, group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
+      q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: [1, 2, 3].includes(Number(q.passage)) ? Number(q.passage) : 1, group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500) };
     }).filter((q) => q.prompt);
@@ -602,7 +616,7 @@ const publicMaterial = (m, withData) => {
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
   if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
-  if (m.type === 'listening') { base.coverUrl = d.coverUrl || ''; base.sectionLabel = d.sectionLabel || 'Section 1'; base.types = cardTypesOf(d); }
+  if (m.type === 'listening') { base.no = Number(d.no) || 0; base.href = require('./listening-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.sectionLabel = d.sectionLabel || 'Section 1'; base.types = cardTypesOf(d); }
   if (m.type === 'writing') { const ts = d.tasks || []; base.coverUrl = d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl || ''; base.tier = d.tier || 'Tier 1'; base.types = d.cardTypes || [];
     base.taskLabel = ts.length > 1 ? 'Task 1 & 2' : ((ts[0] && ts[0].title) || 'Task 1'); }
   if (m.type === 'pdf') Object.assign(base, { coverUrl: d.coverUrl || '', category: d.category || 'reading', badge: d.badge || '', corner: d.corner || '', pages: d.pages || 0, tags: d.tags || [] });
@@ -820,7 +834,7 @@ async function adminAccessView() {
     let pk = sk.packs.find((p) => p.slug === slug || slugOf(p.title) === slug);
     if (!pk) { pk = { key: `pack:${m.type}/${slug}`, slug, title: m.pack || 'Practice', tier: '', extra: true, def: { locked: false, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk); }
     const parent = rules[pk.key]; const def = { locked: !!m.premium, plan: 'standard' };
-    pk.tests.push({ key: 'mat:' + m.id, id: m.id, title: m.title, source: m.description || '', href: '/test?id=' + m.id, material: true, published: m.published !== false, rule: view(rules['mat:' + m.id], parent, def), def });
+    pk.tests.push({ key: 'mat:' + m.id, id: m.id, title: m.title, source: m.description || '', href: (m.type === 'reading' ? require('./reading-router').hrefFor(m) : m.type === 'listening' ? require('./listening-router').hrefFor(m) : '') || '/test?id=' + m.id, material: true, published: m.published !== false, rule: view(rules['mat:' + m.id], parent, def), def });
   }
   return { skills, plans: ['standard', 'max', 'ultra'] };
 }
@@ -838,6 +852,13 @@ async function api(req, res, url) {
   } else if (method !== 'GET' && method !== 'HEAD' && p !== '/api/payments/webhook') {
     const site = String(req.headers['sec-fetch-site'] || '');
     if (site && site !== 'same-origin' && site !== 'none') throw new HttpError(403, 'Cross-site request blocked.');
+  }
+  if (method === 'GET' && /^\/api\/media\/[A-Za-z0-9_-]{8,40}$/.test(p)) {   // a picture kept in the database (see POST /api/admin/uploads on Vercel)
+    const rec = await store.getSetting('media:' + p.split('/').pop()).catch(() => null);
+    if (!rec || !rec.b64 || !/^image\//.test(rec.mime || '')) return send(res, 404, 'Not found.');
+    const buf = Buffer.from(rec.b64, 'base64');
+    res.writeHead(200, { 'Content-Type': rec.mime, 'Content-Length': buf.length, 'Cache-Control': 'public, max-age=31536000, immutable', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox" });
+    return res.end(req.method === 'HEAD' ? undefined : buf);
   }
   if (method === 'GET' && p === '/api/health') {
     rateLimit('health:' + clientIp(req), 60, 60000);
@@ -1319,6 +1340,17 @@ async function api(req, res, url) {
       await audit(admin, 'upload', key, { kind });
       return send(res, 200, { local: false, kind, uploadUrl: `${SUPABASE_URL}/storage/v1${j.url}`, publicUrl: `${SUPABASE_URL}/storage/v1/object/public/${MEDIA_BUCKET}/${key}` });
     }
+    if (method === 'POST' && p === '/api/admin/uploads' && IS_VERCEL) {   // Vercel has no disk: pictures are kept in the database (audio / PDF need Supabase Storage)
+      const { file } = parseMultipart(await readBody(req, 4 * 1024 * 1024), req.headers['content-type']);
+      if (!file) throw new HttpError(400, 'No file uploaded.');
+      const ext = path.extname(file.filename).toLowerCase();
+      if (!IMAGE_EXT.includes(ext)) throw new HttpError(501, 'Audio and PDF files go to Supabase Storage on Vercel: set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY. Or paste a link to the file instead.');
+      if (file.data.length > 3 * 1024 * 1024) throw new HttpError(413, 'This picture is larger than 3 MB. Make it smaller (for example a JPG under 1 MB) and try again.');
+      const mid = crypto.randomBytes(12).toString('base64url');
+      await store.setSetting('media:' + mid, { mime: { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.avif': 'image/avif' }[ext], b64: file.data.toString('base64'), name: cut(file.filename, 120), at: new Date().toISOString() });
+      await audit(admin, 'upload', mid, { type: 'image-db' });
+      return send(res, 201, { ok: true, type: 'images', filename: file.filename, url: '/api/media/' + mid });
+    }
     if (method === 'POST' && p === '/api/admin/uploads') {
       if (IS_VERCEL) throw new HttpError(501, 'On Vercel files go to Supabase Storage: set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (the panel then uploads directly).');
       const { fields, file } = parseMultipart(await readBody(req, MAX_UPLOAD_BYTES + 1024 * 1024), req.headers['content-type']);
@@ -1507,6 +1539,11 @@ const requestHandler = async (req, res) => {
     if (url.pathname === '/sitemap.xml' || url.pathname === '/api/sitemap') {
       return send(res, 200, sitemap(siteUrl(req)), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     }
+    if ((url.pathname === '/test' || url.pathname === '/test.html') && url.searchParams.get('id')) {   // an old /test?id= link of a Listening test -> its new page
+      const lm = await store.getMaterial(url.searchParams.get('id')).catch(() => null);
+      if (lm && lm.type === 'listening') { res.statusCode = 302; res.setHeader('Location', require('./listening-router').hrefFor(lm)); res.end(); return; }
+    }
+    if (await require('./listening-router').route(req, res, url, { root: ROOT, store, currentUser, isAdmin, materialRule, accessRules, allowsLevel, userLevel, send })) return;   // Listening tests made in the admin panel (new listening engine)
     if (await require('./reading-router').route(req, res, url, { root: ROOT, store, currentUser, isAdmin, materialRule, accessRules, allowsLevel, userLevel, send })) return;   // Reading tests made in the admin panel (Part = 1 passage, Full = 3 passages)
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed');
