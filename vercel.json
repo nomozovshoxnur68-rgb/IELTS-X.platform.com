@@ -549,7 +549,7 @@
   ],
   "functions": {
     "api/index.js": {
-      "includeFiles": "{server.js,listening-exam.js,listening-router.js,listening/exam-template.html,reading-exam.js,reading-router.js,reading.js,pessages/test-19.html,full-tests/reading/test-1.html,plans.json,*.html,data/**,supabase-schema.sql,assets/js/full-tests-data.js,assets/js/practice-cards.js}",
+      "includeFiles": "{server.js,*.html,data/**,messages/**,full-tests/**,supabase-schema.sql,assets/**}",
       "maxDuration": 30
     }
   }
