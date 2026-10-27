@@ -5,7 +5,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
-  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', reading: 'Part practice cards', readingfull: 'Reading · Full tests', packs: 'Packs (Full Tests cards)', listening: 'Listening cards', writing: 'Writing cards', speaking: 'Speaking cards', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)' };
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', reading: 'Part practice cards', readingfull: 'Reading · Full tests', packs: 'Packs (Full Tests cards)', listening: 'Listening cards', writing: 'Writing cards', speaking: 'Speaking cards', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control' };
 
   let me = null, users = [], orders = [], audit = [], results = [], stats = null, plans = [];
   let userPage = 1, orderFilter = 'all', activityFilter = '', openUserId = null;

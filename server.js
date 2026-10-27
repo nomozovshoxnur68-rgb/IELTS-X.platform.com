@@ -46,7 +46,7 @@ const RESEND_API_KEY = String(process.env.RESEND_API_KEY || '');
 const MAIL_FROM = String(process.env.MAIL_FROM || '');
 const PUBLIC_URL = String(process.env.PUBLIC_URL || '').replace(/\/$/, '');
 const PAYMENT_WEBHOOK_SECRET = String(process.env.PAYMENT_WEBHOOK_SECRET || '');
-const PAYMENT_CONTACT = String(process.env.PAYMENT_CONTACT || 'https://t.me/ieltsx_admin');
+const PAYMENT_CONTACT = String(process.env.PAYMENT_CONTACT || 'https://t.me/sh7595');
 const PAYMENT_INSTRUCTIONS = String(process.env.PAYMENT_INSTRUCTIONS || 'Pay with Uzcard / Humo, then send the receipt and your order code to our Telegram. Your plan is activated as soon as we confirm the payment.');
 let PLANS = { currency: 'UZS', months: [1, 3, 6], plans: [] };
 try { PLANS = JSON.parse(process.env.PLANS_JSON || fs.readFileSync(path.join(ROOT, 'plans.json'), 'utf8')); } catch (e) { console.warn('plans.json could not be read:', e.message); }
@@ -380,6 +380,7 @@ async function audit(actor, action, target, meta) {
   catch (e) { console.error('audit failed:', e.message); }
 }
 async function grantPremium(user, planName, days) {
+  await grantQuota(user, planName);
   const now = Date.now();
   const base = isPremium(user) && user.premiumExpiresAt && !isAdmin(user) ? Math.max(now, new Date(user.premiumExpiresAt).getTime()) : now;
   return store.updateUser(user.id, { premiumActive: true, plan: planName, premiumExpiresAt: days > 0 ? new Date(base + days * 86400000).toISOString() : null });
@@ -389,6 +390,72 @@ async function sendVerification(req, user) {
   return sendMail({ to: user.email, subject: 'Verify your IELTS X email', text: `Hi ${user.name},\n\nConfirm your email address:\n${siteUrl(req)}/verify.html?token=${encodeURIComponent(token)}\n\nThe link works for 7 days. If you did not create an account, ignore this message.` });
 }
 const planById = (id) => (PLANS.plans || []).find((x) => x.id === id);
+
+/* ---- price control: plans.json holds the defaults, the admin panel (Price control) saves its own copy in settings ---- */
+const DEFAULT_FEATURES = {
+  standard: ['60+ Full Listening, Reading Tests', '60+ Full Writing, Speaking Tests', '6+ Full Mock Tests', '30+ AI essay check & feedback', 'Answer Explanations, Transcripts, Vocabularies', 'Performance Dashboard', 'Weakness Analysis', 'Weekly Articles List'],
+  max: ['60+ Full Listening, Reading Tests', '60+ Full Writing, Speaking Tests', '9+ Mock Tests', 'Exclusive practice materials', '60+ AI essay evaluation & feedback', '100+ Reading Predictions', '30+ Listening Predictions', '100+ Writing Predictions', '30+ Speaking Predictions'],
+  ultra: ['Everything in Max', 'Priority support']
+};
+const DEFAULT_OLD = { standard: { 1: 66000, 3: 198000, 6: 396000 }, max: { 1: 110000, 3: 330000, 6: 660000 }, ultra: {} };
+const PLAN_NAMES = { standard: 'Standard', max: 'Max', ultra: 'Ultra' };
+function defaultPricing() {
+  const months = (PLANS.months && PLANS.months.length ? PLANS.months : [1, 3, 6]).map(Number);
+  return {
+    currency: 'UZS', usdRate: 0, months,
+    contact: 'https://t.me/sh7595', instructions: PAYMENT_INSTRUCTIONS,
+    plans: ['standard', 'max', 'ultra'].map((id) => {
+      const src = planById(id) || { prices: {} };
+      return { id, name: PLAN_NAMES[id], active: id !== 'ultra', recommended: id === 'max', tag: id === 'ultra' ? 'Tier 4 Access' : 'Tier 3 Access',
+        prices: { ...(src.prices || {}) }, oldPrices: { ...(DEFAULT_OLD[id] || {}) }, testsLimit: 0, features: DEFAULT_FEATURES[id].slice() };
+    })
+  };
+}
+const cleanTelegram = (v, fallback) => { const m = String(v || '').trim().match(/^(?:https?:\/\/)?(?:t\.me\/|telegram\.me\/)?@?([A-Za-z0-9_]{4,32})\/?$/); return m ? 'https://t.me/' + m[1] : fallback; };
+function normalizePricing(raw) {
+  const def = defaultPricing(); const r = raw && typeof raw === 'object' ? raw : {};
+  let months = Array.isArray(r.months) ? r.months.map(Number).filter((n) => Number.isInteger(n) && n >= 1 && n <= 36) : def.months;
+  months = [...new Set(months)].sort((a, b) => a - b).slice(0, 6); if (!months.length) months = def.months;
+  const money = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n > 0 && n < 1e10 ? n : 0; };
+  const plans = def.plans.map((d) => {
+    const p = (Array.isArray(r.plans) ? r.plans : []).find((x) => x && x.id === d.id);
+    if (!p) { const o = { ...d, prices: {}, oldPrices: {} }; months.forEach((m) => { if (d.prices[m]) o.prices[m] = d.prices[m]; if (d.oldPrices[m]) o.oldPrices[m] = d.oldPrices[m]; }); return o; }
+    const prices = {}, oldPrices = {};
+    months.forEach((m) => { const a = money(p.prices && p.prices[m]); if (a) prices[m] = a; const b = money(p.oldPrices && p.oldPrices[m]); if (b && a && b > a) oldPrices[m] = b; });
+    const features = (Array.isArray(p.features) ? p.features : d.features).map((f) => String(f || '').replace(/\s+/g, ' ').trim().slice(0, 120)).filter(Boolean).slice(0, 20);
+    const lim = Math.floor(Number(p.testsLimit)); 
+    return { id: d.id, name: d.name, active: p.active !== false && Object.keys(prices).length > 0 ? !!p.active : false, recommended: !!p.recommended,
+      tag: String(p.tag === undefined ? d.tag : p.tag).trim().slice(0, 40), prices, oldPrices, testsLimit: Number.isFinite(lim) && lim > 0 ? Math.min(lim, 100000) : 0, features };
+  });
+  const usd = Number(r.usdRate);
+  return { currency: 'UZS', usdRate: Number.isFinite(usd) && usd > 0 ? Math.min(Math.round(usd), 1e6) : 0, months, plans,
+    contact: cleanTelegram(r.contact, def.contact), instructions: String(r.instructions === undefined ? def.instructions : r.instructions).trim().slice(0, 500) };
+}
+async function getPricing() {
+  let s = null; try { s = await store.getSetting('pricing-config'); } catch (e) { /* defaults */ }
+  return normalizePricing(s && typeof s === 'object' ? s : null);
+}
+/* test allowance: a plan can include a limited number of premium tests (0 = no limit). The opened tests are remembered per user. */
+async function grantQuota(user, planName) {
+  try {
+    const cfg = await getPricing(); const plan = cfg.plans.find((p) => p.name.toLowerCase() === String(planName || '').toLowerCase());
+    const key = 'quota:' + user.id; const old = await store.getSetting(key).catch(() => null);
+    if (!plan || !plan.testsLimit) { if (old && old.limit) await store.setSetting(key, { limit: 0, plan: String(planName || ''), keys: [], updatedAt: new Date().toISOString() }); return; }
+    const keep = isPremium(user) && old && old.limit > 0 && old.plan === plan.name;
+    await store.setSetting(key, { limit: (keep ? old.limit : 0) + plan.testsLimit, plan: plan.name, keys: keep && Array.isArray(old.keys) ? old.keys : [], updatedAt: new Date().toISOString() });
+  } catch (e) { console.error('quota failed:', e.message); }
+}
+async function quotaBlocks(u, gate, tl) {      // true when this member already used up the tests of the plan
+  if (!u || isAdmin(u) || !gate || !gate.locked) return false;
+  let rec = null; try { rec = await store.getSetting('quota:' + u.id); } catch (e) { return false; }
+  if (!rec || !(rec.limit > 0)) return false;
+  const key = hrefPath(tl); const keys = Array.isArray(rec.keys) ? rec.keys : [];
+  if (keys.includes(key)) return false;
+  if (keys.length >= rec.limit) return true;
+  rec.keys = keys.concat(key); rec.updatedAt = new Date().toISOString();
+  try { await store.setSetting('quota:' + u.id, rec); } catch (e) { /* keep going */ }
+  return false;
+}
 
 /* ───────────────────────── helpers: http ───────────────────────── */
 const SECURITY_HEADERS = {
@@ -1012,22 +1079,23 @@ async function api(req, res, url) {
   }
 
   /* ---- plans + orders (manual payment confirmed by an admin, or by a signed webhook) ---- */
-  if (method === 'GET' && p === '/api/plans') return send(res, 200, { currency: PLANS.currency, months: PLANS.months, plans: PLANS.plans, contact: PAYMENT_CONTACT, instructions: PAYMENT_INSTRUCTIONS });
+  if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions }, { 'Cache-Control': 'no-store' }); }
   if (p === '/api/orders' && method === 'POST') {
     const u = await requireUser(req); rateLimit('order:' + u.id, 10, 60 * 60000);
-    const b = await readJson(req); const plan = planById(String(b.plan || '')); const months = Math.floor(Number(b.months));
-    if (!plan || !plan.prices[String(months)]) throw new HttpError(400, 'Choose a plan and a duration.');
+    const b = await readJson(req); const cfg = await getPricing(); const plan = cfg.plans.find((x) => x.active && x.id === String(b.plan || '')); const months = Math.floor(Number(b.months));
+    if (!plan || !cfg.months.includes(months) || !plan.prices[String(months)]) throw new HttpError(400, 'Choose a plan and a duration.');
+    const payment = { contact: cfg.contact, instructions: cfg.instructions };
     const open = (await store.listOrders({ userId: u.id, status: 'pending', limit: 20 }));
     const same = open.find((o) => o.plan === plan.id && o.months === months);
-    if (same) return send(res, 200, { order: same, payment: { contact: PAYMENT_CONTACT, instructions: PAYMENT_INSTRUCTIONS } });
+    if (same) return send(res, 200, { order: same, payment });
     if (open.length >= 5) throw new HttpError(429, 'You already have several unpaid orders. Cancel or finish them first.');
     const ref = 'IX-' + crypto.randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
-    const order = await store.insertOrder({ id: newId(), ref, userId: u.id, userEmail: u.email, plan: plan.id, planName: plan.name, months, amount: plan.prices[String(months)], currency: PLANS.currency, status: 'pending', createdAt: new Date().toISOString(), paidAt: null });
-    return send(res, 201, { order, payment: { contact: PAYMENT_CONTACT, instructions: PAYMENT_INSTRUCTIONS } });
+    const order = await store.insertOrder({ id: newId(), ref, userId: u.id, userEmail: u.email, plan: plan.id, planName: plan.name, months, amount: plan.prices[String(months)], currency: cfg.currency, status: 'pending', createdAt: new Date().toISOString(), paidAt: null });
+    return send(res, 201, { order, payment });
   }
   if (p === '/api/orders' && method === 'GET') {
     const u = await requireUser(req);
-    return send(res, 200, { orders: await store.listOrders({ userId: u.id, limit: 20 }), contact: PAYMENT_CONTACT });
+    return send(res, 200, { orders: await store.listOrders({ userId: u.id, limit: 20 }), contact: (await getPricing()).contact });
   }
   let om = p.match(/^\/api\/orders\/([^/]+)\/cancel$/);
   if (om && method === 'POST') {
@@ -1058,7 +1126,7 @@ async function api(req, res, url) {
   /* ---- premium ---- */
   if (method === 'GET' && p === '/api/premium/status') {
     const u = await currentUser(req);
-    return send(res, 200, { authenticated: !!u, premium: isPremium(u), admin: isAdmin(u), level: userLevel(u), planKey: levelName(userLevel(u)), expiresAt: u ? u.premiumExpiresAt || null : null, plan: u ? publicUser(u).plan : 'Free' });
+    return send(res, 200, { authenticated: !!u, premium: isPremium(u), admin: isAdmin(u), level: userLevel(u), planKey: levelName(userLevel(u)), expiresAt: u ? u.premiumExpiresAt || null : null, plan: u ? publicUser(u).plan : 'Free', quota: await (async () => { try { const q = u && !isAdmin(u) ? await store.getSetting('quota:' + u.id) : null; return q && q.limit > 0 ? { limit: q.limit, used: (q.keys || []).length } : null; } catch (e) { return null; } })() });
   }
 
   /* ---- access rules (which packs / tests are free, locked, and for which plan) ---- */
@@ -1070,8 +1138,9 @@ async function api(req, res, url) {
     const u = await currentUser(req); const level = userLevel(u);
     let want = String(url.searchParams.get('path') || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
     const gate = await gateForPath(hrefPath(want) + '.html') || { locked: false, plan: 'standard' };
-    const allowed = allowsLevel(gate, level);
-    return send(res, 200, { allowed, locked: gate.locked, plan: gate.plan, authenticated: !!u, price: allowed ? null : priceUrl(gate.plan, want) }, { 'Cache-Control': 'no-store, private' });
+    let allowed = allowsLevel(gate, level); let limited = false;
+    if (allowed && gate.locked && await quotaBlocks(u, gate, hrefPath(want) + '.html')) { allowed = false; limited = true; }
+    return send(res, 200, { allowed, limited, locked: gate.locked, plan: gate.plan, authenticated: !!u, price: allowed ? null : (limited ? '/Price?premium=limit&next=' + encodeURIComponent(want) : priceUrl(gate.plan, want)) }, { 'Cache-Control': 'no-store, private' });
   }
 
   /* ---- public materials (tests the admins added) ---- */
@@ -1146,6 +1215,16 @@ async function api(req, res, url) {
       const order = await store.updateOrder(o.id, { status: 'rejected' });
       await audit(admin, 'order.reject', o.ref, { user: o.userEmail });
       return send(res, 200, { order });
+    }
+    if (method === 'GET' && p === '/api/admin/pricing') return send(res, 200, { pricing: await getPricing(), defaults: defaultPricing() }, { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/pricing') {
+      const b = await readJson(req, 64 * 1024);
+      if (b && b.reset) { await store.setSetting('pricing-config', null); await audit(admin, 'pricing.reset', 'pricing'); return send(res, 200, { pricing: await getPricing() }); }
+      const cfg = normalizePricing(b && (b.pricing || b));
+      if (!cfg.plans.some((x) => x.active)) throw new HttpError(400, 'Keep at least one plan switched on, with a price for at least one duration.');
+      await store.setSetting('pricing-config', { ...cfg, updatedAt: new Date().toISOString() });
+      await audit(admin, 'pricing.save', 'pricing', { months: cfg.months, plans: cfg.plans.map((x) => x.id + ':' + (x.active ? 'on' : 'off') + ':' + x.testsLimit) });
+      return send(res, 200, { pricing: cfg });
     }
     if (method === 'GET' && p === '/api/admin/audit') return send(res, 200, { entries: await store.listAudit(Math.min(500, Number(url.searchParams.get('limit')) || 100)) });
     if (method === 'GET' && p === '/api/admin/users') {
@@ -1499,6 +1578,7 @@ async function staticFile(req, res, pathname) {
     if (!u) return redirect(res, `/login?next=${next}`);
     if (needsAdmin && !isAdmin(u)) return redirect(res, '/?admin=denied');
     if (needsPremium && userLevel(u) < needLevel) return redirect(res, priceUrl(gateLocked ? gate.plan : 'standard', pathname));
+    if (gateLocked && await quotaBlocks(u, gate, tl)) return redirect(res, '/Price?premium=limit&next=' + encodeURIComponent(pathname));
   }
   const extra = needsAdmin ? { 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY', 'X-Robots-Tag': 'noindex, nofollow', 'Content-Security-Policy': ADMIN_CSP }
     : needsPremium ? { 'Cache-Control': 'no-store' } : {};
