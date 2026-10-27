@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 /* IELTSX admin: Reading / Listening / Writing / Speaking / Articles builder (admin.html #reading #listening #writing #speaking #articles). */
+=======
+/* IELTSX admin: Reading / Listening / Writing test builder and the Article builder (admin.html #reading #listening #writing #article). */
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+<<<<<<< HEAD
   const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles', pdf: 'PDF materials' };
   const TOPICS = ['General', 'History', 'Science', 'Technology', 'Environment', 'Health', 'Education', 'Society', 'Business', 'Culture', 'Nature', 'Psychology'];
   const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / table / flow-chart / summary completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
@@ -12,6 +17,14 @@
   const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
   const lists = { reading: null, listening: null, writing: null, speaking: null, article: null, pdf: null };
   const VIEW_FOR = { articles: 'article' };            // #articles in the address bar = the article list
+=======
+  const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', article: 'Article' };
+  const Q_LABEL = { short: 'Short answer / gap fill', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice' };
+  const TOPICS = ['History', 'Science', 'Technology', 'Environment', 'Ethics', 'Business', 'Health', 'Education', 'Psychology', 'Culture'];
+  const lists = { reading: null, listening: null, writing: null, article: null };
+  // where students open each kind of material
+  const openUrl = (type, id) => (type === 'article' ? '/collections/article?id=' : type === 'writing' ? '/writing/?id=' : '/test?id=') + encodeURIComponent(id);
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   let draft = null, editingId = null, uploading = 0;
 
   async function api(url, opt = {}) {
@@ -24,12 +37,14 @@
   function toast(m, bad) { const t = $('#toast'); if (!t) return; t.textContent = m; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), bad ? 4500 : 2600); }
   const fail = (e) => toast((e && e.message) || 'Something went wrong', true);
   const fmt = (v) => (v ? new Date(v).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) : '—');
+  const today = () => { const d = new Date(); return [d.getFullYear(), d.getMonth() + 1, d.getDate()].map((n) => String(n).padStart(2, '0')).join('-'); };
 
   /* ───────── list views ───────── */
   async function loadType(type) {
     try { lists[type] = (await api('/api/admin/materials?type=' + type)).items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))); } catch (e) { fail(e); lists[type] = lists[type] || []; }
     renderType(type);
   }
+<<<<<<< HEAD
   const NOUN = { reading: 'test', listening: 'listening card', writing: 'writing card', speaking: 'speaking card', article: 'article card', pdf: 'PDF material' };
   const HELP = {
     reading: 'Passage, pictures and questions with answers. Graded automatically.',
@@ -117,6 +132,34 @@
     const mount = $('#content-' + type); if (!mount) return;
     const q = ($('[data-ct-search="' + type + '"]', mount) || {}).value || ''; const f = ($('[data-ct-filter="' + type + '"]', mount) || {}).value || '';
     mount.querySelectorAll('tbody tr, .pc-card').forEach((tr) => { tr.hidden = !!((q && !tr.dataset.hay.includes(q.toLowerCase())) || (f && !tr.dataset.state.split(' ').includes(f))); });
+=======
+  function contentOf(type, d) {
+    if (type === 'article') return `${(d.vocabulary || []).length} words · ${(d.grammar || []).length} grammar${d.imageUrl ? ' · 🖼' : ''}`;
+    if (type === 'writing') return (d.tasks || []).length + ' task(s)';
+    return (d.questions || []).length + ' questions' + (type === 'listening' ? (d.audioUrl ? ' · 🔊 audio' : ' · <span class="warn-text">no audio</span>') : '');
+  }
+  function renderType(type) {
+    const mount = $('#content-' + type); if (!mount) return;
+    const items = lists[type];
+    const noun = type === 'writing' ? 'task set' : type === 'article' ? 'article' : 'test';
+    const rows = (items || []).map((m) => {
+      const d = m.data || {};
+      const sub = type === 'article' ? [d.topic, d.level].filter(Boolean).join(' · ') : m.pack || '';
+      return `<tr><td><strong>${esc(m.title)}</strong><div class="muted sm">${esc(sub)}</div></td><td>${contentOf(type, d)}</td>
+        <td><button class="chip ${m.premium ? 'chip-premium' : ''}" data-ct="premium" data-id="${esc(m.id)}" data-type="${type}" type="button" title="Click to change">${m.premium ? '★ Premium' : 'Free'}</button></td>
+        <td><button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" data-id="${esc(m.id)}" data-type="${type}" type="button" title="Click to change">${m.published === false ? 'Draft' : 'Published'}</button></td>
+        <td>${fmt(m.createdAt)}</td>
+        <td><div class="btn-row"><button class="btn btn-sm" data-ct="edit" data-id="${esc(m.id)}" data-type="${type}" type="button">Edit</button><a class="btn btn-sm" href="${openUrl(type, m.id)}" target="_blank" rel="noopener">Open ↗</a><button class="btn btn-sm btn-danger" data-ct="delete" data-id="${esc(m.id)}" data-type="${type}" data-title="${esc(m.title)}" type="button">Delete</button></div></td></tr>`;
+    }).join('');
+    const help = { reading: 'Passage, pictures and questions with answers.', listening: 'Audio file, map/diagram pictures and questions with answers.',
+      writing: 'Task 1 / Task 2 prompts with a chart (drawn from your numbers) or a picture. They open in the IELTS writing exam screen.',
+      article: 'Text, cover picture and the vocabulary / grammar students tap on — all in one form.' }[type];
+    const where = type === 'article' ? 'Students see them on the Articles page.' : `Students see them in the ${TYPES[type]} practice page.`;
+    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${TYPES[type]} ${type === 'writing' ? 'tasks' : type === 'article' ? 's' : 'tests'}</div>
+      <div class="muted sm">${help} ${where}</div></div>
+      <button class="btn btn-primary" data-ct="new" data-type="${type}" type="button">+ New ${noun}</button></div>
+      ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Content</th><th>Access</th><th>Status</th><th>Added</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">Nothing here yet. Press “+ New ${noun}” to add the first one.</div>`}</div>`;
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   }
 
   /* ───────── uploads (local disk, or straight to Supabase Storage on Vercel) ───────── */
@@ -169,7 +212,65 @@
   }
   function syncSave() { const b = $('#cb-save'); if (b) { b.disabled = uploading > 0; b.textContent = uploading ? 'Uploading…' : (editingId ? 'Save changes' : 'Create'); } }
 
+  /* ───────── writing chart: "Years: 1961, 1971 …" + one "Name: 10, 30 …" line per series ───────── */
+  const chartToText = (c) => (c && c.years ? ['Years: ' + c.years.join(', ')].concat(c.series.map((s) => s.name + ': ' + s.values.join(', '))).join('\n') : '');
+  function parseChart(text, unit) {
+    const rows = String(text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+    if (!rows.length) return { chart: null };
+    const parsed = rows.map((l) => { const i = l.indexOf(':'); return i < 0 ? null : [l.slice(0, i).trim(), l.slice(i + 1).split(/[,;\t]/).map((x) => x.trim()).filter((x) => x !== '')]; });
+    if (parsed.some((r) => !r)) return { error: 'Every chart line needs a colon, e.g. "No car: 70, 39, 30".' };
+    const [, years] = parsed[0];
+    if (years.length < 2 || parsed.length < 2) return { error: 'The chart needs a Years line and at least one data line.' };
+    const series = parsed.slice(1).map(([name, vals]) => ({ name, values: vals.map(Number) }));
+    const bad = series.find((s) => s.values.length !== years.length || s.values.some((v) => !Number.isFinite(v)));
+    if (bad) return { error: `"${bad.name}" must have ${years.length} numbers, one per year.` };
+    return { chart: { type: 'line', unit: unit || '', years, series } };
+  }
+
+  /* ───────── article words: find them in the text the same way the article page does ───────── */
+  const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function inText(phrase) {
+    phrase = String(phrase || '').replace(/^["“]|["”]$/g, '').trim(); if (phrase.length < 2 || !draft) return false;
+    const body = reEsc(phrase).replace(/\s+/g, '\\s+').replace(/['’‘]/g, "['’‘]").replace(/["“”]/g, '["“”]');
+    try { return new RegExp('(^|[^\\p{L}\\p{N}])' + body + '(?![\\p{L}\\p{N}])', 'iu').test(String(draft.data.body || '')); } catch (e) { return false; }
+  }
+  const vFound = (v) => inText(v.match) || inText(v.word);
+  const gFound = (g) => inText(g.match) || (String(g.sourceContext || '').length <= 140 && inText(g.sourceContext));
+  const foundPill = (ok, missing) => `<span class="cb-found ${ok ? 'ok' : 'miss'}">${ok ? '✓ underlined in the text' : missing}</span>`;
+  function refreshFound() {
+    if (!draft || draft.type !== 'article') return;
+    (draft.data.vocabulary || []).forEach((v, i) => { const el = document.getElementById('vf-' + i); if (el) el.outerHTML = foundPill(vFound(v), '⚠ not in the text — fill “Underline”').replace('<span', `<span id="vf-${i}"`); });
+    (draft.data.grammar || []).forEach((g, i) => { const el = document.getElementById('gf-' + i); if (el) el.outerHTML = foundPill(gFound(g), 'not underlined (still in the list)').replace('<span', `<span id="gf-${i}"`); });
+  }
+  const blankV = () => ({ word: '', match: '', definition: '', definition_uz: '', definition_ru: '', synonyms: '', example: '', sourceContext: '' });
+  const blankG = () => ({ title: '', match: '', pattern: '', explanation: '', explanation_uz: '', explanation_ru: '', example: '', sourceContext: '' });
+  const splitRow = (l) => l.split(l.includes('\t') ? '\t' : '|').map((x) => x.trim());
+  // one word per line: word | definition | o'zbekcha | русский | synonyms | example   (or a JSON list, e.g. the reviewItems of an old article)
+  function parseBulk(text, kind) {
+    text = text.trim(); if (!text) return { vocab: [], grammar: [] };
+    if (/^[[{]/.test(text)) {
+      let arr = JSON.parse(text); if (!Array.isArray(arr)) arr = arr.reviewItems || arr.vocabulary || [];
+      const vocab = [], grammar = [];
+      arr.forEach((x) => {
+        if (!x || typeof x !== 'object') return;
+        const syn = Array.isArray(x.synonyms) ? x.synonyms.join(', ') : x.synonyms || '';
+        if (x.type === 'grammar' || (!x.word && (x.pattern || x.explanation))) grammar.push({ ...blankG(), ...pick(x, blankG()) });
+        else vocab.push({ ...blankV(), ...pick(x, blankV()), word: x.word || x.title || '', synonyms: syn });
+      });
+      return { vocab, grammar };
+    }
+    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (kind === 'grammar') {
+      return { vocab: [], grammar: lines.map(splitRow).map(([title, pattern, explanation, uz, ru, example, match]) =>
+        ({ ...blankG(), title: title || '', pattern: pattern || '', explanation: explanation || '', explanation_uz: uz || '', explanation_ru: ru || '', example: example || '', match: match || '' })) };
+    }
+    return { grammar: [], vocab: lines.map(splitRow).map(([word, definition, uz, ru, synonyms, example]) =>
+      ({ ...blankV(), word: word || '', definition: definition || '', definition_uz: uz || '', definition_ru: ru || '', synonyms: synonyms || '', example: example || '' })) };
+  }
+  const pick = (src, shape) => Object.keys(shape).reduce((o, k) => { if (src[k] != null) o[k] = String(src[k]); return o; }, {});
+
   /* ───────── builder ───────── */
+<<<<<<< HEAD
   const blankQ = (type, passage) => ({ type: type || (draft && draft.type === 'listening' ? 'gap' : 'short'), passage: passage || 1, group: '', blockTitle: '', title: '', prompt: '', options: [], answer: '', explanation: '' });
   const blankPassages = () => [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }];
   function blank(type, mode) {
@@ -183,6 +284,19 @@
       { title: 'Part 3 · Discussion', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' }] });
     if (type === 'article') Object.assign(data, { topic: 'General', passageLabel: 'Passage 1', source: '', readMinutes: 5, coverUrl: '', body: '' });
     if (type === 'writing') Object.assign(data, { coverUrl: '', tier: 'Tier 1', cardTypes: [], tasks: [{ title: 'Task 1', prompt: '', imageUrl: '', minWords: 150, minutes: 20, sample: '' }, { title: 'Task 2', prompt: '', imageUrl: '', minWords: 250, minutes: 40, sample: '' }] });
+=======
+  const blankQ = (type) => ({ type: type || 'short', group: '', prompt: '', options: [], answer: '', explanation: '' });
+  const blankTask = (n) => ({ title: 'Task ' + n, kind: n === 1 ? 'task1' : 'task2', prompt: '', imageUrl: '', chartText: '', chartUnit: '', minWords: n === 1 ? 150 : 250, minutes: n === 1 ? 20 : 40, sample: '' });
+  function blank(type) {
+    if (type === 'article') {
+      return { type, title: '', pack: '', description: '', premium: false, published: true,
+        data: { topic: '', level: 'Passage 1', category: 'Academic Reading', lead: '', author: 'IELTSX Reading Team', date: today(), testDate: '', imageUrl: '', imageAlt: '', body: '', source: '', vocabulary: [blankV()], grammar: [] } };
+    }
+    const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : 60, instructions: '', images: [] };
+    if (type === 'reading') Object.assign(data, { passage: '', questions: [blankQ()] });
+    if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', questions: [blankQ()] });
+    if (type === 'writing') Object.assign(data, { tasks: [blankTask(1), blankTask(2)] });
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
     return { type, title: '', pack: '', description: '', premium: false, published: true, data };
   }
   let PACKS = {};
@@ -193,6 +307,7 @@
   function openBuilder(type, item, mode) {
     loadPacks().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); });
     editingId = item ? item.id : null;
+<<<<<<< HEAD
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type, mode);
     draft.data = draft.data || {}; draft.data.images = draft.data.images || [];
     if (draft.type === 'reading') { draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part'; const ps = Array.isArray(draft.data.passages) ? draft.data.passages : []; draft.data.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); }
@@ -200,11 +315,30 @@
     if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking').data.parts;
     if (draft.type === 'writing' && !(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
     $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + (draft.type === 'reading' ? (draft.data.mode === 'full' ? 'full reading test' : 'part practice card') : NOUN[draft.type]);
+=======
+    draft = item ? JSON.parse(JSON.stringify(item)) : blank(type);
+    draft.data = draft.data || {};
+    if (draft.type === 'article') {
+      const d = draft.data;
+      d.vocabulary = (d.vocabulary || []).map((v) => ({ ...blankV(), ...v, synonyms: Array.isArray(v.synonyms) ? v.synonyms.join(', ') : v.synonyms || '' }));
+      d.grammar = (d.grammar || []).map((g) => ({ ...blankG(), ...g }));
+      if (!d.vocabulary.length) d.vocabulary.push(blankV());
+    } else {
+      draft.data.images = draft.data.images || [];
+      if (draft.type !== 'writing') draft.data.questions = draft.data.questions && draft.data.questions.length ? draft.data.questions : [blankQ()];
+      if (draft.type === 'writing') {
+        if (!(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
+        draft.data.tasks.forEach((t, i) => { t.kind = t.kind || (i === 0 ? 'task1' : 'task2'); t.chartText = chartToText(t.chart); t.chartUnit = (t.chart && t.chart.unit) || ''; });
+      }
+    }
+    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + TYPES[draft.type].toLowerCase() + (draft.type === 'writing' ? ' tasks' : draft.type === 'article' ? '' : ' test');
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
     renderBuilder(); $('#builder').classList.add('open'); $('#builder-body').scrollTop = 0;
   }
   function closeBuilder() { if (uploading && !confirm('A file is still uploading. Close anyway?')) return; $('#builder').classList.remove('open'); draft = null; editingId = null; }
 
   const field = (label, path, val, extra = '') => `<label class="lbl">${label}<input class="field" data-p="${path}" value="${esc(val)}" ${extra}></label>`;
+  const area = (label, path, val, rows, extra = '') => `<label class="lbl">${label}<textarea class="field" rows="${rows}" data-p="${path}" ${extra}>${esc(val)}</textarea></label>`;
   function imagesBlock(label, help) {
     const imgs = draft.data.images || [];
     return `<div class="cb-block"><div class="cb-head"><div><strong>${label}</strong><div class="muted sm">${help}</div></div><button class="btn btn-sm" data-cb="img-add" type="button">⬆ Upload picture</button></div><div class="muted sm" id="img-status"></div>
@@ -518,12 +652,66 @@
 
   function tasksBlock() {
     const ts = draft.data.tasks || [];
-    return `<div class="cb-block"><div class="cb-head"><div><strong>Writing tasks</strong><div class="muted sm">Usually Task 1 (chart / letter) and Task 2 (essay). A picture is optional.</div></div>${ts.length < 4 ? '<button class="btn btn-sm btn-primary" data-cb="t-add" type="button">+ Task</button>' : ''}</div>
-      ${ts.map((t, i) => `<div class="cb-task"><div class="cb-row">${field('Title', `data.tasks.${i}.title`, t.title)}${field('Minimum words', `data.tasks.${i}.minWords`, t.minWords, 'type="number" min="0"')}${field('Suggested minutes', `data.tasks.${i}.minutes`, t.minutes, 'type="number" min="0"')}</div>
-        <label class="lbl">Question / instructions<textarea class="field" rows="5" data-p="data.tasks.${i}.prompt">${esc(t.prompt)}</textarea></label>
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Writing tasks</strong><div class="muted sm">Usually Task 1 (chart / letter) and Task 2 (essay). Each task is one Part of the exam screen. For a line graph type the numbers and the page draws the chart; otherwise upload a picture.</div></div>${ts.length < 4 ? '<button class="btn btn-sm btn-primary" data-cb="t-add" type="button">+ Task</button>' : ''}</div>
+      ${ts.map((t, i) => `<div class="cb-task"><div class="cb-row">${field('Title', `data.tasks.${i}.title`, t.title)}
+        <label class="lbl">Type<select class="field" data-p="data.tasks.${i}.kind"><option value="task1" ${t.kind !== 'task2' ? 'selected' : ''}>Task 1 (report / letter)</option><option value="task2" ${t.kind === 'task2' ? 'selected' : ''}>Task 2 (essay)</option></select></label>
+        ${field('Minimum words', `data.tasks.${i}.minWords`, t.minWords, 'type="number" min="0"')}${field('Suggested minutes', `data.tasks.${i}.minutes`, t.minutes, 'type="number" min="0"')}</div>
+        ${area('Question / instructions', `data.tasks.${i}.prompt`, t.prompt, 5, 'placeholder="The graph below shows … Summarise the information by selecting and reporting the main features, and make comparisons where relevant."')}
+        <details class="cb-chart" ${t.chartText ? 'open' : ''}><summary>Line graph from numbers (optional, instead of a picture)</summary>
+          <div class="cb-row">${area('Data', `data.tasks.${i}.chartText`, t.chartText, 5, 'class="field cb-mono" placeholder="Years: 1961, 1971, 1981, 1991, 2001&#10;2 + cars: 10, 30, 35, 40, 49&#10;1 car: 30, 39, 39, 37, 39&#10;No car: 70, 39, 30, 20, 10"').replace('class="field" rows', 'rows')}
+          ${field('Unit (shown to the examiner)', `data.tasks.${i}.chartUnit`, t.chartUnit, 'placeholder="% of households"')}</div></details>
         <div class="cb-head"><div class="muted sm" id="timg-status-${i}"></div><div class="btn-row"><button class="btn btn-sm" data-cb="t-img" data-i="${i}" type="button">⬆ ${t.imageUrl ? 'Replace' : 'Upload'} chart / picture</button>${t.imageUrl ? `<button class="btn btn-sm btn-danger" data-cb="t-img-del" data-i="${i}" type="button">Remove picture</button>` : ''}${ts.length > 1 ? `<button class="btn btn-sm btn-danger" data-cb="t-del" data-i="${i}" type="button">Delete task</button>` : ''}</div></div>
         ${t.imageUrl ? `<img class="cb-taskimg" src="${esc(t.imageUrl)}" alt="">` : ''}
-        <label class="lbl">Model answer (optional, students can reveal it after writing)<textarea class="field" rows="4" data-p="data.tasks.${i}.sample">${esc(t.sample)}</textarea></label></div>`).join('')}</div>`;
+        ${area('Model answer (optional — shown on the results screen as the sample answer)', `data.tasks.${i}.sample`, t.sample, 4)}</div>`).join('')}</div>`;
+  }
+
+  function vocabBlock() {
+    const vs = draft.data.vocabulary || [];
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Vocabulary (${vs.length})</strong><div class="muted sm">Each word is underlined in yellow where it first appears in the text; students tap it to see the meaning. Use “Underline” when the text has another form (e.g. word <em>persist</em>, text <em>persisted</em>).</div></div>
+      <div class="btn-row"><button class="btn btn-sm" data-cb="v-bulk" type="button">Paste many</button><button class="btn btn-sm btn-primary" data-cb="v-add" type="button">+ Word</button></div></div>
+      <div id="vbulk-box" class="cb-bulk" hidden><div class="muted sm">One word per line, parts separated by <code>|</code> (or columns copied from Excel):<br><code>word | definition | o‘zbekcha | русский | synonym, synonym | example</code><br>You can also paste a JSON list (for example the <code>reviewItems</code> of an old article) — grammar items in it go to the Grammar list.</div>
+        <textarea class="field cb-mono" id="vbulk-text" rows="6" placeholder="bioremediation | the use of bacteria to clean polluted land | bakteriyalar yordamida tozalash | биоремедиация | biological clean-up, biotreatment | A gentler option is bioremediation."></textarea>
+        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="v-bulk-do" type="button">Add them</button></div></div>
+      ${vs.map((v, i) => `<div class="cb-word"><div class="cb-qn cb-qn-v">V${i + 1}</div><div class="cb-qbody">
+        <div class="cb-row">${field('Word / phrase *', `data.vocabulary.${i}.word`, v.word, 'placeholder="bioremediation"')}${field('Underline (if the text uses another form)', `data.vocabulary.${i}.match`, v.match, 'placeholder="optional"')}</div>
+        <div>${foundPill(vFound(v), '⚠ not in the text — fill “Underline”').replace('<span', `<span id="vf-${i}"`)}</div>
+        ${area('Definition (English) *', `data.vocabulary.${i}.definition`, v.definition, 2)}
+        <div class="cb-row">${area('🇺🇿 O‘zbekcha', `data.vocabulary.${i}.definition_uz`, v.definition_uz, 2)}${area('🇷🇺 Русский', `data.vocabulary.${i}.definition_ru`, v.definition_ru, 2)}</div>
+        <div class="cb-row">${field('Synonyms (comma separated)', `data.vocabulary.${i}.synonyms`, v.synonyms)}${field('Example sentence', `data.vocabulary.${i}.example`, v.example)}</div>
+        ${field('Sentence from the text (optional — taken from the text automatically)', `data.vocabulary.${i}.sourceContext`, v.sourceContext)}</div>
+        <div class="cb-side"><button class="btn btn-sm" data-cb="v-up" data-i="${i}" type="button" title="Move up" ${i ? '' : 'disabled'}>↑</button><button class="btn btn-sm btn-danger" data-cb="v-del" data-i="${i}" type="button" title="Delete word">✕</button></div></div>`).join('')}</div>`;
+  }
+  function grammarBlock() {
+    const gs = draft.data.grammar || [];
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Grammar (${gs.length})</strong><div class="muted sm">Underlined in blue. In “Underline” paste the phrase exactly as it is in the text.</div></div>
+      <div class="btn-row"><button class="btn btn-sm" data-cb="g-bulk" type="button">Paste many</button><button class="btn btn-sm btn-primary" data-cb="g-add" type="button">+ Grammar point</button></div></div>
+      <div id="gbulk-box" class="cb-bulk" hidden><div class="muted sm">One per line: <code>title | pattern | explanation | o‘zbekcha | русский | example | phrase to underline</code></div>
+        <textarea class="field cb-mono" id="gbulk-text" rows="4" placeholder="Result clause “such … that” | such + adjective + noun + that | Shows the result of something extreme. | … | … | It was such a hot day that … | such delicate terrain that"></textarea>
+        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="g-bulk-do" type="button">Add them</button></div></div>
+      ${gs.map((g, i) => `<div class="cb-word"><div class="cb-qn cb-qn-g">G${i + 1}</div><div class="cb-qbody">
+        <div class="cb-row">${field('Title *', `data.grammar.${i}.title`, g.title, 'placeholder="Conditional inversion"')}${field('Pattern', `data.grammar.${i}.pattern`, g.pattern, 'placeholder="Should + subject + verb"')}</div>
+        ${field('Underline (phrase from the text)', `data.grammar.${i}.match`, g.match, 'placeholder="should another spill occur"')}
+        <div>${foundPill(gFound(g), 'not underlined (still in the list)').replace('<span', `<span id="gf-${i}"`)}</div>
+        ${area('Explanation (English)', `data.grammar.${i}.explanation`, g.explanation, 2)}
+        <div class="cb-row">${area('🇺🇿 O‘zbekcha', `data.grammar.${i}.explanation_uz`, g.explanation_uz, 2)}${area('🇷🇺 Русский', `data.grammar.${i}.explanation_ru`, g.explanation_ru, 2)}</div>
+        ${field('Example sentence', `data.grammar.${i}.example`, g.example)}</div>
+        <div class="cb-side"><button class="btn btn-sm btn-danger" data-cb="g-del" data-i="${i}" type="button" title="Delete">✕</button></div></div>`).join('')}</div>`;
+  }
+  function articleForm() {
+    const d = draft.data;
+    return `
+      ${field('Title *', 'title', draft.title, 'placeholder="e.g. How to clean a beach" maxlength="200"')}
+      <div class="cb-grid"><label class="lbl">Topic<input class="field" data-p="data.topic" value="${esc(d.topic)}" list="cb-topics" placeholder="History, Science …"></label><datalist id="cb-topics">${TOPICS.map((t) => `<option value="${t}">`).join('')}</datalist>
+        <label class="lbl">Level<select class="field" data-p="data.level">${['Passage 1', 'Passage 2', 'Passage 3'].map((p) => `<option ${d.level === p ? 'selected' : ''}>${p}</option>`).join('')}</select></label>
+        ${field('Author', 'data.author', d.author)}${field('Date', 'data.date', d.date, 'type="date"')}${field('Test date (optional)', 'data.testDate', d.testDate, 'type="date"')}</div>
+      ${area('Lead (short description under the title and on the card) *', 'data.lead', d.lead, 2, 'maxlength="600"')}
+      <div class="cb-block"><div class="cb-head"><div><strong>Cover picture</strong><div class="muted sm">Shown on the Articles card and next to the text.</div></div><div class="btn-row"><button class="btn btn-sm" data-cb="a-img" type="button">⬆ ${d.imageUrl ? 'Replace' : 'Upload'} picture</button>${d.imageUrl ? '<button class="btn btn-sm btn-danger" data-cb="a-img-del" type="button">Remove</button>' : ''}</div></div>
+        <div class="muted sm" id="aimg-status"></div>${d.imageUrl ? `<div class="cb-row"><img class="cb-taskimg" src="${esc(d.imageUrl)}" alt="">${field('Picture description (alt text)', 'data.imageAlt', d.imageAlt)}</div>` : ''}</div>
+      ${area('Article text *', 'data.body', d.body, 16, 'class="field cb-passage" placeholder="Paste the article. Leave an empty line between paragraphs.&#10;Start a line with ## for a heading, e.g.&#10;## The human touch"').replace('class="field" rows', 'rows')}
+      ${field('Source / reference', 'data.source', d.source, 'placeholder="How to clean a beach. Nature 422, 464-466 (2003)."')}
+      <div class="cb-checks cb-checks-row"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>
+      ${vocabBlock()}
+      ${grammarBlock()}`;
   }
   function partsBlock() {
     const ps = draft.data.parts || [];
@@ -546,6 +734,7 @@
   }
   function renderBuilder() {
     const t = draft.type, d = draft.data;
+    if (t === 'article') { $('#builder-body').innerHTML = articleForm(); return syncSave(); }
     $('#builder-body').innerHTML = `
       ${t === 'reading' && d.mode !== 'full' ? readingFormatBlock() : cardBlock(t, d)}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(t === 'reading' && d.mode !== 'full' ? 'Pack shown on the card (e.g. Starter Pack)' : 'Pack — pick one, or type a new name to create a new pack card', 'pack', draft.pack, 'list="ix-pack-list" placeholder="e.g. Pack 5" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>
@@ -583,6 +772,7 @@
       if (v === 'full' && (!dd.durationMin || dd.durationMin === 20)) dd.durationMin = 60; if (v === 'part' && dd.durationMin === 60) dd.durationMin = 20;
     }
     setPath(draft, p, v);
+<<<<<<< HEAD
     const gt = /^groups\.(\d+)\.type$/.exec(p);
     if (gt) {   // another type: the option list moves between the group (matching / map / box) and the questions (multiple choice)
       const g = draft.groups[Number(gt[1])]; const shared = SHARED_OPTS.includes(g.type);
@@ -592,8 +782,23 @@
     }
     if (el.dataset.rerender && e.type === 'change') { if (p.startsWith('groups.')) refreshQuestions(); else renderBuilder(); }
     else if (/^groups\.\d+\.options$/.test(p) && e.type === 'change') refreshQuestions();   // the answer menus follow the option list
+=======
+    if (el.dataset.rerender && e.type === 'change') renderBuilder();
+    if (draft.type === 'article' && /^data\.(body|vocabulary\.\d+\.(word|match)|grammar\.\d+\.(match|sourceContext))$/.test(p)) { clearTimeout(onInput.t); onInput.t = setTimeout(refreshFound, 250); }
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   }
 
+  function checkArticle(d) {
+    if (!String(d.lead || '').trim()) return 'Please write the lead (short description).';
+    if (!String(d.body || '').trim()) return 'Please paste the article text.';
+    d.vocabulary = (d.vocabulary || []).filter((v) => Object.values(v).some((x) => String(x || '').trim()));
+    d.grammar = (d.grammar || []).filter((g) => Object.values(g).some((x) => String(x || '').trim()));
+    const nv = d.vocabulary.findIndex((v) => !String(v.word || '').trim() || !String(v.definition || '').trim());
+    if (nv >= 0) return `Word V${nv + 1} needs the word and its English definition.`;
+    const ng = d.grammar.findIndex((g) => !String(g.title || '').trim());
+    if (ng >= 0) return `Grammar point G${ng + 1} needs a title.`;
+    return '';
+  }
   async function save() {
     if (uploading) return;
     const d = draft.data;
@@ -603,6 +808,7 @@
       d.questions = flatten(draft.groups).filter((q) => q.prompt);
     }
     if (!draft.title.trim()) return toast('Please enter a title.', true);
+<<<<<<< HEAD
     if (draft.type === 'reading' && d.mode === 'full') {
       d.passages = (d.passages || blankPassages()).map((x) => ({ title: String((x && x.title) || '').trim(), passage: String((x && x.passage) || '') }));
       if (!d.passages[0].passage.trim()) return toast('Please paste the text of Passage 1.', true);
@@ -619,12 +825,26 @@
       d.parts = (d.parts || []).filter((t) => String(t.prompt || '').trim() || (t.questions || []).length || t.imageUrl);
       if (!d.parts.length) return toast('Add a cue card or at least one question.', true);
     } else if (draft.type !== 'writing') {
+=======
+    if (draft.type === 'article') {
+      const err = checkArticle(d); if (err) { if (!d.vocabulary.length) d.vocabulary.push(blankV()); renderBuilder(); return toast(err, true); }
+      draft.description = d.lead;
+    }
+    if (draft.type === 'reading' && !String(d.passage || '').trim()) return toast('Please paste the passage text.', true);
+    if (draft.type === 'listening' && !d.audioUrl) return toast('Please upload the audio file.', true);
+    if (draft.type === 'reading' || draft.type === 'listening') {
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
       d.questions = (d.questions || []).filter((q) => String(q.prompt || '').trim());
       if (!d.questions.length) return toast('Add at least one question.', true);
       const noAns = d.questions.findIndex((q) => !String(q.answer || '').trim());
       if (noAns >= 0) return toast('Question ' + (noAns + 1) + ' has no correct answer.', true);
-    } else {
-      d.tasks = (d.tasks || []).filter((t) => String(t.prompt || '').trim() || t.imageUrl);
+    } else if (draft.type === 'writing') {
+      for (const [i, t] of (d.tasks || []).entries()) {
+        const c = parseChart(t.chartText, t.chartUnit);
+        if (c.error) return toast(`${t.title || 'Task ' + (i + 1)}: ${c.error}`, true);
+        t.chart = c.chart;
+      }
+      d.tasks = (d.tasks || []).filter((t) => String(t.prompt || '').trim() || t.imageUrl || t.chart);
       if (!d.tasks.length) return toast('Write at least one task.', true);
     }
     const btn = $('#cb-save'); btn.disabled = true;
@@ -658,6 +878,7 @@
         return;
       }
       if (!draft) return;
+<<<<<<< HEAD
       const a = t.dataset.cb, i = Number(t.dataset.i);
       if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { draft.data.images.push({ url, caption: '' }); renderBuilder(); } }
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
@@ -729,6 +950,47 @@
       else if (a === 't-del') { draft.data.tasks.splice(i, 1); renderBuilder(); }
       else if (a === 't-img') { const url = await pickAndUpload('image/*', $('#timg-status-' + i)); if (url) { draft.data.tasks[i].imageUrl = url; renderBuilder(); } }
       else if (a === 't-img-del') { draft.data.tasks[i].imageUrl = ''; renderBuilder(); }
+=======
+      const a = t.dataset.cb, i = Number(t.dataset.i), d = draft.data;
+      const scrollToLast = (sel) => { const all = document.querySelectorAll(sel); if (all.length) all[all.length - 1].scrollIntoView({ block: 'center' }); };
+      if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { d.images.push({ url, caption: '' }); renderBuilder(); } }
+      else if (a === 'img-del') { d.images.splice(i, 1); renderBuilder(); }
+      else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { d.audioUrl = url; renderBuilder(); } }
+      else if (a === 'q-add') { const last = d.questions[d.questions.length - 1]; d.questions.push(blankQ(last && last.type)); renderBuilder(); scrollToLast('.cb-q'); }
+      else if (a === 'q-del') { d.questions.splice(i, 1); if (!d.questions.length) d.questions.push(blankQ()); renderBuilder(); }
+      else if (a === 'q-bulk') { const b = $('#bulk-box'); b.hidden = !b.hidden; }
+      else if (a === 'q-bulk-do') {
+        const type = $('#bulk-type').value; const lines = $('#bulk-text').value.split('\n').map((x) => x.trim()).filter(Boolean);
+        if (!lines.length) return;
+        const add = lines.map((l) => { const [p, ...r] = l.split('=>'); return { ...blankQ(type), prompt: p.trim(), answer: r.join('=>').trim() }; });
+        d.questions = d.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder(); toast(add.length + ' questions added');
+      }
+      else if (a === 't-add') { d.tasks.push(blankTask(d.tasks.length + 1)); renderBuilder(); }
+      else if (a === 't-del') { d.tasks.splice(i, 1); renderBuilder(); }
+      else if (a === 't-img') { const url = await pickAndUpload('image/*', $('#timg-status-' + i)); if (url) { d.tasks[i].imageUrl = url; renderBuilder(); } }
+      else if (a === 't-img-del') { d.tasks[i].imageUrl = ''; renderBuilder(); }
+      // article
+      else if (a === 'a-img') { const url = await pickAndUpload('image/*', $('#aimg-status')); if (url) { d.imageUrl = url; if (!d.imageAlt) d.imageAlt = draft.title; renderBuilder(); } }
+      else if (a === 'a-img-del') { d.imageUrl = ''; renderBuilder(); }
+      else if (a === 'v-add') { d.vocabulary.push(blankV()); renderBuilder(); scrollToLast('.cb-qn-v'); }
+      else if (a === 'v-del') { d.vocabulary.splice(i, 1); renderBuilder(); }
+      else if (a === 'v-up' && i > 0) { d.vocabulary.splice(i - 1, 0, d.vocabulary.splice(i, 1)[0]); renderBuilder(); }
+      else if (a === 'g-add') { d.grammar.push(blankG()); renderBuilder(); scrollToLast('.cb-qn-g'); }
+      else if (a === 'g-del') { d.grammar.splice(i, 1); renderBuilder(); }
+      else if (a === 'v-bulk' || a === 'g-bulk') { const b = $(a === 'v-bulk' ? '#vbulk-box' : '#gbulk-box'); b.hidden = !b.hidden; }
+      else if (a === 'v-bulk-do' || a === 'g-bulk-do') {
+        let got;
+        try { got = parseBulk($(a === 'v-bulk-do' ? '#vbulk-text' : '#gbulk-text').value, a === 'g-bulk-do' ? 'grammar' : 'vocab'); }
+        catch (err) { return toast('Could not read that list: ' + err.message, true); }
+        const filled = (x) => Object.values(x).some((y) => String(y || '').trim());
+        d.vocabulary = d.vocabulary.filter(filled).concat(got.vocab.filter((v) => v.word));
+        d.grammar = d.grammar.filter(filled).concat(got.grammar.filter((g) => g.title));
+        if (!d.vocabulary.length) d.vocabulary.push(blankV());
+        renderBuilder();
+        const notFound = got.vocab.filter((v) => v.word && !vFound(v)).length;
+        toast(`${got.vocab.length} words, ${got.grammar.length} grammar points added` + (notFound ? ` · ${notFound} not found in the text yet` : ''));
+      }
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
     } catch (err) { fail(err); }
   }
 

@@ -2073,6 +2073,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
 
         // ─── Data ───
         const writingData = [
+            // opens the IELTS writing exam screen (/writing/); the other cards are Premium
+            { id: 13, title: "[Demo] Test 2 - T1: Changes in car ownership in European households between 1971 and 2001", task: "Task 1", tier: "Tier 1", type: "Line Graph", pack: "Demo", plan: "Plan A", img: null, free: true, href: "/writing/" },
             { id: 1, title: "Test 9 - T2: Extreme Sports Skydiving Skiing Dangerous Should Banned", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
             { id: 2, title: "Test 9 - T1: Europeans Different Age Groups Gym Attendance 1990-2010 Chart", task: "Task 1", tier: "Tier 1", type: "Line Graph", pack: "09_02-16_02", plan: "Plan A", img: "https://static-image.ieltsx.com/focus-writing/09_02-16_02/09_02-16_02-t9.png" },
             { id: 3, title: "Test 8 - T2: Internet Most Important Invention Human History", task: "Task 2", tier: "Tier 1", type: "Agree Disagree", pack: "09_02-16_02", plan: "Plan A", img: null },
@@ -2153,12 +2155,18 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                                 </div>
                             </div>
                             <div class="flex gap-2 pt-1">
+<<<<<<< HEAD
                                 <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+=======
+                                ${item.href ? `<a href="${item.href}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap h-8 rounded-md px-3 text-xs font-semibold w-full bg-primary text-primary-foreground shadow hover:bg-primary/90 transition-all" style="text-decoration:none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 mr-1"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>Start test
+                                </a>` : `<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
                                         <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
                                         <path d="M5 21h14" />
                                     </svg>Get Access
-                                </button>
+                                </button>`}
                             </div>
                         </div>
                     </div>
@@ -2292,26 +2300,15 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     
   };
 
-  pages['articles'] = function () {
-      // ---- articles.js ----
-        // ----- DISABLE CONTEXT MENU -----
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
-        // ----- DOM refs -----
+  // Sidebar (desktop collapse, mobile slide-in) and avatar menu of the Articles shell.
+  // The Articles list and every article page (collections/article*.html) share this shell.
+  function articlesShell() {
         const sidebarContainer = document.getElementById('mainSidebarContainer');
         const sidebarRoot = document.getElementById('main-sidebar-root');
         const toggleBtn = document.getElementById('sidebarToggleBtn');
         const overlay = document.getElementById('sidebarOverlay');
         const railBtn = document.querySelector('[data-sidebar="rail"]');
-
-        // ----- THEME: handled by IELTSX.theme (light / dark / system) -----
-        document.addEventListener('ieltsx:themechange', function() {
-            renderArticles();
-            renderLiveFeed();
-        });
+        if (!sidebarContainer) return;
 
         // ----- SIDEBAR TOGGLE (core fix) -----
         function toggleSidebar() {
@@ -2379,6 +2376,65 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 sidebarContainer.classList.remove('mobile-open');
                 overlay.classList.remove('active');
             }
+        });
+
+        // Avatar dropdown
+        const avatarTrigger = document.getElementById('avatar-dropdown-trigger');
+        const userDropdown = document.getElementById('user-dropdown');
+        let isOpen = false;
+
+        function closeDropdown() { userDropdown?.classList.add('hidden');
+            isOpen = false; }
+
+        function openDropdown() { userDropdown?.classList.remove('hidden');
+            isOpen = true; }
+        if (avatarTrigger && userDropdown) {
+            avatarTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isOpen ? closeDropdown() : openDropdown();
+            });
+            document.addEventListener('click', (e) => {
+                if (!avatarTrigger.contains(e.target) && !userDropdown.contains(e.target)) closeDropdown();
+            });
+            document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
+            document.getElementById('dropdown-logout')?.addEventListener('click', () => {
+                if (window.IELTSXAuth && window.IELTSXAuth.logout) { window.IELTSXAuth.logout(); return; }
+                closeDropdown();
+            });
+        }
+
+        // Ensure sidebar root initial state matches container
+        if (sidebarRoot) {
+            const containerState = sidebarContainer.getAttribute('data-collapsible');
+            const containerDataState = sidebarContainer.getAttribute('data-state');
+            if (containerState !== sidebarRoot.getAttribute('data-collapsible')) {
+                sidebarRoot.setAttribute('data-collapsible', containerState);
+            }
+            if (containerDataState !== sidebarRoot.getAttribute('data-state')) {
+                sidebarRoot.setAttribute('data-state', containerDataState);
+            }
+        }
+  }
+
+  pages['article'] = function () {
+      // the reading area itself is assets/js/article.js
+      articlesShell();
+  };
+
+  pages['articles'] = function () {
+      // ---- articles.js ----
+        // ----- DISABLE CONTEXT MENU -----
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        articlesShell();
+
+        // ----- THEME: handled by IELTSX.theme (light / dark / system) -----
+        document.addEventListener('ieltsx:themechange', function() {
+            renderArticles();
+            renderLiveFeed();
         });
 
         // ----- ARTICLES DATA -----
@@ -2536,43 +2592,24 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         renderLiveFeed();
         activateTab('passages');
 
-        // Avatar dropdown
-        const avatarTrigger = document.getElementById('avatar-dropdown-trigger');
-        const userDropdown = document.getElementById('user-dropdown');
-        let isOpen = false;
+        // Articles added in the admin panel (they open in /collections/article?id=...)
+        fetch('/api/materials?type=article', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+            .then(function (d) {
+                const items = d.items || [];
+                const esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+                const cap = function (s) { s = String(s || '').trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'General'; };
+                items.forEach(function (m, i) {
+                    articlesData.push({
+                        id: 1000 + items.length - i, title: esc(m.title), passage: esc(m.level || 'Passage 1'), topic: esc(cap(m.topic)),
+                        date: m.date || m.createdAt, image: esc(m.imageUrl || ''), description: esc(m.description || m.lead || ''),
+                        href: '/collections/article?id=' + encodeURIComponent(m.id)
+                    });
+                });
+                if (items.length) renderArticles();
+            })
+            .catch(function () { /* the saved articles still show */ });
 
-        function closeDropdown() { userDropdown?.classList.add('hidden');
-            isOpen = false; }
-
-        function openDropdown() { userDropdown?.classList.remove('hidden');
-            isOpen = true; }
-        if (avatarTrigger && userDropdown) {
-            avatarTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                isOpen ? closeDropdown() : openDropdown();
-            });
-            document.addEventListener('click', (e) => {
-                if (!avatarTrigger.contains(e.target) && !userDropdown.contains(e.target)) closeDropdown();
-            });
-            document.getElementById('dropdown-account')?.addEventListener('click', closeDropdown);
-            document.getElementById('dropdown-logout')?.addEventListener('click', () => {
-                if (window.IELTSXAuth && window.IELTSXAuth.logout) { window.IELTSXAuth.logout(); return; }
-                closeDropdown();
-            });
-        }
-
-        // Ensure sidebar root initial state matches container
-        if (sidebarRoot) {
-            const containerState = sidebarContainer.getAttribute('data-collapsible');
-            const containerDataState = sidebarContainer.getAttribute('data-state');
-            if (containerState !== sidebarRoot.getAttribute('data-collapsible')) {
-                sidebarRoot.setAttribute('data-collapsible', containerState);
-            }
-            if (containerDataState !== sidebarRoot.getAttribute('data-state')) {
-                sidebarRoot.setAttribute('data-state', containerDataState);
-            }
-        }
-    
   };
 
   pages['pdf_materials'] = function () {
@@ -2689,6 +2726,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     if (pages[file]) return file;
 
     var $ = function (s) { return document.querySelector(s); };
+    if ($('#article-content')) return 'article';
     if ($('#main-sidebar-root') && $('#avatar-container')) return 'index';
     if ($('#partFilter')) return 'speaking';
     if ($('#taskFilter')) return 'writing';

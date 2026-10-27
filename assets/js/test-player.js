@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* IELTSX — plays what was made in the admin panel: reading, listening (graded on the server), writing, speaking and articles. */
+=======
+/* IELTSX — plays tests made in the admin panel: reading and listening (graded on the server). Writing sets open in /writing/, articles in /collections/article. */
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -24,12 +28,22 @@
     if (r.status === 401) return state(`<h2>Please sign in</h2><p>Sign in to open this test.</p><a class="tp-btn" href="/login?next=${encodeURIComponent(location.pathname + location.search)}">Sign in</a>`);
     if (r.status === 403) return state(`<h2>🔒 Locked</h2><p>${esc(d.error || 'This content is for paid members.')}</p><a class="tp-btn" href="/Price?premium=required&next=${encodeURIComponent(location.pathname + location.search)}">Get Access</a>`);
     if (!r.ok) return state(`<h2>Test not found</h2><p>${esc(d.error || 'It may have been removed.')}</p><a class="tp-btn" href="/part/practice/reading">Browse tests</a>`);
+<<<<<<< HEAD
     item = d.item; document.title = item.title + ' — IELTSX';
     if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace(item.href || ('/exam/reading/' + encodeURIComponent(item.id))); return; }   // Reading opens in the real-exam player
     $('#tp-title').textContent = item.title; const isArticle = item.type === 'article';
     $('#tp-back').href = isArticle ? '/study/Tools/Articles' : '/part/practice/' + item.type;
     $('#tp-back').textContent = isArticle ? '← Articles' : '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
     if (item.type === 'writing') renderWriting(); else if (item.type === 'speaking') renderSpeaking(); else if (isArticle) renderArticle(); else renderExam();
+=======
+    item = d.item;
+    // writing sets open in the IELTS writing exam screen, articles in the article reader
+    if (item.type === 'writing') return location.replace('/writing/?id=' + encodeURIComponent(id));
+    if (item.type === 'article') return location.replace('/collections/article?id=' + encodeURIComponent(id));
+    document.title = item.title + ' — IELTSX';
+    $('#tp-title').textContent = item.title; $('#tp-back').href = '/part/practice/' + item.type; $('#tp-back').textContent = '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
+    renderExam();
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   }
 
   /* ───────── timer ───────── */
@@ -123,6 +137,7 @@
     $('#tp-prog').textContent = `Score ${d.correct} / ${d.total} · Band ${d.band.toFixed(1)}`;
   }
 
+<<<<<<< HEAD
   /* ───────── writing ───────── */
   function renderWriting() {
     const tasks = item.data.tasks || []; let cur = 0;
@@ -213,5 +228,7 @@
     document.querySelectorAll('.tp-tab').forEach((b) => b.addEventListener('click', () => { cur = Number(b.dataset.t); paint(); }));
     window.addEventListener('pagehide', stopAll); paint();
   }
+=======
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   load();
 })();

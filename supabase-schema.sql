@@ -99,6 +99,7 @@ alter table public.ieltsx_materials add column if not exists published boolean n
 alter table public.ieltsx_materials add column if not exists "updatedAt" timestamptz not null default now();
 -- the panel creates the public "ieltsx-media" Storage bucket (audio + images) by itself on the first upload.
 
+<<<<<<< HEAD
 -- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
 -- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
 -- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
@@ -156,3 +157,9 @@ alter table public.ieltsx_materials add constraint ieltsx_materials_type_check c
 -- Adds speaking, article and pdf (PDF library) to the allowed types. Without it Supabase refuses to save those.
 alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
 alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','speaking','article','vocab','pdf'));
+=======
+-- ───────────── added in v5: articles made in the admin panel (text + vocabulary + grammar in "data") ─────────────
+-- Run this part once on an existing database (it is safe to run again).
+alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','article'));
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)

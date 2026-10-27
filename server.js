@@ -543,10 +543,44 @@ async function ensureBucket() {
 }
 
 /* ───────────────────────── tests created in the admin panel ───────────────────────── */
+<<<<<<< HEAD
 const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab', 'pdf'];
 const Q_TYPES = ['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
 const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
+=======
+const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'article'];
+const Q_TYPES = ['short', 'tfng', 'ynng', 'mcq'];
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
+const cleanTitle = (v) => String(v || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
+const cleanList = (v, max, len) => (Array.isArray(v) ? v : String(v || '').split(',')).map((x) => cleanName(x).slice(0, len)).filter(Boolean).slice(0, max);
+// a line graph drawn by the writing exam page (years along the bottom, one line per series)
+function cleanChart(c) {
+  if (!c || typeof c !== 'object') return null;
+  const years = (Array.isArray(c.years) ? c.years : []).slice(0, 12).map((y) => cleanName(y).slice(0, 16)).filter(Boolean);
+  const series = (Array.isArray(c.series) ? c.series : []).slice(0, 6).map((s) => ({
+    name: cleanName(s && s.name).slice(0, 40),
+    values: (Array.isArray(s && s.values) ? s.values : []).slice(0, years.length).map((x) => (Number.isFinite(Number(x)) ? Number(x) : 0))
+  })).filter((s) => s.name && s.values.length === years.length);
+  if (years.length < 2 || !series.length) return null;
+  return { type: 'line', unit: cleanName(c.unit).slice(0, 40), years, series };
+}
+function cleanArticleData(d) {
+  const day = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : '');
+  return {
+    topic: cleanName(d.topic).slice(0, 40), level: ['Passage 1', 'Passage 2', 'Passage 3'].includes(d.level) ? d.level : 'Passage 1',
+    category: cleanName(d.category).slice(0, 60) || 'Academic Reading', lead: cut(d.lead, 600), author: cleanName(d.author), date: day(d.date), testDate: day(d.testDate),
+    imageUrl: cleanUrl(d.imageUrl), imageAlt: cleanName(d.imageAlt), body: cut(d.body, 60000), source: cut(d.source, 600),
+    vocabulary: (Array.isArray(d.vocabulary) ? d.vocabulary : []).slice(0, 80).map((v) => { v = v || {};
+      return { word: cleanName(v.word), match: cut(v.match, 140), definition: cut(v.definition, 600), definition_uz: cut(v.definition_uz, 600), definition_ru: cut(v.definition_ru, 600),
+        synonyms: cleanList(v.synonyms, 8, 60), example: cut(v.example, 600), sourceContext: cut(v.sourceContext, 800) };
+    }).filter((v) => v.word),
+    grammar: (Array.isArray(d.grammar) ? d.grammar : []).slice(0, 40).map((g) => { g = g || {};
+      return { title: cut(g.title, 160).trim(), match: cut(g.match, 200), pattern: cut(g.pattern, 200), explanation: cut(g.explanation, 1200), explanation_uz: cut(g.explanation_uz, 1200),
+        explanation_ru: cut(g.explanation_ru, 1200), example: cut(g.example, 600), sourceContext: cut(g.sourceContext, 800) };
+    }).filter((g) => g.title)
+  };
+}
 function cleanUrl(v) {
   const u = String(v || '').trim().slice(0, 1000);
   if (!u) return '';
@@ -571,6 +605,7 @@ async function keepReadingNo(type, data, cur) {
 }
 function cleanMaterialData(type, d) {
   d = d && typeof d === 'object' ? d : {};
+<<<<<<< HEAD
   const out = { durationMin: Math.max(0, Math.min(300, Math.floor(Number(d.durationMin) || 0))), instructions: cut(d.instructions, 3000) };
   out.images = (Array.isArray(d.images) ? d.images : []).slice(0, 12).map((i) => ({ url: cleanUrl(i && i.url), caption: cut(i && i.caption, 200), passage: [1, 2, 3].includes(Number(i && i.passage)) ? Number(i.passage) : 1 })).filter((i) => i.url);
   if (type === 'reading') {
@@ -604,6 +639,13 @@ function cleanMaterialData(type, d) {
     out.tags = (Array.isArray(d.tags) ? d.tags : String(d.tags || '').split(/[,\n]/)).slice(0, 6).map((x) => cut(x, 40).trim()).filter(Boolean);
     delete out.images; delete out.instructions; delete out.durationMin;
   }
+=======
+  if (type === 'article') return cleanArticleData(d);
+  const out ={ durationMin: Math.max(0, Math.min(300, Math.floor(Number(d.durationMin) || 0))), instructions: cut(d.instructions, 3000) };
+  out.images = (Array.isArray(d.images) ? d.images : []).slice(0, 12).map((i) => ({ url: cleanUrl(i && i.url), caption: cut(i && i.caption, 200) })).filter((i) => i.url);
+  if (type === 'reading') out.passage = cut(d.passage, 60000);
+  if (type === 'listening') { out.audioUrl = cleanUrl(d.audioUrl); out.transcript = cut(d.transcript, 60000); }
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
@@ -641,9 +683,10 @@ function cleanMaterialData(type, d) {
   }
   if (type === 'writing') {
     out.tasks = (Array.isArray(d.tasks) ? d.tasks : []).slice(0, 4).map((t, i) => { t = t || {};
-      return { id: 't' + (i + 1), title: cut(t.title, 120) || 'Task ' + (i + 1), prompt: cut(t.prompt, 4000), imageUrl: cleanUrl(t.imageUrl),
+      return { id: 't' + (i + 1), title: cut(t.title, 120) || 'Task ' + (i + 1), kind: ['task1', 'task2'].includes(t.kind) ? t.kind : (i === 0 ? 'task1' : 'task2'),
+        prompt: cut(t.prompt, 4000), imageUrl: cleanUrl(t.imageUrl), chart: cleanChart(t.chart),
         minWords: Math.max(0, Math.min(1000, Math.floor(Number(t.minWords) || 0))), minutes: Math.max(0, Math.min(180, Math.floor(Number(t.minutes) || 0))), sample: cut(t.sample, 8000) };
-    }).filter((t) => t.prompt || t.imageUrl);
+    }).filter((t) => t.prompt || t.imageUrl || t.chart);
   }
   return out;
 }
@@ -681,6 +724,7 @@ function cardTypesOf(d) {
 const publicMaterial = (m, withData) => {
   const d = m.data || {};
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
+<<<<<<< HEAD
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
   if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
   if (m.type === 'listening') { base.no = Number(d.no) || 0; base.href = require('./listening-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.sectionLabel = d.sectionLabel || 'Section 1'; base.types = cardTypesOf(d); }
@@ -691,6 +735,13 @@ const publicMaterial = (m, withData) => {
   if (m.type === 'vocab') {   // the list never carries the cards; they are sent only by the single-item call, after the Premium check
     base.wordCount = (d.words || []).length; base.kind = d.kind || 'collection'; base.level = d.level || 'Intermediate'; base.source = d.source || ''; base.icon = d.icon || 'reading';
     return withData ? { ...base, data: { kind: base.kind, level: base.level, source: base.source, icon: base.icon, words: d.words || [] } } : base;
+=======
+    questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length };
+  if (m.type === 'article') {
+    Object.assign(base, { topic: d.topic || '', level: d.level || '', imageUrl: d.imageUrl || '', lead: d.lead || '', date: d.date || '',
+      vocabCount: (d.vocabulary || []).length, grammarCount: (d.grammar || []).length });
+    return withData ? { ...base, data: d } : base;
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   }
   if (!withData) return base;
   return { ...base, data: { ...d, questions: (d.questions || []).map(({ answer, explanation, ...q }) => q), transcript: undefined,
@@ -1177,7 +1228,11 @@ async function api(req, res, url) {
       return send(res, 200, { samples: (d.tasks || d.parts || []).map((t) => ({ id: t.id, sample: t.sample || '' })) });
     }
     if (method === 'POST' && mm[2] === '/grade') {
+<<<<<<< HEAD
       if (m.type === 'writing' || m.type === 'speaking' || m.type === 'article') throw new HttpError(400, 'This content is not auto-graded.');
+=======
+      if (m.type !== 'reading' && m.type !== 'listening') throw new HttpError(400, 'Only reading and listening tests are graded here.');
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
       rateLimit('grade:' + (u ? u.id : clientIp(req)), 200, 60 * 60000);
       const b = await readJson(req); const given = b.answers && typeof b.answers === 'object' ? b.answers : {};
       const qs = d.questions || []; if (!qs.length) throw new HttpError(400, 'This test has no questions yet.');
@@ -1377,8 +1432,13 @@ async function api(req, res, url) {
     }
     if (method === 'GET' && p === '/api/admin/materials') return send(res, 200, { items: await store.listMaterials(url.searchParams.get('type') || '') });
     if (method === 'POST' && p === '/api/admin/materials') {
+<<<<<<< HEAD
       const b = await readJson(req, 2 * 1024 * 1024); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
       const title = cleanName(b.title); if (!title) throw new HttpError(400, 'Title is required.');
+=======
+      const b = await readJson(req); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
+      const title = cleanTitle(b.title); if (!title) throw new HttpError(400, 'Title is required.');
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
       const now = new Date().toISOString();
       const item = await store.insertMaterial({ id: newId(), type, title, pack: cleanName(b.pack), description: cut(b.description, 2000), content: '', premium: !!b.premium,
         published: b.published !== false, data: await keepReadingNo(type, cleanMaterialData(type, b.data), null), createdAt: now, updatedAt: now });
@@ -1392,8 +1452,13 @@ async function api(req, res, url) {
     }
     if (m && method === 'PATCH') {
       const id = decodeURIComponent(m[1]); const cur = await store.getMaterial(id); if (!cur) throw new HttpError(404, 'Material not found.');
+<<<<<<< HEAD
       const b = await readJson(req, 2 * 1024 * 1024); const patch = { updatedAt: new Date().toISOString() };
       if (b.title !== undefined) { patch.title = cleanName(b.title); if (!patch.title) throw new HttpError(400, 'Title is required.'); }
+=======
+      const b = await readJson(req); const patch = { updatedAt: new Date().toISOString() };
+      if (b.title !== undefined) { patch.title = cleanTitle(b.title); if (!patch.title) throw new HttpError(400, 'Title is required.'); }
+>>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
       if (b.pack !== undefined) patch.pack = cleanName(b.pack);
       if (b.description !== undefined) patch.description = cut(b.description, 2000);
       if (b.premium !== undefined) { patch.premium = !!b.premium; try { const r0 = { ...(await accessRules(true)) }; if (r0['mat:' + id]) { delete r0['mat:' + id]; await store.setSetting('access-rules', { rules: cleanRules(r0), updatedAt: new Date().toISOString() }); rulesCache = { t: 0, v: {} }; } } catch (e) { /* the flag still applies */ } }

@@ -337,7 +337,29 @@ server.listen(0, async () => {
     const wBoss = await call('GET', '/api/materials/' + wid, { jar: boss }); assert.equal(wBoss.status, 200);
     assert.ok(!JSON.stringify(wBoss.json).includes('secret sample') && wBoss.json.item.data.tasks[0].hasSample);
     assert.equal((await call('POST', '/api/materials/' + wid + '/grade', { jar: boss, body: {} })).status, 400);
-    const ls = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'Library', published: false, data: { audioUrl: '/uploads/audio/a.mp3', questions: [{ prompt: 'Name?', answer: 'Smith' }] } } });
+    // writing: line graph from numbers, task type, long titles
+    const longTitle = '[Demo] Test 2 - T1: Changes in car ownership in European households between 1971 and 2001 (long title)';
+    const wc = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'writing', title: longTitle, data: { tasks: [
+      { prompt: 'Describe', kind: 'task1', chart: { unit: '%', years: [1961, 1971], series: [{ name: 'No car', values: [70, '39'] }, { name: 'bad', values: [1] }] } }, { prompt: 'Essay', kind: 'nonsense' }] } } });
+    assert.equal(wc.status, 201); assert.equal(wc.json.item.title, longTitle);
+    const ch = wc.json.item.data.tasks[0].chart;
+    assert.deepEqual(ch.years, ['1961', '1971']); assert.equal(ch.series.length, 1); assert.deepEqual(ch.series[0].values, [70, 39]);
+    assert.equal(wc.json.item.data.tasks[1].kind, 'task2');
+    await call('DELETE', '/api/admin/materials/' + wc.json.item.id, { jar: boss });
+    // articles: text + vocabulary + grammar saved in one go
+    const ar = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'article', title: 'How to clean a beach', data: { topic: 'Environment', level: 'Passage 9', lead: 'Oil spills', body: 'A slick <b>x</b>',
+      imageUrl: 'javascript:alert(1)', vocabulary: [{ word: 'slick', definition: 'oil layer', definition_uz: 'neft dog‘i', synonyms: 'oil slick, sheen' }, { definition: 'no word' }], grammar: [{ title: 'Inversion', match: 'should another spill occur' }] } } });
+    assert.equal(ar.status, 201); const ad = ar.json.item.data;
+    assert.equal(ad.level, 'Passage 1'); assert.equal(ad.imageUrl, ''); assert.deepEqual(ad.vocabulary[0].synonyms, ['oil slick', 'sheen']);
+    assert.equal(ad.vocabulary.length, 1); assert.equal(ad.grammar.length, 1);
+    const card = (await call('GET', '/api/materials?type=article')).json.items.find((x) => x.id === ar.json.item.id);
+    assert.equal(card.vocabCount, 1); assert.equal(card.topic, 'Environment');
+    assert.equal((await call('GET', '/api/materials/' + ar.json.item.id)).json.item.data.vocabulary[0].definition_uz, 'neft dog‘i');
+    assert.equal((await call('POST', '/api/materials/' + ar.json.item.id + '/grade', { body: {} })).status, 400);
+    assert.equal((await call('GET', '/collections/article')).status, 200); assert.equal((await call('GET', '/writing/')).status, 200);
+    await call('DELETE', '/api/admin/materials/' + ar.json.item.id, { jar: boss });
+    ok('admin-made articles (vocabulary + grammar in one form) and writing line graphs');
+    const ls =await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'Library', published: false, data: { audioUrl: '/uploads/audio/a.mp3', questions: [{ prompt: 'Name?', answer: 'Smith' }] } } });
     assert.equal(ls.status, 201); assert.equal(ls.json.item.data.audioUrl, '/uploads/audio/a.mp3');
     assert.ok(!(await call('GET', '/api/materials?type=listening')).json.items.some((x) => x.id === ls.json.item.id), 'drafts are hidden');
     assert.equal((await call('GET', '/api/materials/' + ls.json.item.id)).status, 404);

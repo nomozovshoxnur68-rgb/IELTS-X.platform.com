@@ -265,18 +265,9 @@
 
         /* mobile */
         @media (max-width: 768px) {
-            .sidebar-container {
-                position: fixed;
-                left: -100%;
-                top: 0;
-                bottom: 0;
-                z-index: 40;
-                transition: left 0.2s ease;
-                width: 280px;
-            }
-            .sidebar-container.mobile-open {
-                left: 0;
-            }
+            /* #mainSidebarContainer wraps the whole page (sidebar + content), so it must stay in place:
+               on phones the menu is the drawer of assets/js/mobile-nav.js */
+            .sidebar-container > .flex-1 { min-width: 0; }
             .sidebar-overlay {
                 position: fixed;
                 inset: 0;

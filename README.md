@@ -5,7 +5,7 @@ No npm packages (Node 18+).
 
 ```bash
 npm start            # http://localhost:3000
-npm test             # 23 checks: accounts, premium, orders, results, file protection ...
+npm test             # 26 checks: accounts, premium, orders, results, admin tests + articles, file protection ...
 ```
 
 ## Test links (always `test-1`, `test-2`, ... in listing order)
@@ -81,9 +81,32 @@ Students open them from the Reading / Listening / Writing practice pages (sectio
 Reading + listening are **graded on the server** (answers never reach the browser before submitting), get an IELTS band and are
 saved to the account's results. Writing has a timer, word counter and auto-saved draft.
 
+**Writing** sets open in the IELTS writing exam screen `/writing/?id=...` (`writing/index.html`, `writing/css/style.css`,
+`writing/js/script.js`): every task is one Part (Part 1, Part 2 in the bottom bar), one timer for the whole set, auto-saved drafts,
+then a results page per task plus the overall Writing band (Task 2 counts twice). For a line graph type the numbers in the task
+(`Years: 1961, 1971 …` and one `Name: 10, 30 …` line per series) and the page draws the chart; otherwise upload a picture.
+The model answer is shown on the results page. `/writing/` without an id is the free demo (car ownership line graph).
+Scoring uses an offline demo grader until an AI endpoint is set in `CONFIG.ai` (top of `writing/js/script.js`);
+only real AI results are saved to the student's account.
+
 **Uploads on Vercel** go straight from the browser to Supabase Storage (public bucket `ieltsx-media`, created automatically) -
 needs `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` and the **v4 part of `supabase-schema.sql`** (run once). On a normal server
 they are saved in `uploads/`.
+
+## Articles (`/study/Tools/Articles`)
+
+Every article page uses the same files: the site shell (sidebar, header, light/dark) like the Articles list,
+`assets/css/article.css` for the reading area and `assets/js/article.js` for Read / Review tabs, text size, font and the word pop-up.
+
+* **Saved articles** `collections/article-1.html` ... `article-6.html`: the text is in the HTML, the word list in
+  `<script type="application/json" id="article-data">` (vocabulary with English / O‘zbekcha / Русский / synonyms, grammar points).
+* **Admin articles** (`/admin#article` -> **+ New article**): title, topic, level (Passage 1-3), lead, cover picture, the text
+  (empty line between paragraphs, `## Heading` for a heading), source, and in the same form the **vocabulary** and **grammar**
+  lists. **Paste many** adds a whole list at once: one word per line `word | definition | o‘zbekcha | русский | synonyms | example`
+  (or columns copied from Excel, or a JSON list such as the `reviewItems` of an old article). Each word shows whether it was found
+  in the text; it is underlined where it first appears (use "Underline" when the text has another form of the word).
+  They open at `/collections/article?id=...` with exactly the same design and show up first on the Articles page.
+* On Supabase run the **v5 part** of `supabase-schema.sql` once (it allows the `article` type).
 
 ## Results follow the account
 
