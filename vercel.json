@@ -480,7 +480,6 @@
   ],
   "rewrites": [
     {
-<<<<<<< HEAD
       "source": "/full-tests/reading/:t(test-[0-9]+)",
       "destination": "/api"
     },
@@ -510,9 +509,6 @@
     },
     {
       "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack((?!test-|index)[a-z0-9][a-z0-9_-]*|pack-[A-Za-z0-9_-]+|volume-[A-Za-z0-9_-]+|jan-august|sep-dec|09_02-16_02)",
-=======
-      "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack((?!test-|index)[A-Za-z0-9][A-Za-z0-9_-]*)",
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
       "destination": "/full-tests/pack.html"
     },
     {
