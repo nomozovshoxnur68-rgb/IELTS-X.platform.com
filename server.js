@@ -1170,7 +1170,9 @@ async function api(req, res, url) {
   }
   if (method === 'GET' && p === '/api/access/check') {      // used by the test pages themselves (assets/js/access-gate.js)
     const u = await currentUser(req); const level = userLevel(u);
-    let want = String(url.searchParams.get('path') || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
+    // the page is sent as ?page=. The older ?path= clashes on Vercel: the "/api/:path*" rewrite adds its own path=access/check
+    // to the query, so only a value that starts with "/" can be the page.
+    let want = String(url.searchParams.get('page') || url.searchParams.getAll('path').find((v) => String(v).startsWith('/')) || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
     // Mock tests and /premium-audio/ (PREMIUM_PATHS) need a paid plan too; middleware.js asks this before Vercel sends the file
     const gate = await gateForPath(hrefPath(want) + '.html') || (isPremiumPath(hrefPath(want) + '.html') || isPremiumPath(hrefPath(want)) ? { locked: true, plan: 'standard' } : { locked: false, plan: 'standard' });
     let allowed = allowsLevel(gate, level); let limited = false;

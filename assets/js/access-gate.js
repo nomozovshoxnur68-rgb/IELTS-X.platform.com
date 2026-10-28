@@ -16,7 +16,8 @@
     var path = location.pathname;
     var ctl = window.AbortController ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctl) ctl.abort(); show(); }, 5000);
-    fetch('/api/access/check?path=' + encodeURIComponent(path), { credentials: 'same-origin', cache: 'no-store', signal: ctl ? ctl.signal : undefined })
+    // ?page=, not ?path=: on Vercel the "/api/:path*" rewrite adds its own "path" to the query string
+    fetch('/api/access/check?page=' + encodeURIComponent(path), { credentials: 'same-origin', cache: 'no-store', signal: ctl ? ctl.signal : undefined })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
             clearTimeout(timer);

@@ -23,7 +23,8 @@ export default async function middleware(request) {
   const audio = /^\/premium-audio\//i.test(path);
   // only the session cookie is passed on, so a huge or broken Cookie header cannot make the check fail
   const session = (String(request.headers.get('cookie') || '').match(/(?:^|;\s*)ieltsx_session=([^;]{1,4096})/) || [])[1];
-  const check = new URL('/api/access/check', url.origin); check.searchParams.set('path', path);
+  // ?page=, not ?path=: the "/api/:path*" rewrite of vercel.json puts its own "path" into the query
+  const check = new URL('/api/access/check', url.origin); check.searchParams.set('page', path);
   let r;
   try {
     const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 5000);

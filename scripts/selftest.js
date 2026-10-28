@@ -423,6 +423,10 @@ server.listen(0, async () => {
       let chk = (await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json;
       assert.equal(chk.allowed, false); assert.equal(chk.plan, 'max'); assert.ok(chk.price.includes('plan=max'));
       assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: maxU.j })).json.allowed, true);
+      // ?page= (what access-gate.js and middleware.js send), and the query Vercel builds: its rewrite adds path=access/check first
+      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
+      assert.equal((await call('GET', '/api/access/check?path=access%2Fcheck&path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
+      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/Mock tests'))).json.allowed, false, 'Mock tests need a plan');
       ok('one test can be made Max-only (Standard -> Price page, Max still opens it)');
 
       // a whole pack: Free for everybody, then Max, then back to default; a test setting wins over its pack
@@ -539,6 +543,10 @@ server.listen(0, async () => {
       let chk = (await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json;
       assert.equal(chk.allowed, false); assert.equal(chk.plan, 'max'); assert.ok(chk.price.includes('plan=max'));
       assert.equal((await call('GET', '/api/access/check?path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: maxU.j })).json.allowed, true);
+      // ?page= (what access-gate.js and middleware.js send), and the query Vercel builds: its rewrite adds path=access/check first
+      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
+      assert.equal((await call('GET', '/api/access/check?path=access%2Fcheck&path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
+      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/Mock tests'))).json.allowed, false, 'Mock tests need a plan');
       ok('one test can be made Max-only (Standard -> Price page, Max still opens it)');
 
       // a whole pack: Free for everybody, then Max, then back to default; a test setting wins over its pack
