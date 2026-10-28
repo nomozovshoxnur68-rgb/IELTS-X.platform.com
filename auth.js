@@ -84,7 +84,7 @@ export async function getCurrentUser() { return (await request('/api/auth/me')).
 export async function getAuthConfig() {
   try { return await request('/api/auth/config'); } catch (e) { return { googleClientId: null, apiError: e && e.message ? e.message : 'API unavailable' }; }
 }
-export async function requestPasswordReset(email) { await request('/api/auth/forgot', { method: 'POST', body: { email } }); }
+export async function requestPasswordReset(email) { return request('/api/auth/forgot', { method: 'POST', body: { email } }); }
 export async function resetPassword(token, newPassword) {
   const { user } = await request('/api/auth/reset', { method: 'POST', body: { token, newPassword } });
   rememberAccount(user);

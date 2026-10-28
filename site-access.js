@@ -98,7 +98,7 @@ function showVerifyBanner(user) {
   const x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'Dismiss');
   btn.addEventListener('click', async () => {
     btn.disabled = true;
-    try { const r = await resendVerification(); msg.textContent = r.alreadyVerified ? 'Your email is already verified.' : 'Verification email sent. Check your inbox (and spam).'; btn.remove(); }
+    try { const r = await resendVerification(); msg.textContent = r.alreadyVerified ? 'Your email is already verified.' : r.sent === false ? 'Email sending is not set up on the site yet. You can keep using your account.' : 'Verification email sent. Check your inbox (and spam).'; btn.remove(); }
     catch (e) { msg.textContent = e.message || 'Could not send the email.'; btn.disabled = false; }
   });
   x.addEventListener('click', () => { bar.remove(); try { sessionStorage.setItem('ix-verify-dismissed', '1'); } catch (e) { /* ignore */ } });

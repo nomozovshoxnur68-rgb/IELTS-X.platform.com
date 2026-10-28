@@ -13,9 +13,14 @@ if (page === 'forgot') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('Please enter a valid email address.');
         showError(''); $('#submit').disabled = true;
         try {
-            await requestPasswordReset(email);
+            const r = await requestPasswordReset(email);
             const done = $('#done'); done.hidden = false;
-            done.textContent = 'If an account exists for this email, a reset link is on its way. It works for one hour.';
+            if (r && r.mail === false) {   // the site cannot send emails yet: support resets the password by hand
+                done.textContent = 'Password reset by email is not available yet. Write to support and we will help you get back into your account: ';
+                const a = document.createElement('a'); a.href = /^https:\/\//.test(r.contact || '') ? r.contact : 'https://t.me/sh7595';
+                a.target = '_blank'; a.rel = 'noopener noreferrer'; a.className = 'link'; a.textContent = a.href.replace(/^https:\/\/(t\.me\/)?/, '@');
+                done.append(a);
+            } else done.textContent = 'If an account exists for this email, a reset link is on its way. It works for one hour.';
         } catch (err) { showError(err.message); $('#submit').disabled = false; }
     });
 }

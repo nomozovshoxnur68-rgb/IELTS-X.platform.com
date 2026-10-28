@@ -144,16 +144,24 @@ rate limited; after 15 wrong passwords an account waits 15 minutes. Cross-site P
 `noindex`. CSV export neutralises spreadsheet formulas. Every admin action is written to the activity log. `server.js`, `data/`, `scripts/`, `.env*`, `*.md`, `*.sql`, dot-files are never served. Uploaded files
 are sandboxed. `/api/health` is there for uptime monitors.
 
+On **Vercel** the locked test pages are static files, so `middleware.js` (Vercel Routing Middleware) asks
+`/api/access/check` with the visitor's session cookie before Vercel sends a full test, a practice passage / section,
+`Mock tests` or anything under `/premium-audio/`; a visitor who may not open it goes to the Price page (audio: 403).
+`vercel.json` sends the same security headers as the Node server, and the admin page gets its strict CSP, `DENY` and
+`noindex` there too. Privacy Policy and Terms of Service: `privacy-policy.html`, `terms-of-service.html`.
+
 ## Configuration
 
 See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUBLIC_URL`, mail keys, Supabase keys
-(run `supabase-schema.sql`, it also contains the new tables).
+(run `supabase-schema.sql`, it also contains the new tables). **Real keys go only into `.env` (ignored by git) and the
+Vercel dashboard, never into `.env.example`: the repository is public.** Without `RESEND_API_KEY` + `MAIL_FROM` the
+"Forgot password" page tells students to write to `PAYMENT_CONTACT` instead of waiting for an email.
 
 ## Deploying
 
 * **Render / Railway / VPS (recommended)**: `npm start`; every rule above is enforced, uploads work.
-* **Vercel**: use Supabase; static HTML (admin, premium, full tests) is served by Vercel itself, so only the API is
-  protected there. No uploads on Vercel. `sitemap.xml` and `robots.txt` work through `/api/sitemap`, `/api/robots`.
+* **Vercel**: use Supabase; static HTML is served by Vercel itself, the locked test pages are guarded by `middleware.js`
+  (see above). No uploads on Vercel. `sitemap.xml` and `robots.txt` work through `/api/sitemap`, `/api/robots`.
 
 ## Not included (needs something from you)
 

@@ -2,4 +2,12 @@ data/db.json
 data/.session-secret
 uploads/
 .env
+.env.local
 node_modules/
+
+# npm logs and local tool folders (never part of the site)
+.npm/
+${HOME}/
+.claude/
+.vercel/
+*.log

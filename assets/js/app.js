@@ -1821,11 +1821,13 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                     var items = (d.items || []).filter(function (m) { return m.mode !== 'full'; });
                     window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: m.href || ('/test?id=' + encodeURIComponent(m.id)), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
                     var made = [];
+                    // text typed in the admin panel goes into the card HTML: escape it
+                    var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
                     items.forEach(function (m, n) {
                         var c = {
-                            id: 1000 + n, title: m.title, status: m.premium ? 'PREMIUM' : 'FREE', types: m.types || [], plan: m.pack || 'Starter Pack', pack: m.pack || 'Starter Pack',
-                            passage: m.passageLabel || 'Passage 1', href: m.href || ('/test?id=' + encodeURIComponent(m.id)), img: m.coverUrl || '',
-                            desc: (m.description || (m.premium ? 'Premium' : 'Free Sample') + ' | ' + (m.pack || 'Starter Pack')), badge: m.premium ? 'PREMIUM' : 'FREE', admin: true
+                            id: 1000 + n, title: esc(m.title), status: m.premium ? 'PREMIUM' : 'FREE', types: (m.types || []).map(esc), plan: esc(m.pack || 'Starter Pack'), pack: esc(m.pack || 'Starter Pack'),
+                            passage: esc(m.passageLabel || 'Passage 1'), href: esc(m.href || ('/test?id=' + encodeURIComponent(m.id))), img: esc(m.coverUrl || ''),
+                            desc: esc(m.description || (m.premium ? 'Premium' : 'Free Sample') + ' | ' + (m.pack || 'Starter Pack')), badge: m.premium ? 'PREMIUM' : 'FREE', admin: true
                         };
                         c.key = c.href; c.freeCard = !m.premium;
                         c.typeKeys = (c.types || []).reduce(function (a, t) { return a.concat(IELTSX.canonicalQuestionTypes(t, 'reading')); }, []);
@@ -2287,8 +2289,10 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                     // writing sets open in the IELTS writing exam screen (/writing/?id=…)
                     var hrefOf = function (m) { return m.href || ('/writing/?id=' + encodeURIComponent(m.id)); };
                     window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: hrefOf(m), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    // text typed in the admin panel goes into the card HTML: escape it
+                    var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
                     var made = items.map(function (m, n) {
-                        return { id: 1000 + n, title: m.title, task: m.taskLabel || 'Task 1', tier: m.tier || 'Tier 1', type: (m.types || [])[0] || 'Writing task', pack: m.pack || 'Practice', plan: 'Plan A', img: m.coverUrl || null, href: hrefOf(m), admin: true };
+                        return { id: 1000 + n, title: esc(m.title), task: esc(m.taskLabel || 'Task 1'), tier: esc(m.tier || 'Tier 1'), type: esc((m.types || [])[0] || 'Writing task'), pack: esc(m.pack || 'Practice'), plan: 'Plan A', img: m.coverUrl ? esc(m.coverUrl) : null, href: esc(hrefOf(m)), admin: true };
                     });
                     Array.prototype.unshift.apply(writingData, made);
                     if (made.length) { currentPage = 1; renderCards(); }

@@ -363,8 +363,12 @@ function siteUrl(req) {
 }
 // Sends through Resend (https://resend.com) when RESEND_API_KEY + MAIL_FROM are set; otherwise prints the mail
 // to the server console so the links can still be used while developing.
+const MAIL_READY = !!(RESEND_API_KEY && MAIL_FROM);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/* On Vercel the function may be frozen as soon as the answer is sent, so a mail is awaited (for at most `ms`) before answering */
+const mailWithin = (work, ms = 6000) => Promise.race([work.catch((e) => { console.error('mail failed:', e.message); return false; }), sleep(ms).then(() => false)]);
 async function sendMail({ to, subject, text }) {
-  if (RESEND_API_KEY && MAIL_FROM) {
+  if (MAIL_READY) {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST', headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ from: MAIL_FROM, to: [to], subject, text })
@@ -999,7 +1003,7 @@ async function api(req, res, url) {
     if (await store.findUserByEmail(email)) throw new HttpError(409, 'An account with this email already exists. Try signing in.');
     const hp = hashPassword(password);
     const u = await createUser({ name, email, passwordHash: hp.hash, passwordSalt: hp.salt });
-    sendVerification(req, u).catch((e) => console.error('verification mail failed:', e.message));
+    await mailWithin(sendVerification(req, u), 4000);
     return send(res, 201, { user: publicUser(u) }, secureHeaders(u));
   }
   if (method === 'POST' && p === '/api/auth/login') {
@@ -1051,12 +1055,10 @@ async function api(req, res, url) {
     const email = normEmail((await readJson(req)).email);
     rateLimit('forgot:' + clientIp(req), 5, 15 * 60000);
     const u = validEmail(email) ? await store.findUserByEmail(email) : null;
-    if (u) {
-      const token = purposeToken('reset', { sub: u.id, sv: sessionVersion(u) }, 60 * 60000);
-      sendMail({ to: u.email, subject: 'Reset your IELTS X password', text: `Hi ${u.name},\n\nChoose a new password:\n${siteUrl(req)}/reset.html?token=${encodeURIComponent(token)}\n\nThe link works for 1 hour and only once. If you did not ask for this, ignore this message.` })
-        .catch((e) => console.error('reset mail failed:', e.message));
-    }
-    return send(res, 200, { ok: true }); // same answer whether or not the account exists
+    const work = u ? sendMail({ to: u.email, subject: 'Reset your IELTS X password', text: `Hi ${u.name},\n\nChoose a new password:\n${siteUrl(req)}/reset.html?token=${encodeURIComponent(purposeToken('reset', { sub: u.id, sv: sessionVersion(u) }, 60 * 60000))}\n\nThe link works for 1 hour and only once. If you did not ask for this, ignore this message.` }) : Promise.resolve(false);
+    // the same answer, and about the same time, whether or not the account exists
+    await Promise.all([mailWithin(work), sleep(700 + crypto.randomInt(400))]);
+    return send(res, 200, MAIL_READY ? { ok: true, mail: true } : { ok: true, mail: false, contact: PAYMENT_CONTACT });
   }
   if (method === 'POST' && p === '/api/auth/reset') {
     rateLimit('reset:' + clientIp(req), 10, 15 * 60000);
@@ -1169,7 +1171,8 @@ async function api(req, res, url) {
   if (method === 'GET' && p === '/api/access/check') {      // used by the test pages themselves (assets/js/access-gate.js)
     const u = await currentUser(req); const level = userLevel(u);
     let want = String(url.searchParams.get('path') || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
-    const gate = await gateForPath(hrefPath(want) + '.html') || { locked: false, plan: 'standard' };
+    // Mock tests and /premium-audio/ (PREMIUM_PATHS) need a paid plan too; middleware.js asks this before Vercel sends the file
+    const gate = await gateForPath(hrefPath(want) + '.html') || (isPremiumPath(hrefPath(want) + '.html') || isPremiumPath(hrefPath(want)) ? { locked: true, plan: 'standard' } : { locked: false, plan: 'standard' });
     let allowed = allowsLevel(gate, level); let limited = false;
     if (allowed && gate.locked && await quotaBlocks(u, gate, hrefPath(want) + '.html')) { allowed = false; limited = true; }
     return send(res, 200, { allowed, limited, locked: gate.locked, plan: gate.plan, authenticated: !!u, price: allowed ? null : (limited ? '/Price?premium=limit&next=' + encodeURIComponent(want) : priceUrl(gate.plan, want)) }, { 'Cache-Control': 'no-store, private' });
@@ -1503,7 +1506,7 @@ function isBlocked(rel) {
 // old links that still exist in saved pages -> the real file
 const ALIASES = {
   '/home': '/index.html', '/features': '/index.html', '/teachers': '/index.html', '/support': '/index.html',
-  '/privacy-policy': '/index.html', '/terms-of-service': '/index.html', '/feedback': '/index.html',
+  '/privacy-policy': '/privacy-policy.html', '/terms-of-service': '/terms-of-service.html', '/feedback': '/index.html', '/favicon.ico': '/assets/ieltsx-only-logo-BajnupZg.png',
   '/login': '/login.html', '/account': '/account.html', '/pricing': '/Price.html', '/practice/mock': '/Mock tests.html',
   '/listening.html': '/part/practice/listening.html', '/reading.html': '/part/practice/reading.html', '/writing.html': '/part/practice/writing.html', '/speaking.html': '/part/practice/speaking.html',
   '/full-tests/reading.html': '/full-tests/reading/index.html', '/full-tests/listening.html': '/full-tests/listening/index.html',
@@ -1620,7 +1623,7 @@ async function staticFile(req, res, pathname) {
 /* ───────────────────────── sitemap (public pages only) ───────────────────────── */
 function sitemap(origin) {
   const urls = new Set(['/', '/Price', '/Predictions', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
-    '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/']);
+    '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/privacy-policy', '/terms-of-service']);
   for (const dir of ['pessages', 'sections']) {
     try {
       for (const f of fs.readdirSync(path.join(ROOT, dir))) {
