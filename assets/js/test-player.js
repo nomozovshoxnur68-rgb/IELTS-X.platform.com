@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-/* IELTSX — plays what was made in the admin panel: reading, listening (graded on the server), writing, speaking and articles. */
-=======
-/* IELTSX — plays tests made in the admin panel: reading and listening (graded on the server). Writing sets open in /writing/, articles in /collections/article. */
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+/* IELTSX — plays what was made in the admin panel: reading, listening (graded on the server) and speaking. Writing sets open in /writing/, articles in /collections/article. */
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -28,22 +24,14 @@
     if (r.status === 401) return state(`<h2>Please sign in</h2><p>Sign in to open this test.</p><a class="tp-btn" href="/login?next=${encodeURIComponent(location.pathname + location.search)}">Sign in</a>`);
     if (r.status === 403) return state(`<h2>🔒 Locked</h2><p>${esc(d.error || 'This content is for paid members.')}</p><a class="tp-btn" href="/Price?premium=required&next=${encodeURIComponent(location.pathname + location.search)}">Get Access</a>`);
     if (!r.ok) return state(`<h2>Test not found</h2><p>${esc(d.error || 'It may have been removed.')}</p><a class="tp-btn" href="/part/practice/reading">Browse tests</a>`);
-<<<<<<< HEAD
-    item = d.item; document.title = item.title + ' — IELTSX';
-    if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace(item.href || ('/exam/reading/' + encodeURIComponent(item.id))); return; }   // Reading opens in the real-exam player
-    $('#tp-title').textContent = item.title; const isArticle = item.type === 'article';
-    $('#tp-back').href = isArticle ? '/study/Tools/Articles' : '/part/practice/' + item.type;
-    $('#tp-back').textContent = isArticle ? '← Articles' : '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
-    if (item.type === 'writing') renderWriting(); else if (item.type === 'speaking') renderSpeaking(); else if (isArticle) renderArticle(); else renderExam();
-=======
     item = d.item;
     // writing sets open in the IELTS writing exam screen, articles in the article reader
     if (item.type === 'writing') return location.replace('/writing/?id=' + encodeURIComponent(id));
     if (item.type === 'article') return location.replace('/collections/article?id=' + encodeURIComponent(id));
+    if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace(item.href || ('/exam/reading/' + encodeURIComponent(item.id))); return; }   // Reading opens in the real-exam player
     document.title = item.title + ' — IELTSX';
     $('#tp-title').textContent = item.title; $('#tp-back').href = '/part/practice/' + item.type; $('#tp-back').textContent = '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
-    renderExam();
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+    if (item.type === 'speaking') renderSpeaking(); else renderExam();
   }
 
   /* ───────── timer ───────── */
@@ -137,57 +125,8 @@
     $('#tp-prog').textContent = `Score ${d.correct} / ${d.total} · Band ${d.band.toFixed(1)}`;
   }
 
-<<<<<<< HEAD
-  /* ───────── writing ───────── */
-  function renderWriting() {
-    const tasks = item.data.tasks || []; let cur = 0;
-    const key = (i) => 'ieltsx_w_' + id + '_' + i; const store = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* blocked */ } };
-    const read = (k) => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
-    const words = (t) => (t.trim().match(/\S+/g) || []).length;
-    main.innerHTML = `<div class="tp-tabs" role="tablist">${tasks.map((t, i) => `<button class="tp-tab" role="tab" data-t="${i}" type="button">${esc(t.title)}</button>`).join('')}</div><div id="tp-w"></div>`;
-    startTimer(item.data.durationMin);
-    const paint = () => {
-      const t = tasks[cur]; document.querySelectorAll('.tp-tab').forEach((b) => b.classList.toggle('active', Number(b.dataset.t) === cur));
-      $('#tp-w').innerHTML = `<div class="tp-exam split"><section class="tp-pane"><h2>${esc(t.title)}</h2>${t.minutes ? `<div class="tp-hint">Suggested time: ${t.minutes} minutes</div>` : ''}${t.prompt ? `<div class="tp-wprompt">${esc(t.prompt).replace(/\n/g, '<br>')}</div>` : ''}${t.imageUrl ? `<figure class="tp-fig"><img src="${esc(t.imageUrl)}" alt="Task picture"></figure>` : ''}</section>
-        <section class="tp-pane"><textarea id="tp-essay" class="tp-essay" placeholder="Write your answer here…" spellcheck="true"></textarea>
-        <div class="tp-wbar"><span id="tp-wc">0 words</span><span class="tp-hint">Saved on this device automatically</span></div>
-        <div class="tp-actions"><button class="tp-btn ghost" id="tp-copy" type="button">Copy my answer</button><button class="tp-btn ghost" id="tp-clear" type="button">Clear</button>${t.hasSample ? '<button class="tp-btn" id="tp-sample" type="button">Show model answer</button>' : ''}</div><div id="tp-sample-box" class="tp-trans" hidden></div></section></div>`;
-      const ta = $('#tp-essay'); ta.value = read(key(cur));
-      const upd = () => { const w = words(ta.value); const wc = $('#tp-wc'); wc.textContent = w + ' words' + (t.minWords ? ` (minimum ${t.minWords})` : ''); wc.classList.toggle('ok', !t.minWords || w >= t.minWords); };
-      ta.addEventListener('input', () => { store(key(cur), ta.value || null); upd(); }); upd();
-      $('#tp-copy').onclick = () => { navigator.clipboard?.writeText(ta.value).then(() => alert('Copied.'), () => { ta.select(); }); };
-      $('#tp-clear').onclick = () => { if (confirm('Clear your answer?')) { ta.value = ''; store(key(cur), null); upd(); } };
-      const sb = $('#tp-sample'); if (sb) sb.onclick = async () => {
-        const box = $('#tp-sample-box'); if (!box.hidden) { box.hidden = true; return; }
-        try { const r = await fetch('/api/materials/' + encodeURIComponent(id) + '/sample', { credentials: 'same-origin' }); const d = await r.json(); const s = (d.samples || []).find((x) => x.id === t.id); box.innerHTML = '<strong>Model answer</strong><div>' + esc(s ? s.sample : '').replace(/\n/g, '<br>') + '</div>'; box.hidden = false; } catch (e) { alert('Could not load the model answer.'); }
-      };
-    };
-    document.querySelectorAll('.tp-tab').forEach((b) => b.addEventListener('click', () => { cur = Number(b.dataset.t); paint(); }));
-    paint();
-  }
-
-  /* ───────── safe picture / text helpers ───────── */
+  /* ───────── safe picture helper ───────── */
   const safeUrl = (u) => { u = String(u || '').trim(); return (/^\/(uploads|assets)\//.test(u) && !u.includes('..')) || /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : ''; };
-  // article text: blank line = new paragraph, "## Heading", "![caption](picture url)", "- item" lists
-  function richText(text) {
-    return String(text || '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean).map((b) => {
-      const img = /^!\[([^\]]*)\]\(([^)\s]+)\)$/.exec(b);
-      if (img && safeUrl(img[2])) return `<figure class="tp-fig"><img src="${esc(safeUrl(img[2]))}" alt="${esc(img[1])}" loading="lazy">${img[1] ? `<figcaption>${esc(img[1])}</figcaption>` : ''}</figure>`;
-      if (/^#{1,3}\s+/.test(b)) return `<h3 class="tp-group">${esc(b.replace(/^#{1,3}\s+/, ''))}</h3>`;
-      if (/^[-*]\s+/.test(b)) return '<ul>' + b.split('\n').map((l) => `<li>${esc(l.replace(/^[-*]\s+/, ''))}</li>`).join('') + '</ul>';
-      return `<p>${esc(b).replace(/\n/g, '<br>')}</p>`;
-    }).join('');
-  }
-
-  /* ───────── article ───────── */
-  function renderArticle() {
-    const d = item.data, cover = safeUrl(d.coverUrl);
-    main.innerHTML = `<article class="tp-article">${cover ? `<img class="tp-cover" src="${esc(cover)}" alt="" onerror="this.remove()">` : ''}
-      <div class="tp-chips"><span>${esc(d.passageLabel || 'Passage 1')}</span><span>${esc(d.topic || 'General')}</span>${d.source ? `<span>${esc(d.source)}</span>` : ''}${d.readMinutes ? `<span>${d.readMinutes} min read</span>` : ''}</div>
-      <h1>${esc(item.title)}</h1>${item.description ? `<p class="tp-lead">${esc(item.description)}</p>` : ''}
-      <div class="tp-body">${richText(d.body)}${(d.images || []).map((im) => safeUrl(im.url) ? `<figure class="tp-fig"><img src="${esc(safeUrl(im.url))}" alt="${esc(im.caption || '')}" loading="lazy">${im.caption ? `<figcaption>${esc(im.caption)}</figcaption>` : ''}</figure>` : '').join('')}</div>
-      <div class="tp-actions"><a class="tp-btn ghost" href="/study/Tools/Articles">← More articles</a></div></article>`;
-  }
 
   /* ───────── speaking ───────── */
   function renderSpeaking() {
@@ -228,7 +167,5 @@
     document.querySelectorAll('.tp-tab').forEach((b) => b.addEventListener('click', () => { cur = Number(b.dataset.t); paint(); }));
     window.addEventListener('pagehide', stopAll); paint();
   }
-=======
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   load();
 })();

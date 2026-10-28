@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-/* IELTSX admin: Reading / Listening / Writing / Speaking / Articles builder (admin.html #reading #listening #writing #speaking #articles). */
-=======
-/* IELTSX admin: Reading / Listening / Writing test builder and the Article builder (admin.html #reading #listening #writing #article). */
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+/* IELTSX admin: Reading / Listening / Writing / Speaking / PDF builder and the Article builder (admin.html #reading #listening #writing #speaking #articles #pdf). */
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-<<<<<<< HEAD
   const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles', pdf: 'PDF materials' };
   const TOPICS = ['General', 'History', 'Science', 'Technology', 'Environment', 'Health', 'Education', 'Society', 'Business', 'Culture', 'Nature', 'Psychology'];
   const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / table / flow-chart / summary completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
@@ -17,14 +12,6 @@
   const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
   const lists = { reading: null, listening: null, writing: null, speaking: null, article: null, pdf: null };
   const VIEW_FOR = { articles: 'article' };            // #articles in the address bar = the article list
-=======
-  const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', article: 'Article' };
-  const Q_LABEL = { short: 'Short answer / gap fill', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice' };
-  const TOPICS = ['History', 'Science', 'Technology', 'Environment', 'Ethics', 'Business', 'Health', 'Education', 'Psychology', 'Culture'];
-  const lists = { reading: null, listening: null, writing: null, article: null };
-  // where students open each kind of material
-  const openUrl = (type, id) => (type === 'article' ? '/collections/article?id=' : type === 'writing' ? '/writing/?id=' : '/test?id=') + encodeURIComponent(id);
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   let draft = null, editingId = null, uploading = 0;
 
   async function api(url, opt = {}) {
@@ -44,14 +31,13 @@
     try { lists[type] = (await api('/api/admin/materials?type=' + type)).items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))); } catch (e) { fail(e); lists[type] = lists[type] || []; }
     renderType(type);
   }
-<<<<<<< HEAD
   const NOUN = { reading: 'test', listening: 'listening card', writing: 'writing card', speaking: 'speaking card', article: 'article card', pdf: 'PDF material' };
   const HELP = {
     reading: 'Passage, pictures and questions with answers. Graded automatically.',
     listening: 'Audio file, map/diagram pictures and questions with answers. Graded automatically.',
-    writing: 'Task 1 / Task 2 prompts with an optional chart picture and model answer.',
+    writing: 'Task 1 / Task 2 prompts with a chart (drawn from your numbers) or a picture and a model answer. They open in the IELTS writing exam screen.',
     speaking: 'Part 1 questions, Part 2 cue card, Part 3 discussion. Timers, pictures, model-answer audio.',
-    article: 'Reading articles with a cover picture, pictures inside the text, topic and source.',
+    article: 'Text, cover picture and the vocabulary / grammar students tap on — all in one form.',
     pdf: 'A PDF file with its own card (picture, title, tags) on the PDF Library page. Students download it from the card.'
   };
   const WHERE = { reading: 'the Reading practice page (Part) or the Full Reading page (Full)', listening: 'the Listening practice page', writing: 'the Writing practice page', speaking: 'the Speaking practice page', article: 'the Articles page', pdf: 'the PDF Library page' };
@@ -60,7 +46,7 @@
     if (type === 'writing') return (d.tasks || []).length + ' task(s)';
     if (type === 'speaking') { const ps = d.parts || []; return ps.length + ' part(s) · ' + ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''); }
     if (type === 'pdf') return (d.fileUrl ? '📄 file' : '<span class="warn-text">no file</span>') + (d.pages ? ' · ' + d.pages + ' pages' : '');
-    if (type === 'article') return esc(d.passageLabel || 'Passage 1') + ' · ' + esc(d.topic || 'General') + (d.coverUrl ? ' · 🖼 cover' : ' · <span class="warn-text">no cover</span>');
+    if (type === 'article') return esc(d.level || d.passageLabel || 'Passage 1') + ' · ' + `${(d.vocabulary || []).length} words · ${(d.grammar || []).length} grammar` + (d.imageUrl || d.coverUrl ? ' · 🖼 cover' : ' · <span class="warn-text">no cover</span>');
     if (type === 'reading') return (d.mode === 'full' ? 'FULL · 3 passages · ' : 'PART · 1 passage · ') + nq + ' questions' + (d.no ? ' · test-' + d.no : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
     return nq + ' questions' + (type === 'listening' ? (d.audioUrl ? ' · 🔊 audio' : ' · <span class="warn-text">no audio</span>') : '') + ((d.images || []).length ? ' · 🖼 ' + d.images.length : '');
   }
@@ -94,9 +80,9 @@
   const GRID = {
     reading: { title: 'Part practice cards', noun: 'part practice card', help: 'Each card is one passage on the Reading practice page, in the same grid as the other cards.' },
     listening: { title: 'Listening cards', noun: 'listening card', help: 'Each card is one section on the Listening practice page: audio, questions with answers and explanations, card picture.' },
-    writing: { title: 'Writing cards', noun: 'writing card', help: 'Each card is a Task 1 / Task 2 set on the Writing practice page, with its chart picture and model answer.' },
+    writing: { title: 'Writing cards', noun: 'writing card', help: 'Each card is a Task 1 / Task 2 set on the Writing practice page, with its chart and model answer. It opens in the IELTS writing exam screen.' },
     speaking: { title: 'Speaking cards', noun: 'speaking card', help: 'Each card is a speaking test: Part 1, Part 2 cue card, Part 3.' },
-    article: { title: 'Article cards', noun: 'article card', help: 'Each card is an article on the Articles page, with its cover picture.' },
+    article: { title: 'Article cards', noun: 'article card', help: 'Each card is an article on the Articles page: text, cover picture and the vocabulary / grammar students tap on.' },
     pdf: { title: 'PDF material cards', noun: 'PDF material', help: 'Each card is a PDF on the PDF Library page. Upload the file and a card picture; students press Download.' }
   };
   function cardInfo(type, m) {
@@ -104,9 +90,9 @@
     const expTxt = nq ? (exp === nq ? ' · 💡 all explained' : exp ? ' · ' + exp + '/' + nq + ' explained' : '') : '';
     if (type === 'reading') return { img: d.coverUrl, tag: d.passageLabel || 'Passage 1', sub: nq + ' questions · ' + (d.durationMin ? d.durationMin + ' min' : 'no timer') + expTxt, href: d.no ? '/pessages/test-' + d.no : '/test?id=' + encodeURIComponent(m.id) };
     if (type === 'listening') return { img: d.coverUrl, tag: d.sectionLabel || 'Section 1', sub: nq + ' questions' + (d.audioUrl ? ' · 🔊 audio' : ' · ⚠ no audio') + expTxt, href: d.no ? '/sections/test-' + d.no : '/exam/listening/' + encodeURIComponent(m.id) };
-    if (type === 'writing') { const ts = d.tasks || []; return { img: d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl, tag: d.tier || 'Tier 1', sub: ts.length + ' task(s)' + (ts.some((t) => t.sample) ? ' · model answer' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
+    if (type === 'writing') { const ts = d.tasks || []; return { img: d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl, tag: d.tier || 'Tier 1', sub: ts.length + ' task(s)' + (ts.some((t) => t.chart) ? ' · chart' : '') + (ts.some((t) => t.sample) ? ' · model answer' : ''), href: '/writing/?id=' + encodeURIComponent(m.id) }; }
     if (type === 'speaking') { const ps = d.parts || []; return { img: (ps.find((t) => t.imageUrl) || {}).imageUrl, tag: ps.length + ' part(s)', sub: ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
-    if (type === 'article') return { img: d.coverUrl, tag: d.passageLabel || 'Passage 1', sub: (d.topic || 'General') + (d.readMinutes ? ' · ' + d.readMinutes + ' min read' : ''), href: '/test?id=' + encodeURIComponent(m.id) };
+    if (type === 'article') return { img: d.imageUrl || d.coverUrl, tag: d.level || d.passageLabel || 'Passage 1', sub: (d.topic || 'General') + ` · ${(d.vocabulary || []).length} words · ${(d.grammar || []).length} grammar`, href: '/collections/article?id=' + encodeURIComponent(m.id) };
     return { img: d.coverUrl, tag: ({ reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', magazine: 'Magazine', other: 'PDF' })[d.category] || 'PDF', sub: (d.fileUrl ? '📄 PDF uploaded' : '⚠ no PDF file') + (d.pages ? ' · ' + d.pages + ' pages' : ''), href: d.fileUrl || '' };
   }
   function renderCardGrid(type, mount, items) {
@@ -132,34 +118,6 @@
     const mount = $('#content-' + type); if (!mount) return;
     const q = ($('[data-ct-search="' + type + '"]', mount) || {}).value || ''; const f = ($('[data-ct-filter="' + type + '"]', mount) || {}).value || '';
     mount.querySelectorAll('tbody tr, .pc-card').forEach((tr) => { tr.hidden = !!((q && !tr.dataset.hay.includes(q.toLowerCase())) || (f && !tr.dataset.state.split(' ').includes(f))); });
-=======
-  function contentOf(type, d) {
-    if (type === 'article') return `${(d.vocabulary || []).length} words · ${(d.grammar || []).length} grammar${d.imageUrl ? ' · 🖼' : ''}`;
-    if (type === 'writing') return (d.tasks || []).length + ' task(s)';
-    return (d.questions || []).length + ' questions' + (type === 'listening' ? (d.audioUrl ? ' · 🔊 audio' : ' · <span class="warn-text">no audio</span>') : '');
-  }
-  function renderType(type) {
-    const mount = $('#content-' + type); if (!mount) return;
-    const items = lists[type];
-    const noun = type === 'writing' ? 'task set' : type === 'article' ? 'article' : 'test';
-    const rows = (items || []).map((m) => {
-      const d = m.data || {};
-      const sub = type === 'article' ? [d.topic, d.level].filter(Boolean).join(' · ') : m.pack || '';
-      return `<tr><td><strong>${esc(m.title)}</strong><div class="muted sm">${esc(sub)}</div></td><td>${contentOf(type, d)}</td>
-        <td><button class="chip ${m.premium ? 'chip-premium' : ''}" data-ct="premium" data-id="${esc(m.id)}" data-type="${type}" type="button" title="Click to change">${m.premium ? '★ Premium' : 'Free'}</button></td>
-        <td><button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" data-id="${esc(m.id)}" data-type="${type}" type="button" title="Click to change">${m.published === false ? 'Draft' : 'Published'}</button></td>
-        <td>${fmt(m.createdAt)}</td>
-        <td><div class="btn-row"><button class="btn btn-sm" data-ct="edit" data-id="${esc(m.id)}" data-type="${type}" type="button">Edit</button><a class="btn btn-sm" href="${openUrl(type, m.id)}" target="_blank" rel="noopener">Open ↗</a><button class="btn btn-sm btn-danger" data-ct="delete" data-id="${esc(m.id)}" data-type="${type}" data-title="${esc(m.title)}" type="button">Delete</button></div></td></tr>`;
-    }).join('');
-    const help = { reading: 'Passage, pictures and questions with answers.', listening: 'Audio file, map/diagram pictures and questions with answers.',
-      writing: 'Task 1 / Task 2 prompts with a chart (drawn from your numbers) or a picture. They open in the IELTS writing exam screen.',
-      article: 'Text, cover picture and the vocabulary / grammar students tap on — all in one form.' }[type];
-    const where = type === 'article' ? 'Students see them on the Articles page.' : `Students see them in the ${TYPES[type]} practice page.`;
-    mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${TYPES[type]} ${type === 'writing' ? 'tasks' : type === 'article' ? 's' : 'tests'}</div>
-      <div class="muted sm">${help} ${where}</div></div>
-      <button class="btn btn-primary" data-ct="new" data-type="${type}" type="button">+ New ${noun}</button></div>
-      ${items === null ? '<div class="empty">Loading…</div>' : items.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Content</th><th>Access</th><th>Status</th><th>Added</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">Nothing here yet. Press “+ New ${noun}” to add the first one.</div>`}</div>`;
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   }
 
   /* ───────── uploads (local disk, or straight to Supabase Storage on Vercel) ───────── */
@@ -270,10 +228,14 @@
   const pick = (src, shape) => Object.keys(shape).reduce((o, k) => { if (src[k] != null) o[k] = String(src[k]); return o; }, {});
 
   /* ───────── builder ───────── */
-<<<<<<< HEAD
   const blankQ = (type, passage) => ({ type: type || (draft && draft.type === 'listening' ? 'gap' : 'short'), passage: passage || 1, group: '', blockTitle: '', title: '', prompt: '', options: [], answer: '', explanation: '' });
   const blankPassages = () => [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }];
+  const blankTask = (n) => ({ title: 'Task ' + n, kind: n === 1 ? 'task1' : 'task2', prompt: '', imageUrl: '', chartText: '', chartUnit: '', minWords: n === 1 ? 150 : 250, minutes: n === 1 ? 20 : 40, sample: '' });
   function blank(type, mode) {
+    if (type === 'article') {
+      return { type, title: '', pack: '', description: '', premium: false, published: true,
+        data: { topic: '', level: 'Passage 1', category: 'Academic Reading', lead: '', author: 'IELTSX Reading Team', date: today(), testDate: '', imageUrl: '', imageAlt: '', body: '', source: '', vocabulary: [blankV()], grammar: [] } };
+    }
     const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : type === 'reading' ? (mode === 'full' ? 60 : 20) : 60, instructions: '', images: [] };
     if (type === 'reading') Object.assign(data, { mode: mode === 'full' ? 'full' : 'part', coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()] });
     if (type === 'listening') Object.assign(data, { audioUrl: '', audioStart: 0, audioEnd: 0, durationMin: 10, transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ('gap')] });
@@ -282,21 +244,7 @@
       { title: 'Part 1 · Introduction and interview', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' },
       { title: 'Part 2 · Long turn (cue card)', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 60, speakSeconds: 120, sample: '' },
       { title: 'Part 3 · Discussion', prompt: '', questions: [], imageUrl: '', audioUrl: '', prepSeconds: 0, speakSeconds: 0, sample: '' }] });
-    if (type === 'article') Object.assign(data, { topic: 'General', passageLabel: 'Passage 1', source: '', readMinutes: 5, coverUrl: '', body: '' });
-    if (type === 'writing') Object.assign(data, { coverUrl: '', tier: 'Tier 1', cardTypes: [], tasks: [{ title: 'Task 1', prompt: '', imageUrl: '', minWords: 150, minutes: 20, sample: '' }, { title: 'Task 2', prompt: '', imageUrl: '', minWords: 250, minutes: 40, sample: '' }] });
-=======
-  const blankQ = (type) => ({ type: type || 'short', group: '', prompt: '', options: [], answer: '', explanation: '' });
-  const blankTask = (n) => ({ title: 'Task ' + n, kind: n === 1 ? 'task1' : 'task2', prompt: '', imageUrl: '', chartText: '', chartUnit: '', minWords: n === 1 ? 150 : 250, minutes: n === 1 ? 20 : 40, sample: '' });
-  function blank(type) {
-    if (type === 'article') {
-      return { type, title: '', pack: '', description: '', premium: false, published: true,
-        data: { topic: '', level: 'Passage 1', category: 'Academic Reading', lead: '', author: 'IELTSX Reading Team', date: today(), testDate: '', imageUrl: '', imageAlt: '', body: '', source: '', vocabulary: [blankV()], grammar: [] } };
-    }
-    const data = { durationMin: type === 'writing' ? 60 : type === 'listening' ? 30 : 60, instructions: '', images: [] };
-    if (type === 'reading') Object.assign(data, { passage: '', questions: [blankQ()] });
-    if (type === 'listening') Object.assign(data, { audioUrl: '', transcript: '', questions: [blankQ()] });
-    if (type === 'writing') Object.assign(data, { tasks: [blankTask(1), blankTask(2)] });
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+    if (type === 'writing') Object.assign(data, { coverUrl: '', tier: 'Tier 1', cardTypes: [], tasks: [blankTask(1), blankTask(2)] });
     return { type, title: '', pack: '', description: '', premium: false, published: true, data };
   }
   let PACKS = {};
@@ -307,32 +255,26 @@
   function openBuilder(type, item, mode) {
     loadPacks().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); });
     editingId = item ? item.id : null;
-<<<<<<< HEAD
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type, mode);
-    draft.data = draft.data || {}; draft.data.images = draft.data.images || [];
-    if (draft.type === 'reading') { draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part'; const ps = Array.isArray(draft.data.passages) ? draft.data.passages : []; draft.data.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); }
-    if (draft.type === 'reading' || draft.type === 'listening') { draft.groups = toGroups(draft.data.questions || []); if (!draft.groups.length) draft.groups = [newGroup(draft.type === 'listening' ? 'gap' : 'short')]; }
-    if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking').data.parts;
-    if (draft.type === 'writing' && !(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
-    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + (draft.type === 'reading' ? (draft.data.mode === 'full' ? 'full reading test' : 'part practice card') : NOUN[draft.type]);
-=======
-    draft = item ? JSON.parse(JSON.stringify(item)) : blank(type);
     draft.data = draft.data || {};
     if (draft.type === 'article') {
       const d = draft.data;
+      // older admin articles kept the cover in coverUrl, the level in passageLabel and the lead in the description
+      if (!d.imageUrl && d.coverUrl) d.imageUrl = d.coverUrl;
+      if (!d.level && d.passageLabel) d.level = d.passageLabel;
+      if (!d.lead && draft.description) d.lead = draft.description;
       d.vocabulary = (d.vocabulary || []).map((v) => ({ ...blankV(), ...v, synonyms: Array.isArray(v.synonyms) ? v.synonyms.join(', ') : v.synonyms || '' }));
       d.grammar = (d.grammar || []).map((g) => ({ ...blankG(), ...g }));
       if (!d.vocabulary.length) d.vocabulary.push(blankV());
-    } else {
-      draft.data.images = draft.data.images || [];
-      if (draft.type !== 'writing') draft.data.questions = draft.data.questions && draft.data.questions.length ? draft.data.questions : [blankQ()];
-      if (draft.type === 'writing') {
-        if (!(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
-        draft.data.tasks.forEach((t, i) => { t.kind = t.kind || (i === 0 ? 'task1' : 'task2'); t.chartText = chartToText(t.chart); t.chartUnit = (t.chart && t.chart.unit) || ''; });
-      }
+    } else draft.data.images = draft.data.images || [];
+    if (draft.type === 'reading') { draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part'; const ps = Array.isArray(draft.data.passages) ? draft.data.passages : []; draft.data.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); }
+    if (draft.type === 'reading' || draft.type === 'listening') { draft.groups = toGroups(draft.data.questions || []); if (!draft.groups.length) draft.groups = [newGroup(draft.type === 'listening' ? 'gap' : 'short')]; }
+    if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking').data.parts;
+    if (draft.type === 'writing') {
+      if (!(draft.data.tasks || []).length) draft.data.tasks = blank('writing').data.tasks;
+      draft.data.tasks.forEach((t, i) => { t.kind = t.kind || (i === 0 ? 'task1' : 'task2'); t.chartText = chartToText(t.chart); t.chartUnit = (t.chart && t.chart.unit) || ''; });
     }
-    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + TYPES[draft.type].toLowerCase() + (draft.type === 'writing' ? ' tasks' : draft.type === 'article' ? '' : ' test');
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+    $('#builder-title').textContent = (editingId ? 'Edit ' : 'New ') + (draft.type === 'reading' ? (draft.data.mode === 'full' ? 'full reading test' : 'part practice card') : NOUN[draft.type]);
     renderBuilder(); $('#builder').classList.add('open'); $('#builder-body').scrollTop = 0;
   }
   function closeBuilder() { if (uploading && !confirm('A file is still uploading. Close anyway?')) return; $('#builder').classList.remove('open'); draft = null; editingId = null; }
@@ -684,10 +626,10 @@
   function grammarBlock() {
     const gs = draft.data.grammar || [];
     return `<div class="cb-block"><div class="cb-head"><div><strong>Grammar (${gs.length})</strong><div class="muted sm">Underlined in blue. In “Underline” paste the phrase exactly as it is in the text.</div></div>
-      <div class="btn-row"><button class="btn btn-sm" data-cb="g-bulk" type="button">Paste many</button><button class="btn btn-sm btn-primary" data-cb="g-add" type="button">+ Grammar point</button></div></div>
+      <div class="btn-row"><button class="btn btn-sm" data-cb="gr-bulk" type="button">Paste many</button><button class="btn btn-sm btn-primary" data-cb="gr-add" type="button">+ Grammar point</button></div></div>
       <div id="gbulk-box" class="cb-bulk" hidden><div class="muted sm">One per line: <code>title | pattern | explanation | o‘zbekcha | русский | example | phrase to underline</code></div>
         <textarea class="field cb-mono" id="gbulk-text" rows="4" placeholder="Result clause “such … that” | such + adjective + noun + that | Shows the result of something extreme. | … | … | It was such a hot day that … | such delicate terrain that"></textarea>
-        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="g-bulk-do" type="button">Add them</button></div></div>
+        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="gr-bulk-do" type="button">Add them</button></div></div>
       ${gs.map((g, i) => `<div class="cb-word"><div class="cb-qn cb-qn-g">G${i + 1}</div><div class="cb-qbody">
         <div class="cb-row">${field('Title *', `data.grammar.${i}.title`, g.title, 'placeholder="Conditional inversion"')}${field('Pattern', `data.grammar.${i}.pattern`, g.pattern, 'placeholder="Should + subject + verb"')}</div>
         ${field('Underline (phrase from the text)', `data.grammar.${i}.match`, g.match, 'placeholder="should another spill occur"')}
@@ -695,7 +637,7 @@
         ${area('Explanation (English)', `data.grammar.${i}.explanation`, g.explanation, 2)}
         <div class="cb-row">${area('🇺🇿 O‘zbekcha', `data.grammar.${i}.explanation_uz`, g.explanation_uz, 2)}${area('🇷🇺 Русский', `data.grammar.${i}.explanation_ru`, g.explanation_ru, 2)}</div>
         ${field('Example sentence', `data.grammar.${i}.example`, g.example)}</div>
-        <div class="cb-side"><button class="btn btn-sm btn-danger" data-cb="g-del" data-i="${i}" type="button" title="Delete">✕</button></div></div>`).join('')}</div>`;
+        <div class="cb-side"><button class="btn btn-sm btn-danger" data-cb="gr-del" data-i="${i}" type="button" title="Delete">✕</button></div></div>`).join('')}</div>`;
   }
   function articleForm() {
     const d = draft.data;
@@ -707,7 +649,8 @@
       ${area('Lead (short description under the title and on the card) *', 'data.lead', d.lead, 2, 'maxlength="600"')}
       <div class="cb-block"><div class="cb-head"><div><strong>Cover picture</strong><div class="muted sm">Shown on the Articles card and next to the text.</div></div><div class="btn-row"><button class="btn btn-sm" data-cb="a-img" type="button">⬆ ${d.imageUrl ? 'Replace' : 'Upload'} picture</button>${d.imageUrl ? '<button class="btn btn-sm btn-danger" data-cb="a-img-del" type="button">Remove</button>' : ''}</div></div>
         <div class="muted sm" id="aimg-status"></div>${d.imageUrl ? `<div class="cb-row"><img class="cb-taskimg" src="${esc(d.imageUrl)}" alt="">${field('Picture description (alt text)', 'data.imageAlt', d.imageAlt)}</div>` : ''}</div>
-      ${area('Article text *', 'data.body', d.body, 16, 'class="field cb-passage" placeholder="Paste the article. Leave an empty line between paragraphs.&#10;Start a line with ## for a heading, e.g.&#10;## The human touch"').replace('class="field" rows', 'rows')}
+      <div class="cb-block"><div class="cb-head"><div><strong>Article text *</strong><div class="muted sm">Empty line = new paragraph. <code>## Heading</code> for a heading. Use “Insert picture” to put a picture inside the text.</div></div><button class="btn btn-sm" data-cb="body-img" type="button">⬆ Insert picture</button></div><div class="muted sm" id="body-status"></div>
+        <textarea class="field cb-passage" id="body-text" rows="16" data-p="data.body" placeholder="Paste the article. Leave an empty line between paragraphs.&#10;Start a line with ## for a heading, e.g.&#10;## The human touch">${esc(d.body)}</textarea></div>
       ${field('Source / reference', 'data.source', d.source, 'placeholder="How to clean a beach. Nature 422, 464-466 (2003)."')}
       <div class="cb-checks cb-checks-row"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>
       ${vocabBlock()}
@@ -722,15 +665,6 @@
         <div class="cb-head"><div class="muted sm" id="pimg-status-${i}"></div><div class="btn-row"><button class="btn btn-sm" data-cb="p-img" data-i="${i}" type="button">⬆ ${t.imageUrl ? 'Replace' : 'Upload'} picture</button>${t.imageUrl ? `<button class="btn btn-sm btn-danger" data-cb="p-img-del" data-i="${i}" type="button">Remove picture</button>` : ''}<button class="btn btn-sm" data-cb="p-audio" data-i="${i}" type="button">⬆ ${t.audioUrl ? 'Replace' : 'Upload'} model-answer audio</button>${t.audioUrl ? `<button class="btn btn-sm btn-danger" data-cb="p-audio-del" data-i="${i}" type="button">Remove audio</button>` : ''}</div></div>
         ${t.imageUrl ? `<img class="cb-taskimg" src="${esc(t.imageUrl)}" alt="">` : ''}${t.audioUrl ? `<audio controls preload="none" src="${esc(t.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
         <label class="lbl">Model answer (optional, the student can reveal it)<textarea class="field" rows="4" data-p="data.parts.${i}.sample">${esc(t.sample)}</textarea></label></div>`).join('')}</div>`;
-  }
-  function articleBlock() {
-    const d = draft.data;
-    return `<div class="cb-block"><div class="cb-head"><div><strong>Cover picture</strong><div class="muted sm">Shown on the article card and at the top of the article (png, jpg, webp, avif).</div></div><div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="cover" type="button">⬆ ${d.coverUrl ? 'Replace cover' : 'Upload cover'}</button>${d.coverUrl ? '<button class="btn btn-sm btn-danger" data-cb="cover-del" type="button">Remove</button>' : ''}</div></div><div class="muted sm" id="cover-status"></div>${d.coverUrl ? `<img class="cb-taskimg" src="${esc(d.coverUrl)}" alt="">` : ''}</div>
-      <div class="cb-grid"><label class="lbl">Topic<select class="field" data-p="data.topic">${TOPICS.map((x) => `<option ${d.topic === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
-        <label class="lbl">Passage level<select class="field" data-p="data.passageLabel">${['Passage 1', 'Passage 2', 'Passage 3'].map((x) => `<option ${d.passageLabel === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div>
-      <div class="cb-grid">${field('Source (optional)', 'data.source', d.source, 'placeholder="e.g. National Geographic" maxlength="120"')}${field('Reading time, minutes', 'data.readMinutes', d.readMinutes, 'type="number" min="0"')}</div>
-      <div class="cb-block"><div class="cb-head"><div><strong>Article text *</strong><div class="muted sm">Empty line = new paragraph. <code>## Heading</code> for a heading, <code>- item</code> for a list. Use “Insert picture” to put a picture inside the text.</div></div><button class="btn btn-sm" data-cb="body-img" type="button">⬆ Insert picture</button></div><div class="muted sm" id="body-status"></div>
-        <textarea class="field cb-passage" id="body-text" rows="16" data-p="data.body">${esc(d.body)}</textarea></div>`;
   }
   function renderBuilder() {
     const t = draft.type, d = draft.data;
@@ -747,7 +681,7 @@
         <label class="lbl">Audio link (https://… or /uploads/…)<input class="field" data-p="data.audioUrl" value="${esc(d.audioUrl)}" placeholder="https://…/recording.mp3"></label>
         <div class="cb-grid"><label class="lbl">Starts at (seconds, 0 = from the beginning)<input class="field" type="number" min="0" data-p="data.audioStart" data-num="1" value="${esc(d.audioStart || 0)}"></label><label class="lbl">Ends at (seconds, 0 = until the end)<input class="field" type="number" min="0" data-p="data.audioEnd" data-num="1" value="${esc(d.audioEnd || 0)}"></label></div>
         <div class="muted sm">Use these two numbers when one long recording holds all four sections and this test is only one of them.</div></div>` : ''}
-      ${t === 'article' ? articleBlock() : ''}${t === 'speaking' ? partsBlock() : ''}
+      ${t === 'speaking' ? partsBlock() : ''}
       ${t === 'writing' ? tasksBlock() : t === 'speaking' || t === 'pdf' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
       ${t === 'reading' || t === 'listening' ? questionsBlock() : ''}
       ${t === 'listening' ? `<label class="lbl">Transcript (optional, shown only after the student submits). One line per speaker turn, e.g. <code>Tom: Good morning…</code>. The line that contains an answer is highlighted automatically<textarea class="field" rows="8" data-p="data.transcript">${esc(d.transcript)}</textarea></label>` : ''}`;
@@ -772,7 +706,6 @@
       if (v === 'full' && (!dd.durationMin || dd.durationMin === 20)) dd.durationMin = 60; if (v === 'part' && dd.durationMin === 60) dd.durationMin = 20;
     }
     setPath(draft, p, v);
-<<<<<<< HEAD
     const gt = /^groups\.(\d+)\.type$/.exec(p);
     if (gt) {   // another type: the option list moves between the group (matching / map / box) and the questions (multiple choice)
       const g = draft.groups[Number(gt[1])]; const shared = SHARED_OPTS.includes(g.type);
@@ -782,10 +715,7 @@
     }
     if (el.dataset.rerender && e.type === 'change') { if (p.startsWith('groups.')) refreshQuestions(); else renderBuilder(); }
     else if (/^groups\.\d+\.options$/.test(p) && e.type === 'change') refreshQuestions();   // the answer menus follow the option list
-=======
-    if (el.dataset.rerender && e.type === 'change') renderBuilder();
     if (draft.type === 'article' && /^data\.(body|vocabulary\.\d+\.(word|match)|grammar\.\d+\.(match|sourceContext))$/.test(p)) { clearTimeout(onInput.t); onInput.t = setTimeout(refreshFound, 250); }
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
   }
 
   function checkArticle(d) {
@@ -808,7 +738,6 @@
       d.questions = flatten(draft.groups).filter((q) => q.prompt);
     }
     if (!draft.title.trim()) return toast('Please enter a title.', true);
-<<<<<<< HEAD
     if (draft.type === 'reading' && d.mode === 'full') {
       d.passages = (d.passages || blankPassages()).map((x) => ({ title: String((x && x.title) || '').trim(), passage: String((x && x.passage) || '') }));
       if (!d.passages[0].passage.trim()) return toast('Please paste the text of Passage 1.', true);
@@ -818,22 +747,14 @@
     } else if (draft.type === 'reading' && !String(d.passage || '').trim()) return toast('Please paste the passage text.', true);
     if (draft.type === 'listening' && !d.audioUrl) return toast('Please upload the audio file.', true);
     if (draft.type === 'article') {
-      if (!String(d.body || '').trim()) return toast('Please paste the article text.', true);
+      const err = checkArticle(d); if (err) { if (!d.vocabulary.length) d.vocabulary.push(blankV()); renderBuilder(); return toast(err, true); }
+      draft.description = d.lead;
     } else if (draft.type === 'pdf') {
       if (!d.fileUrl) return toast('Please upload the PDF file.', true);
     } else if (draft.type === 'speaking') {
       d.parts = (d.parts || []).filter((t) => String(t.prompt || '').trim() || (t.questions || []).length || t.imageUrl);
       if (!d.parts.length) return toast('Add a cue card or at least one question.', true);
     } else if (draft.type !== 'writing') {
-=======
-    if (draft.type === 'article') {
-      const err = checkArticle(d); if (err) { if (!d.vocabulary.length) d.vocabulary.push(blankV()); renderBuilder(); return toast(err, true); }
-      draft.description = d.lead;
-    }
-    if (draft.type === 'reading' && !String(d.passage || '').trim()) return toast('Please paste the passage text.', true);
-    if (draft.type === 'listening' && !d.audioUrl) return toast('Please upload the audio file.', true);
-    if (draft.type === 'reading' || draft.type === 'listening') {
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
       d.questions = (d.questions || []).filter((q) => String(q.prompt || '').trim());
       if (!d.questions.length) return toast('Add at least one question.', true);
       const noAns = d.questions.findIndex((q) => !String(q.answer || '').trim());
@@ -878,8 +799,8 @@
         return;
       }
       if (!draft) return;
-<<<<<<< HEAD
-      const a = t.dataset.cb, i = Number(t.dataset.i);
+      const a = t.dataset.cb, i = Number(t.dataset.i), d = draft.data;
+      const scrollToLast = (sel) => { const all = document.querySelectorAll(sel); if (all.length) all[all.length - 1].scrollIntoView({ block: 'center' }); };
       if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { draft.data.images.push({ url, caption: '' }); renderBuilder(); } }
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
@@ -930,10 +851,8 @@
       }
       else if (a === 'pdf-file') { const url = await pickAndUpload('.pdf,application/pdf', $('#pdf-status')); if (url) { draft.data.fileUrl = url; renderBuilder(); } }
       else if (a === 'pdf-file-del') { draft.data.fileUrl = ''; renderBuilder(); }
-      else if (a === 'cover') { const url = await pickAndUpload('image/*', $('#cover-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
       else if (a === 'card-img') { const url = await pickAndUpload('image/*', $('#card-img-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }
       else if (a === 'card-img-del') { draft.data.coverUrl = ''; renderBuilder(); }
-      else if (a === 'cover-del') { draft.data.coverUrl = ''; renderBuilder(); }
       else if (a === 'body-img') {
         const url = await pickAndUpload('image/*', $('#body-status')); if (!url) return;
         const ta = $('#body-text'); const at = ta ? (ta.selectionStart ?? ta.value.length) : String(draft.data.body || '').length; const cur = String(draft.data.body || '');
@@ -946,41 +865,22 @@
       else if (a === 'p-img-del') { draft.data.parts[i].imageUrl = ''; renderBuilder(); }
       else if (a === 'p-audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#pimg-status-' + i)); if (url) { draft.data.parts[i].audioUrl = url; renderBuilder(); } }
       else if (a === 'p-audio-del') { draft.data.parts[i].audioUrl = ''; renderBuilder(); }
-      else if (a === 't-add') { draft.data.tasks.push({ title: 'Task ' + (draft.data.tasks.length + 1), prompt: '', imageUrl: '', minWords: 150, minutes: 20, sample: '' }); renderBuilder(); }
+      else if (a === 't-add') { draft.data.tasks.push(blankTask(draft.data.tasks.length + 1)); renderBuilder(); }
       else if (a === 't-del') { draft.data.tasks.splice(i, 1); renderBuilder(); }
       else if (a === 't-img') { const url = await pickAndUpload('image/*', $('#timg-status-' + i)); if (url) { draft.data.tasks[i].imageUrl = url; renderBuilder(); } }
       else if (a === 't-img-del') { draft.data.tasks[i].imageUrl = ''; renderBuilder(); }
-=======
-      const a = t.dataset.cb, i = Number(t.dataset.i), d = draft.data;
-      const scrollToLast = (sel) => { const all = document.querySelectorAll(sel); if (all.length) all[all.length - 1].scrollIntoView({ block: 'center' }); };
-      if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { d.images.push({ url, caption: '' }); renderBuilder(); } }
-      else if (a === 'img-del') { d.images.splice(i, 1); renderBuilder(); }
-      else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { d.audioUrl = url; renderBuilder(); } }
-      else if (a === 'q-add') { const last = d.questions[d.questions.length - 1]; d.questions.push(blankQ(last && last.type)); renderBuilder(); scrollToLast('.cb-q'); }
-      else if (a === 'q-del') { d.questions.splice(i, 1); if (!d.questions.length) d.questions.push(blankQ()); renderBuilder(); }
-      else if (a === 'q-bulk') { const b = $('#bulk-box'); b.hidden = !b.hidden; }
-      else if (a === 'q-bulk-do') {
-        const type = $('#bulk-type').value; const lines = $('#bulk-text').value.split('\n').map((x) => x.trim()).filter(Boolean);
-        if (!lines.length) return;
-        const add = lines.map((l) => { const [p, ...r] = l.split('=>'); return { ...blankQ(type), prompt: p.trim(), answer: r.join('=>').trim() }; });
-        d.questions = d.questions.filter((q) => q.prompt || q.answer).concat(add); renderBuilder(); toast(add.length + ' questions added');
-      }
-      else if (a === 't-add') { d.tasks.push(blankTask(d.tasks.length + 1)); renderBuilder(); }
-      else if (a === 't-del') { d.tasks.splice(i, 1); renderBuilder(); }
-      else if (a === 't-img') { const url = await pickAndUpload('image/*', $('#timg-status-' + i)); if (url) { d.tasks[i].imageUrl = url; renderBuilder(); } }
-      else if (a === 't-img-del') { d.tasks[i].imageUrl = ''; renderBuilder(); }
       // article
       else if (a === 'a-img') { const url = await pickAndUpload('image/*', $('#aimg-status')); if (url) { d.imageUrl = url; if (!d.imageAlt) d.imageAlt = draft.title; renderBuilder(); } }
       else if (a === 'a-img-del') { d.imageUrl = ''; renderBuilder(); }
       else if (a === 'v-add') { d.vocabulary.push(blankV()); renderBuilder(); scrollToLast('.cb-qn-v'); }
       else if (a === 'v-del') { d.vocabulary.splice(i, 1); renderBuilder(); }
       else if (a === 'v-up' && i > 0) { d.vocabulary.splice(i - 1, 0, d.vocabulary.splice(i, 1)[0]); renderBuilder(); }
-      else if (a === 'g-add') { d.grammar.push(blankG()); renderBuilder(); scrollToLast('.cb-qn-g'); }
-      else if (a === 'g-del') { d.grammar.splice(i, 1); renderBuilder(); }
-      else if (a === 'v-bulk' || a === 'g-bulk') { const b = $(a === 'v-bulk' ? '#vbulk-box' : '#gbulk-box'); b.hidden = !b.hidden; }
-      else if (a === 'v-bulk-do' || a === 'g-bulk-do') {
+      else if (a === 'gr-add') { d.grammar.push(blankG()); renderBuilder(); scrollToLast('.cb-qn-g'); }
+      else if (a === 'gr-del') { d.grammar.splice(i, 1); renderBuilder(); }
+      else if (a === 'v-bulk' || a === 'gr-bulk') { const b = $(a === 'v-bulk' ? '#vbulk-box' : '#gbulk-box'); b.hidden = !b.hidden; }
+      else if (a === 'v-bulk-do' || a === 'gr-bulk-do') {
         let got;
-        try { got = parseBulk($(a === 'v-bulk-do' ? '#vbulk-text' : '#gbulk-text').value, a === 'g-bulk-do' ? 'grammar' : 'vocab'); }
+        try { got = parseBulk($(a === 'v-bulk-do' ? '#vbulk-text' : '#gbulk-text').value, a === 'gr-bulk-do' ? 'grammar' : 'vocab'); }
         catch (err) { return toast('Could not read that list: ' + err.message, true); }
         const filled = (x) => Object.values(x).some((y) => String(y || '').trim());
         d.vocabulary = d.vocabulary.filter(filled).concat(got.vocab.filter((v) => v.word));
@@ -990,7 +890,6 @@
         const notFound = got.vocab.filter((v) => v.word && !vFound(v)).length;
         toast(`${got.vocab.length} words, ${got.grammar.length} grammar points added` + (notFound ? ` · ${notFound} not found in the text yet` : ''));
       }
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
     } catch (err) { fail(err); }
   }
 

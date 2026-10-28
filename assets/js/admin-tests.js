@@ -26,12 +26,8 @@
             };
             box.innerHTML = '<div class="bg-card border rounded-lg p-4"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px"><h2 class="text-lg font-semibold">New ' + type + ' tests</h2><span class="text-xs text-muted-foreground">' + items.length + ' added</span></div>' +
                 '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">' + items.map(function (i) {
-<<<<<<< HEAD
-                    return '<a href="' + (i.href ? esc(i.href) : '/test?id=' + encodeURIComponent(i.id)) + '" class="bg-card border rounded-lg p-4" style="display:block;text-decoration:none;color:inherit;transition:box-shadow .15s" onmouseover="this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'\'">' +
-=======
-                    var href = (type === 'writing' ? '/writing/?id=' : '/test?id=') + encodeURIComponent(i.id);
-                    return '<a href="' + href + '" class="bg-card border rounded-lg p-4" style="display:block;text-decoration:none;color:inherit;transition:box-shadow .15s" onmouseover="this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'\'">' +
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+                    var href = i.href || ((type === 'writing' ? '/writing/?id=' : '/test?id=') + encodeURIComponent(i.id));
+                    return '<a href="' + esc(href) + '" class="bg-card border rounded-lg p-4" style="display:block;text-decoration:none;color:inherit;transition:box-shadow .15s" onmouseover="this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'\'">' +
                         (i.pack ? '<div class="text-xs text-muted-foreground">' + esc(i.pack) + '</div>' : '') +
                         '<div class="font-medium" style="margin:2px 0 6px">' + esc(i.title) + '</div>' +
                         (i.description ? '<div class="text-sm text-muted-foreground" style="margin-bottom:6px">' + esc(i.description) + '</div>' : '') +

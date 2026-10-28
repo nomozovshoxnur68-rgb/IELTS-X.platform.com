@@ -92,23 +92,14 @@ alter table public.ieltsx_users add column if not exists "sessionEpoch" integer 
 
 -- ───────────── added in v4: tests made in the admin panel (Reading / Listening / Writing) ─────────────
 -- Run this part once on an existing database (it is safe to run again).
-alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing'));
 alter table public.ieltsx_materials add column if not exists data jsonb not null default '{}'::jsonb;
 alter table public.ieltsx_materials add column if not exists published boolean not null default true;
 alter table public.ieltsx_materials add column if not exists "updatedAt" timestamptz not null default now();
 -- the panel creates the public "ieltsx-media" Storage bucket (audio + images) by itself on the first upload.
 
-<<<<<<< HEAD
--- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
--- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
--- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
-alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab'));
-
 -- ───────────── added in v6: Access rules (admin panel -> Access: free / locked + plan for every pack and test) ─────────────
 -- Run this once on an existing database (safe to run again). Without it the site keeps working with the default locks,
--- but the choices made in the panel cannot be saved.
+-- but the choices made in the panel cannot be saved. Pictures uploaded on Vercel without Storage are kept here too.
 create table if not exists public.ieltsx_settings (
   key text primary key,
   value jsonb not null default '{}'::jsonb,
@@ -116,50 +107,11 @@ create table if not exists public.ieltsx_settings (
 );
 alter table public.ieltsx_settings enable row level security;
 
--- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
--- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
--- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
+-- ───────────── every type the admin panel can create (v4 – v7; run once on an existing database, safe to run again) ─────────────
+-- reading / listening / writing (v4), vocab = Vocabulary collections (v5), speaking, article and pdf = PDF library (v7).
+-- Vocabulary collections keep { kind, level, source, icon, words[] } in "data"; articles keep their text, cover picture,
+-- vocabulary and grammar there. The list is set in ONE place: a shorter list fails ("violated by some row") on a
+-- database that already holds vocab / speaking / article / pdf rows. Without it Supabase refuses to save those types.
 alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab'));
-
--- ───────────── added in v6: Access rules (admin panel -> Access: free / locked + plan for every pack and test) ─────────────
--- Run this once on an existing database (safe to run again). Without it the site keeps working with the default locks,
--- but the choices made in the panel cannot be saved.
-create table if not exists public.ieltsx_settings (
-  key text primary key,
-  value jsonb not null default '{}'::jsonb,
-  "updatedAt" timestamptz not null default now()
-);
-alter table public.ieltsx_settings enable row level security;
-
--- ───────────── added in v5: Vocabulary collections (admin panel -> Vocabulary) ─────────────
--- Run this once on an existing database (safe to run again). Collections are rows of ieltsx_materials with type 'vocab':
--- `premium` = locked for Free users, `published` = visible, `data` = { kind, level, source, icon, words[] }.
-alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab'));
-
--- ───────────── added in v6: Access rules (admin panel -> Access: free / locked + plan for every pack and test) ─────────────
--- Run this once on an existing database (safe to run again). Without it the site keeps working with the default locks,
--- but the choices made in the panel cannot be saved.
-create table if not exists public.ieltsx_settings (
-  key text primary key,
-  value jsonb not null default '{}'::jsonb,
-  "updatedAt" timestamptz not null default now()
-);
-alter table public.ieltsx_settings enable row level security;
-
-
--- ───────────── added in v7: Speaking tests and Articles made in the admin panel (run once) ─────────────
-alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','vocab','speaking','article'));
-
--- ───────────── added in v7: every type the admin panel can create (run once on an existing database; safe to run again) ─────────────
--- Adds speaking, article and pdf (PDF library) to the allowed types. Without it Supabase refuses to save those.
-alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','speaking','article','vocab','pdf'));
-=======
--- ───────────── added in v5: articles made in the admin panel (text + vocabulary + grammar in "data") ─────────────
--- Run this part once on an existing database (it is safe to run again).
-alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
-alter table public.ieltsx_materials add constraint ieltsx_materials_type_check check (type in ('reading','listening','writing','article'));
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+alter table public.ieltsx_materials add constraint ieltsx_materials_type_check
+  check (type in ('reading','listening','writing','speaking','article','vocab','pdf'));

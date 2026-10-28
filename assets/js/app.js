@@ -2155,13 +2155,9 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                                 </div>
                             </div>
                             <div class="flex gap-2 pt-1">
-<<<<<<< HEAD
-                                <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
-=======
                                 ${item.href ? `<a href="${item.href}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap h-8 rounded-md px-3 text-xs font-semibold w-full bg-primary text-primary-foreground shadow hover:bg-primary/90 transition-all" style="text-decoration:none">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 mr-1"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>Start test
-                                </a>` : `<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
->>>>>>> 5d18dcd (Unify article pages, add article + writing builders in admin, add writing exam)
+                                </a>` : `<button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
                                         <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
                                         <path d="M5 21h14" />
@@ -2288,9 +2284,11 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 .then(function (d) {
                     clearTimeout(timer);
                     var items = d.items || [];
-                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: '/test?id=' + encodeURIComponent(m.id), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    // writing sets open in the IELTS writing exam screen (/writing/?id=…)
+                    var hrefOf = function (m) { return m.href || ('/writing/?id=' + encodeURIComponent(m.id)); };
+                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: hrefOf(m), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
                     var made = items.map(function (m, n) {
-                        return { id: 1000 + n, title: m.title, task: m.taskLabel || 'Task 1', tier: m.tier || 'Tier 1', type: (m.types || [])[0] || 'Writing task', pack: m.pack || 'Practice', plan: 'Plan A', img: m.coverUrl || null, href: '/test?id=' + encodeURIComponent(m.id), admin: true };
+                        return { id: 1000 + n, title: m.title, task: m.taskLabel || 'Task 1', tier: m.tier || 'Tier 1', type: (m.types || [])[0] || 'Writing task', pack: m.pack || 'Practice', plan: 'Plan A', img: m.coverUrl || null, href: hrefOf(m), admin: true };
                     });
                     Array.prototype.unshift.apply(writingData, made);
                     if (made.length) { currentPage = 1; renderCards(); }
@@ -2493,15 +2491,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 href: "/collections/article-4.html" },
         ];
 
-        // cards whose page does not exist are dropped (they led to the 404 page); articles made in the admin panel are added
+        // cards whose page does not exist are dropped (they led to the 404 page); articles made in the admin panel are added at the end
         for (var ai = articlesData.length - 1; ai >= 0; ai--) { if (!/^\/collections\//.test(String(articlesData[ai].href || ''))) articlesData.splice(ai, 1); }
-        fetch('/api/materials?type=article', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
-            (d.items || []).forEach(function (m, i) {
-                articlesData.push({ id: 1000 + ((d.items || []).length - i), title: m.title, passage: m.passageLabel || 'Passage 1', topic: m.topic || 'General', date: String(m.createdAt || '').slice(0, 10) || '2026-01-01',
-                    image: m.coverUrl || '', description: m.description || m.source || '', href: '/test?id=' + encodeURIComponent(m.id), locked: !!m.locked });
-            });
-            if (document.getElementById('articlesGrid')) renderArticles();
-        }).catch(function () { /* the built-in articles still show */ });
 
         function renderArticles() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -2600,10 +2591,11 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 const esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
                 const cap = function (s) { s = String(s || '').trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'General'; };
                 items.forEach(function (m, i) {
+                    // older admin articles kept the cover in coverUrl and the level in passageLabel
                     articlesData.push({
-                        id: 1000 + items.length - i, title: esc(m.title), passage: esc(m.level || 'Passage 1'), topic: esc(cap(m.topic)),
-                        date: m.date || m.createdAt, image: esc(m.imageUrl || ''), description: esc(m.description || m.lead || ''),
-                        href: '/collections/article?id=' + encodeURIComponent(m.id)
+                        id: 1000 + items.length - i, title: esc(m.title), passage: esc(m.level || m.passageLabel || 'Passage 1'), topic: esc(cap(m.topic)),
+                        date: m.date || m.createdAt, image: esc(m.imageUrl || m.coverUrl || ''), description: esc(m.description || m.lead || m.source || ''),
+                        href: '/collections/article?id=' + encodeURIComponent(m.id), locked: !!m.locked
                     });
                 });
                 if (items.length) renderArticles();

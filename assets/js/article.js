@@ -60,9 +60,12 @@
        <div class="ixa-meta"><span class="ixa-author">${esc(d.author || 'IELTSX Reading Team')}</span><span>${esc(fmtDate(d.date || m.createdAt))}</span>${d.testDate ? `<span>${ICON_CAL}Test date: ${esc(fmtDate(d.testDate))}</span>` : ''}</div>`;
 
     let html = d.imageUrl ? `<figure class="ixa-figure"><img src="${esc(d.imageUrl)}" alt="${esc(d.imageAlt || m.title)}">${d.imageCaption ? `<figcaption>${esc(d.imageCaption)}</figcaption>` : ''}</figure>` : '';
+    // a paragraph that is only ![caption](picture url) is a picture inside the text ("Insert picture" in the admin panel)
+    const picUrl = (u) => ((/^\/(uploads|assets)\//.test(u) && !u.includes('..')) || /^\/api\/media\/[A-Za-z0-9_-]{8,40}$/.test(u) || /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : '');
     String(d.body || '').replace(/\r/g, '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean).forEach((b) => {
-      const h = /^#{1,3}\s+(.+)$/.exec(b);
-      html += h && !b.includes('\n') ? `<h3>${esc(h[1])}</h3>` : `<p>${esc(b).replace(/\n/g, '<br>')}</p>`;
+      const h = /^#{1,3}\s+(.+)$/.exec(b), img = /^!\[([^\]]*)\]\(([^)\s]+)\)$/.exec(b);
+      if (img && picUrl(img[2])) html += `<figure class="ixa-figure"><img src="${esc(picUrl(img[2]))}" alt="${esc(img[1] || m.title)}" loading="lazy">${img[1] ? `<figcaption>${esc(img[1])}</figcaption>` : ''}</figure>`;
+      else html += h && !b.includes('\n') ? `<h3>${esc(h[1])}</h3>` : `<p>${esc(b).replace(/\n/g, '<br>')}</p>`;
     });
     readBody.innerHTML = html;
     $('#ixa-source').textContent = d.source || m.title;
