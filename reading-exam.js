@@ -13,6 +13,31 @@
 const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const safeUrl = (u) => (/^(\/(uploads|assets)\/[^"'<>\s]*|https:\/\/[^"'<>\s]+)$/i.test(String(u || '')) ? String(u) : '');
 const ROMAN = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
+/* "Questions 1–5" is printed by the player itself, so it is cut off a typed / pasted instruction */
+const cleanInstr = (g) => String(g || '').replace(/^\s*(?:questions?|savollar)\s+\d+\s*(?:[-\u2013\u2014]|to|dan)\s*\d+\s*[:.\-\u2013\u2014]?\s*/i, '').trim();
+
+/* ── Evidence for the passage highlight ──
+   Each explanation gets `highlights`: the words the student should see lit up in the passage.
+   Taken from the question's own "evidence" field, else from the words quoted in the explanation
+   ("..." or '...', cut at ellipses). Only phrases really found in the passage are kept, so a typo
+   never breaks anything; with none found, the player falls back to the best-matching sentence. */
+const normTxt = (t) => String(t || '').replace(/[\u2018\u2019\u201b\u02bc]/g, "'").replace(/[\u201c\u201d\u201f]/g, '"').replace(/[\u2010-\u2015]/g, '-').replace(/\s+/g, ' ').toLowerCase();
+function quotedPhrases(text) {
+  const t = String(text || '').replace(/\s+/g, ' '); const out = [];
+  const re = /["\u201c\u201d]([^"\u201c\u201d]{6,}?)["\u201c\u201d]|(?:^|[\s(\u2014\u2013:-])['\u2018]((?:[^'\u2018\u2019]|['\u2019](?=[a-z]))+?)['\u2019](?=[\s.,;:)!?\u2014\u2013-]|$)/g;
+  let m;
+  while ((m = re.exec(t))) (m[1] || m[2] || '').split(/\s*(?:\u2026|\.\.\.)\s*/).forEach((f) => {
+    f = f.replace(/^[\s,.;:\u2014\u2013-]+|[\s,.;:\u2014\u2013-]+$/g, '');
+    if (f.split(/\s+/).length >= 2 && f.length >= 8) out.push(f);
+  });
+  return out;
+}
+function evidenceOf(q, passageText) {
+  const hay = normTxt(passageText);
+  const raw = [].concat(String(q.evidence || '').split(/\n|\s*\|\|\s*/)).map((x) => x.trim()).filter(Boolean);
+  const cands = raw.length ? raw.reduce((a, x) => a.concat(x.split(/\s*(?:\u2026|\.\.\.)\s*/)), []) : quotedPhrases(q.explanation);
+  return cands.map((x) => x.replace(/^["'\u201c\u2018]+|["'\u201d\u2019]+$/g, '').trim()).filter((x) => x.length >= 4 && hay.includes(normTxt(x)));
+}
 
 /* A block of questions ("Questions 1-5 ...") is typed once in the admin panel. Older tests repeated the heading and the option list on every
    question; newer ones carry a group number (gi). Either way: a question that has no heading / no options of its own continues the block above
@@ -33,11 +58,49 @@ function inheritGroups(list) {
   return out;
 }
 
+/* Paragraphs of a pasted passage. Text copied from a PDF has a line break at the end of every printed
+   line (and often no blank line between paragraphs): wrapped lines are joined back into one paragraph,
+   and without blank lines a paragraph ends at a clearly short line that ends a sentence. */
+function splitParas(text) {
+  const src = String(text || '').replace(/\r/g, '').replace(/\f/g, '\n').trim();
+  if (!src) return [];
+  const ls = src.split('\n').map((l) => l.trim());
+  // the printed line width: a high percentile, not the maximum (one very long line must not make every line look short)
+  const lens = ls.map((l) => l.length).filter((n) => n > 0).sort((x, y) => x - y);
+  const L = Math.max(40, lens.length ? lens[Math.floor(lens.length * 0.9)] : 40);
+  const END = /[.!?:"\u201d\u2019)]$/;
+  const full = ls.filter(Boolean);
+  // typed in by hand: (almost) every line is a whole paragraph
+  if (full.length && full.filter((l) => END.test(l)).length / full.length > 0.6) return full.map((l) => l.replace(/\s+/g, ' '));
+  // copied from a PDF: wrapped lines. A paragraph ends at a blank line or a clearly short line that ends a
+  // sentence; a blank line in the middle of a sentence is a page break and is ignored.
+  const paras = []; let cur = [];
+  const close = () => { if (cur.length) paras.push(cur); cur = []; };
+  ls.forEach((t) => {
+    if (!t) { if (cur.length && END.test(cur[cur.length - 1])) close(); return; }
+    if (!cur.length && t.length < 0.6 * L && !END.test(t)) { paras.push([t]); return; }          // a title / sub-heading line
+    if (cur.length && /^[A-Z][.)]?\s+[A-Z\u201c"\u2018']/.test(t) && END.test(cur[cur.length - 1])) close();
+    cur.push(t);
+    if (t.length < 0.75 * L && END.test(t)) close();
+  });
+  close();
+  // join wrapped lines with a space; keep a real line break only after a short line (lists, addresses)
+  return paras.map((lines) => lines.filter(Boolean).reduce((acc, l, i, arr) => acc + (i ? (arr[i - 1].length < 0.6 * L ? '\n' : ' ') : '') + l, '').trim()).filter(Boolean);
+}
+
 function passageHtml(d, title) {
   const imgs = (d.images || []).map((i) => safeUrl(i.url)).filter(Boolean)
     .map((u) => `<p><img class='pass-img' alt='' src='${esc(u)}'></p>`).join('');
-  const paras = String(d.passage || '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean).filter((p, i) => !(i === 0 && p.toLowerCase() === String(title || '').trim().toLowerCase())).map((p, i) => {
-    const m = /^([A-Z])[.)]\s+([\s\S]*)$/.exec(p);
+  const list = splitParas(d.passage).filter((p, i) => !(i === 0 && p.toLowerCase() === String(title || '').trim().toLowerCase()));
+  // Paragraph letters: "A. text", "A) text" or, as printed in PDFs, "A Text". A bare "A " only counts as a
+  // letter where a run A, B, C … really starts (so "A newborn baby…" is not taken for paragraph A).
+  const LET = /^([A-Z])(?:[.)]\s+|\s+(?=[A-Z0-9\u201c"\u2018'(]))([\s\S]*)$/;
+  const lettered = new Set();
+  let start = list.findIndex((p, i) => { const a = LET.exec(p), b = list[i + 1] && LET.exec(list[i + 1]); return a && a[1] === 'A' && b && b[1] === 'B'; });
+  if (start < 0) start = list.findIndex((p) => /^A[.)]\s+/.test(p));
+  if (start >= 0) { let want = 65; for (let i = start; i < list.length; i++) { const m = LET.exec(list[i]); if (m && m[1].charCodeAt(0) === want) { lettered.add(i); want++; } } }
+  const paras = list.map((p, i) => {
+    const m = lettered.has(i) ? LET.exec(p) : null;
     if (m) return `<p><strong class="para-letter">${m[1]}</strong> ${esc(m[2]).replace(/\n/g, '<br>')}</p>`;
     return i === 0 && p.length < 160 && !/[.!?]$/.test(p) ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
   }).join('');
@@ -70,7 +133,7 @@ function buildSections(questions, startN) {
     const gi = (q.gi === undefined || q.gi === null || q.gi === '') ? '' : String(q.gi);
     const k = type + '|' + gi + '|' + (q.group || '') + '|' + (extra || '');
     if (cur && k === key) return cur;
-    cur = { type, num: '', title: defaultTitle[type] || 'Questions', instruction: q.group ? esc(q.group) : (defaultInstr[type] || ''), items: [] };
+    cur = { type, num: '', title: defaultTitle[type] || 'Questions', instruction: cleanInstr(q.group) ? esc(cleanInstr(q.group)) : (defaultInstr[type] || ''), items: [] };
     key = k; sections.push(cur); return cur;
   };
   for (const q of questions) {
@@ -81,7 +144,7 @@ function buildSections(questions, startN) {
       open('mcq', q).items.push({ id: n, answer: String(q.answer || 'A').trim().charAt(0).toUpperCase(), label: esc(q.prompt), options: (q.options || []).map((o, i) => { const k = optTok(o, i); return k.l + '. ' + esc(k.t); }) }); n += 1;
     } else if (t === 'mcq-multi') {
       const letters = String(q.answer || '').toUpperCase().split(/[^A-Z]+/).filter(Boolean);
-      const sec = { type: 'mcq-multi', gid: 'g' + n, num: '', title: 'Choose ' + (letters.length === 2 ? 'TWO' : letters.length) + ' answers', instruction: q.group ? esc(q.group) : 'Choose the correct letters.', prompt: esc(q.prompt),
+      const sec = { type: 'mcq-multi', gid: 'g' + n, num: '', title: 'Choose ' + (letters.length === 2 ? 'TWO' : letters.length) + ' answers', instruction: cleanInstr(q.group) ? esc(cleanInstr(q.group)) : 'Choose the correct letters.', prompt: esc(q.prompt),
         options: (q.options || []).map((o, i) => { const k = optTok(o, i); return { l: String.fromCharCode(65 + i), t: esc(k.t) }; }), items: [] };
       (letters.length ? letters : ['A']).forEach((l) => { sec.items.push({ id: n, answer: l }); n += 1; });
       sections.push(sec); cur = null; key = '';
@@ -130,10 +193,11 @@ function buildData(material) {
   const d = material.data || {};
   const full = isFull(material);
   const qs = Array.isArray(d.questions) ? d.questions : [];
-  const SECTIONS = { 1: [], 2: [], 3: [] }; const PASSAGES = {}; const VOCAB = {}; const ordered = [];
+  const SECTIONS = { 1: [], 2: [], 3: [] }; const PASSAGES = {}; const VOCAB = {}; const ordered = []; const passText = {};
   let last = 0;
   passagesOf(material).forEach((ps) => {
     const mine = qs.filter((q) => (full ? (Number(q.passage) || 1) : 1) === ps.no);
+    mine.forEach((q) => { passText[ordered.length + mine.indexOf(q)] = String(ps.text || ''); });
     if (full && !mine.length && !String(ps.text || '').trim()) return;           // an empty passage is simply left out
     const b = buildSections(mine, last + 1); last = b.total;
     SECTIONS[ps.no] = b.sections; ordered.push(...mine);
@@ -144,10 +208,11 @@ function buildData(material) {
   });
   // explanation per question number (numbers follow passage order, exactly as the sections above)
   const expl = {}; let n = 1;
-  for (const q of ordered) {
+  ordered.forEach((q, k) => {
     const span = q.type === 'mcq-multi' ? Math.max(1, String(q.answer || '').split(/[^A-Za-z]+/).filter(Boolean).length) : 1;
-    for (let i = 0; i < span; i++, n++) if (q.explanation) expl[n] = { explanation: esc(q.explanation), highlights: [], paraphraseMap: [], en: esc(q.explanation), uz: '' };
-  }
+    const hl = (q.explanation || q.evidence) ? evidenceOf(q, passText[k]) : [];
+    for (let i = 0; i < span; i++, n++) if (q.explanation || hl.length) expl[n] = { explanation: esc(q.explanation || ''), highlights: hl, paraphraseMap: [], en: esc(q.explanation || ''), uz: '' };
+  });
   const dflt = full ? 60 : 20;
   return { full, SECTIONS, PASSAGES, VOCAB, expl, total: last || 1, minutes: Math.max(1, Math.min(180, Number(d.durationMin) || dflt)) };
 }

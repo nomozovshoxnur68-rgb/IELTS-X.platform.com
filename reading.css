@@ -5577,3 +5577,58 @@ body.dark-mode.review-mode .feedback-pill .fb-badge{color:#0d1117}
 #ix-verify-banner{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:9998;max-width:calc(100vw - 2rem);display:flex;gap:.75rem;align-items:center;justify-content:center;flex-wrap:wrap;padding:.5rem .75rem .5rem 1rem;border-radius:9999px;border:1px solid #f5c26b;background:#fff8e6;color:#7a4a00;box-shadow:0 10px 30px -8px rgba(0,0,0,.35);font:500 13px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 #ix-verify-banner button{border:1px solid currentColor;background:transparent;color:inherit;border-radius:9999px;padding:.2rem .7rem;font:inherit;cursor:pointer}
 body.dark-mode #ix-verify-banner{background:#2a2112;border-color:#6b4f1d;color:#f5d48b}
+
+/* =====================================================================
+   COMPACT QUESTION SPACING (Oct 2026)
+   The question pane had long empty stretches: every block after the first
+   carried an 80px bottom margin, option rows were 43px tall with 24px under
+   each list, and notes lists had 16px margins on every single bullet.
+   ===================================================================== */
+.section-block{padding-bottom:0}
+.section-block+.section-block{margin-bottom:0}
+.section-block+.section-block{margin-top:22px}
+#questions-pane .section-block:last-child{padding-bottom:72px}
+.options{margin:2px 0 14px}
+.option,.tfn-opts .option,.multi-opts .option{padding:6px 8px 6px 32px}
+.option input[type=radio],.option input[type=checkbox]{top:8px}
+.q-card+.q-card{margin-top:2px}
+.notes-list ul{margin:6px 0}
+.notes-list ul:first-child{margin-top:0}
+.section-head .num{margin:0 0 6px}
+.section-head .instruction{margin:0 0 12px}
+
+/* TRUE / FALSE / NOT GIVEN key under the instruction */
+.tfng-legend{border-collapse:collapse;margin:-4px 0 14px;font:400 16px/24px Arial,sans-serif;color:#000}
+.tfng-legend th{font-weight:700;text-align:left;padding:0 22px 0 0;white-space:nowrap;vertical-align:top}
+.tfng-legend td{padding:0}
+body.dark-mode .tfng-legend{color:var(--ex-ink-2)}
+body.dark-mode .tfng-legend th{color:var(--ex-ink)}
+body.theme-sepia .tfng-legend{color:var(--sp-ink-2)}
+
+/* free-form notes (sec.lines) and one-line-per-question sentences */
+.note-lines .note-sub{font-weight:700;margin:12px 0 4px}
+.note-lines .note-sub:first-child{margin-top:0}
+.note-lines .note-line{margin:4px 0}
+.note-lines .note-ul{list-style:disc outside;padding-left:28px;margin:2px 0 6px}
+.note-lines .note-ul.lvl-2{list-style:circle outside;margin:2px 0}
+.note-lines li{line-height:24px;margin:4px 0}
+.sent-lines .sent-line{margin:0 0 14px;line-height:30px}
+.sent-lines .sent-line:last-child{margin-bottom:4px}
+body.dark-mode .note-lines .note-sub{color:var(--ex-ink)}
+
+/* review: the per-question Explanation button sits under its own question,
+   with clear air before the next one (it used to read as the next question's) */
+body.review-mode .q-card > .explain-btn{margin:-6px 0 22px}
+body.review-mode .q-card > .explain-panel.show{margin:0 0 22px}
+
+/* passage sub-headings and footnotes written by scripts/build-reading.js */
+.passage-text .pass-sub{margin:18px 0 6px}
+.passage-text .pass-foot{font-size:.85em;color:#555;margin-top:14px}
+body.dark-mode .passage-text .pass-foot{color:var(--ex-ink-2)}
+
+/* wide completion tables (4–5 columns) fit the question pane instead of running off its edge */
+.rt-table{width:100%;max-width:100%;table-layout:fixed;word-wrap:break-word}
+.rt-table td{overflow-wrap:anywhere}
+.rt-table th{overflow-wrap:normal;hyphens:auto;-webkit-hyphens:auto}
+.rt-table .prose-gap{display:inline-flex;max-width:100%}
+.rt-table .gap-input{width:100%;max-width:150px;min-width:56px;box-sizing:border-box}

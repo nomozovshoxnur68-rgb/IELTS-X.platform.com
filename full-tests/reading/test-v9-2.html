@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Academic Reading — Volume 9 · Full Test 2</title>
+<link rel="stylesheet" href="../../reading.css">
+<script src="/assets/js/access-gate.js"></script>
+</head>
+<body>
+
+<!-- ====
+     STAGE 1: REGISTRATION ====-->
+<!-- COSMOS: the restart sheet is removed. A reload restarts the paper
+     silently — restartSheet() falls through to startFresh() with no
+     #resume-sheet in the document. -->
+
+<!-- The boot class is set here, before the registration markup is parsed, so
+     the card is never painted for a frame ahead of the prelude. If scripting
+     is off the class is never added and the card simply renders. -->
+<!-- The login / registration card and the instructions screen have been removed: the paper opens straight on Passage 1. -->
+
+
+<!-- ====
+     STAGE 2: READING INSTRUCTIONS ====-->
+
+<!-- ====
+     STAGE 3: READING TEST  (real-exam chrome) ====-->
+<!-- The CDI mark used to live on the registration card. That card is gone, so the
+     one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
+     and paints the completion screen and the certificate from it. -->
+<img class="brand-logo" alt="READING CDI" hidden style="display:none" src="data:image/png;base64,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">
+
+<!-- ====
+     STAGE 1: LOGIN / REGISTRATION ====-->
+<div class="stage active" id="stage-registration">
+  <div class="rcx-card">
+    <span class="rcx-wordmark">READING_CDI</span>
+    <h1>Volume 9 · Full Test 2</h1>
+    <p class="rcx-lead">Academic Reading &middot; Passages 1&ndash;3 &middot; Questions 1&ndash;40 &middot; 60 minutes</p>
+    <div class="rcx-field" id="start-field">
+      <label for="start-name">Candidate full name</label>
+      <input id="start-name" autocomplete="off" spellcheck="false" placeholder="Type your full name"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();ExamApp.validateStart();}">
+      <div id="start-hint-text" class="rcx-err"></div>
+    </div>
+    <div class="rcx-note"><b>How this test runs.</b> You have <b>60 minutes</b> for Questions 1&ndash;40.
+      Select text in the passage to highlight it or add a note. The tick at the bottom right submits the
+      test and shows your answers with a full explanation for every question.</div>
+    <button class="rcx-btn" type="button" onclick="ExamApp.validateStart()">Start &rarr;</button>
+  </div>
+</div>
+
+<div class="stage" id="stage-reading">
+  <div id="hdr">
+    <div id="hdr-left">
+      <div class="ex-logo"><!-- PLACEHOLDER LOGO: replace this <svg> with your own <img src="your-logo.png" alt="logo"> --><svg viewBox="0 0 32 32" role="img" aria-label="Logo" focusable="false"><rect width="32" height="32" fill="#b3121f"/><rect x="5.5" y="5.5" width="21" height="21" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 23L23 9" stroke="#fff" stroke-width="2"/></svg></div>
+      <div class="ex-status">
+        <div class="ex-name ex-title" id="hdr-title">[Demo] Volume 9 · Full Test 2 - P1</div>
+        <div class="timer" id="timer-reading" title="Time remaining">
+          <span id="timer-text" class="timer-text">60 minutes remaining</span>
+        </div>
+        <div class="ex-name ttid-name" id="ttid-name">&nbsp;</div>
+      </div>
+    </div>
+    <!-- Right-hand icons: wifi, full screen, options (menu), notes. -->
+    <div id="hdr-right">
+      <div class="ex-icbtn" id="wifi-btn" title="Connected"><svg width="27.4" height="25" viewBox="0 0 2048 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121 q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75z M1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z"/></svg></div>
+      <button class="ex-icbtn" id="fs-btn" type="button" title="Full screen" aria-label="Toggle full screen" onclick="ExamApp.toggleFullscreen()"><svg class="fs-glyph" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="fs-in" d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/><path class="fs-out" d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" style="display:none"/></svg></button>
+      <button class="ex-icbtn" id="menu-btn" type="button" title="Options" aria-label="Options" onclick="toggleMenu()"><svg width="20.58" height="25" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45 t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z"/></svg></button>
+      <button class="ex-icbtn" id="notes-btn" type="button" title="Notes" aria-label="Show notes" onclick="ExamApp.toggleNotesDrawer()"><svg width="24" height="25" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M888 352l116 116l-152 152l-116 -116v-56h96v-96h56zM1328 1072q-16 16 -33 -1l-350 -350q-17 -17 -1 -33t33 1l350 350q17 17 1 33zM1408 478v-190q0 -119 -84.5 -203.5t-203.5 -84.5h-832q-119 0 -203.5 84.5t-84.5 203.5v832q0 119 84.5 203.5t203.5 84.5h832 q63 0 117 -25q15 -7 18 -23q3 -17 -9 -29l-49 -49q-14 -14 -32 -8q-23 6 -45 6h-832q-66 0 -113 -47t-47 -113v-832q0 -66 47 -113t113 -47h832q66 0 113 47t47 113v126q0 13 9 22l64 64q15 15 35 7t20 -29zM1312 1216l288 -288l-672 -672h-288v288zM1756 1084l-92 -92 l-288 288l92 92q28 28 68 28t68 -28l152 -152q28 -28 28 -68t-28 -68z"/></svg><span class="nd-count" id="notes-count" hidden>0</span></button>
+    </div>
+  </div>
+
+  <div id="pbar">
+    <div id="pbar-inner">
+      <span id="pbar-title">Part 1</span>
+      <span id="pbar-desc">Read the text and answer questions 1–13.</span>
+    </div>
+  </div>
+
+  <div class="exam-main" id="main">
+    <section id="passage-pane" class="split-pane"></section>
+    <div class="split-divider" id="resizer"><div class="resizeBar" id="resize-bar"><button type="button" id="div-btn" aria-label="Resize the panes" title="Resize the panes"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1792 896q0 26 -19 45l-256 256q-19 19 -45 19t-45 -19t-19 -45v-128h-1024v128q0 26 -19 45t-45 19t-45 -19l-256 -256q-19 -19 -19 -45t19 -45l256 -256q19 -19 45 -19t45 19t19 45v128h1024v-128q0 -26 19 -45t45 -19t45 19l256 256q19 19 19 45z"/></svg></button></div></div>
+    <section id="questions-pane" class="split-pane"></section>
+  </div>
+
+  <div id="bnav">
+    <div id="reading-nav"></div>
+  </div>
+
+  <div id="qnav-arrows">
+    <button class="qnav-btn prev" onclick="ExamApp.prevPart()" title="Previous part" aria-label="Previous part"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1600 960v-128q0 -53 -32.5 -90.5t-84.5 -37.5h-704l293 -294q38 -36 38 -90t-38 -90l-75 -76q-37 -37 -90 -37q-52 0 -91 37l-651 652q-37 37 -37 90q0 52 37 91l651 650q38 38 91 38q52 0 90 -38l75 -74q38 -38 38 -91t-38 -91l-293 -293h704q52 0 84.5 -37.5t32.5 -90.5z"/></svg></button>
+    <button class="qnav-btn next" onclick="ExamApp.nextPart()" title="Next part" aria-label="Next part"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1600 896q0 -53 -37 -90l-651 -652q-39 -37 -91 -37q-51 0 -90 37l-75 75q-38 38 -38 91t38 91l293 293h-704q-52 0 -84.5 37.5t-32.5 90.5v128q0 53 32.5 90.5t84.5 37.5h704l-293 294q-38 36 -38 90t38 90l75 75q38 38 90 38q53 0 91 -38l651 -651q37 -35 37 -90z"/></svg></button>
+  </div>
+
+  <!-- The official player replaces the small dropdown with a full-screen white
+       Options page: three 698 x 75.8 rows in a 700px column at x=370, the first
+       one #e31837, and Contrast / Text size opening as sub-pages. -->
+  <div class="ex-sheet ex-options" id="ex-options" role="dialog" aria-modal="true" aria-label="Options">
+   <div class="ex-sheet-top">
+    <button type="button" class="ex-sheet-back" onclick="exOptionsPage('root')"><svg class="ex-ic" width="19.43" height="27.2" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1171 1235l-531 -531l531 -531q19 -19 19 -45t-19 -45l-166 -166q-19 -19 -45 -19t-45 19l-742 742q-19 19 -19 45t19 45l742 742q19 19 45 19t45 -19l166 -166q19 -19 19 -45t-19 -45z"/></svg><span>Options</span></button>
+    <h1 class="ex-sheet-title">Options</h1>
+    <button type="button" class="ex-sheet-close" aria-label="Close" onclick="exCloseSheet()"><svg class="ex-ic" width="21.21" height="27" viewBox="0 0 1408 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z"/></svg></button>
+   </div>
+   <div class="ex-sheet-body">
+    <div class="ex-opt-page is-on" data-page="root">
+   <div class="ex-opt-group is-red">
+    <button type="button" class="ex-opt-item is-red" onclick="exGoSubmission()"><span class="ex-opt-ic"><svg class="ex-ic" width="20.9" height="20.9" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1764 1525q33 -24 27 -64l-256 -1536q-5 -29 -32 -45q-14 -8 -31 -8q-11 0 -24 5l-527 215l-298 -327q-18 -21 -47 -21q-14 0 -23 4q-19 7 -30 23.5t-11 36.5v452l-472 193q-37 14 -40 55q-3 39 32 59l1664 960q35 21 68 -2zM1422 26l221 1323l-1434 -827l336 -137 l863 639l-478 -797z"/></svg></span><span class="ex-opt-label">Go to submission page</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+   </div>
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item" onclick="exOptionsPage('contrast')"><span class="ex-opt-ic is-grey"><svg class="ex-ic" style="margin-left:2px" width="18" height="21" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M768 96v1088q-148 0 -273 -73t-198 -198t-73 -273t73 -273t198 -198t273 -73zM1536 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z"/></svg></span><span class="ex-opt-label">Contrast</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+    <button type="button" class="ex-opt-item" onclick="exOptionsPage('text')"><span class="ex-opt-ic is-grey"><svg class="ex-ic" width="19.7" height="21.2" viewBox="0 0 1664 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 736v-64q0 -13 -9.5 -22.5t-22.5 -9.5h-224v-224q0 -13 -9.5 -22.5t-22.5 -9.5h-64q-13 0 -22.5 9.5t-9.5 22.5v224h-224q-13 0 -22.5 9.5t-9.5 22.5v64q0 13 9.5 22.5t22.5 9.5h224v224q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5 -9.5t9.5 -22.5v-224h224 q13 0 22.5 -9.5t9.5 -22.5zM1152 704q0 185 -131.5 316.5t-316.5 131.5t-316.5 -131.5t-131.5 -316.5t131.5 -316.5t316.5 -131.5t316.5 131.5t131.5 316.5zM1664 -128q0 -53 -37.5 -90.5t-90.5 -37.5q-54 0 -90 38l-343 342q-179 -124 -399 -124q-143 0 -273.5 55.5 t-225 150t-150 225t-55.5 273.5t55.5 273.5t150 225t225 150t273.5 55.5t273.5 -55.5t225 -150t150 -225t55.5 -273.5q0 -220 -124 -399l343 -343q37 -37 37 -90z"/></svg></span><span class="ex-opt-label">Text size</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+   </div>
+    </div>
+    <div class="ex-opt-page" data-page="contrast">
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item ex-contrast-opt is-on" data-val="bw" onclick="setContrast('bw')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Black on white</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#ffffff" stroke="#c9c9c9"/><rect x="6" y="9" width="26" height="2.5" fill="#111111"/><rect x="6" y="16" width="44" height="2.5" fill="#111111"/><rect x="6" y="22" width="44" height="2.5" fill="#111111"/><rect x="6" y="28" width="44" height="2.5" fill="#111111"/></svg></span></button>
+    <button type="button" class="ex-opt-item ex-contrast-opt" data-val="wb" onclick="setContrast('wb')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">White on black</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#000000" stroke="#000000"/><rect x="6" y="9" width="26" height="2.5" fill="#ffffff"/><rect x="6" y="16" width="44" height="2.5" fill="#ffffff"/><rect x="6" y="22" width="44" height="2.5" fill="#ffffff"/><rect x="6" y="28" width="44" height="2.5" fill="#ffffff"/></svg></span></button>
+    <button type="button" class="ex-opt-item ex-contrast-opt" data-val="yb" onclick="setContrast('yb')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Yellow on black</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#000000" stroke="#000000"/><rect x="6" y="9" width="26" height="2.5" fill="#ffe200"/><rect x="6" y="16" width="44" height="2.5" fill="#ffe200"/><rect x="6" y="22" width="44" height="2.5" fill="#ffe200"/><rect x="6" y="28" width="44" height="2.5" fill="#ffe200"/></svg></span></button>
+   </div>
+    </div>
+    <div class="ex-opt-page" data-page="text">
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item ex-text-opt is-on" data-val="regular" onclick="setTextSize('regular')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Regular</span></button>
+    <button type="button" class="ex-opt-item ex-text-opt" data-val="large" onclick="setTextSize('large')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Large</span></button>
+    <button type="button" class="ex-opt-item ex-text-opt" data-val="xlarge" onclick="setTextSize('xlarge')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Extra large</span></button>
+   </div>
+    </div>
+   </div>
+   <div class="ex-sheet-empty"></div>
+  </div>
+  <div class="ex-sheet ex-messages" id="ex-messages" role="dialog" aria-modal="true" aria-label="Messages">
+   <div class="ex-sheet-top">
+    <h1 class="ex-sheet-title">Messages</h1>
+    <button type="button" class="ex-sheet-close" aria-label="Close" onclick="exCloseSheet()"><svg class="ex-ic" width="21.21" height="27" viewBox="0 0 1408 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z"/></svg></button>
+   </div>
+   <div class="ex-sheet-empty"></div>
+  </div>
+</div>
+
+<!-- ====
+     STAGE 4: COMPLETION ====-->
+<div class="stage" id="stage-completion">
+  <div class="complete-card">
+    <div class="ch-comp-body">
+
+      <div class="ch-comp-head">
+        <div class="ch-seal" id="ch-seal">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs><linearGradient id="chSealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f3f46"/><stop offset=".55" stop-color="#71717a"/><stop offset="1" stop-color="#111111"/></linearGradient><linearGradient id="chSealDone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111111"/><stop offset="1" stop-color="#52525b"/></linearGradient></defs>
+            <circle class="ch-seal-track" cx="32" cy="32" r="28"/>
+            <circle class="ch-seal-arc" id="ch-seal-arc" cx="32" cy="32" r="28"/>
+          </svg>
+          <div class="ch-seal-core"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4.6 10.4l3.5 3.5 7.3-7.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="ch-seal-pct" id="ch-seal-pct">0%</div>
+        </div>
+        <div>
+          <div class="trans-eyebrow">Reading test complete</div>
+          <h1 class="complete-title">Your answer sheet is in.</h1>
+          <p class="complete-sub" id="ch-status">Sealing your answer sheet&hellip;</p>
+        </div>
+      </div>
+
+      <ol class="ch-steps" id="ch-steps">
+        <li><span class="ch-step-dot"></span>Answers locked and time&#8209;stamped</li>
+        <li><span class="ch-step-dot"></span>Every response checked against the answer key</li>
+        <li><span class="ch-step-dot"></span>Official IELTS Academic Reading band table applied</li>
+      </ol>
+
+      <div class="ch-note">
+        <p>Sitting a full paper under real conditions is much harder than most people think &mdash; and analysing it afterwards is what separates the high scorers. You just did the hard half. Now go and read your mistakes.</p>
+        <!-- ===== EDIT PER TEST · AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
+        <p class="ch-sign">Built from scratch by <strong>Islom Kenjayev</strong> &middot; IELTS 8.5 (L&nbsp;9.0 &middot; R&nbsp;9.0)</p>
+      </div>
+
+      <div class="ch-cta-slot">
+        <p class="ch-wait" id="ch-wait" aria-live="polite">Marking takes a couple of seconds &mdash; nothing you answered can be lost.</p>
+        <div class="ch-cta" id="ch-cta">
+          <button class="btn btn-primary btn-lg" onclick="ExamApp.unlockResults()">
+            <span>See my band score</span>
+            <svg class="ch-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.6 8h10.8m0 0L9.6 4.2M13.4 8l-3.8 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <a class="channel-promo" href="https://t.me/reading_cdi" target="_blank" rel="noopener">
+      <div class="tg-icon">&#9992;</div>
+      <div class="channel-text">
+        <div class="channel-name">@READING_CDI</div>
+        <div class="channel-desc">New authentic practice tests every week</div>
+      </div>
+      <div class="channel-cta">Join</div>
+    </a>
+  </div>
+</div>
+
+<!-- ====
+     STAGE 5: RESULTS ====-->
+<div class="stage" id="stage-results">
+  <div class="results-modal-box">
+    <button type="button" class="results-modal-close" aria-label="Close" onclick="ExamApp.closeResultsModal()">&times;</button>
+    <div class="rcx-hdr">
+      <div class="rcx-hdr-left">
+        <div class="rcx-mark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+        <div class="rcx-ttblock"><div class="rcx-ttid" id="res-taker">Test taker ID</div></div>
+      </div>
+      <div class="rcx-hdr-right">
+        <a class="rcx-tglink" href="https://t.me/reading_cdi" target="_blank" rel="noopener" title="Join @reading_cdi on Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23l7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3L3.64 12c-.88-.25-.89-1.37.2-1.64l16.56-6.4c.75-.29 1.4.22 1.2.94l-2.67 12.61c-.22.95-1.13 1.18-1.78.73l-4.5-3.32l-2.23 2.15c-.47.44-1.29.21-1.48-.37z"/></svg>READING_CDI</a>
+      </div>
+    </div>
+    <div class="results-content" id="results-content"></div>
+  </div>
+</div>
+
+<!-- ====
+     OVERLAYS ====-->
+<div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
+  <div class="warning-card">
+    <div class="wc-body">
+      <div class="wc-top">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6 2.6 20h18.8L12 3.6Z"/><path d="M12 9.6v4.6"/><path d="M12 17.3h.01"/></svg>
+        </div>
+        <div class="wc-heads">
+          <div class="wc-eyebrow">Exam integrity</div>
+          <h2 id="warning-title">This session is being monitored</h2>
+        </div>
+      </div>
+      <div class="wc-reason">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        <p id="warning-body"></p>
+      </div>
+      <div class="wc-meter">
+        <div class="wc-meter-head"><span>Violations recorded</span></div>
+        <div class="strike-counter" id="strike-counter" role="img" aria-label="Violation counter">
+          <div class="strike"></div><div class="strike"></div><div class="strike"></div>
+        </div>
+        <p id="warning-strikes-text">Warning <strong>1 of 3</strong> &mdash; the test will be terminated on the third violation.</p>
+      </div>
+    </div>
+    <div class="wc-foot">
+      <div class="wc-note">Real IELTS test centres apply the same rule. Stay in full-screen until you submit.</div>
+      <button class="wc-btn" onclick="ExamApp.dismissWarning()">Return to the test</button>
+    </div>
+  </div>
+</div>
+
+<!-- Matches the real player's adder: a small white card with exactly two
+     icon-above-label buttons, Note and Highlight. Erase stays as a third,
+     revealed only when the selection already sits on a highlight. -->
+<div id="hl-popup" class="hl-popup">
+  <button class="tool-btn note" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Add a note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    <span>Note</span>
+  </button>
+  <button class="tool-btn hilite" onmousedown="event.preventDefault(); ExamApp.applyHighlight('hl-y')" title="Highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+    <span>Highlight</span>
+  </button>
+  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Remove highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+    <span>Clear</span>
+  </button>
+</div>
+
+<!-- V3: note composer (V2 called getElementById('note-modal') but never shipped one) -->
+<div id="note-modal" class="note-modal">
+  <div class="nm-head">
+    <span class="nm-title">Note</span>
+    <button class="nm-x" onclick="ExamApp.closeNote()" title="Close">&times;</button>
+  </div>
+  <textarea id="note-textarea" class="nm-text" rows="4" placeholder="Write your note&hellip;"
+            onkeydown="if(event.key==='Escape'){ExamApp.closeNote();}
+                       if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){ExamApp.saveNote();}"></textarea>
+  <div class="nm-foot">
+    <span class="nm-hint">&#8984;/Ctrl + Enter to save</span>
+    <div class="nm-actions">
+      <button class="nm-btn ghost" onclick="ExamApp.deleteNote()">Delete</button>
+      <button class="nm-btn solid" onclick="ExamApp.saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- V3: notes drawer — mirrors the real player's right-hand Notes panel -->
+<aside id="notes-drawer" class="notes-drawer" aria-label="Notes" aria-hidden="true">
+  <div class="nd-head">
+    <span class="nd-title">Notes</span>
+    <button class="nd-x" onclick="ExamApp.toggleNotesDrawer(false)" aria-label="Close notes">&times;</button>
+  </div>
+  <div class="nd-body" id="notes-drawer-body"></div>
+</aside>
+
+<!-- V3: pacing marker -->
+<div id="pace-note" class="pace-note">
+  <div class="pn-bar"></div>
+  <div class="pn-body"><strong id="pace-title"></strong><span id="pace-sub"></span></div>
+  <button class="pn-x" onclick="document.getElementById('pace-note').classList.remove('show')">&times;</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="vocab-print"></div>
+<!-- The printable report. Off-screen and empty until buildPrintReport() fills
+     it (on the Download Report button, and on any browser-initiated print):
+     page 1 is the Test Report Form, page 2 the Schedule of Answers. -->
+<div id="print-report"></div>
+
+<script>
+/* ====
+   TEST DATA — Volume 9 · Full Test 2
+   Passages, questions, answers and explanations for this test only.
+   The functions live in reading.js (shared by every test). ====*/
+window.READING_TEST = (function () {
+/* BUILT by scripts/build-reading.js from reading-src/volume-9/test-2.js — edit that file and run "npm run build:reading", not this page. */
+const STORAGE_KEY = "cdi_reading_v3_volume_9_test_2";
+const SECTIONS = {
+ "1": [
+  {
+   "type": "notes",
+   "num": "",
+   "title": "",
+   "instruction": "Complete the notes below. Write \u003cb>ONE WORD ONLY\u003c/b> from the passage for each answer. Write your answers in boxes 1&ndash;7 on your answer sheet.",
+   "items": [
+    {
+     "id": 1,
+     "answer": "father",
+     "label": ""
+    },
+    {
+     "id": 2,
+     "answer": "music",
+     "label": ""
+    },
+    {
+     "id": 3,
+     "answer": "secretary",
+     "label": ""
+    },
+    {
+     "id": 4,
+     "answer": "steel",
+     "label": ""
+    },
+    {
+     "id": 5,
+     "answer": "prices",
+     "label": ""
+    },
+    {
+     "id": 6,
+     "answer": "banks",
+     "label": ""
+    },
+    {
+     "id": 7,
+     "answer": "projects",
+     "label": ""
+    }
+   ],
+   "noteTitle": "Carnegie's Life",
+   "wordLimit": 1,
+   "lines": [
+    "## 1835–1855",
+    "- found employment in the same workplace as his {{1}}",
+    "- educated himself through books, theatrical performances and {{2}}",
+    "## 1855–1865",
+    "- worked in a telegraph office",
+    "- became {{3}} to Thomas A Scott at Pennsylvania Railroad",
+    "## 1865–1870",
+    "- made investments in the US and England",
+    "- realised that changing engineering needs would require a greater demand for {{4}}",
+    "## 1873",
+    "- managed a rail manufacturing business by:",
+    "-- reducing {{5}}",
+    "-- restructuring",
+    "-- reinvesting profit and sometimes borrowing money from {{6}}",
+    "## 1880s",
+    "- Frick and Carnegie became partners",
+    "- Carnegie's responsibilities:",
+    "-- arranging future {{7}} and innovations for factories",
+    "- Frick's responsibilities: production"
+   ]
+  },
+  {
+   "type": "tfng",
+   "num": "",
+   "title": "",
+   "instruction": "Do the following statements agree with the information given in Reading Passage 1? In boxes 8&ndash;13 on your answer sheet, write",
+   "items": [
+    {
+     "id": 8,
+     "answer": "TRUE",
+     "label": "Carnegie believed that the USA offered more opportunities than European countries did."
+    },
+    {
+     "id": 9,
+     "answer": "TRUE",
+     "label": "A smaller workforce was required at the Homestead factory after Carnegie took control."
+    },
+    {
+     "id": 10,
+     "answer": "FALSE",
+     "label": "Carnegie prevented his workers from joining unions."
+    },
+    {
+     "id": 11,
+     "answer": "NOT GIVEN",
+     "label": "Carnegie blamed Frick for the violent workers' strike in 1892."
+    },
+    {
+     "id": 12,
+     "answer": "FALSE",
+     "label": "In the 1890s Carnegie negotiated with his competitors."
+    },
+    {
+     "id": 13,
+     "answer": "FALSE",
+     "label": "Carnegie's provision of funds for libraries was limited to those in the United States."
+    }
+   ]
+  }
+ ],
+ "2": [
+  {
+   "type": "matching-info",
+   "num": "",
+   "title": "",
+   "instruction": "Reading Passage 2 has eight paragraphs, \u003cb>A&ndash;H\u003c/b>. Which paragraph contains the following information? Write the correct letter, \u003cb>A&ndash;H\u003c/b>, in boxes 14&ndash;15 on your answer sheet.",
+   "items": [
+    {
+     "id": 14,
+     "answer": "E",
+     "label": "the effect that a client's requirements have on the nature of a translation"
+    },
+    {
+     "id": 15,
+     "answer": "H",
+     "label": "contrasting attitudes towards translators"
+    }
+   ],
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ]
+  },
+  {
+   "type": "summary",
+   "num": "",
+   "title": "",
+   "instruction": "Complete the summary below. Choose \u003cb>NO MORE THAN TWO WORDS\u003c/b> from paragraphs C, D and E for each answer. Write your answers in boxes 16&ndash;19 on your answer sheet.",
+   "items": [
+    {
+     "id": 16,
+     "answer": "semantic equivalence",
+     "label": ""
+    },
+    {
+     "id": 17,
+     "answer": "practical functioning",
+     "label": ""
+    },
+    {
+     "id": 18,
+     "answer": "stylistic",
+     "label": ""
+    },
+    {
+     "id": 19,
+     "answer": "content",
+     "label": ""
+    }
+   ],
+   "noteTitle": "The goal of translation",
+   "wordLimit": 2,
+   "prose": "Translation is an attempt to create a text in the target language which displays {{16}} with a source text. It is inevitable that not all information can be conveyed, however, so translations are best judged according to their {{17}}. For example, the translator of a business letter or scientific text does not need to consider its {{18}} aspects, while someone dubbing a film may give a relatively low value to {{19}}."
+  },
+  {
+   "type": "matching-features",
+   "num": "",
+   "title": "",
+   "instruction": "Look at the following features of translating (Questions 20&ndash;23) and the types of translation below. Match each feature with the correct type of translation, \u003cb>A&ndash;F\u003c/b>. Write the correct letter, \u003cb>A&ndash;F\u003c/b>, in boxes 20&ndash;23 on your answer sheet.",
+   "items": [
+    {
+     "id": 20,
+     "answer": "E",
+     "label": "focuses on reproducing the content accurately"
+    },
+    {
+     "id": 21,
+     "answer": "B",
+     "label": "looks at important cultural aspects of language use"
+    },
+    {
+     "id": 22,
+     "answer": "D",
+     "label": "follows the original grammatical structures as required by the target language"
+    },
+    {
+     "id": 23,
+     "answer": "C",
+     "label": "focuses on meaning without necessarily using the original grammatical structures"
+    }
+   ],
+   "bankLabel": "Types of Translation",
+   "people": [
+    {
+     "l": "A",
+     "name": "aesthetic"
+    },
+    {
+     "l": "B",
+     "name": "ethnographic"
+    },
+    {
+     "l": "C",
+     "name": "free"
+    },
+    {
+     "l": "D",
+     "name": "literal"
+    },
+    {
+     "l": "E",
+     "name": "pragmatic"
+    },
+    {
+     "l": "F",
+     "name": "word-for-word"
+    }
+   ]
+  },
+  {
+   "type": "mcq-multi",
+   "num": "",
+   "title": "",
+   "instruction": "Choose \u003cb>THREE\u003c/b> letters, \u003cb>A&ndash;F\u003c/b>. Write the correct letters in boxes 24&ndash;26 on your answer sheet.",
+   "items": [
+    {
+     "id": 24,
+     "answer": "B"
+    },
+    {
+     "id": 25,
+     "answer": "D"
+    },
+    {
+     "id": 26,
+     "answer": "F"
+    }
+   ],
+   "gid": "g24",
+   "prompt": "Which THREE of the following points are mentioned by the writer of the passage?",
+   "options": [
+    {
+     "l": "A",
+     "t": "The objectives of translating are always clearly different from those of interpreting."
+    },
+    {
+     "l": "B",
+     "t": "A translator may need to consider the culture of the target language."
+    },
+    {
+     "l": "C",
+     "t": "Translation is an activity which requires professional training."
+    },
+    {
+     "l": "D",
+     "t": "It is difficult to specify what constitutes a very good translation."
+    },
+    {
+     "l": "E",
+     "t": "The skill required for translation is increasingly gaining recognition."
+    },
+    {
+     "l": "F",
+     "t": "A translation should give the impression of being an original work."
+    }
+   ]
+  }
+ ],
+ "3": [
+  {
+   "type": "wordbank",
+   "num": "",
+   "title": "",
+   "instruction": "Complete the summary using the list of words, \u003cb>A&ndash;D\u003c/b>, below. Write the correct letter, \u003cb>A&ndash;D\u003c/b>, in boxes 27&ndash;30 on your answer sheet.",
+   "items": [
+    {
+     "id": 27,
+     "answer": "D",
+     "label": ""
+    },
+    {
+     "id": 28,
+     "answer": "C",
+     "label": ""
+    },
+    {
+     "id": 29,
+     "answer": "A",
+     "label": ""
+    },
+    {
+     "id": 30,
+     "answer": "B",
+     "label": ""
+    }
+   ],
+   "noteTitle": "Early European reaction to the discovery of Easter Island",
+   "prose": "When Dutchman Jacob Roggeveen sailed to Easter Island in 1722, he was amazed by the stone statues he saw for a number of reasons. Firstly, it was clear that they were immensely heavy, and there was no {{27}} around, which would have helped with their construction. Roggeveen did not think the inhabitants had any metal tools, or animals for heavy labour either. Another mystery was the poor quality of the local inhabitants' {{28}}; Roggeveen wondered how the people had managed to survive long trips. At the time of Roggeveen's visit, he observed that the people were living in {{29}} and there was no evidence of successful {{30}} on the island.",
+   "bank": [
+    {
+     "id": "A",
+     "word": "poverty"
+    },
+    {
+     "id": "B",
+     "word": "agriculture"
+    },
+    {
+     "id": "C",
+     "word": "boats"
+    },
+    {
+     "id": "D",
+     "word": "wood"
+    }
+   ]
+  },
+  {
+   "type": "ynng",
+   "num": "",
+   "title": "",
+   "instruction": "Do the following statements agree with the claims of the writer in Reading Passage 3? In boxes 31&ndash;35 on your answer sheet, write",
+   "items": [
+    {
+     "id": 31,
+     "answer": "YES",
+     "label": "Erich von Däniken's claims were briefly accepted by some sections of society."
+    },
+    {
+     "id": 32,
+     "answer": "NOT GIVEN",
+     "label": "Archaeologists removed valuable artefacts from the island."
+    },
+    {
+     "id": 33,
+     "answer": "NOT GIVEN",
+     "label": "Smallpox continued to affect Easter Island's inhabitants for centuries."
+    },
+    {
+     "id": 34,
+     "answer": "NO",
+     "label": "It remains open to question whether Easter Island was once covered in forest."
+    },
+    {
+     "id": 35,
+     "answer": "YES",
+     "label": "The way that rats arrived on Easter Island is still to be established."
+    }
+   ]
+  },
+  {
+   "type": "mcq",
+   "num": "",
+   "title": "",
+   "instruction": "Choose the correct letter, \u003cb>A\u003c/b>, \u003cb>B\u003c/b>, \u003cb>C\u003c/b> or \u003cb>D\u003c/b>. Write the correct letter in boxes 36&ndash;40 on your answer sheet.",
+   "items": [
+    {
+     "id": 36,
+     "answer": "C",
+     "label": "What does Jared Diamond blame for the lack of vegetation on Easter Island?",
+     "options": [
+      "A. The construction of stone statues",
+      "B. Climate change over a long period",
+      "C. A method of transportation",
+      "D. The arrival of Europeans"
+     ]
+    },
+    {
+     "id": 37,
+     "answer": "B",
+     "label": "What do Hunt and Lipo suggest about the population of Easter Island?",
+     "options": [
+      "A. It collapsed before European contact",
+      "B. The first settlers arrived much later than is widely accepted",
+      "C. It never exceeded a few thousand inhabitants",
+      "D. It declined mainly because of disease"
+     ]
+    },
+    {
+     "id": 38,
+     "answer": "A",
+     "label": "What is suggested about rats on Easter Island in the fifth paragraph?",
+     "options": [
+      "A. They were a likely cause of deforestation",
+      "B. They arrived after the forests had disappeared",
+      "C. They had no effect on plant regeneration",
+      "D. They were introduced by Europeans"
+     ]
+    },
+    {
+     "id": 39,
+     "answer": "A",
+     "label": "Flenley responds to Hunt and Lipo's theory by",
+     "options": [
+      "A. dismissing it",
+      "B. partially supporting it",
+      "C. expanding on their arguments",
+      "D. avoiding direct criticism"
+     ]
+    },
+    {
+     "id": 40,
+     "answer": "B",
+     "label": "The writer's purpose in this article is to",
+     "options": [
+      "A. argue in favour of Diamond's interpretation",
+      "B. provide an overview of a series of arguments",
+      "C. prove that rats were the main cause of deforestation",
+      "D. criticise modern archaeological methods"
+     ]
+    }
+   ]
+  }
+ ]
+};
+const PASSAGES = {
+ "1": {
+  "title": "Andrew Carnegie: industrialist and philanthropist",
+  "content": "\u003cdiv>\u003cp>The Scottish-born American industrialist and philanthropist Andrew Carnegie, who was the leader of the American steel industry from 1873 to 1901, donated large sums of his fortune to educational, cultural, and scientific institutions. He was born in 1835 in Scotland, the son of William Carnegie, a weaver, and Margaret Morrison Carnegie.\u003c/p>\u003cp>With the invention of weaving machines, William Carnegie's job disappeared, and eventually the family was forced into poverty. In 1848 the family left Scotland and settled in Pittsburgh, Pennsylvania, in the USA. William found a job in a cotton factory, but he soon quit to return to his home handloom, making linens and trying to sell them door-to-door. Andrew Carnegie also worked in the cotton factory, but after his father died in 1855, his strong desire to help take care of the family pushed him to educate himself. He became an avid reader, a theatergoer, and a lover of music.\u003c/p>\u003cp>Andrew Carnegie became a messenger boy in a telegraph office and later became a telegraph operator. Thomas A. Scott, superintendent of the western division of the Pennsylvania Railroad, made the eighteen-year-old his secretary. Carnegie was soon earning enough to buy a house for his mother. During the Civil War in the United States (1861–65), he helped organize the military telegraph system, but soon returned to Pittsburgh to take Scott's old job with the railroad.\u003c/p>\u003cp>Between 1865 and 1870 Carnegie made money through investments in several small iron mills and factories. He also traveled throughout England, selling the bonds of small United States railroads and bridge companies. Carnegie began to see that steel was eventually going to replace iron for the manufacture of rails, structural shapes, pipe, and wire. In 1873 he organized a steel rail company and continued building by cutting prices, driving out competitors, shaking off weak partners, and putting earnings back into the company. He never went public (sold shares of his company in order to raise money). Instead he obtained capital from profit, and when necessary from banks, and he kept on growing, making heavy steel alone.\u003c/p>\u003cp>In the 1880s Carnegie's purchases included a majority stake in the H C Frick Company in Pennsylvania that had vast coal interests, and also the Homestead mills business. Frick became his partner and eventually chairman of the Carnegie Company. Carnegie had moved to New York City in 1867 to be close to the marketing centers for steel products, while Frick stayed in Pennsylvania as the general manager. They made a good team. Behind the scenes, Carnegie planned new projects and the improvement of existing plants; Frick was the working director who watched over the mass-production programs that helped keep price down.\u003c/p>\u003cp>Carnegie spent his leisure time traveling. He also wrote several books, including Triumphant Democracy (1886), which pointed out what he thought were the advantages of life in the United States over the unequal societies of Britain and other European countries. To Carnegie, access to education was the key to America's political stability and industrial accomplishments. In 1889 he published an article, 'Wealth', stating his belief that the rich had a duty to use their money to improve the welfare of the community. Carnegie remained a bachelor until his mother died in 1886. A year later he married Louise Whitfield and they had one child together. The couple began to spend six months each year in Scotland, though Carnegie kept an eye on business developments and problems.\u003c/p>\u003cp>Carnegie's absence from the United States was a factor in the Homestead mills strike of 1892. After acquiring Homestead, Carnegie had invested in new plants and equipment, increased production, and automated many of the mill's operations, cutting down the number of workers that were needed. Carnegie believed that workers had a right to join unions and to bargain with management through their unions. He also recognized the right to strike, as long as the action was conducted peacefully. He viewed strikes as trials of strength, with peaceful discussion resolving the conflict. In contract talks during 1892, Frick wanted to lower the minimum wage because of the need for fewer workers. The union representing his workers would not accept this and organized a strike.\u003c/p>\u003cp>Following a violent confrontation that resulted in the death of eight workers, soldiers were sent in to restore order and Carnegie was criticized for his lack of action. In the 1890s Carnegie also began to meet with tougher competition from newer, bigger companies who were interested in controlled prices and sharing the market. Companies that he had sold to for years threatened to cut down their purchases unless he agreed to cooperate. These threats made him decide to fight back. He refused to enter into any agreements with other companies. Moreover, he decided to invade their territories by making similar products and by expanding his sales activities into the west of the country. Eventually, though, he decided to sell his company to the newly formed U.S. Steel Corporation in 1901 for almost $500 million. Carnegie's personal share was $225 million.\u003c/p>\u003cp>In retirement, Carnegie began to set up trust funds 'for the improvement of mankind'. He built some three thousand public libraries all over the English-speaking world and funded galleries, museums and concert halls in the US. He also built a group of technical schools, a research institute, and a foundation providing pensions for university professors. When Carnegie died in 1919, the continuation of his broad interests was put under the general charge of the Carnegie Corporation, with a donation of $125 million.\u003c/p>\u003c/div>"
+ },
+ "2": {
+  "title": "Translating: a key to international understanding?",
+  "content": "\u003cdiv>\u003cp>\u003cstrong class=\"para-letter\">A\u003c/strong> The term 'translation' is used for all cases where the meaning of expressions in one language (the 'source' language) is turned into the meaning in another (the target language), whether the medium is spoken, written, or signed. In specific professional contexts, however, a distinction is drawn between work with the spoken or signed language (interpreting), and work with the written language (translating), although certain tasks blur this distinction.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">B\u003c/strong> It is sometimes said that there is no task more complex than translation — a claim that can be readily believed when all the variables involved are taken into account. Translators not only need to know their source language well; they must also have a thorough understanding in the field of knowledge covered by the source text, and of any social, cultural, or emotional connotations that need to be specified in the target language if the intended effect is to be conveyed. The same special awareness needs to be present for the target language, so that points of special phrasing, contemporary fashions in expression, local expectations, and so on, can all be taken into account. On the whole, translators work into their mother tongue (or language of habitual use), to ensure a result that sounds as natural as possible though some translators have argued that, for certain types of text (e.g., scientific material) where translation accuracy is more crucial than naturalness, it makes more sense for the translators to be more fluent in the source language.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">C\u003c/strong> The aim of translation is to provide semantic equivalence between source and target language. This is what makes translation different from other linguistic activities, such as adapting, precise writing, and abstracting. However, there are many problems hidden within this apparently simple statement, all to do with what standards of 'equivalence' should be expected and accepted.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">D\u003c/strong> Exact equivalence is of course impossible: no translator could provide a translation that was a perfect parallel to the source text, in such respects as rhythm, puns and cultural allusions. Such a parallel is not even possible when paraphrasing within a single language: there is always some loss of information.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">E\u003c/strong> On the other hand, there are many kinds of inexact equivalence, any of which can be successful at a certain level of practical functioning. It therefore follows that there is no such thing as a best translation. The success of translation depends on the purpose for which it was made, which in turn reflects the needs of the people for whom it was made. A rough-and-ready translation of a letter can suffice to inform a firm of the nature of an enquiry. A translation of a scientific article requires careful attention to meaning but little attention to stylistic features. The provision of a dubbed film script will warrant scrupulous care over the synchronisation of lip movements, often at the expense of content. Literary work requires a sensitive consideration of form as well as content, and may prompt several translations, each of which emphasises a different aspect of the original. It is easy to see what might be 'best' for one set of circumstances may be entirely unsuitable for another.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">F\u003c/strong> Several different kinds of translation have been proposed to allow for this range of possibilities. A pragmatic translation emphasises accuracy and knowledge of the subject, required for instruction manuals and much scientific research. In an aesthetic translation, important for literary material, the focus is on preserving the emotional as well as the cognitive content of the work, and on maintaining some level of stylistic equivalence. Ethnographic or sociolinguistic translations aim to pay full attention to the cultural backgrounds of the authors and the recipients, and take into account differences between source and target language, and the ways of life in which they are embedded. And there are various kinds of linguistic translation, where the aim is to convey the structural flavour of the original text, often in quite a literal manner, emphasising such features as archaisms, dialecticisms, and levels of formality. Most translations, of course, are mixtures of these theoretical types, reflecting the complex reality of language in use.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">G\u003c/strong> At another level, in a word-for-word translation each word in the source language is translated by a word in the target language. The result often makes no sense, especially when idiomatic constructions are used. In a literal translation the linguistic structure of the source text is followed, but is normalised according to the rules of the target language. In a free translation the linguistic structure of the source language is ignored, and an equivalent is found based on the meaning it conveys.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">H\u003c/strong> Translators aim to produce a text that is as faithful to the original as circumstances require or permit, and yet that reads as if it were written originally in the target language. They aim to be \"invisible people\" — transferring content without drawing attention to the considerable artistic and technical skills involved in the process. The complexity of the task is apparent, but its importance is often underestimated, and its practitioners' social status and legal rights undervalued. Some countries view translation as a menial, clerical task, and pay their translators accordingly, while others regard it as a major intellectual discipline in its own right. The question of status is currently much debated, particularly in Europe, where demand for translators is rocketing, especially in relation to the European Union.\u003c/p>\u003c/div>"
+ },
+ "3": {
+  "title": "The mystery of Easter Island",
+  "content": "\u003cdiv>\u003cp>\u003cem>What could possibly explain the lack of vegetation on Easter Island?\u003c/em>\u003c/p>\u003cp>The giant stone statues of Easter Island in the Pacific Ocean have perplexed archaeologists ever since European explorers first witnessed them three centuries ago. Jacob Roggeveen, the Dutch seaman who gave the island its name in 1722, was amazed by the statues, each of which clearly weighed several tonnes. But as there were no forests on the island, he could not comprehend how people devoid of heavy timber could build and erect something that size. It was also remarkable considering the absence of metal objects for carving and cutting, and the reliance on mere human strength as no draught animals could be seen either. Roggeveen was equally amazed as to how the islanders could have come to colonise such a remote place. Their canoes were leaky and frail, not the sort of ocean-going craft that could survive a three-week sea journey. At the time of his visit, it seemed evident the islanders were living in extremely poor conditions and that there was no cultivation of crops.\u003c/p>\u003cp>What was the mystery behind the statues? In the 1970s, the author Erich von Däniken suggested the statues were the work of extraterrestrial beings. It was hard to believe the stones were the work of humans who were more than 2,000 miles from the nearest mainland, so for a short period of time his theory appealed to those fascinated with space travel. But for serious academics, the puzzle of the statues has caused a deep divide. Some archaeologists see Easter Island as an example of what can happen when the lust for material splendour — ever bigger stone carvings in this case — is satisfied at the expense of the environment. Others, meanwhile, take a different view. The island, these scholars argue, suffered at the hands of introduced diseases, notably smallpox, and a slave trade that stole a huge proportion of its indigenous population. At the heart of the debate is the issue of the island's deforestation. There is no doubt that the island was once covered in palm trees. There is also no doubt that something happened that caused the island to become completely denuded over a short period of time. But was it the islanders who triggered this environmental degradation or another event beyond their control, such as the introduction of rats? It is an indisputable fact that rats found their way to the island, although exactly how is a matter of debate.\u003c/p>\u003cp>In 2005, the anthropologist Jared Diamond claimed the islanders started building ceremonial statues in an atmosphere of rivalry between the many clans. To move the statues from the island's quarry in the south-east, they needed to cut large logs for the construction of long 'canoe ladders' to carry them to the coast. For its transport alone, each statue would have required several trees to be cut down. As a result of the deforestation, Diamond believes food production fell dramatically. Consequently the population collapsed from perhaps as many as 15,000 to the few thousand that were eking out a living by the time Roggeveen arrived. Smallpox and slavery killed off those who remained, but the islanders were on the way to total collapse even without any European contact, says Diamond.\u003c/p>\u003cp>But not everyone is convinced. Professor Terry Hunt, an anthropologist at the University of Hawaii, says: 'There is no evidence that a population collapse occurred before European contact.' He is supported by Professor Carl Lipo of California State University. They argue that Easter Island was colonised by the first Polynesian seafarers nowhere near as early as supposed. They say the first people to arrive came around AD1200, about 400 years later than other scientists have suggested from radio-carbon dating. This makes it implausible for the population to have reached the 15,000 figure that would have caused such a fast ecocide. They also believe the deforestation occurred over a longer period as a result of climate change, and rats probably also played a part. The islanders did not go through a population collapse until after the arrival of Europeans, they say.\u003c/p>\u003cp>Hunt has examined new data from the Hawaiian and other Pacific islands that shows that by early historic times the deforestation of Easter Island was already complete, or nearly so. A dense forest of palm trees and shrubs had mostly disappeared and as a result, as many as six land bird species had also become extinct. Crucially, much of the forest damage appears to have been done before evidence of fires on the island. However, almost all of the palm seed shells discovered on the island were found to have been gnawed by rats which would have made them unable to germinate. Evidence from other Pacific islands also confirms how destructive rats can be. However, John Flenley of New Zealand's Massey University, who carried out much of the radio-carbon work on Easter Island, says there is ample evidence for a much earlier arrival of Polynesian settlers. He refutes the arguments of the sceptics: whilst admitting that the Europeans did bring certain disasters, he maintains that Hunt and Lipo are ignoring archaeological, botanical and sedimentological evidence proving the island was transformed from a subtropical rainforest to a treeless landscape. The radio-carbon dating points to an initial colonisation before AD900, Flenley argues. This was ample time for the rapid deforestation, environmental collapse and a population crash, he insists.\u003c/p>\u003cp>Why all this is important today is not, of course, lost in the age of globalisation, climate change and a rapidly growing world population in the billions. As Diamond says: 'The parallels between Easter Island and the whole of the modern world are chillingly obvious.'\u003c/p>\u003c/div>"
+ }
+};
+const VOCABULARY_DATA = {
+ "1": {
+  "passageTitle": "Andrew Carnegie: industrialist and philanthropist",
+  "words": []
+ },
+ "2": {
+  "passageTitle": "Translating: a key to international understanding?",
+  "words": []
+ },
+ "3": {
+  "passageTitle": "The mystery of Easter Island",
+  "words": []
+ }
+};
+const READING_EXPLANATIONS = {
+ "1": {
+  "explanation": "father — “William found a job in a cotton factory” and “Andrew Carnegie also worked in the cotton factory”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Andrew otasi William ishlagan paxta fabrikasida ishlagan.\u003c/div>",
+  "highlights": [
+   "William found a job in a cotton factory",
+   "Andrew Carnegie also worked in the cotton factory"
+  ],
+  "paraphraseMap": [],
+  "en": "father — “William found a job in a cotton factory” and “Andrew Carnegie also worked in the cotton factory”.",
+  "uz": "Andrew otasi William ishlagan paxta fabrikasida ishlagan."
+ },
+ "2": {
+  "explanation": "music — “He became an avid reader, a theatergoer, and a lover of music”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> U kitob o‘qish, teatr va musiqa orqali o‘zini o‘zi o‘qitgan.\u003c/div>",
+  "highlights": [
+   "He became an avid reader, a theatergoer, and a lover of music"
+  ],
+  "paraphraseMap": [],
+  "en": "music — “He became an avid reader, a theatergoer, and a lover of music”.",
+  "uz": "U kitob o‘qish, teatr va musiqa orqali o‘zini o‘zi o‘qitgan."
+ },
+ "3": {
+  "explanation": "secretary — Thomas A. Scott “made the eighteen-year-old his secretary”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Thomas A. Scott 18 yoshli Carnegie’ni kotibi qilib olgan.\u003c/div>",
+  "highlights": [
+   "made the eighteen-year-old his secretary"
+  ],
+  "paraphraseMap": [],
+  "en": "secretary — Thomas A. Scott “made the eighteen-year-old his secretary”.",
+  "uz": "Thomas A. Scott 18 yoshli Carnegie’ni kotibi qilib olgan."
+ },
+ "4": {
+  "explanation": "steel — “Carnegie began to see that steel was eventually going to replace iron for the manufacture of rails, structural shapes, pipe, and wire”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Carnegie temir o‘rnini po‘lat egallashini oldindan ko‘rgan.\u003c/div>",
+  "highlights": [
+   "Carnegie began to see that steel was eventually going to replace iron for the manufacture of rails, structural shapes, pipe, and wire"
+  ],
+  "paraphraseMap": [],
+  "en": "steel — “Carnegie began to see that steel was eventually going to replace iron for the manufacture of rails, structural shapes, pipe, and wire”.",
+  "uz": "Carnegie temir o‘rnini po‘lat egallashini oldindan ko‘rgan."
+ },
+ "5": {
+  "explanation": "prices — he “continued building by cutting prices, driving out competitors”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> U narxlarni pasaytirish orqali biznesini kengaytirgan.\u003c/div>",
+  "highlights": [
+   "continued building by cutting prices, driving out competitors"
+  ],
+  "paraphraseMap": [],
+  "en": "prices — he “continued building by cutting prices, driving out competitors”.",
+  "uz": "U narxlarni pasaytirish orqali biznesini kengaytirgan."
+ },
+ "6": {
+  "explanation": "banks — “he obtained capital from profit, and when necessary from banks”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Kapitalni foydadan, zarur bo‘lsa banklardan olgan.\u003c/div>",
+  "highlights": [
+   "he obtained capital from profit, and when necessary from banks"
+  ],
+  "paraphraseMap": [],
+  "en": "banks — “he obtained capital from profit, and when necessary from banks”.",
+  "uz": "Kapitalni foydadan, zarur bo‘lsa banklardan olgan."
+ },
+ "7": {
+  "explanation": "projects — “Carnegie planned new projects and the improvement of existing plants; Frick was the working director”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Carnegie yangi loyihalar va zavodlarni yaxshilashni rejalashtirgan, Frick esa ishlab chiqarishni boshqargan.\u003c/div>",
+  "highlights": [
+   "Carnegie planned new projects and the improvement of existing plants; Frick was the working director"
+  ],
+  "paraphraseMap": [],
+  "en": "projects — “Carnegie planned new projects and the improvement of existing plants; Frick was the working director”.",
+  "uz": "Carnegie yangi loyihalar va zavodlarni yaxshilashni rejalashtirgan, Frick esa ishlab chiqarishni boshqargan."
+ },
+ "8": {
+  "explanation": "TRUE — his book pointed out “the advantages of life in the United States over the unequal societies of Britain and other European countries”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> TRUE — Carnegie AQShdagi hayotni Yevropaning tengsiz jamiyatlaridan afzal deb yozgan.\u003c/div>",
+  "highlights": [
+   "the advantages of life in the United States over the unequal societies of Britain and other European countries"
+  ],
+  "paraphraseMap": [],
+  "en": "TRUE — his book pointed out “the advantages of life in the United States over the unequal societies of Britain and other European countries”.",
+  "uz": "TRUE — Carnegie AQShdagi hayotni Yevropaning tengsiz jamiyatlaridan afzal deb yozgan."
+ },
+ "9": {
+  "explanation": "TRUE — he “automated many of the mill's operations, cutting down the number of workers that were needed”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> TRUE — avtomatlashtirish tufayli kerakli ishchilar soni kamaygan.\u003c/div>",
+  "highlights": [
+   "automated many of the mill's operations, cutting down the number of workers that were needed"
+  ],
+  "paraphraseMap": [],
+  "en": "TRUE — he “automated many of the mill's operations, cutting down the number of workers that were needed”.",
+  "uz": "TRUE — avtomatlashtirish tufayli kerakli ishchilar soni kamaygan."
+ },
+ "10": {
+  "explanation": "FALSE — “Carnegie believed that workers had a right to join unions and to bargain with management through their unions”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — Carnegie ishchilarning kasaba uyushmasiga a’zo bo‘lish huquqini tan olgan.\u003c/div>",
+  "highlights": [
+   "Carnegie believed that workers had a right to join unions and to bargain with management through their unions"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — “Carnegie believed that workers had a right to join unions and to bargain with management through their unions”.",
+  "uz": "FALSE — Carnegie ishchilarning kasaba uyushmasiga a’zo bo‘lish huquqini tan olgan."
+ },
+ "11": {
+  "explanation": "NOT GIVEN — we read that “Carnegie was criticized for his lack of action”, but nothing about Carnegie blaming Frick.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> NOT GIVEN — Carnegie tanqid qilingani aytiladi, lekin u Frickni ayblagani haqida ma’lumot yo‘q.\u003c/div>",
+  "highlights": [
+   "Carnegie was criticized for his lack of action"
+  ],
+  "paraphraseMap": [],
+  "en": "NOT GIVEN — we read that “Carnegie was criticized for his lack of action”, but nothing about Carnegie blaming Frick.",
+  "uz": "NOT GIVEN — Carnegie tanqid qilingani aytiladi, lekin u Frickni ayblagani haqida ma’lumot yo‘q."
+ },
+ "12": {
+  "explanation": "FALSE — “He refused to enter into any agreements with other companies” and decided to fight back.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — U raqiblar bilan hech qanday kelishuvga kirmagan, aksincha kurashgan.\u003c/div>",
+  "highlights": [
+   "He refused to enter into any agreements with other companies"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — “He refused to enter into any agreements with other companies” and decided to fight back.",
+  "uz": "FALSE — U raqiblar bilan hech qanday kelishuvga kirmagan, aksincha kurashgan."
+ },
+ "13": {
+  "explanation": "FALSE — “He built some three thousand public libraries all over the English-speaking world”, not only in the US.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — U butun ingliz tilli dunyoda kutubxonalar qurgan, faqat AQShda emas.\u003c/div>",
+  "highlights": [
+   "He built some three thousand public libraries all over the English-speaking world"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — “He built some three thousand public libraries all over the English-speaking world”, not only in the US.",
+  "uz": "FALSE — U butun ingliz tilli dunyoda kutubxonalar qurgan, faqat AQShda emas."
+ },
+ "14": {
+  "explanation": "E — “The success of translation depends on the purpose for which it was made, which in turn reflects the needs of the people for whom it was made”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> E: tarjimaning muvaffaqiyati mijozning maqsadi va ehtiyojlariga bog‘liq.\u003c/div>",
+  "highlights": [
+   "The success of translation depends on the purpose for which it was made, which in turn reflects the needs of the people for whom it was made"
+  ],
+  "paraphraseMap": [],
+  "en": "E — “The success of translation depends on the purpose for which it was made, which in turn reflects the needs of the people for whom it was made”.",
+  "uz": "E: tarjimaning muvaffaqiyati mijozning maqsadi va ehtiyojlariga bog‘liq."
+ },
+ "15": {
+  "explanation": "H — “Some countries view translation as a menial, clerical task … while others regard it as a major intellectual discipline in its own right”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> H: ba’zi davlatlar tarjimani oddiy ish, boshqalari esa jiddiy intellektual soha deb biladi.\u003c/div>",
+  "highlights": [
+   "Some countries view translation as a menial, clerical task",
+   "while others regard it as a major intellectual discipline in its own right"
+  ],
+  "paraphraseMap": [],
+  "en": "H — “Some countries view translation as a menial, clerical task … while others regard it as a major intellectual discipline in its own right”.",
+  "uz": "H: ba’zi davlatlar tarjimani oddiy ish, boshqalari esa jiddiy intellektual soha deb biladi."
+ },
+ "16": {
+  "explanation": "semantic equivalence — “The aim of translation is to provide semantic equivalence between source and target language”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tarjimaning maqsadi — ma’no jihatdan tenglik (semantic equivalence).\u003c/div>",
+  "highlights": [
+   "The aim of translation is to provide semantic equivalence between source and target language"
+  ],
+  "paraphraseMap": [],
+  "en": "semantic equivalence — “The aim of translation is to provide semantic equivalence between source and target language”.",
+  "uz": "Tarjimaning maqsadi — ma’no jihatdan tenglik (semantic equivalence)."
+ },
+ "17": {
+  "explanation": "practical functioning — inexact equivalence “can be successful at a certain level of practical functioning”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tarjima amaliy vazifasini qanchalik bajarishiga qarab baholanadi.\u003c/div>",
+  "highlights": [
+   "can be successful at a certain level of practical functioning"
+  ],
+  "paraphraseMap": [],
+  "en": "practical functioning — inexact equivalence “can be successful at a certain level of practical functioning”.",
+  "uz": "Tarjima amaliy vazifasini qanchalik bajarishiga qarab baholanadi."
+ },
+ "18": {
+  "explanation": "stylistic — a scientific article “requires careful attention to meaning but little attention to stylistic features”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Ilmiy maqola tarjimasida uslubiy jihatlarga kam e’tibor beriladi.\u003c/div>",
+  "highlights": [
+   "requires careful attention to meaning but little attention to stylistic features"
+  ],
+  "paraphraseMap": [],
+  "en": "stylistic — a scientific article “requires careful attention to meaning but little attention to stylistic features”.",
+  "uz": "Ilmiy maqola tarjimasida uslubiy jihatlarga kam e’tibor beriladi."
+ },
+ "19": {
+  "explanation": "content — a dubbed film needs “scrupulous care over the synchronisation of lip movements, often at the expense of content”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Film dublyajida lab harakati muhimroq, mazmun esa ko‘pincha qurbon qilinadi.\u003c/div>",
+  "highlights": [
+   "scrupulous care over the synchronisation of lip movements, often at the expense of content"
+  ],
+  "paraphraseMap": [],
+  "en": "content — a dubbed film needs “scrupulous care over the synchronisation of lip movements, often at the expense of content”.",
+  "uz": "Film dublyajida lab harakati muhimroq, mazmun esa ko‘pincha qurbon qilinadi."
+ },
+ "20": {
+  "explanation": "E (pragmatic) — “A pragmatic translation emphasises accuracy and knowledge of the subject”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Pragmatik tarjima aniqlik va mavzuni bilishga urg‘u beradi.\u003c/div>",
+  "highlights": [
+   "A pragmatic translation emphasises accuracy and knowledge of the subject"
+  ],
+  "paraphraseMap": [],
+  "en": "E (pragmatic) — “A pragmatic translation emphasises accuracy and knowledge of the subject”.",
+  "uz": "Pragmatik tarjima aniqlik va mavzuni bilishga urg‘u beradi."
+ },
+ "21": {
+  "explanation": "B (ethnographic) — “Ethnographic or sociolinguistic translations aim to pay full attention to the cultural backgrounds of the authors and the recipients”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Etnografik tarjima madaniy jihatlarga to‘liq e’tibor beradi.\u003c/div>",
+  "highlights": [
+   "Ethnographic or sociolinguistic translations aim to pay full attention to the cultural backgrounds of the authors and the recipients"
+  ],
+  "paraphraseMap": [],
+  "en": "B (ethnographic) — “Ethnographic or sociolinguistic translations aim to pay full attention to the cultural backgrounds of the authors and the recipients”.",
+  "uz": "Etnografik tarjima madaniy jihatlarga to‘liq e’tibor beradi."
+ },
+ "22": {
+  "explanation": "D (literal) — “In a literal translation the linguistic structure of the source text is followed, but is normalised according to the rules of the target language”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> So‘zma-so‘z emas, literal tarjimada asl tuzilma saqlanib, maqsad til qoidalariga moslanadi.\u003c/div>",
+  "highlights": [
+   "In a literal translation the linguistic structure of the source text is followed, but is normalised according to the rules of the target language"
+  ],
+  "paraphraseMap": [],
+  "en": "D (literal) — “In a literal translation the linguistic structure of the source text is followed, but is normalised according to the rules of the target language”.",
+  "uz": "So‘zma-so‘z emas, literal tarjimada asl tuzilma saqlanib, maqsad til qoidalariga moslanadi."
+ },
+ "23": {
+  "explanation": "C (free) — “In a free translation the linguistic structure of the source language is ignored, and an equivalent is found based on the meaning it conveys”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Erkin tarjimada asl tuzilma e’tiborga olinmaydi, faqat ma’no beriladi.\u003c/div>",
+  "highlights": [
+   "In a free translation the linguistic structure of the source language is ignored, and an equivalent is found based on the meaning it conveys"
+  ],
+  "paraphraseMap": [],
+  "en": "C (free) — “In a free translation the linguistic structure of the source language is ignored, and an equivalent is found based on the meaning it conveys”.",
+  "uz": "Erkin tarjimada asl tuzilma e’tiborga olinmaydi, faqat ma’no beriladi."
+ },
+ "24": {
+  "explanation": "B, D and F — B: translators need awareness of “social, cultural, or emotional connotations”. D: “there is no such thing as a best translation”. F: a translation “reads as if it were written originally in the target language”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> B — tarjimon madaniy jihatlarni hisobga olishi kerak; D — “eng yaxshi tarjima” degan narsa yo‘q; F — tarjima asl matndek o‘qilishi kerak.\u003c/div>",
+  "highlights": [
+   "social, cultural, or emotional connotations",
+   "there is no such thing as a best translation",
+   "reads as if it were written originally in the target language"
+  ],
+  "paraphraseMap": [],
+  "en": "B, D and F — B: translators need awareness of “social, cultural, or emotional connotations”. D: “there is no such thing as a best translation”. F: a translation “reads as if it were written originally in the target language”.",
+  "uz": "B — tarjimon madaniy jihatlarni hisobga olishi kerak; D — “eng yaxshi tarjima” degan narsa yo‘q; F — tarjima asl matndek o‘qilishi kerak."
+ },
+ "25": {
+  "explanation": "B, D and F — B: translators need awareness of “social, cultural, or emotional connotations”. D: “there is no such thing as a best translation”. F: a translation “reads as if it were written originally in the target language”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> B — tarjimon madaniy jihatlarni hisobga olishi kerak; D — “eng yaxshi tarjima” degan narsa yo‘q; F — tarjima asl matndek o‘qilishi kerak.\u003c/div>",
+  "highlights": [
+   "social, cultural, or emotional connotations",
+   "there is no such thing as a best translation",
+   "reads as if it were written originally in the target language"
+  ],
+  "paraphraseMap": [],
+  "en": "B, D and F — B: translators need awareness of “social, cultural, or emotional connotations”. D: “there is no such thing as a best translation”. F: a translation “reads as if it were written originally in the target language”.",
+  "uz": "B — tarjimon madaniy jihatlarni hisobga olishi kerak; D — “eng yaxshi tarjima” degan narsa yo‘q; F — tarjima asl matndek o‘qilishi kerak."
+ },
+ "26": {
+  "explanation": "B, D and F — B: translators need awareness of “social, cultural, or emotional connotations”. D: “there is no such thing as a best translation”. F: a translation “reads as if it were written originally in the target language”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> B — tarjimon madaniy jihatlarni hisobga olishi kerak; D — “eng yaxshi tarjima” degan narsa yo‘q; F — tarjima asl matndek o‘qilishi kerak.\u003c/div>",
+  "highlights": [
+   "social, cultural, or emotional connotations",
+   "there is no such thing as a best translation",
+   "reads as if it were written originally in the target language"
+  ],
+  "paraphraseMap": [],
+  "en": "B, D and F — B: translators need awareness of “social, cultural, or emotional connotations”. D: “there is no such thing as a best translation”. F: a translation “reads as if it were written originally in the target language”.",
+  "uz": "B — tarjimon madaniy jihatlarni hisobga olishi kerak; D — “eng yaxshi tarjima” degan narsa yo‘q; F — tarjima asl matndek o‘qilishi kerak."
+ },
+ "27": {
+  "explanation": "D (wood) — “as there were no forests on the island, he could not comprehend how people devoid of heavy timber could build and erect something that size”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Orolda o‘rmon yo‘q edi — haykallarni qurish uchun yog‘och bo‘lmagan.\u003c/div>",
+  "highlights": [
+   "as there were no forests on the island, he could not comprehend how people devoid of heavy timber could build and erect something that size"
+  ],
+  "paraphraseMap": [],
+  "en": "D (wood) — “as there were no forests on the island, he could not comprehend how people devoid of heavy timber could build and erect something that size”.",
+  "uz": "Orolda o‘rmon yo‘q edi — haykallarni qurish uchun yog‘och bo‘lmagan."
+ },
+ "28": {
+  "explanation": "C (boats) — “Their canoes were leaky and frail, not the sort of ocean-going craft that could survive a three-week sea journey”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Ularning qayiqlari teshik va mo‘rt edi — uzoq dengiz safariga yaramagan.\u003c/div>",
+  "highlights": [
+   "Their canoes were leaky and frail, not the sort of ocean-going craft that could survive a three-week sea journey"
+  ],
+  "paraphraseMap": [],
+  "en": "C (boats) — “Their canoes were leaky and frail, not the sort of ocean-going craft that could survive a three-week sea journey”.",
+  "uz": "Ularning qayiqlari teshik va mo‘rt edi — uzoq dengiz safariga yaramagan."
+ },
+ "29": {
+  "explanation": "A (poverty) — “the islanders were living in extremely poor conditions”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Orolliklar juda qashshoq sharoitda yashagan.\u003c/div>",
+  "highlights": [
+   "the islanders were living in extremely poor conditions"
+  ],
+  "paraphraseMap": [],
+  "en": "A (poverty) — “the islanders were living in extremely poor conditions”.",
+  "uz": "Orolliklar juda qashshoq sharoitda yashagan."
+ },
+ "30": {
+  "explanation": "B (agriculture) — “there was no cultivation of crops”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Orolda ekin ekilmagan — dehqonchilik yo‘q edi.\u003c/div>",
+  "highlights": [
+   "there was no cultivation of crops"
+  ],
+  "paraphraseMap": [],
+  "en": "B (agriculture) — “there was no cultivation of crops”.",
+  "uz": "Orolda ekin ekilmagan — dehqonchilik yo‘q edi."
+ },
+ "31": {
+  "explanation": "YES — “for a short period of time his theory appealed to those fascinated with space travel”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> YES — uning nazariyasi qisqa vaqt koinot sayohatiga qiziquvchilarga yoqqan.\u003c/div>",
+  "highlights": [
+   "for a short period of time his theory appealed to those fascinated with space travel"
+  ],
+  "paraphraseMap": [],
+  "en": "YES — “for a short period of time his theory appealed to those fascinated with space travel”.",
+  "uz": "YES — uning nazariyasi qisqa vaqt koinot sayohatiga qiziquvchilarga yoqqan."
+ },
+ "32": {
+  "explanation": "NOT GIVEN — the passage never mentions archaeologists taking artefacts away.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> NOT GIVEN — arxeologlar oroldan buyum olib ketgani haqida hech narsa yo‘q.\u003c/div>",
+  "highlights": [],
+  "paraphraseMap": [],
+  "en": "NOT GIVEN — the passage never mentions archaeologists taking artefacts away.",
+  "uz": "NOT GIVEN — arxeologlar oroldan buyum olib ketgani haqida hech narsa yo‘q."
+ },
+ "33": {
+  "explanation": "NOT GIVEN — smallpox is named as one of the “introduced diseases”, but nothing says how long it lasted.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> NOT GIVEN — chechak tilga olinadi, ammo qancha davom etgani aytilmagan.\u003c/div>",
+  "highlights": [
+   "introduced diseases"
+  ],
+  "paraphraseMap": [],
+  "en": "NOT GIVEN — smallpox is named as one of the “introduced diseases”, but nothing says how long it lasted.",
+  "uz": "NOT GIVEN — chechak tilga olinadi, ammo qancha davom etgani aytilmagan."
+ },
+ "34": {
+  "explanation": "NO — “There is no doubt that the island was once covered in palm trees”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> NO — Orol bir paytlar palma daraxtlari bilan qoplangani shubhasiz deyilgan.\u003c/div>",
+  "highlights": [
+   "There is no doubt that the island was once covered in palm trees"
+  ],
+  "paraphraseMap": [],
+  "en": "NO — “There is no doubt that the island was once covered in palm trees”.",
+  "uz": "NO — Orol bir paytlar palma daraxtlari bilan qoplangani shubhasiz deyilgan."
+ },
+ "35": {
+  "explanation": "YES — “rats found their way to the island, although exactly how is a matter of debate”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> YES — kalamushlar orolga qanday kelgani hali ham bahsli.\u003c/div>",
+  "highlights": [
+   "rats found their way to the island, although exactly how is a matter of debate"
+  ],
+  "paraphraseMap": [],
+  "en": "YES — “rats found their way to the island, although exactly how is a matter of debate”.",
+  "uz": "YES — kalamushlar orolga qanday kelgani hali ham bahsli."
+ },
+ "36": {
+  "explanation": "C — to move the statues “they needed to cut large logs for the construction of long 'canoe ladders'”; “For its transport alone, each statue would have required several trees to be cut down”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> C — Diamond haykallarni tashish uchun daraxtlar kesilganini (transport usuli) ayblaydi.\u003c/div>",
+  "highlights": [
+   "they needed to cut large logs for the construction of long 'canoe ladders'",
+   "For its transport alone, each statue would have required several trees to be cut down"
+  ],
+  "paraphraseMap": [],
+  "en": "C — to move the statues “they needed to cut large logs for the construction of long 'canoe ladders'”; “For its transport alone, each statue would have required several trees to be cut down”.",
+  "uz": "C — Diamond haykallarni tashish uchun daraxtlar kesilganini (transport usuli) ayblaydi."
+ },
+ "37": {
+  "explanation": "B — “the first people to arrive came around AD1200, about 400 years later than other scientists have suggested”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> B — ularning fikricha birinchi aholi taxminan 1200-yilda, odatdagidan 400 yil kechroq kelgan.\u003c/div>",
+  "highlights": [
+   "the first people to arrive came around AD1200, about 400 years later than other scientists have suggested"
+  ],
+  "paraphraseMap": [],
+  "en": "B — “the first people to arrive came around AD1200, about 400 years later than other scientists have suggested”.",
+  "uz": "B — ularning fikricha birinchi aholi taxminan 1200-yilda, odatdagidan 400 yil kechroq kelgan."
+ },
+ "38": {
+  "explanation": "A — “almost all of the palm seed shells discovered on the island were found to have been gnawed by rats which would have made them unable to germinate”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> A — palma urug‘larini kalamushlar kemirgan, ular unib chiqa olmagan — o‘rmon yo‘qolishining ehtimoliy sababi.\u003c/div>",
+  "highlights": [
+   "almost all of the palm seed shells discovered on the island were found to have been gnawed by rats which would have made them unable to germinate"
+  ],
+  "paraphraseMap": [],
+  "en": "A — “almost all of the palm seed shells discovered on the island were found to have been gnawed by rats which would have made them unable to germinate”.",
+  "uz": "A — palma urug‘larini kalamushlar kemirgan, ular unib chiqa olmagan — o‘rmon yo‘qolishining ehtimoliy sababi."
+ },
+ "39": {
+  "explanation": "A — “He refutes the arguments of the sceptics” and says “Hunt and Lipo are ignoring archaeological, botanical and sedimentological evidence”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> A — Flenley ularning dalillarini rad etadi.\u003c/div>",
+  "highlights": [
+   "He refutes the arguments of the sceptics",
+   "Hunt and Lipo are ignoring archaeological, botanical and sedimentological evidence"
+  ],
+  "paraphraseMap": [],
+  "en": "A — “He refutes the arguments of the sceptics” and says “Hunt and Lipo are ignoring archaeological, botanical and sedimentological evidence”.",
+  "uz": "A — Flenley ularning dalillarini rad etadi."
+ },
+ "40": {
+  "explanation": "B — the writer sets out Diamond's view, then Hunt and Lipo's, then Flenley's, without taking sides: “But for serious academics, the puzzle of the statues has caused a deep divide”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> B — muallif turli olimlarning qarashlarini tarafkashliksiz bayon qiladi.\u003c/div>",
+  "highlights": [
+   "But for serious academics, the puzzle of the statues has caused a deep divide"
+  ],
+  "paraphraseMap": [],
+  "en": "B — the writer sets out Diamond's view, then Hunt and Lipo's, then Flenley's, without taking sides: “But for serious academics, the puzzle of the statues has caused a deep divide”.",
+  "uz": "B — muallif turli olimlarning qarashlarini tarafkashliksiz bayon qiladi."
+ }
+};
+return { STORAGE_KEY: STORAGE_KEY, QTOTAL: 40, MINUTES: 60, FINISH_URL: "/full-tests/reading/volume-9",
+         SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCABULARY_DATA: VOCABULARY_DATA, READING_EXPLANATIONS: READING_EXPLANATIONS };
+})();
+</script>
+<script src="../../reading.js"></script>
+
+<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+     Listening and Reading tests. Inlined, so it works from a memory stick
+     with the network off. See the header comment inside for what it does and
+     why it is not jsPDF + html2canvas. ══ -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     MONOCHROME SKIN — grey / black / white only.
+     Appended last on purpose: it re-tokenises the login card, the completion
+     screen and the certificate without touching #stage-reading, which is the
+     Arial exam screen and already neutral. Nothing here introduces a hue.
+     ════════════════════════════════════════════════════════════════════════ -->
+
+
+<script src="../../ieltsx-data.js"></script>
+<script src="../../assets/js/test-complete.js"></script>
+<script type="module" src="../../site-access.js"></script>
+</body>
+</html>
+

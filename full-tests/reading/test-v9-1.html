@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Academic Reading — Volume 9 · Full Test 1</title>
+<link rel="stylesheet" href="../../reading.css">
+<script src="/assets/js/access-gate.js"></script>
+</head>
+<body>
+
+<!-- ====
+     STAGE 1: REGISTRATION ====-->
+<!-- COSMOS: the restart sheet is removed. A reload restarts the paper
+     silently — restartSheet() falls through to startFresh() with no
+     #resume-sheet in the document. -->
+
+<!-- The boot class is set here, before the registration markup is parsed, so
+     the card is never painted for a frame ahead of the prelude. If scripting
+     is off the class is never added and the card simply renders. -->
+<!-- The login / registration card and the instructions screen have been removed: the paper opens straight on Passage 1. -->
+
+
+<!-- ====
+     STAGE 2: READING INSTRUCTIONS ====-->
+
+<!-- ====
+     STAGE 3: READING TEST  (real-exam chrome) ====-->
+<!-- The CDI mark used to live on the registration card. That card is gone, so the
+     one copy of the logo is parked here instead: applyBrandLogo() reads it at boot
+     and paints the completion screen and the certificate from it. -->
+<img class="brand-logo" alt="READING CDI" hidden style="display:none" src="data:image/png;base64,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">
+
+<!-- ====
+     STAGE 1: LOGIN / REGISTRATION ====-->
+<div class="stage active" id="stage-registration">
+  <div class="rcx-card">
+    <span class="rcx-wordmark">READING_CDI</span>
+    <h1>Volume 9 · Full Test 1</h1>
+    <p class="rcx-lead">Academic Reading &middot; Passages 1&ndash;3 &middot; Questions 1&ndash;40 &middot; 60 minutes</p>
+    <div class="rcx-field" id="start-field">
+      <label for="start-name">Candidate full name</label>
+      <input id="start-name" autocomplete="off" spellcheck="false" placeholder="Type your full name"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();ExamApp.validateStart();}">
+      <div id="start-hint-text" class="rcx-err"></div>
+    </div>
+    <div class="rcx-note"><b>How this test runs.</b> You have <b>60 minutes</b> for Questions 1&ndash;40.
+      Select text in the passage to highlight it or add a note. The tick at the bottom right submits the
+      test and shows your answers with a full explanation for every question.</div>
+    <button class="rcx-btn" type="button" onclick="ExamApp.validateStart()">Start &rarr;</button>
+  </div>
+</div>
+
+<div class="stage" id="stage-reading">
+  <div id="hdr">
+    <div id="hdr-left">
+      <div class="ex-logo"><!-- PLACEHOLDER LOGO: replace this <svg> with your own <img src="your-logo.png" alt="logo"> --><svg viewBox="0 0 32 32" role="img" aria-label="Logo" focusable="false"><rect width="32" height="32" fill="#b3121f"/><rect x="5.5" y="5.5" width="21" height="21" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 23L23 9" stroke="#fff" stroke-width="2"/></svg></div>
+      <div class="ex-status">
+        <div class="ex-name ex-title" id="hdr-title">[Demo] Volume 9 · Full Test 1 - P1</div>
+        <div class="timer" id="timer-reading" title="Time remaining">
+          <span id="timer-text" class="timer-text">60 minutes remaining</span>
+        </div>
+        <div class="ex-name ttid-name" id="ttid-name">&nbsp;</div>
+      </div>
+    </div>
+    <!-- Right-hand icons: wifi, full screen, options (menu), notes. -->
+    <div id="hdr-right">
+      <div class="ex-icbtn" id="wifi-btn" title="Connected"><svg width="27.4" height="25" viewBox="0 0 2048 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121 q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75z M1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z"/></svg></div>
+      <button class="ex-icbtn" id="fs-btn" type="button" title="Full screen" aria-label="Toggle full screen" onclick="ExamApp.toggleFullscreen()"><svg class="fs-glyph" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="fs-in" d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/><path class="fs-out" d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" style="display:none"/></svg></button>
+      <button class="ex-icbtn" id="menu-btn" type="button" title="Options" aria-label="Options" onclick="toggleMenu()"><svg width="20.58" height="25" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45 t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z"/></svg></button>
+      <button class="ex-icbtn" id="notes-btn" type="button" title="Notes" aria-label="Show notes" onclick="ExamApp.toggleNotesDrawer()"><svg width="24" height="25" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M888 352l116 116l-152 152l-116 -116v-56h96v-96h56zM1328 1072q-16 16 -33 -1l-350 -350q-17 -17 -1 -33t33 1l350 350q17 17 1 33zM1408 478v-190q0 -119 -84.5 -203.5t-203.5 -84.5h-832q-119 0 -203.5 84.5t-84.5 203.5v832q0 119 84.5 203.5t203.5 84.5h832 q63 0 117 -25q15 -7 18 -23q3 -17 -9 -29l-49 -49q-14 -14 -32 -8q-23 6 -45 6h-832q-66 0 -113 -47t-47 -113v-832q0 -66 47 -113t113 -47h832q66 0 113 47t47 113v126q0 13 9 22l64 64q15 15 35 7t20 -29zM1312 1216l288 -288l-672 -672h-288v288zM1756 1084l-92 -92 l-288 288l92 92q28 28 68 28t68 -28l152 -152q28 -28 28 -68t-28 -68z"/></svg><span class="nd-count" id="notes-count" hidden>0</span></button>
+    </div>
+  </div>
+
+  <div id="pbar">
+    <div id="pbar-inner">
+      <span id="pbar-title">Part 1</span>
+      <span id="pbar-desc">Read the text and answer questions 1–13.</span>
+    </div>
+  </div>
+
+  <div class="exam-main" id="main">
+    <section id="passage-pane" class="split-pane"></section>
+    <div class="split-divider" id="resizer"><div class="resizeBar" id="resize-bar"><button type="button" id="div-btn" aria-label="Resize the panes" title="Resize the panes"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1792 896q0 26 -19 45l-256 256q-19 19 -45 19t-45 -19t-19 -45v-128h-1024v128q0 26 -19 45t-45 19t-45 -19l-256 -256q-19 -19 -19 -45t19 -45l256 -256q19 -19 45 -19t45 19t19 45v128h1024v-128q0 -26 19 -45t45 -19t45 19l256 256q19 19 19 45z"/></svg></button></div></div>
+    <section id="questions-pane" class="split-pane"></section>
+  </div>
+
+  <div id="bnav">
+    <div id="reading-nav"></div>
+  </div>
+
+  <div id="qnav-arrows">
+    <button class="qnav-btn prev" onclick="ExamApp.prevPart()" title="Previous part" aria-label="Previous part"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1600 960v-128q0 -53 -32.5 -90.5t-84.5 -37.5h-704l293 -294q38 -36 38 -90t-38 -90l-75 -76q-37 -37 -90 -37q-52 0 -91 37l-651 652q-37 37 -37 90q0 52 37 91l651 650q38 38 91 38q52 0 90 -38l75 -74q38 -38 38 -91t-38 -91l-293 -293h704q52 0 84.5 -37.5t32.5 -90.5z"/></svg></button>
+    <button class="qnav-btn next" onclick="ExamApp.nextPart()" title="Next part" aria-label="Next part"><svg viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1600 896q0 -53 -37 -90l-651 -652q-39 -37 -91 -37q-51 0 -90 37l-75 75q-38 38 -38 91t38 91l293 293h-704q-52 0 -84.5 37.5t-32.5 90.5v128q0 53 32.5 90.5t84.5 37.5h704l-293 294q-38 36 -38 90t38 90l75 75q38 38 90 38q53 0 91 -38l651 -651q37 -35 37 -90z"/></svg></button>
+  </div>
+
+  <!-- The official player replaces the small dropdown with a full-screen white
+       Options page: three 698 x 75.8 rows in a 700px column at x=370, the first
+       one #e31837, and Contrast / Text size opening as sub-pages. -->
+  <div class="ex-sheet ex-options" id="ex-options" role="dialog" aria-modal="true" aria-label="Options">
+   <div class="ex-sheet-top">
+    <button type="button" class="ex-sheet-back" onclick="exOptionsPage('root')"><svg class="ex-ic" width="19.43" height="27.2" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1171 1235l-531 -531l531 -531q19 -19 19 -45t-19 -45l-166 -166q-19 -19 -45 -19t-45 19l-742 742q-19 19 -19 45t19 45l742 742q19 19 45 19t45 -19l166 -166q19 -19 19 -45t-19 -45z"/></svg><span>Options</span></button>
+    <h1 class="ex-sheet-title">Options</h1>
+    <button type="button" class="ex-sheet-close" aria-label="Close" onclick="exCloseSheet()"><svg class="ex-ic" width="21.21" height="27" viewBox="0 0 1408 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z"/></svg></button>
+   </div>
+   <div class="ex-sheet-body">
+    <div class="ex-opt-page is-on" data-page="root">
+   <div class="ex-opt-group is-red">
+    <button type="button" class="ex-opt-item is-red" onclick="exGoSubmission()"><span class="ex-opt-ic"><svg class="ex-ic" width="20.9" height="20.9" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1764 1525q33 -24 27 -64l-256 -1536q-5 -29 -32 -45q-14 -8 -31 -8q-11 0 -24 5l-527 215l-298 -327q-18 -21 -47 -21q-14 0 -23 4q-19 7 -30 23.5t-11 36.5v452l-472 193q-37 14 -40 55q-3 39 32 59l1664 960q35 21 68 -2zM1422 26l221 1323l-1434 -827l336 -137 l863 639l-478 -797z"/></svg></span><span class="ex-opt-label">Go to submission page</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+   </div>
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item" onclick="exOptionsPage('contrast')"><span class="ex-opt-ic is-grey"><svg class="ex-ic" style="margin-left:2px" width="18" height="21" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M768 96v1088q-148 0 -273 -73t-198 -198t-73 -273t73 -273t198 -198t273 -73zM1536 640q0 -209 -103 -385.5t-279.5 -279.5t-385.5 -103t-385.5 103t-279.5 279.5t-103 385.5t103 385.5t279.5 279.5t385.5 103t385.5 -103t279.5 -279.5t103 -385.5z"/></svg></span><span class="ex-opt-label">Contrast</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+    <button type="button" class="ex-opt-item" onclick="exOptionsPage('text')"><span class="ex-opt-ic is-grey"><svg class="ex-ic" width="19.7" height="21.2" viewBox="0 0 1664 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 736v-64q0 -13 -9.5 -22.5t-22.5 -9.5h-224v-224q0 -13 -9.5 -22.5t-22.5 -9.5h-64q-13 0 -22.5 9.5t-9.5 22.5v224h-224q-13 0 -22.5 9.5t-9.5 22.5v64q0 13 9.5 22.5t22.5 9.5h224v224q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5 -9.5t9.5 -22.5v-224h224 q13 0 22.5 -9.5t9.5 -22.5zM1152 704q0 185 -131.5 316.5t-316.5 131.5t-316.5 -131.5t-131.5 -316.5t131.5 -316.5t316.5 -131.5t316.5 131.5t131.5 316.5zM1664 -128q0 -53 -37.5 -90.5t-90.5 -37.5q-54 0 -90 38l-343 342q-179 -124 -399 -124q-143 0 -273.5 55.5 t-225 150t-150 225t-55.5 273.5t55.5 273.5t150 225t225 150t273.5 55.5t273.5 -55.5t225 -150t150 -225t55.5 -273.5q0 -220 -124 -399l343 -343q37 -37 37 -90z"/></svg></span><span class="ex-opt-label">Text size</span><span class="ex-opt-chev"><svg class="ex-ic" width="12.65" height="17.7" viewBox="0 0 1280 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1107 659l-742 -742q-19 -19 -45 -19t-45 19l-166 166q-19 19 -19 45t19 45l531 531l-531 531q-19 19 -19 45t19 45l166 166q19 19 45 19t45 -19l742 -742q19 -19 19 -45t-19 -45z"/></svg></span></button>
+   </div>
+    </div>
+    <div class="ex-opt-page" data-page="contrast">
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item ex-contrast-opt is-on" data-val="bw" onclick="setContrast('bw')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Black on white</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#ffffff" stroke="#c9c9c9"/><rect x="6" y="9" width="26" height="2.5" fill="#111111"/><rect x="6" y="16" width="44" height="2.5" fill="#111111"/><rect x="6" y="22" width="44" height="2.5" fill="#111111"/><rect x="6" y="28" width="44" height="2.5" fill="#111111"/></svg></span></button>
+    <button type="button" class="ex-opt-item ex-contrast-opt" data-val="wb" onclick="setContrast('wb')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">White on black</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#000000" stroke="#000000"/><rect x="6" y="9" width="26" height="2.5" fill="#ffffff"/><rect x="6" y="16" width="44" height="2.5" fill="#ffffff"/><rect x="6" y="22" width="44" height="2.5" fill="#ffffff"/><rect x="6" y="28" width="44" height="2.5" fill="#ffffff"/></svg></span></button>
+    <button type="button" class="ex-opt-item ex-contrast-opt" data-val="yb" onclick="setContrast('yb')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Yellow on black</span><span class="ex-opt-sw"><svg width="56" height="37.5" viewBox="0 0 56 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="0.5" y="0.5" width="55" height="39" fill="#000000" stroke="#000000"/><rect x="6" y="9" width="26" height="2.5" fill="#ffe200"/><rect x="6" y="16" width="44" height="2.5" fill="#ffe200"/><rect x="6" y="22" width="44" height="2.5" fill="#ffe200"/><rect x="6" y="28" width="44" height="2.5" fill="#ffe200"/></svg></span></button>
+   </div>
+    </div>
+    <div class="ex-opt-page" data-page="text">
+   <div class="ex-opt-group">
+    <button type="button" class="ex-opt-item ex-text-opt is-on" data-val="regular" onclick="setTextSize('regular')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Regular</span></button>
+    <button type="button" class="ex-opt-item ex-text-opt" data-val="large" onclick="setTextSize('large')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Large</span></button>
+    <button type="button" class="ex-opt-item ex-text-opt" data-val="xlarge" onclick="setTextSize('xlarge')"><span class="ex-opt-ic is-tick"><svg class="ex-ic" width="21.5" height="21.5" viewBox="0 0 1792 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></svg></span><span class="ex-opt-label">Extra large</span></button>
+   </div>
+    </div>
+   </div>
+   <div class="ex-sheet-empty"></div>
+  </div>
+  <div class="ex-sheet ex-messages" id="ex-messages" role="dialog" aria-modal="true" aria-label="Messages">
+   <div class="ex-sheet-top">
+    <h1 class="ex-sheet-title">Messages</h1>
+    <button type="button" class="ex-sheet-close" aria-label="Close" onclick="exCloseSheet()"><svg class="ex-ic" width="21.21" height="27" viewBox="0 0 1408 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1298 214q0 -40 -28 -68l-136 -136q-28 -28 -68 -28t-68 28l-294 294l-294 -294q-28 -28 -68 -28t-68 28l-136 136q-28 28 -28 68t28 68l294 294l-294 294q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -294l294 294q28 28 68 28t68 -28l136 -136q28 -28 28 -68 t-28 -68l-294 -294l294 -294q28 -28 28 -68z"/></svg></button>
+   </div>
+   <div class="ex-sheet-empty"></div>
+  </div>
+</div>
+
+<!-- ====
+     STAGE 4: COMPLETION ====-->
+<div class="stage" id="stage-completion">
+  <div class="complete-card">
+    <div class="ch-comp-body">
+
+      <div class="ch-comp-head">
+        <div class="ch-seal" id="ch-seal">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs><linearGradient id="chSealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f3f46"/><stop offset=".55" stop-color="#71717a"/><stop offset="1" stop-color="#111111"/></linearGradient><linearGradient id="chSealDone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111111"/><stop offset="1" stop-color="#52525b"/></linearGradient></defs>
+            <circle class="ch-seal-track" cx="32" cy="32" r="28"/>
+            <circle class="ch-seal-arc" id="ch-seal-arc" cx="32" cy="32" r="28"/>
+          </svg>
+          <div class="ch-seal-core"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4.6 10.4l3.5 3.5 7.3-7.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="ch-seal-pct" id="ch-seal-pct">0%</div>
+        </div>
+        <div>
+          <div class="trans-eyebrow">Reading test complete</div>
+          <h1 class="complete-title">Your answer sheet is in.</h1>
+          <p class="complete-sub" id="ch-status">Sealing your answer sheet&hellip;</p>
+        </div>
+      </div>
+
+      <ol class="ch-steps" id="ch-steps">
+        <li><span class="ch-step-dot"></span>Answers locked and time&#8209;stamped</li>
+        <li><span class="ch-step-dot"></span>Every response checked against the answer key</li>
+        <li><span class="ch-step-dot"></span>Official IELTS Academic Reading band table applied</li>
+      </ol>
+
+      <div class="ch-note">
+        <p>Sitting a full paper under real conditions is much harder than most people think &mdash; and analysing it afterwards is what separates the high scorers. You just did the hard half. Now go and read your mistakes.</p>
+        <!-- ===== EDIT PER TEST · AUTHOR CREDIT (V3 - Universal Reading - BUILD.md) ===== -->
+        <p class="ch-sign">Built from scratch by <strong>Islom Kenjayev</strong> &middot; IELTS 8.5 (L&nbsp;9.0 &middot; R&nbsp;9.0)</p>
+      </div>
+
+      <div class="ch-cta-slot">
+        <p class="ch-wait" id="ch-wait" aria-live="polite">Marking takes a couple of seconds &mdash; nothing you answered can be lost.</p>
+        <div class="ch-cta" id="ch-cta">
+          <button class="btn btn-primary btn-lg" onclick="ExamApp.unlockResults()">
+            <span>See my band score</span>
+            <svg class="ch-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.6 8h10.8m0 0L9.6 4.2M13.4 8l-3.8 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <a class="channel-promo" href="https://t.me/reading_cdi" target="_blank" rel="noopener">
+      <div class="tg-icon">&#9992;</div>
+      <div class="channel-text">
+        <div class="channel-name">@READING_CDI</div>
+        <div class="channel-desc">New authentic practice tests every week</div>
+      </div>
+      <div class="channel-cta">Join</div>
+    </a>
+  </div>
+</div>
+
+<!-- ====
+     STAGE 5: RESULTS ====-->
+<div class="stage" id="stage-results">
+  <div class="results-modal-box">
+    <button type="button" class="results-modal-close" aria-label="Close" onclick="ExamApp.closeResultsModal()">&times;</button>
+    <div class="rcx-hdr">
+      <div class="rcx-hdr-left">
+        <div class="rcx-mark"><svg viewBox="0 0 777.8 228.6" role="img" aria-label="IELTS" focusable="false"><g transform="translate(107.14286,-229.37293)" fill="#E31837"><path d="M555.6,458 c-38.2,0.3-51.2-5.2-67.7-18c-16.5-12.8-24.2-33.3-25.6-59.4h52.2c2.3,26.8,17.2,37.3,42.2,37.1c19.4-0.1,36.8-4.7,34.8-24.2 c-1.4-20.3-32.2-17-72.2-33.9c-28-8.3-54.9-30.6-52.6-65.4c3.5-47.2,46-64.7,85.8-64.9c47.6,0,83.9,23.3,84.5,72l-51.4-0.7 c-0.2-28.7-32-28.8-36-28.9c-20.7-0.7-30.9,10.5-30.4,19.5c0.2,17,21.1,21.6,41.6,28.2c38.4,12.2,83.5,19.5,83.8,70.9 c-0.4,20.5-6.1,35.7-23.2,49.4C608.2,450.1,585.7,457.8,555.6,458L555.6,458z"/><path d="M-107.1,238.7h55.7v215.9h-55.7V238.7z"/><path d="M-27.9,238.7h166.4v43.9H26.3v40.5h112.3v42.9H26.3v44.3 h112.3v44.4H-27.9L-27.9,238.7z"/><path d="M160,238.7h55v169.5h101.4v46.4 H160L160,238.7z"/><path d="M276,238.7h179.3v43.9h-62.1v172h-54.8v-172H276L276,238.7z"/><path d="M631.7,263.8v-21.4h-7.3V238h19.4v4.4h-7.2v21.4H631.7z"/><path d="M647,263.8V238h7.4l4.4,17.6l4.4-17.6h7.4v25.8h-4.6v-20.3l-4.9,20.3h-4.8 l-4.8-20.3v20.3H647z"/></g></svg></div>
+        <div class="rcx-ttblock"><div class="rcx-ttid" id="res-taker">Test taker ID</div></div>
+      </div>
+      <div class="rcx-hdr-right">
+        <a class="rcx-tglink" href="https://t.me/reading_cdi" target="_blank" rel="noopener" title="Join @reading_cdi on Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23l7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3L3.64 12c-.88-.25-.89-1.37.2-1.64l16.56-6.4c.75-.29 1.4.22 1.2.94l-2.67 12.61c-.22.95-1.13 1.18-1.78.73l-4.5-3.32l-2.23 2.15c-.47.44-1.29.21-1.48-.37z"/></svg>READING_CDI</a>
+      </div>
+    </div>
+    <div class="results-content" id="results-content"></div>
+  </div>
+</div>
+
+<!-- ====
+     OVERLAYS ====-->
+<div class="warning-overlay" id="warning-overlay" role="alertdialog" aria-modal="true" aria-labelledby="warning-title">
+  <div class="warning-card">
+    <div class="wc-body">
+      <div class="wc-top">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6 2.6 20h18.8L12 3.6Z"/><path d="M12 9.6v4.6"/><path d="M12 17.3h.01"/></svg>
+        </div>
+        <div class="wc-heads">
+          <div class="wc-eyebrow">Exam integrity</div>
+          <h2 id="warning-title">This session is being monitored</h2>
+        </div>
+      </div>
+      <div class="wc-reason">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        <p id="warning-body"></p>
+      </div>
+      <div class="wc-meter">
+        <div class="wc-meter-head"><span>Violations recorded</span></div>
+        <div class="strike-counter" id="strike-counter" role="img" aria-label="Violation counter">
+          <div class="strike"></div><div class="strike"></div><div class="strike"></div>
+        </div>
+        <p id="warning-strikes-text">Warning <strong>1 of 3</strong> &mdash; the test will be terminated on the third violation.</p>
+      </div>
+    </div>
+    <div class="wc-foot">
+      <div class="wc-note">Real IELTS test centres apply the same rule. Stay in full-screen until you submit.</div>
+      <button class="wc-btn" onclick="ExamApp.dismissWarning()">Return to the test</button>
+    </div>
+  </div>
+</div>
+
+<!-- Matches the real player's adder: a small white card with exactly two
+     icon-above-label buttons, Note and Highlight. Erase stays as a third,
+     revealed only when the selection already sits on a highlight. -->
+<div id="hl-popup" class="hl-popup">
+  <button class="tool-btn note" onmousedown="event.preventDefault(); ExamApp.addNote()" title="Add a note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    <span>Note</span>
+  </button>
+  <button class="tool-btn hilite" onmousedown="event.preventDefault(); ExamApp.applyHighlight('hl-y')" title="Highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+    <span>Highlight</span>
+  </button>
+  <button class="tool-btn erase" onmousedown="event.preventDefault(); ExamApp.clearHighlight()" title="Remove highlight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+    <span>Clear</span>
+  </button>
+</div>
+
+<!-- V3: note composer (V2 called getElementById('note-modal') but never shipped one) -->
+<div id="note-modal" class="note-modal">
+  <div class="nm-head">
+    <span class="nm-title">Note</span>
+    <button class="nm-x" onclick="ExamApp.closeNote()" title="Close">&times;</button>
+  </div>
+  <textarea id="note-textarea" class="nm-text" rows="4" placeholder="Write your note&hellip;"
+            onkeydown="if(event.key==='Escape'){ExamApp.closeNote();}
+                       if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){ExamApp.saveNote();}"></textarea>
+  <div class="nm-foot">
+    <span class="nm-hint">&#8984;/Ctrl + Enter to save</span>
+    <div class="nm-actions">
+      <button class="nm-btn ghost" onclick="ExamApp.deleteNote()">Delete</button>
+      <button class="nm-btn solid" onclick="ExamApp.saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- V3: notes drawer — mirrors the real player's right-hand Notes panel -->
+<aside id="notes-drawer" class="notes-drawer" aria-label="Notes" aria-hidden="true">
+  <div class="nd-head">
+    <span class="nd-title">Notes</span>
+    <button class="nd-x" onclick="ExamApp.toggleNotesDrawer(false)" aria-label="Close notes">&times;</button>
+  </div>
+  <div class="nd-body" id="notes-drawer-body"></div>
+</aside>
+
+<!-- V3: pacing marker -->
+<div id="pace-note" class="pace-note">
+  <div class="pn-bar"></div>
+  <div class="pn-body"><strong id="pace-title"></strong><span id="pace-sub"></span></div>
+  <button class="pn-x" onclick="document.getElementById('pace-note').classList.remove('show')">&times;</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="vocab-print"></div>
+<!-- The printable report. Off-screen and empty until buildPrintReport() fills
+     it (on the Download Report button, and on any browser-initiated print):
+     page 1 is the Test Report Form, page 2 the Schedule of Answers. -->
+<div id="print-report"></div>
+
+<script>
+/* ====
+   TEST DATA — Volume 9 · Full Test 1
+   Passages, questions, answers and explanations for this test only.
+   The functions live in reading.js (shared by every test). ====*/
+window.READING_TEST = (function () {
+/* BUILT by scripts/build-reading.js from reading-src/volume-9/test-1.js — edit that file and run "npm run build:reading", not this page. */
+const STORAGE_KEY = "cdi_reading_v3_volume_9_test_1";
+const SECTIONS = {
+ "1": [
+  {
+   "type": "tfng",
+   "num": "",
+   "title": "",
+   "instruction": "Do the following statements agree with the information given in Reading Passage 1? In boxes 1&ndash;6 on your answer sheet, write",
+   "items": [
+    {
+     "id": 1,
+     "answer": "FALSE",
+     "label": "All of the baobab species found on Madagascar are unique to the island."
+    },
+    {
+     "id": 2,
+     "answer": "NOT GIVEN",
+     "label": "Adanson and Grandidier were the first foreign botanists to visit Madagascar."
+    },
+    {
+     "id": 3,
+     "answer": "FALSE",
+     "label": "The baobab can be found in most areas of Madagascar."
+    },
+    {
+     "id": 4,
+     "answer": "TRUE",
+     "label": "The landscape around the Avenue des Baobabs is the result of agricultural development."
+    },
+    {
+     "id": 5,
+     "answer": "FALSE",
+     "label": "Jim Bond is certain about what is causing baobabs in the Morondava area to fall."
+    },
+    {
+     "id": 6,
+     "answer": "FALSE",
+     "label": "There is general agreement about the reasons for baobabs falling down."
+    }
+   ]
+  },
+  {
+   "type": "notes",
+   "num": "",
+   "title": "",
+   "instruction": "Complete the notes below. Choose \u003cb>ONE WORD ONLY\u003c/b> from the passage for each answer. Write your answers in boxes 7&ndash;13 on your answer sheet.",
+   "items": [
+    {
+     "id": 7,
+     "answer": "irrigation",
+     "label": ""
+    },
+    {
+     "id": 8,
+     "answer": "cyclones",
+     "label": ""
+    },
+    {
+     "id": 9,
+     "answer": "farming",
+     "label": ""
+    },
+    {
+     "id": 10,
+     "answer": "logging",
+     "label": ""
+    },
+    {
+     "id": 11,
+     "answer": "animals",
+     "label": ""
+    },
+    {
+     "id": 12,
+     "answer": "maps",
+     "label": ""
+    },
+    {
+     "id": 13,
+     "answer": "book",
+     "label": ""
+    }
+   ],
+   "noteTitle": "Baobabs under threat",
+   "wordLimit": 1,
+   "lines": [
+    "Reasons why Madagascar's baobabs are declining in number:",
+    "## Morondava area",
+    "- trees may be falling down because of {{7}} from nearby fields",
+    "- lone trees are at risk from {{8}}",
+    "## Forest areas",
+    "- land clearance: mainly by burning carried out to create space for {{9}} activity",
+    "- practice of {{10}} makes seed germination difficult",
+    "- disappearance of certain {{11}} which dispersed baobab seeds",
+    "## Jim Bond's efforts to record information about the baobab:",
+    "- making {{12}} of areas of relatively undamaged baobab forest",
+    "- producing a {{13}} showing importance of baobab in local culture"
+   ]
+  }
+ ],
+ "2": [
+  {
+   "type": "matching-headings",
+   "num": "",
+   "title": "",
+   "instruction": "Reading Passage 2 has seven paragraphs. Choose the correct heading for each paragraph from the list of headings below. Write the correct number, \u003cb>i&ndash;xi\u003c/b>, in boxes 14&ndash;20 on your answer sheet.",
+   "items": [
+    {
+     "id": 14,
+     "answer": "vii"
+    },
+    {
+     "id": 15,
+     "answer": "xi"
+    },
+    {
+     "id": 16,
+     "answer": "v"
+    },
+    {
+     "id": 17,
+     "answer": "iv"
+    },
+    {
+     "id": 18,
+     "answer": "ii"
+    },
+    {
+     "id": 19,
+     "answer": "ix"
+    },
+    {
+     "id": 20,
+     "answer": "vi"
+    }
+   ]
+  },
+  {
+   "type": "mcq-multi",
+   "num": "",
+   "title": "",
+   "instruction": "Choose \u003cb>TWO\u003c/b> letters, \u003cb>A&ndash;E\u003c/b>. Write the correct letters in boxes 21&ndash;22 on your answer sheet.",
+   "items": [
+    {
+     "id": 21,
+     "answer": "A"
+    },
+    {
+     "id": 22,
+     "answer": "C"
+    }
+   ],
+   "gid": "g21",
+   "prompt": "Which TWO of these comments about ancient coins are made by the writer of the text?",
+   "options": [
+    {
+     "l": "A",
+     "t": "There is no record of the names of the coin makers."
+    },
+    {
+     "l": "B",
+     "t": "Coins were not popular as payment for traded objects."
+    },
+    {
+     "l": "C",
+     "t": "Coins with the same design often looked quite different."
+    },
+    {
+     "l": "D",
+     "t": "Greek coins were more beautiful in design than Roman coins."
+    },
+    {
+     "l": "E",
+     "t": "At times, too many coins were produced in Greece."
+    }
+   ]
+  },
+  {
+   "type": "summary",
+   "num": "",
+   "title": "",
+   "instruction": "Complete the summary below. Choose \u003cb>ONE WORD ONLY\u003c/b> from the passage for each answer. Write your answers in boxes 23&ndash;26 on your answer sheet.",
+   "items": [
+    {
+     "id": 23,
+     "answer": "civilisation|civilization",
+     "label": ""
+    },
+    {
+     "id": 24,
+     "answer": "barter",
+     "label": ""
+    },
+    {
+     "id": 25,
+     "answer": "silver",
+     "label": ""
+    },
+    {
+     "id": 26,
+     "answer": "inflation",
+     "label": ""
+    }
+   ],
+   "noteTitle": "Greek traders and coins",
+   "wordLimit": 1,
+   "prose": "The ancient Greek {{23}} was made up of many city-states which were spread over a large area. Many Greeks were seafarers who travelled the seas trading. Before coins, they had to do this through {{24}}. This meant that, whenever they set out, they had to carry a lot of goods, which could get damaged on the voyages. The Greeks liked coins; they were made of metal, and the weather and sea had little effect on them. The Greeks had a plentiful supply of {{25}} which they mined themselves, but were able to avoid the problem of {{26}} which the Spanish encountered much later, after they allowed too much gold from the New World to enter their economy."
+  }
+ ],
+ "3": [
+  {
+   "type": "matching-info",
+   "num": "",
+   "title": "",
+   "instruction": "Reading Passage 3 has nine paragraphs, \u003cb>A&ndash;I\u003c/b>. Which paragraph contains the following information? Write the correct letter, \u003cb>A&ndash;I\u003c/b>, in boxes 27&ndash;33 on your answer sheet. \u003cb>NB\u003c/b> You may use any letter more than once.",
+   "items": [
+    {
+     "id": 27,
+     "answer": "B",
+     "label": "details of an experiment in taste comparison"
+    },
+    {
+     "id": 28,
+     "answer": "H",
+     "label": "examples of medications that could be improved using compounds that remove bitterness"
+    },
+    {
+     "id": 29,
+     "answer": "E",
+     "label": "a biological reason why some people don't like bitter-tasting foods"
+    },
+    {
+     "id": 30,
+     "answer": "F",
+     "label": "an explanation of how the taste process works"
+    },
+    {
+     "id": 31,
+     "answer": "C",
+     "label": "why bitterness is more interesting commercially than other tastes"
+    },
+    {
+     "id": 32,
+     "answer": "H",
+     "label": "an example of how compounds that remove bitterness could indirectly benefit health"
+    },
+    {
+     "id": 33,
+     "answer": "D",
+     "label": "a reason why people have different taste preferences from animals"
+    }
+   ],
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I"
+   ]
+  },
+  {
+   "type": "sentence",
+   "num": "",
+   "title": "",
+   "instruction": "Complete the sentences below. Choose \u003cb>NO MORE THAN TWO WORDS\u003c/b> from the passage for each answer. Write your answers in boxes 34&ndash;38 on your answer sheet.",
+   "items": [
+    {
+     "id": 34,
+     "answer": "naringin",
+     "label": "The grapefruit used to make drinks is chosen because it contains a smaller amount of a substance called",
+     "after": "."
+    },
+    {
+     "id": 35,
+     "answer": "poisonous|that are poisonous|which are poisonous",
+     "label": "Animals associate a bitter taste with plants",
+     "after": "."
+    },
+    {
+     "id": 36,
+     "answer": "genetic",
+     "label": "Our varying degree of sensitivity to bitter tastes is thought to be",
+     "after": "."
+    },
+    {
+     "id": 37,
+     "answer": "supertasters|supertaster",
+     "label": "People who are extremely aware of bitter tastes are called",
+     "after": "."
+    },
+    {
+     "id": 38,
+     "answer": "taste buds|taste bud",
+     "label": "Receptors inside the",
+     "after": "on the tongue detect the taste of food and drink."
+    }
+   ],
+   "wordLimit": 2
+  },
+  {
+   "type": "mcq",
+   "num": "",
+   "title": "",
+   "instruction": "Choose the correct letter, \u003cb>A\u003c/b>, \u003cb>B\u003c/b>, \u003cb>C\u003c/b> or \u003cb>D\u003c/b>. Write the correct letter in boxes 39&ndash;40 on your answer sheet.",
+   "items": [
+    {
+     "id": 39,
+     "answer": "A",
+     "label": "The G protein identified by Robert Margolskee",
+     "options": [
+      "A. is responsible for transmitting bitter tastes.",
+      "B. causes dangerous reactions in the cells of the tongue.",
+      "C. has a similar function to sight and smell receptors.",
+      "D. can be found only in sweetness and umami."
+     ]
+    },
+    {
+     "id": 40,
+     "answer": "C",
+     "label": "AMP is an organic compound which is",
+     "options": [
+      "A. found only in breast milk.",
+      "B. bitter-tasting when added to food.",
+      "C. able to reduce some bitter tastes.",
+      "D. found in bitter taste receptors."
+     ]
+    }
+   ]
+  }
+ ]
+};
+const PASSAGES = {
+ "1": {
+  "title": "The Baobabs of Madagascar",
+  "content": "\u003cdiv>\u003cp>\u003cem>The ancient baobabs of Madagascar are some of the largest and most distinctive trees in the world, but they face an uncertain future.\u003c/em>\u003c/p>\u003cp>The island of Madagascar in the Indian Ocean is the best place in the world to see baobabs. These spectacular trees, with their massive trunks and distinctive horizontal root-like branches, can live over 800 years. Of the eight known species, six are found only there, while a seventh has made its way across the Mozambique Channel from mainland Africa with a certain amount of human help. Some of the most visited and photographed baobabs in Madagascar are at the Avenue des Baobabs in the western province of Menabe, close to the town of Morondava. There, a dozen trees straddle a narrow sandy road, soaring 30 metres into the sky. Known as renala – \"mother of the forest\" – in the local Malagasy* language, these trees belong to the tallest baobab species in the world: Adansonia grandidieri, named after two great 19th-century French botanists, Michel Adanson and Alfred Grandidier.\u003c/p>\u003cp>Baobabs have religious and spiritual significance for many Malagasy tribes, although the majority of the island's population will probably never see one – they only grow along the western margin of the island and not in the more populous central highlands. However, as the national tree and the national emblem, the trees are an ideal symbol for increasing awareness not only of the endangered forests, but also of the traditional beliefs of the people who live alongside them. But what does the future hold for the Malagasy baobabs?\u003c/p>\u003cp>The Avenue des Baobabs is something of a contradiction; the \"natural\" scene that tourists visit is actually man-made. While the trees themselves are natural enough, the surrounding landscape was created by humans. Back in the early 20th century, much of the Morondava plain was cleared for rice and sugar-cane fields. However, many baobabs were spared because they are valuable as a food source and renewable building material, or they simply survived the fires that were set to clear the dry deciduous forest around them. These days many stand alone in fields, a reminder of where the forest once was. But now it seems that even the mighty baobabs are falling down. \"Every year I see new trees that have fallen,\" says Jim Bond, an ethnobotanist who has studied Madagascar's baobabs for more than a decade. The exact cause of the falling baobabs is uncertain, but some people think that the water used to irrigate the nearby fields is partly to blame. Baobabs are adapted to the annual wet season, but their roots can't cope with constantly waterlogged soils. Lone trees separated from the surrounding forest are also susceptible to cyclones, which reach speeds of over 200 kph in the area, and can easily uproot even a 30-metre baobab.\u003c/p>\u003cp>Baobabs elsewhere on the island are also facing a host of threats, with three of the six native species now listed as endangered by the World Conservation Union. David Baum from the University of Wisconsin has spent years researching Malagasy baobabs. \"The main threat to their survival is land clearance for farming, which probably suppresses regeneration,\" he says. Burning is the usual method of clearing land, and while baobabs have some resistance to this, they will eventually succumb to repeated burning. Human disturbance in the forest, such as logging, is also a problem. This practice may be promoting the rapid spread of shrubby undergrowth, which quickly fills in the bright forest gaps needed for baobab germination. Another problem the trees face is the dispersal of their seeds. Baum suggests that dispersal is being limited by the absence of two large, now extinct animals – a gorilla-sized lemur and the three-metre-tall elephant bird. Passage through the digestive tract of these giant fruit-eating animals probably once played a vital role in the distribution of the renala baobabs in particular.\u003c/p>\u003cp>The Malagasy government is becoming increasingly concerned as the baobab is key to the local tourism industry, and thus to the economy of the island as a whole. But visiting and photographing the solitary trees in the dramatic open landscape at the Avenue des Baobabs isn't the only way to experience baobabs in Madagascar. Within a few hours' drive of Morondava, three species of baobab can be seen in largely intact, dry forest habitat. Jim Bond has led expeditions of Malagasy and foreign participants to the Mikea forest in the island's southwest, which is almost certainly one of the least studied and least damaged areas of baobab forest left in Madagascar. On his expeditions Bond works closely with local people to search for, and create maps of baobab distribution. He also plans to compile an illustrated children's book of the many local folk-tales about the tree, hoping that national and international versions will help to spread the word about how important baobabs are in Malagasy culture. But it's going to require some swift and coordinated action to ensure that the baobab becomes a symbol of conservation success, rather than a symbol of humanity's mistakes.\u003c/p>\u003cp class=\"pass-foot\">\u003csmall>* Malagasy: of Madagascar\u003c/small>\u003c/p>\u003c/div>"
+ },
+ "2": {
+  "title": "Coins – the first form of money",
+  "content": "\u003cdiv>\u003cp>\u003cstrong class=\"para-letter\">A\u003c/strong> Few people pay much attention to coins; we take them for granted. Since the advent of paper currency and the abandonment of a monetary system based on intrinsic of actual value, they have been demoted to the status of change: what is left when you have paid for something with \"paper\" money. There is even a belief that they will one day be obsolete, as will paper or plastic notes, and money will at last have achieved the pure status of a mathematical formulation, a system of electronic credits and debits.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">B\u003c/strong> In the modern media environment, the sheer number of visual images is overwhelming, but it makes one stop to think that coins are among the most durable of our artefacts, and future archaeologists will scrutinise coins in order to learn about their distant ancestors. This is exactly the way ancient coins have informed us for over four millennia. There are thousands of different coins, each designed to carry meaning as well as value, tiny but rich sources of documentary evidence about events and cultural attitudes, frequently produced with exquisite craftsmanship.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">C\u003c/strong> Coins in Europe date from 2,500 to 2,700 years ago, and seem to have originated in the ancient kingdom of Lydia, in what is now Turkey. Before coins, trade was based on barter: the direct trade of commodities. Barter required the physical presence of both commodities that were being traded. Metal coins were far more portable, and not subject to the same spoilage on long sea journeys as a commodity like grain might be if it became wet. However, they could also be accumulated, and these hoards could be stolen. Coins were therefore a temptation to criminals. The Greeks, however, were the first to realise the full potential of the new invention. They were a trading people of seafarers. Their civilisation, which was composed of dozens of city-states, was highly decentralised. Despite the potential for theft, the Greeks realised that they could benefit enormously from a system that used coins, because it meant that they no longer had to carry goods with them to barter.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">D\u003c/strong> The value of coins was generally based on the intrinsic value of the metal they were made of. At first this was mostly silver, and this meant that the discovery of silver mines on Greek territory actually increased the quantity of money they could produce. Had the Greek mining been on a larger scale, it could have caused problems similar to those faced by the Spanish centuries later, when so much gold from the New World was brought into their economy that it resulted in serious inflation. One advantage of intrinsic value was that coins could be weighed to determine the amount of metal they contained, so that the only thing an issuing state had to guarantee was the purity of the metal to prevent accusations of fraud and cheating, which could cause fighting and unrest. This was quite difficult to do, especially with coins made of gold, until Archimedes realised that different metals have different weight-volume ratios, and that by measuring the amount of displacement when coins were immersed in water, it was possible to establish whether gold was alloyed with silver.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">E\u003c/strong> All ancient coins were made by hand using engraved metal moulds. Many hundreds of coins were made, and as a result the moulds often cracked and new ones had to be engraved. This explains the endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly, by many different artisans. One of the distinctive features of coins, in fact, is that they are the work of anonymous craftsmen, and yet each coin is an intimate reflection of the character of its city of origin. It was the Greeks who realised that coins could have a double function, as a unit of value and as a symbol of the identity of the city that issued them. The Greek view of life was deeply motivated by a spirit of competition, and coins, which circulated around the trading world, were a way of advertising the qualities of each particular city-state.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">F\u003c/strong> Interestingly, Greek coins from the city of Athens, which was the home of the greatest sculptors of the classical period, seem to have been completely disconnected from the high sculptural tradition. The beautiful features of the city's patron, Athena (with her owl on the reverse of the coin), seem to have been repeated virtually unaltered for many years. Perhaps this was because the Athenian currency had grown increasingly to be the international standard and, like the US dollar today, a uniform design implied integrity.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">G\u003c/strong> One side of a coin was always occupied by the head of a divinity, so it was a relatively small step, at around 323 BC, for Greek coins to replace that head with the portrait of the reigning monarch, a tradition that has continued in monarchies to the present day. Republics may have either symbolic heads – going back to the older tradition of divinities – or the features of a distinguished past head of state. The Romans adopted the Greek practice of coin design and as a result, the features of many great Romans have survived and are known to modern generations, despite the fact that the art of portrait painting was completely lost for more than a millennium following the fall of the Roman Empire.\u003c/p>\u003c/div>",
+  "headings": [
+   {
+    "id": "i",
+    "text": "Training coin makers"
+   },
+   {
+    "id": "ii",
+    "text": "A form of regional promotion"
+   },
+   {
+    "id": "iii",
+    "text": "More gold than silver in Greece"
+   },
+   {
+    "id": "iv",
+    "text": "Calculating what a coin was worth"
+   },
+   {
+    "id": "v",
+    "text": "A simpler, more efficient way of trading"
+   },
+   {
+    "id": "vi",
+    "text": "Putting a face to famous historical names"
+   },
+   {
+    "id": "vii",
+    "text": "An uncertain future"
+   },
+   {
+    "id": "viii",
+    "text": "Careless workmanship caused breakages"
+   },
+   {
+    "id": "ix",
+    "text": "Unchanging coins signalled trustworthiness"
+   },
+   {
+    "id": "x",
+    "text": "Reading the writing on coins"
+   },
+   {
+    "id": "xi",
+    "text": "Significant records of past societies"
+   }
+  ],
+  "headingSlots": [
+   {
+    "letter": "A",
+    "qNum": 14
+   },
+   {
+    "letter": "B",
+    "qNum": 15
+   },
+   {
+    "letter": "C",
+    "qNum": 16
+   },
+   {
+    "letter": "D",
+    "qNum": 17
+   },
+   {
+    "letter": "E",
+    "qNum": 18
+   },
+   {
+    "letter": "F",
+    "qNum": 19
+   },
+   {
+    "letter": "G",
+    "qNum": 20
+   }
+  ]
+ },
+ "3": {
+  "title": "Creating a Better Grapefruit",
+  "content": "\u003cdiv>\u003cp>\u003cem>By blocking the right taste receptors, biotech researchers turn bitter into sweet.\u003c/em>\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">A\u003c/strong> There is a reason why grapefruit juice is served in little glasses. Most people don't want to drink more than a few ounces at a time. This is because a natural chemical compound found in grapefruit, naringin, has a bitter taste. Some people like that bitterness in small doses and believe it enhances the general flavour, but others would rather avoid it altogether. So juice packagers often select grapefruit with low naringin content, even though the compound has antioxidant properties that some nutritionists contend may help prevent many serious diseases.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">B\u003c/strong> It is possible, however, to get the goodness of grapefruit without the bitter taste. In a test conducted by a biotechnology company, sets of two miniature white paper cups, labelled 304 and 305, were placed before five people seated around a conference table. Each person drank from one cup and then the other, cleansing their palates between tastes with water and a cracker. Even the smallest sip of 304 had grapefruit's unmistakeable bite. But 305 was smoother; there was the sour taste of citrus but none of the bitterness of naringin. This juice had been treated with AMP, a compound that blocks the bitterness in foods without making them less nutritious.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">C\u003c/strong> Taste research is a booming business these days, with scientists delving into all five basics: sweet, bitter, sour, salty, and umami (the savory taste of protein). However, bitterness is of special interest to the food industry because it is present in so many different types of food. There are thousands of bitter-tasting compounds in nature. They defend plants by warning animals away and protect animals by letting them know when a plant may be poisonous. But the system isn't foolproof. Grapefruit and bitter green vegetables like Brussels sprouts and kale are nutritious despite – and sometimes because of – their bitter-tasting components.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">D\u003c/strong> \"Humans are the only species that enjoys a bitter taste,\" says Charles Zuker, a neuroscientist at the University of California School of Medicine at San Diego. \"Every other species is averse to bitter because it means bad news. But we have learned to enjoy it. We drink coffee, which is bitter, and quinine (in tonic water) too. We enjoy having that spice in our lives.\" Because bitterness can be pleasant in small quantities but repellent when intense, bitter blockers like AMP could make a whole range of foods, drinks and medicines more palatable.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">E\u003c/strong> People have varying capacities for tasting bitterness and the differences appear to be genetic. About 75% of people are sensitive to the taste of some well-identified bitter compounds. Those who are sensitive seem to be less likely than others to eat bitter vegetables, according to Stephen Wooding, a geneticist at the University of Utah. Some people who have an unusually high number of taste buds, and are known as \"supertasters\", are especially sensitive to these compounds. Supertasters tend to shun all kinds of bitter-tasting things, including vegetables, coffee, and dark chocolate.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">F\u003c/strong> The tongue is covered with taste buds. Under the microscope each one looks like an onion, consisting of 50 to 100 elongated cells running from the top of the taste buds to the bottom. At the top is a group of receptors that captures the taste molecules, known as tastants, in food and drink. The receptors function much like those for sight and smell. Once a bitter signal has been received, it is relayed via proteins known as G proteins. The G protein involved in the perception of bitterness, sweetness and umami was identified in the early 1990s by Robert Margolskee, at Mount Sinai School of Medicine in New York. The protein triggers a cascade of chemical reactions that lead to ion concentrations within the cell. Ultimately, this delivers a signal to the brain that registers as bitter.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">G\u003c/strong> Once they understood the taste mechanism, scientists began to think of ways to interfere with it. They tried AMP, an organic compound found in breast milk and other substances, that is created as cells break down food. AMP has no bitterness of its own, but when put in foods, as Margolskee and his colleagues discovered, it attaches to bitter-taste receptors. As effective as it is, AMP may not be able to dampen every type of bitter taste because it probably doesn't attach to all 30 bitter-taste receptors.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">H\u003c/strong> Some taste researchers believe that, in time, compounds like AMP will help make processed foods less unhealthy. Consider, for example, that a single cup of canned chicken noodle soup contains 850 milligrams of sodium chloride, or table salt – more than a third of the recommended daily allowance. The salt masks the bitterness created by the high temperatures used in the canning process, which cause sugars and amino acids to react. Part of the table salt could be replaced by another type of salt, potassium chloride, which tends to be scarce in some people's diets because of its bitter taste. But that bitter taste could be eliminated with a dose of AMP. Bitter blockers could also be used in place of sugary cherry and grape flavourings in children's cough syrups, and they could dampen the bitterness of drugs like antihistamines, antibiotics and other similar products.\u003c/p>\u003cp>\u003cstrong class=\"para-letter\">I\u003c/strong> A number of foodmakers have already begun to experiment with AMP in their products, and other bitter blockers are being developed. In a few years, perhaps, after food companies have taken the bitterness from canned soup and improved the taste of medicines, they can set their sights on something more useful: a bitter blocker in a bottle that any of us can sprinkle on our Brussels sprouts or stir into our grapefruit juice.\u003c/p>\u003c/div>"
+ }
+};
+const VOCABULARY_DATA = {
+ "1": {
+  "passageTitle": "The Baobabs of Madagascar",
+  "words": []
+ },
+ "2": {
+  "passageTitle": "Coins – the first form of money",
+  "words": []
+ },
+ "3": {
+  "passageTitle": "Creating a Better Grapefruit",
+  "words": []
+ }
+};
+const READING_EXPLANATIONS = {
+ "1": {
+  "explanation": "FALSE — Seven species grow on Madagascar but only six are unique to it: “Of the eight known species, six are found only there, while a seventh has made its way across the Mozambique Channel from mainland Africa”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — Madagaskarda yetti tur o‘sadi, lekin faqat oltitasi shu orolga xos; yettinchisi Afrika qit’asidan kelgan.\u003c/div>",
+  "highlights": [
+   "Of the eight known species, six are found only there, while a seventh has made its way across the Mozambique Channel from mainland Africa"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — Seven species grow on Madagascar but only six are unique to it: “Of the eight known species, six are found only there, while a seventh has made its way across the Mozambique Channel from mainland Africa”.",
+  "uz": "FALSE — Madagaskarda yetti tur o‘sadi, lekin faqat oltitasi shu orolga xos; yettinchisi Afrika qit’asidan kelgan."
+ },
+ "2": {
+  "explanation": "NOT GIVEN — They are only described as “two great 19th-century French botanists”. Nothing says whether they were the first foreign botanists to visit the island.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> NOT GIVEN — Matnda ular faqat XIX asrning ikki buyuk fransuz botanigi deb aytiladi; orolga birinchi kelgan chet ellik botaniklar bo‘lgani haqida ma’lumot yo‘q.\u003c/div>",
+  "highlights": [
+   "two great 19th-century French botanists"
+  ],
+  "paraphraseMap": [],
+  "en": "NOT GIVEN — They are only described as “two great 19th-century French botanists”. Nothing says whether they were the first foreign botanists to visit the island.",
+  "uz": "NOT GIVEN — Matnda ular faqat XIX asrning ikki buyuk fransuz botanigi deb aytiladi; orolga birinchi kelgan chet ellik botaniklar bo‘lgani haqida ma’lumot yo‘q."
+ },
+ "3": {
+  "explanation": "FALSE — Baobabs grow in one region only: “they only grow along the western margin of the island and not in the more populous central highlands”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — Baobablar faqat orolning g‘arbiy chekkasida o‘sadi, aholi zich markaziy tog‘liklarda o‘smaydi.\u003c/div>",
+  "highlights": [
+   "they only grow along the western margin of the island and not in the more populous central highlands"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — Baobabs grow in one region only: “they only grow along the western margin of the island and not in the more populous central highlands”.",
+  "uz": "FALSE — Baobablar faqat orolning g‘arbiy chekkasida o‘sadi, aholi zich markaziy tog‘liklarda o‘smaydi."
+ },
+ "4": {
+  "explanation": "TRUE — “the surrounding landscape was created by humans” when “much of the Morondava plain was cleared for rice and sugar-cane fields”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> TRUE — Atrofdagi manzara guruch va shakarqamish dalalari uchun yer tozalanganda inson tomonidan yaratilgan.\u003c/div>",
+  "highlights": [
+   "the surrounding landscape was created by humans",
+   "much of the Morondava plain was cleared for rice and sugar-cane fields"
+  ],
+  "paraphraseMap": [],
+  "en": "TRUE — “the surrounding landscape was created by humans” when “much of the Morondava plain was cleared for rice and sugar-cane fields”.",
+  "uz": "TRUE — Atrofdagi manzara guruch va shakarqamish dalalari uchun yer tozalanganda inson tomonidan yaratilgan."
+ },
+ "5": {
+  "explanation": "FALSE — Bond only reports that trees keep falling; the passage states “The exact cause of the falling baobabs is uncertain”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — Bond daraxtlar yiqilayotganini ko‘radi, lekin matnda yiqilishning aniq sababi noma’lum ekani aytilgan.\u003c/div>",
+  "highlights": [
+   "The exact cause of the falling baobabs is uncertain"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — Bond only reports that trees keep falling; the passage states “The exact cause of the falling baobabs is uncertain”.",
+  "uz": "FALSE — Bond daraxtlar yiqilayotganini ko‘radi, lekin matnda yiqilishning aniq sababi noma’lum ekani aytilgan."
+ },
+ "6": {
+  "explanation": "FALSE — The cause is “uncertain” and only “some people think that the water used to irrigate the nearby fields is partly to blame” — there is no general agreement.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> FALSE — Sabab noaniq, faqat “ba’zi odamlar” sug‘orish suvini aybdor deb hisoblaydi — umumiy kelishuv yo‘q.\u003c/div>",
+  "highlights": [
+   "some people think that the water used to irrigate the nearby fields is partly to blame"
+  ],
+  "paraphraseMap": [],
+  "en": "FALSE — The cause is “uncertain” and only “some people think that the water used to irrigate the nearby fields is partly to blame” — there is no general agreement.",
+  "uz": "FALSE — Sabab noaniq, faqat “ba’zi odamlar” sug‘orish suvini aybdor deb hisoblaydi — umumiy kelishuv yo‘q."
+ },
+ "7": {
+  "explanation": "irrigation — “some people think that the water used to irrigate the nearby fields is partly to blame”; the roots “can't cope with constantly waterlogged soils”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Yaqin dalalarni sug‘orish suvi sabab bo‘lishi mumkin — ildizlar doimiy nam tuproqqa chiday olmaydi. Javob: irrigation.\u003c/div>",
+  "highlights": [
+   "some people think that the water used to irrigate the nearby fields is partly to blame",
+   "can't cope with constantly waterlogged soils"
+  ],
+  "paraphraseMap": [],
+  "en": "irrigation — “some people think that the water used to irrigate the nearby fields is partly to blame”; the roots “can't cope with constantly waterlogged soils”.",
+  "uz": "Yaqin dalalarni sug‘orish suvi sabab bo‘lishi mumkin — ildizlar doimiy nam tuproqqa chiday olmaydi. Javob: irrigation."
+ },
+ "8": {
+  "explanation": "cyclones — “Lone trees separated from the surrounding forest are also susceptible to cyclones”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> O‘rmondan ajralib qolgan yolg‘iz daraxtlar siklonlarga (kuchli bo‘ronlarga) moyil.\u003c/div>",
+  "highlights": [
+   "Lone trees separated from the surrounding forest are also susceptible to cyclones"
+  ],
+  "paraphraseMap": [],
+  "en": "cyclones — “Lone trees separated from the surrounding forest are also susceptible to cyclones”.",
+  "uz": "O‘rmondan ajralib qolgan yolg‘iz daraxtlar siklonlarga (kuchli bo‘ronlarga) moyil."
+ },
+ "9": {
+  "explanation": "farming — “The main threat to their survival is land clearance for farming” and “Burning is the usual method of clearing land”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Yer asosan dehqonchilik uchun yondirib tozalanadi.\u003c/div>",
+  "highlights": [
+   "The main threat to their survival is land clearance for farming",
+   "Burning is the usual method of clearing land"
+  ],
+  "paraphraseMap": [],
+  "en": "farming — “The main threat to their survival is land clearance for farming” and “Burning is the usual method of clearing land”.",
+  "uz": "Yer asosan dehqonchilik uchun yondirib tozalanadi."
+ },
+ "10": {
+  "explanation": "logging — “Human disturbance in the forest, such as logging, is also a problem”: it spreads undergrowth that fills “the bright forest gaps needed for baobab germination”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Daraxt kesish (logging) butazorlarni ko‘paytiradi va urug‘ unib chiqishi uchun kerakli ochiq joylarni yopib qo‘yadi.\u003c/div>",
+  "highlights": [
+   "Human disturbance in the forest, such as logging, is also a problem",
+   "the bright forest gaps needed for baobab germination"
+  ],
+  "paraphraseMap": [],
+  "en": "logging — “Human disturbance in the forest, such as logging, is also a problem”: it spreads undergrowth that fills “the bright forest gaps needed for baobab germination”.",
+  "uz": "Daraxt kesish (logging) butazorlarni ko‘paytiradi va urug‘ unib chiqishi uchun kerakli ochiq joylarni yopib qo‘yadi."
+ },
+ "11": {
+  "explanation": "animals — seed “dispersal is being limited by the absence of two large, now extinct animals”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Urug‘larni tarqatgan ikki yirik hayvon (lemur va fil-qush) endi yo‘q bo‘lib ketgan.\u003c/div>",
+  "highlights": [
+   "dispersal is being limited by the absence of two large, now extinct animals"
+  ],
+  "paraphraseMap": [],
+  "en": "animals — seed “dispersal is being limited by the absence of two large, now extinct animals”.",
+  "uz": "Urug‘larni tarqatgan ikki yirik hayvon (lemur va fil-qush) endi yo‘q bo‘lib ketgan."
+ },
+ "12": {
+  "explanation": "maps — Bond works with local people “to search for, and create maps of baobab distribution”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Bond mahalliy aholi bilan birga baobablar tarqalishi xaritalarini tuzadi.\u003c/div>",
+  "highlights": [
+   "to search for, and create maps of baobab distribution"
+  ],
+  "paraphraseMap": [],
+  "en": "maps — Bond works with local people “to search for, and create maps of baobab distribution”.",
+  "uz": "Bond mahalliy aholi bilan birga baobablar tarqalishi xaritalarini tuzadi."
+ },
+ "13": {
+  "explanation": "book — “He also plans to compile an illustrated children's book of the many local folk-tales about the tree”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> U daraxt haqidagi xalq ertaklaridan rasmli bolalar kitobini tayyorlamoqchi.\u003c/div>",
+  "highlights": [
+   "He also plans to compile an illustrated children's book of the many local folk-tales about the tree"
+  ],
+  "paraphraseMap": [],
+  "en": "book — “He also plans to compile an illustrated children's book of the many local folk-tales about the tree”.",
+  "uz": "U daraxt haqidagi xalq ertaklaridan rasmli bolalar kitobini tayyorlamoqchi."
+ },
+ "14": {
+  "explanation": "vii (An uncertain future) — “There is even a belief that they will one day be obsolete”, replaced by “a system of electronic credits and debits”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> A paragrafda tangalar bir kun butunlay keraksiz bo‘lib qolishi mumkinligi aytiladi — noaniq kelajak.\u003c/div>",
+  "highlights": [
+   "There is even a belief that they will one day be obsolete",
+   "a system of electronic credits and debits"
+  ],
+  "paraphraseMap": [],
+  "en": "vii (An uncertain future) — “There is even a belief that they will one day be obsolete”, replaced by “a system of electronic credits and debits”.",
+  "uz": "A paragrafda tangalar bir kun butunlay keraksiz bo‘lib qolishi mumkinligi aytiladi — noaniq kelajak."
+ },
+ "15": {
+  "explanation": "xi (Significant records of past societies) — coins are “among the most durable of our artefacts”, and “future archaeologists will scrutinise coins in order to learn about their distant ancestors”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tangalar eng uzoq saqlanadigan buyumlar; ular o‘tmish jamiyatlari haqida muhim manba.\u003c/div>",
+  "highlights": [
+   "among the most durable of our artefacts",
+   "future archaeologists will scrutinise coins in order to learn about their distant ancestors"
+  ],
+  "paraphraseMap": [],
+  "en": "xi (Significant records of past societies) — coins are “among the most durable of our artefacts”, and “future archaeologists will scrutinise coins in order to learn about their distant ancestors”.",
+  "uz": "Tangalar eng uzoq saqlanadigan buyumlar; ular o‘tmish jamiyatlari haqida muhim manba."
+ },
+ "16": {
+  "explanation": "v (A simpler, more efficient way of trading) — coins replaced barter: “Metal coins were far more portable, and not subject to the same spoilage on long sea journeys”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tangalar ayirboshlash (barter)ga qaraganda qulayroq: olib yurish oson va buzilmaydi.\u003c/div>",
+  "highlights": [
+   "Metal coins were far more portable, and not subject to the same spoilage on long sea journeys"
+  ],
+  "paraphraseMap": [],
+  "en": "v (A simpler, more efficient way of trading) — coins replaced barter: “Metal coins were far more portable, and not subject to the same spoilage on long sea journeys”.",
+  "uz": "Tangalar ayirboshlash (barter)ga qaraganda qulayroq: olib yurish oson va buzilmaydi."
+ },
+ "17": {
+  "explanation": "iv (Calculating what a coin was worth) — “coins could be weighed to determine the amount of metal they contained”, and Archimedes measured “the amount of displacement when coins were immersed in water”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tanga qiymati metall miqdori bilan o‘lchangan; Arximed esa tangani suvga botirib tekshirgan.\u003c/div>",
+  "highlights": [
+   "coins could be weighed to determine the amount of metal they contained",
+   "the amount of displacement when coins were immersed in water"
+  ],
+  "paraphraseMap": [],
+  "en": "iv (Calculating what a coin was worth) — “coins could be weighed to determine the amount of metal they contained”, and Archimedes measured “the amount of displacement when coins were immersed in water”.",
+  "uz": "Tanga qiymati metall miqdori bilan o‘lchangan; Arximed esa tangani suvga botirib tekshirgan."
+ },
+ "18": {
+  "explanation": "ii (A form of regional promotion) — “coins, which circulated around the trading world, were a way of advertising the qualities of each particular city-state”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Har bir shahar-davlat o‘z tangalari orqali o‘z fazilatlarini reklama qilgan.\u003c/div>",
+  "highlights": [
+   "coins, which circulated around the trading world, were a way of advertising the qualities of each particular city-state"
+  ],
+  "paraphraseMap": [],
+  "en": "ii (A form of regional promotion) — “coins, which circulated around the trading world, were a way of advertising the qualities of each particular city-state”.",
+  "uz": "Har bir shahar-davlat o‘z tangalari orqali o‘z fazilatlarini reklama qilgan."
+ },
+ "19": {
+  "explanation": "ix (Unchanging coins signalled trustworthiness) — Athena's features were “repeated virtually unaltered for many years”, because “a uniform design implied integrity”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Afina tangalari ko‘p yillar o‘zgarmagan — bir xil dizayn ishonchlilikni bildirgan.\u003c/div>",
+  "highlights": [
+   "repeated virtually unaltered for many years",
+   "a uniform design implied integrity"
+  ],
+  "paraphraseMap": [],
+  "en": "ix (Unchanging coins signalled trustworthiness) — Athena's features were “repeated virtually unaltered for many years”, because “a uniform design implied integrity”.",
+  "uz": "Afina tangalari ko‘p yillar o‘zgarmagan — bir xil dizayn ishonchlilikni bildirgan."
+ },
+ "20": {
+  "explanation": "vi (Putting a face to famous historical names) — coins carried “the portrait of the reigning monarch”, so “the features of many great Romans have survived and are known to modern generations”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tangalarda hukmdorlar portreti bo‘lgan — shu tufayli buyuk rimliklarning yuzi bizgacha yetib kelgan.\u003c/div>",
+  "highlights": [
+   "the portrait of the reigning monarch",
+   "the features of many great Romans have survived and are known to modern generations"
+  ],
+  "paraphraseMap": [],
+  "en": "vi (Putting a face to famous historical names) — coins carried “the portrait of the reigning monarch”, so “the features of many great Romans have survived and are known to modern generations”.",
+  "uz": "Tangalarda hukmdorlar portreti bo‘lgan — shu tufayli buyuk rimliklarning yuzi bizgacha yetib kelgan."
+ },
+ "21": {
+  "explanation": "A and C — A: coins “are the work of anonymous craftsmen”. C: there is an “endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly”. B, D and E are not stated.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> A — tangalarni yasagan ustalar noma’lum. C — qoliplar qayta-qayta yasalgani uchun bir xil dizayndagi tangalar har xil ko‘ringan. B, D, E matnda yo‘q.\u003c/div>",
+  "highlights": [
+   "are the work of anonymous craftsmen",
+   "endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly"
+  ],
+  "paraphraseMap": [],
+  "en": "A and C — A: coins “are the work of anonymous craftsmen”. C: there is an “endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly”. B, D and E are not stated.",
+  "uz": "A — tangalarni yasagan ustalar noma’lum. C — qoliplar qayta-qayta yasalgani uchun bir xil dizayndagi tangalar har xil ko‘ringan. B, D, E matnda yo‘q."
+ },
+ "22": {
+  "explanation": "A and C — A: coins “are the work of anonymous craftsmen”. C: there is an “endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly”. B, D and E are not stated.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> A — tangalarni yasagan ustalar noma’lum. C — qoliplar qayta-qayta yasalgani uchun bir xil dizayndagi tangalar har xil ko‘ringan. B, D, E matnda yo‘q.\u003c/div>",
+  "highlights": [
+   "are the work of anonymous craftsmen",
+   "endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly"
+  ],
+  "paraphraseMap": [],
+  "en": "A and C — A: coins “are the work of anonymous craftsmen”. C: there is an “endless variety encountered in coins with the same designs because the moulds had to be remade repeatedly”. B, D and E are not stated.",
+  "uz": "A — tangalarni yasagan ustalar noma’lum. C — qoliplar qayta-qayta yasalgani uchun bir xil dizayndagi tangalar har xil ko‘ringan. B, D, E matnda yo‘q."
+ },
+ "23": {
+  "explanation": "civilisation — “Their civilisation, which was composed of dozens of city-states, was highly decentralised”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Yunon sivilizatsiyasi o‘nlab shahar-davlatlardan iborat bo‘lgan.\u003c/div>",
+  "highlights": [
+   "Their civilisation, which was composed of dozens of city-states, was highly decentralised"
+  ],
+  "paraphraseMap": [],
+  "en": "civilisation — “Their civilisation, which was composed of dozens of city-states, was highly decentralised”.",
+  "uz": "Yunon sivilizatsiyasi o‘nlab shahar-davlatlardan iborat bo‘lgan."
+ },
+ "24": {
+  "explanation": "barter — “Before coins, trade was based on barter: the direct trade of commodities”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Tangalardan oldin savdo ayirboshlash (barter) orqali bo‘lgan.\u003c/div>",
+  "highlights": [
+   "Before coins, trade was based on barter: the direct trade of commodities"
+  ],
+  "paraphraseMap": [],
+  "en": "barter — “Before coins, trade was based on barter: the direct trade of commodities”.",
+  "uz": "Tangalardan oldin savdo ayirboshlash (barter) orqali bo‘lgan."
+ },
+ "25": {
+  "explanation": "silver — “the discovery of silver mines on Greek territory actually increased the quantity of money they could produce”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Yunonlar o‘z hududida kumush konlarini topib, kumush qazib olishgan.\u003c/div>",
+  "highlights": [
+   "the discovery of silver mines on Greek territory actually increased the quantity of money they could produce"
+  ],
+  "paraphraseMap": [],
+  "en": "silver — “the discovery of silver mines on Greek territory actually increased the quantity of money they could produce”.",
+  "uz": "Yunonlar o‘z hududida kumush konlarini topib, kumush qazib olishgan."
+ },
+ "26": {
+  "explanation": "inflation — so much New World gold reached Spain “that it resulted in serious inflation”; Greek mining was smaller, so Greece avoided it.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Ispaniyada ortiqcha oltin jiddiy inflyatsiyaga olib kelgan; Yunoniston bundan qochgan.\u003c/div>",
+  "highlights": [
+   "that it resulted in serious inflation"
+  ],
+  "paraphraseMap": [],
+  "en": "inflation — so much New World gold reached Spain “that it resulted in serious inflation”; Greek mining was smaller, so Greece avoided it.",
+  "uz": "Ispaniyada ortiqcha oltin jiddiy inflyatsiyaga olib kelgan; Yunoniston bundan qochgan."
+ },
+ "27": {
+  "explanation": "B — “sets of two miniature white paper cups, labelled 304 and 305, were placed before five people”; 304 was bitter, 305 was smoother.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> B paragrafda 304 va 305 raqamli stakanlar bilan ta’mni solishtirish tajribasi tasvirlangan.\u003c/div>",
+  "highlights": [
+   "sets of two miniature white paper cups, labelled 304 and 305, were placed before five people"
+  ],
+  "paraphraseMap": [],
+  "en": "B — “sets of two miniature white paper cups, labelled 304 and 305, were placed before five people”; 304 was bitter, 305 was smoother.",
+  "uz": "B paragrafda 304 va 305 raqamli stakanlar bilan ta’mni solishtirish tajribasi tasvirlangan."
+ },
+ "28": {
+  "explanation": "H — bitter blockers “could dampen the bitterness of drugs like antihistamines, antibiotics and other similar products”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> H paragrafda antigistamin, antibiotik va yo‘tal siroplari kabi dorilar misol keltirilgan.\u003c/div>",
+  "highlights": [
+   "could dampen the bitterness of drugs like antihistamines, antibiotics and other similar products"
+  ],
+  "paraphraseMap": [],
+  "en": "H — bitter blockers “could dampen the bitterness of drugs like antihistamines, antibiotics and other similar products”.",
+  "uz": "H paragrafda antigistamin, antibiotik va yo‘tal siroplari kabi dorilar misol keltirilgan."
+ },
+ "29": {
+  "explanation": "E — “the differences appear to be genetic”; people who are sensitive “seem to be less likely than others to eat bitter vegetables”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> E paragraf: achchiqqa sezgirlik genetik, sezgir odamlar achchiq sabzavotlarni kamroq yeydi.\u003c/div>",
+  "highlights": [
+   "the differences appear to be genetic",
+   "seem to be less likely than others to eat bitter vegetables"
+  ],
+  "paraphraseMap": [],
+  "en": "E — “the differences appear to be genetic”; people who are sensitive “seem to be less likely than others to eat bitter vegetables”.",
+  "uz": "E paragraf: achchiqqa sezgirlik genetik, sezgir odamlar achchiq sabzavotlarni kamroq yeydi."
+ },
+ "30": {
+  "explanation": "F — taste buds and “a group of receptors that captures the taste molecules”, a signal “relayed via proteins known as G proteins” to the brain.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> F paragrafda ta’m kurtaklari, retseptorlar va G oqsillari orqali ta’m qanday sezilishi tushuntiriladi.\u003c/div>",
+  "highlights": [
+   "a group of receptors that captures the taste molecules",
+   "relayed via proteins known as G proteins"
+  ],
+  "paraphraseMap": [],
+  "en": "F — taste buds and “a group of receptors that captures the taste molecules”, a signal “relayed via proteins known as G proteins” to the brain.",
+  "uz": "F paragrafda ta’m kurtaklari, retseptorlar va G oqsillari orqali ta’m qanday sezilishi tushuntiriladi."
+ },
+ "31": {
+  "explanation": "C — “bitterness is of special interest to the food industry because it is present in so many different types of food”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> C: achchiq ta’m oziq-ovqat sanoati uchun alohida qiziq, chunki u juda ko‘p mahsulotlarda bor.\u003c/div>",
+  "highlights": [
+   "bitterness is of special interest to the food industry because it is present in so many different types of food"
+  ],
+  "paraphraseMap": [],
+  "en": "C — “bitterness is of special interest to the food industry because it is present in so many different types of food”.",
+  "uz": "C: achchiq ta’m oziq-ovqat sanoati uchun alohida qiziq, chunki u juda ko‘p mahsulotlarda bor."
+ },
+ "32": {
+  "explanation": "H — “Part of the table salt could be replaced by another type of salt, potassium chloride” whose bitterness “could be eliminated with a dose of AMP” — less sodium in canned soup.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> H: osh tuzining bir qismini kaliy xloridga almashtirish mumkin, uning achchiqligini AMP yo‘qotadi — bu sog‘liq uchun foydali.\u003c/div>",
+  "highlights": [
+   "Part of the table salt could be replaced by another type of salt, potassium chloride",
+   "could be eliminated with a dose of AMP"
+  ],
+  "paraphraseMap": [],
+  "en": "H — “Part of the table salt could be replaced by another type of salt, potassium chloride” whose bitterness “could be eliminated with a dose of AMP” — less sodium in canned soup.",
+  "uz": "H: osh tuzining bir qismini kaliy xloridga almashtirish mumkin, uning achchiqligini AMP yo‘qotadi — bu sog‘liq uchun foydali."
+ },
+ "33": {
+  "explanation": "D — “Humans are the only species that enjoys a bitter taste … Every other species is averse to bitter because it means bad news.”\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> D: achchiq ta’mni yoqtiradigan yagona tur — inson; boshqa hayvonlar undan qochadi.\u003c/div>",
+  "highlights": [
+   "Humans are the only species that enjoys a bitter taste",
+   "Every other species is averse to bitter because it means bad news"
+  ],
+  "paraphraseMap": [],
+  "en": "D — “Humans are the only species that enjoys a bitter taste … Every other species is averse to bitter because it means bad news.”",
+  "uz": "D: achchiq ta’mni yoqtiradigan yagona tur — inson; boshqa hayvonlar undan qochadi."
+ },
+ "34": {
+  "explanation": "naringin — “juice packagers often select grapefruit with low naringin content”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Sharbat uchun naringin moddasi kam bo‘lgan greypfrut tanlanadi.\u003c/div>",
+  "highlights": [
+   "juice packagers often select grapefruit with low naringin content"
+  ],
+  "paraphraseMap": [],
+  "en": "naringin — “juice packagers often select grapefruit with low naringin content”.",
+  "uz": "Sharbat uchun naringin moddasi kam bo‘lgan greypfrut tanlanadi."
+ },
+ "35": {
+  "explanation": "poisonous — bitter compounds “protect animals by letting them know when a plant may be poisonous”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Achchiq ta’m hayvonlarga o‘simlik zaharli bo‘lishi mumkinligini bildiradi.\u003c/div>",
+  "highlights": [
+   "protect animals by letting them know when a plant may be poisonous"
+  ],
+  "paraphraseMap": [],
+  "en": "poisonous — bitter compounds “protect animals by letting them know when a plant may be poisonous”.",
+  "uz": "Achchiq ta’m hayvonlarga o‘simlik zaharli bo‘lishi mumkinligini bildiradi."
+ },
+ "36": {
+  "explanation": "genetic — “People have varying capacities for tasting bitterness and the differences appear to be genetic”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Achchiqni sezish darajasidagi farqlar genetik deb hisoblanadi.\u003c/div>",
+  "highlights": [
+   "People have varying capacities for tasting bitterness and the differences appear to be genetic"
+  ],
+  "paraphraseMap": [],
+  "en": "genetic — “People have varying capacities for tasting bitterness and the differences appear to be genetic”.",
+  "uz": "Achchiqni sezish darajasidagi farqlar genetik deb hisoblanadi."
+ },
+ "37": {
+  "explanation": "supertasters — people with “an unusually high number of taste buds” are known as supertasters and “are especially sensitive to these compounds”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Ta’m kurtaklari juda ko‘p bo‘lgan, achchiqqa o‘ta sezgir odamlar “supertasters” deb ataladi.\u003c/div>",
+  "highlights": [
+   "an unusually high number of taste buds",
+   "are especially sensitive to these compounds"
+  ],
+  "paraphraseMap": [],
+  "en": "supertasters — people with “an unusually high number of taste buds” are known as supertasters and “are especially sensitive to these compounds”.",
+  "uz": "Ta’m kurtaklari juda ko‘p bo‘lgan, achchiqqa o‘ta sezgir odamlar “supertasters” deb ataladi."
+ },
+ "38": {
+  "explanation": "taste buds — “The tongue is covered with taste buds” and “At the top is a group of receptors that captures the taste molecules”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> Til ta’m kurtaklari bilan qoplangan; ularning ichidagi retseptorlar ta’mni sezadi.\u003c/div>",
+  "highlights": [
+   "The tongue is covered with taste buds",
+   "At the top is a group of receptors that captures the taste molecules"
+  ],
+  "paraphraseMap": [],
+  "en": "taste buds — “The tongue is covered with taste buds” and “At the top is a group of receptors that captures the taste molecules”.",
+  "uz": "Til ta’m kurtaklari bilan qoplangan; ularning ichidagi retseptorlar ta’mni sezadi."
+ },
+ "39": {
+  "explanation": "A — “Once a bitter signal has been received, it is relayed via proteins known as G proteins”; the protein “delivers a signal to the brain that registers as bitter”.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> A — G oqsili achchiq signalni miyaga yetkazadi.\u003c/div>",
+  "highlights": [
+   "Once a bitter signal has been received, it is relayed via proteins known as G proteins",
+   "delivers a signal to the brain that registers as bitter"
+  ],
+  "paraphraseMap": [],
+  "en": "A — “Once a bitter signal has been received, it is relayed via proteins known as G proteins”; the protein “delivers a signal to the brain that registers as bitter”.",
+  "uz": "A — G oqsili achchiq signalni miyaga yetkazadi."
+ },
+ "40": {
+  "explanation": "C — AMP “blocks the bitterness in foods”, but it “may not be able to dampen every type of bitter taste” — so it reduces some bitter tastes.\u003cdiv style=\"margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);\">\u003cb>Oʻzbekcha:\u003c/b> C — AMP achchiqlikni to‘sadi, ammo hamma turdagi achchiq ta’mni emas, faqat bir qismini kamaytiradi.\u003c/div>",
+  "highlights": [
+   "blocks the bitterness in foods",
+   "may not be able to dampen every type of bitter taste"
+  ],
+  "paraphraseMap": [],
+  "en": "C — AMP “blocks the bitterness in foods”, but it “may not be able to dampen every type of bitter taste” — so it reduces some bitter tastes.",
+  "uz": "C — AMP achchiqlikni to‘sadi, ammo hamma turdagi achchiq ta’mni emas, faqat bir qismini kamaytiradi."
+ }
+};
+return { STORAGE_KEY: STORAGE_KEY, QTOTAL: 40, MINUTES: 60, FINISH_URL: "/full-tests/reading/volume-9",
+         SECTIONS: SECTIONS, PASSAGES: PASSAGES, VOCABULARY_DATA: VOCABULARY_DATA, READING_EXPLANATIONS: READING_EXPLANATIONS };
+})();
+</script>
+<script src="../../reading.js"></script>
+
+<!-- ══ PDFX ══ the one-click PDF exporter, shared verbatim by the Writing,
+     Listening and Reading tests. Inlined, so it works from a memory stick
+     with the network off. See the header comment inside for what it does and
+     why it is not jsPDF + html2canvas. ══ -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     MONOCHROME SKIN — grey / black / white only.
+     Appended last on purpose: it re-tokenises the login card, the completion
+     screen and the certificate without touching #stage-reading, which is the
+     Arial exam screen and already neutral. Nothing here introduces a hue.
+     ════════════════════════════════════════════════════════════════════════ -->
+
+
+<script src="../../ieltsx-data.js"></script>
+<script src="../../assets/js/test-complete.js"></script>
+<script type="module" src="../../site-access.js"></script>
+</body>
+</html>
+

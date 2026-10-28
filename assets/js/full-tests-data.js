@@ -75,6 +75,14 @@
                 { source: 'Full Reading Test 8', tags: ['True False Not Given', 'Matching Headings', 'Sentence Completion'], href: '/full-tests/reading/test-1', premium: true }
             ] },
             { slug: 'volume-9', title: 'Volume 9', tier: 'Tier 2', plan: 'MAX', premium: true, tests: [
+                /* Volume 9 Full Tests 1–7: pages built from reading-src/volume-9/test-N.js (npm run build:reading) */
+                { source: 'Volume 9 | Full Test 1', tags: ['True False Not Given', 'Matching Headings', 'Summary Completion'], href: '/full-tests/reading/test-v9-1', premium: true },
+                { source: 'Volume 9 | Full Test 2', tags: ['Notes Completion', 'Matching Features', 'Yes No Not Given'], href: '/full-tests/reading/test-v9-2', premium: true },
+                { source: 'Volume 9 | Full Test 3', tags: ['Table Completion', 'Matching Headings', 'Yes No Not Given'], href: '/full-tests/reading/test-v9-3', premium: true },
+                { source: 'Volume 9 | Full Test 4', tags: ['Sentence Completion', 'Matching Information', 'Sentence Endings'], href: '/full-tests/reading/test-v9-4', premium: true },
+                { source: 'Volume 9 | Full Test 5', tags: ['Notes Completion', 'Matching Headings', 'Short Answer'], href: '/full-tests/reading/test-v9-5', premium: true },
+                { source: 'Volume 9 | Full Test 6', tags: ['Table Completion', 'Matching Headings', 'Multiple Choice'], href: '/full-tests/reading/test-v9-6', premium: true },
+                { source: 'Volume 9 | Full Test 7', tags: ['Notes Completion', 'Multiple Choice', 'Sentence Endings'], href: '/full-tests/reading/test-v9-7', premium: true },
                 { source: 'Full Reading Test 9', tags: ['Matching Information', 'Multiple Choice', 'Summary Completion'], href: '/full-tests/reading/test-2', premium: true }
             ] },
             { slug: 'pack-1', title: 'Pack 1', tier: 'Tier 1', plan: 'MAX', premium: true, tests: [

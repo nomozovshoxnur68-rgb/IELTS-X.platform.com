@@ -1233,7 +1233,10 @@ const READING_EXPLANATIONS = __T.READING_EXPLANATIONS;
 const SYNONYMS = __T.SYNONYMS || {};   // optional (only some tests have a synonym table)
 const PONLY  = parseInt(__T.PONLY, 10)  || 1;     // which passage this page holds
 const QTOTAL = parseInt(__T.QTOTAL, 10) || 40;    // how many questions it has
-const MINUTES = parseInt(__T.MINUTES, 10) || 20;  // clock for this page
+// A page that holds two or three passages is a full 60-minute paper. Hand-made full tests never set
+// MINUTES, so they used to start on the 20-minute part clock.
+const MINUTES = parseInt(__T.MINUTES, 10) ||
+  ([1,2,3].filter(function(p){ return (__T.SECTIONS && __T.SECTIONS[p] || []).length; }).length >= 2 ? 60 : 20);
 const PARTS = [1,2,3].filter(function(p){ return (SECTIONS[p] || []).length; });
 
 function synSectionHTML() {
@@ -2154,8 +2157,9 @@ function fillTokens(str, builder) {
 function secHead(sec) {
   // The two grid tasks (which paragraph / match each item) open with a bold "Questions 14–17" line.
   // The range is taken from the question numbers, so it never needs typing in the data.
+  // Every block now opens with it (the paper prints "Questions 1–7" above every task).
   let num = sec.num;
-  if (!num && (sec.type === 'matching-info' || sec.type === 'matching-features') && sec.items && sec.items.length) {
+  if (!num && sec.items && sec.items.length) {
     const ids = sec.items.map(q => q.id), a = Math.min.apply(null, ids), b = Math.max.apply(null, ids);
     num = a === b ? 'Question ' + a : 'Questions ' + a + '\u2013' + b;
   }
@@ -2163,8 +2167,54 @@ function secHead(sec) {
        + (num ? `<h3 class="num">${num}</h3>` : ``)
        + (sec.title ? `<h2>${sec.title}</h2>` : ``)
        + (sec.instruction ? `<div class="instruction">${sec.instruction}</div>` : ``)
+       + tfngLegend(sec)
        + `</div>`;
 }
+// TRUE / FALSE / NOT GIVEN (or YES / NO / NOT GIVEN) key printed under the
+// instruction, as on the paper. Added only when the instruction does not
+// already spell it out (older data ended the instruction with "write").
+function tfngLegend(sec) {
+  if (sec.type !== 'tfng' && sec.type !== 'ynng') return '';
+  if (sec.legend === false || /if the statement|if there is no information|impossible to say/i.test(sec.instruction || '')) return '';
+  const rows = sec.type === 'tfng'
+    ? [['TRUE', 'if the statement agrees with the information'], ['FALSE', 'if the statement contradicts the information'], ['NOT GIVEN', 'if there is no information on this']]
+    : [['YES', 'if the statement agrees with the claims of the writer'], ['NO', 'if the statement contradicts the claims of the writer'], ['NOT GIVEN', 'if it is impossible to say what the writer thinks about this']];
+  return `<table class="tfng-legend">${rows.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>`;
+}
+// Free-form notes / summary text: `sec.lines` (notes) or `sec.prose` (summary)
+// with {{id}} where each gap goes. Lines starting "## " are sub-headings,
+// "- " bullets, "-- " second-level bullets; anything else is a plain line.
+function renderNoteLines(sec) {
+  const limit = sec.wordLimit || 0;
+  const gap = id => gapInput(id, limit);
+  if (sec.prose) return `<div class="q-card">${noteTitleHTML(sec)}<div class="prose-summary">${fillTokens(sec.prose, gap)}</div></div>`;
+  let html = '', open = 0;
+  const close = (to) => { while (open > to) { html += '</ul>'; open--; } };
+  (sec.lines || []).forEach(raw => {
+    const l = String(raw);
+    let m;
+    if ((m = /^##\s*(.*)$/.exec(l))) { close(0); html += `<div class="note-sub">${fillTokens(m[1], gap)}</div>`; return; }
+    if ((m = /^(-{1,2})\s+(.*)$/.exec(l))) {
+      const lvl = m[1].length;
+      while (open < lvl) { html += `<ul class="note-ul lvl-${open + 1}">`; open++; }
+      close(lvl);
+      html += `<li>${fillTokens(m[2], gap)}</li>`; return;
+    }
+    close(0); html += `<div class="note-line">${fillTokens(l, gap)}</div>`;
+  });
+  close(0);
+  return `<div class="q-card">${noteTitleHTML(sec)}<div class="prose-summary note-lines">${html}</div></div>`;
+}
+// Sentence completion / short answers: one line per question.
+function renderSentenceLines(sec) {
+  const limit = sec.wordLimit || 0;
+  const rows = sec.items.map(q => {
+    const before = q.label || '', after = q.after || '';
+    return `<div class="sent-line">${before ? `<span>${before} </span>` : ''}${gapInput(q.id, limit)}${after ? `<span> ${after}</span>` : ''}</div>`;
+  }).join('');
+  return `<div class="q-card">${noteTitleHTML(sec)}<div class="prose-summary sent-lines">${rows}</div></div>`;
+}
+
 // The note-completion title is an h2 at 700 17.6px/21.12px with a 14.608px
 // bottom margin, not an h4 at 700 16px.
 function noteTitleHTML(sec) {
@@ -2183,9 +2233,10 @@ const RENDERERS = {
   ynng: (sec) => sec.items.map(q => readingTfng(q.id, q.label, ['YES','NO','NOT GIVEN'])).join(''),
   mcq:  (sec) => sec.items.map(q => readingMcq(q.id, q.label, q.options)).join(''),
 
-  notes:    (sec) => noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0, true),
-  summary:  (sec) => noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0),
-  sentence: (sec) => noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0),
+  notes:    (sec) => (sec.lines || sec.prose) ? renderNoteLines(sec) : noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0, true),
+  summary:  (sec) => (sec.lines || sec.prose) ? renderNoteLines(sec) : noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0),
+  sentence: (sec) => renderSentenceLines(sec),
+  short:    (sec) => renderSentenceLines(sec),
 
   'mcq-multi':         (sec) => renderMcqMulti(sec),
   wordbank:            (sec) => renderWordBank(sec),
@@ -2467,6 +2518,7 @@ function readingProseSummary(items, limit, bulleted) {
     let before, after;
     if (q.after !== undefined) {
       before = q.label || '';
+      if (bulleted) before = before.replace(/^\s*(?:&bull;|\u2022|&#8226;|-)\s*/, '');
       after  = q.after  || '';
     } else {
       const parts = q.label.split(new RegExp(`${q.id}\\s*_+`));
@@ -3780,7 +3832,8 @@ function renderResults() {
     'matching-headings':'Matching Headings', 'matching-info':'Matching Information',
     'matching-features':'Matching Features', 'sentence-endings':'Sentence Endings',
     'notes':'Notes Completion', 'summary':'Summary Completion',
-    'table':'Table Completion', 'short-answer':'Short Answer'
+    'table':'Table Completion', 'short-answer':'Short Answer', 'short':'Short Answer',
+    'sentence':'Sentence Completion', 'flowchart':'Flow-chart Completion', 'wordbank':'Summary Completion'
   };
   const typeLabel = t => TYPE_LABELS[t] || String(t || 'Other')
     .replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -4628,7 +4681,7 @@ function injectExplanationButtons() {
           sharedPanel.innerHTML = `<div class="ep-title">Q${id} — Why this answer?</div><div class="ep-text">${data.explanation}</div>${bridgeHTML}`;
           sharedPanel.classList.add('show');
           btn.classList.add('open');
-          if (data.highlights?.length) highlightPassagePhrases(data.highlights);
+          showEvidence(id);
           // Highlight BOTH sides of each paraphrase pair. The question side was
           // missing here, so grouped types (summary completion, notes, table)
           // only ever lit up the passage — half the point of a synonym map.
@@ -4686,7 +4739,7 @@ function injectExplanationButtons() {
       clearExplainHighlights();
       if (!isOpen) {
         panel.classList.add('show'); btn.classList.add('open');
-        if (data.highlights?.length) highlightPassagePhrases(data.highlights);
+        showEvidence(numId);
         if (data.paraphraseMap?.length) {
           // grid rows (matching features / information) are <tr> with .mg-label,
           // not .q-text — fall back to the row so the question side still lights up
@@ -4745,7 +4798,7 @@ function injectExplanationButtons() {
       clearExplainHighlights();
       if (!isOpen) {
         panel.classList.add('show'); btn.classList.add('open');
-        if (data.highlights?.length) highlightPassagePhrases(data.highlights);
+        showEvidence(qNum);
         const passageEl = document.querySelector('#passage-pane .passage-text');
         const qPane = document.getElementById('questions-pane');
         (data.paraphraseMap || []).forEach((pm, idx) => {
@@ -4775,7 +4828,7 @@ function injectExplanationButtons() {
   // They belong on the grouped path: one compact lightbulb row placed BELOW the
   // grid, the same way summary/notes completion does it.
   const PER_CARD  = new Set(['tfng','ynng','mcq','sentence-endings']);
-  const GROUP_ROW = new Set(['notes','summary','sentence','wordbank','table','flowchart',
+  const GROUP_ROW = new Set(['notes','summary','sentence','short','wordbank','table','flowchart',
                              'map','diagram','matching-info','matching-features']);
 
   [1,2,3].forEach(pp => (SECTIONS[pp] || []).forEach((sec, i) => {
@@ -4800,6 +4853,80 @@ function injectExplanationButtons() {
 // Was a second copy of the single-text-node matcher, with the same bug: any
 // supporting sentence that crossed inline markup, or differed by a curly quote
 // or a line break, silently failed to highlight. Now shares the one matcher.
+// ── Evidence: the passage words behind an answer ─────────────────────
+// Tests made in the admin panel (and some hand-made ones) carry no
+// `highlights`, so the passage stayed blank when an explanation was opened.
+// Evidence is now taken, in order, from: highlights -> `evidence` -> the words
+// quoted in the explanation ("..." or '...', split at ellipses) -> the passage
+// sentence that shares the most words with the question and its answer.
+const EVIDENCE_CACHE = {};
+function stripTags(h) { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent || ''; }
+function quotedPhrases(text) {
+  const t = String(text || '').replace(/\s+/g, ' ');
+  const out = [];
+  const re = /["“”]([^"“”]{6,}?)["“”]|(?:^|[\s(—–:-])['‘]((?:[^'‘’]|['’](?=[a-z]))+?)['’](?=[\s.,;:)!?—–-]|$)/g;
+  let m;
+  while ((m = re.exec(t))) {
+    (m[1] || m[2] || '').split(/\s*(?:…|\.\.\.)\s*/).forEach(f => {
+      f = f.replace(/^[\s,.;:—–-]+|[\s,.;:—–-]+$/g, '');
+      if (f.split(/\s+/).length >= 2 && f.length >= 8) out.push(f);
+    });
+  }
+  return out;
+}
+function evidenceFor(id) {
+  if (EVIDENCE_CACHE[id]) return EVIDENCE_CACHE[id];
+  const d = READING_EXPLANATIONS[id] || {};
+  let list = [];
+  if (Array.isArray(d.highlights)) list = d.highlights.filter(Boolean);
+  if (!list.length && d.evidence) list = [].concat(d.evidence).filter(Boolean);
+  // stripTags also decodes &quot; / &rsquo; (admin-made tests store the text escaped)
+  if (!list.length) list = quotedPhrases(stripTags(d.en || String(d.explanation || '').split(/<div/i)[0]));
+  return (EVIDENCE_CACHE[id] = list);
+}
+const EV_STOP = new Set(('the a an and or of to in on at for by with from as is are was were be been it its this that these those which who whom what when where why how not no than then there their they them he she his her we our you your has have had do does did can could may might will would should about into over more most some such only also very much many any all each other').split(' '));
+function evWords(s) { return (normForMatch(String(s || '').toLowerCase()).match(/[a-z0-9]+/g) || []).filter(w => w.length > 2 && !EV_STOP.has(w)); }
+function bestSentenceFor(id, root) {
+  const meta = QMETA[id]; const sec = meta && meta.sec;
+  const item = sec && (sec.items || []).find(it => it.id === id);
+  if (!item) return '';
+  const label = stripTags((item.label || item.stem || '') + ' ' + (item.after || ''));
+  const ans = String(item.answer || '').split('|')[0].trim();
+  const isWord = !/^(TRUE|FALSE|NOT GIVEN|YES|NO|[A-Z]|[ivx]+)$/i.test(ans);
+  const q = new Set(evWords(label)); const a = new Set(isWord ? evWords(ans) : []);
+  if (!q.size && !a.size) return '';
+  // sentence by sentence, block by block (root.textContent glues a paragraph
+  // letter or a title straight onto the next sentence)
+  const sents = [];
+  const blocks = root.querySelectorAll('p,li,h1,h2,h3,h4,h5,td,th,blockquote');
+  (blocks.length ? Array.prototype.slice.call(blocks) : [root]).forEach(bl => {
+    if (bl !== root && bl.querySelector('p,li,td')) return;
+    let t = (bl.textContent || '').replace(/\s+/g, ' ').trim();
+    const pl = bl.querySelector('.para-letter');
+    if (pl && t.indexOf(pl.textContent.trim()) === 0) t = t.slice(pl.textContent.trim().length).trim();
+    t.split(/(?<=[.!?])\s+(?=[A-Z“"‘'(])/).forEach(x => { if (x.trim()) sents.push(x); });
+  });
+  let best = '', score = 0;
+  sents.forEach(snt => {
+    const ws = new Set(evWords(snt)); let sc = 0;
+    q.forEach(w => { if (ws.has(w)) sc += 1; });
+    a.forEach(w => { if (ws.has(w)) sc += 3; });
+    if (sc > score) { score = sc; best = snt; }
+  });
+  return score >= 2 ? best.trim() : '';
+}
+function showEvidence(id) {
+  const root = document.querySelector('#passage-pane .passage-text');
+  if (!root) return false;
+  let hit = false;
+  evidenceFor(id).forEach(ph => { if (highlightNodeText(root, ph, '', 'ep-highlight-src')) hit = true; });
+  if (!hit) {
+    const s = bestSentenceFor(id, root);
+    if (s) hit = highlightNodeText(root, s, '', 'ep-highlight-src');
+  }
+  return hit;
+}
+
 function highlightPassagePhrases(phrases) {
   const passageEl = document.querySelector('#passage-pane .passage-text');
   if (!passageEl || !phrases) return;
@@ -5326,9 +5453,10 @@ function fpPaintPassage() {
 
   (SECTIONS[p] || []).forEach(sec => (sec.items || []).forEach(it => {
     const data = READING_EXPLANATIONS[it.id];
-    if (!data || !data.highlights || !data.highlights.length) return;
+    if (!data) return;
     if (root.querySelector('.fp-hl[data-q="' + it.id + '"]')) return;
-    if (!highlightNodeText(root, data.highlights[0], '', 'fp-hl')) return;
+    const ev = evidenceFor(it.id);
+    if (!ev.length || !highlightNodeText(root, ev[0], '', 'fp-hl')) return;
     const fresh = Array.prototype.slice.call(root.querySelectorAll('.fp-hl:not([data-q])'));
     if (!fresh.length) return;
     fresh.forEach(s => { s.dataset.q = it.id; });
