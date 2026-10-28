@@ -240,3 +240,10 @@ code{background:var(--bg);padding:1px 5px;border-radius:4px}
 .cb-issues li.error{color:#b91c1c}.cb-issues li.warn{color:#b45309}
 .cb-import{border:1px dashed #2563eb;background:rgba(37,99,235,.04)}
 @media (max-width:720px){.gi-line{grid-template-columns:1fr}}
+
+/* Logo (admin-branding.js) */
+.br-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:16px}
+.br-grid .card{margin:0}
+.br-preview{display:flex;align-items:center;justify-content:center;min-height:120px;margin:12px 0;padding:16px;border:1px dashed var(--line-2);border-radius:10px;background:repeating-conic-gradient(#f2f4f7 0% 25%,#fff 0% 50%) 0 0/16px 16px}
+.br-preview img{max-width:100%;max-height:96px;object-fit:contain}
+.br-preview.br-square img{width:96px;height:96px}

@@ -200,6 +200,15 @@ server.listen(0, async () => {
     const acts = r.json.entries.map((e) => e.action); assert.ok(acts.includes('premium.grant') && acts.includes('order.approve') && acts.includes('role.admin') && acts.includes('upload'));
     assert.equal((await call('GET', '/api/admin/audit', { jar: user })).status, 403); ok('admin audit log');
 
+    // --- site logo (admin panel -> Logo)
+    assert.deepEqual(Object.values((await call('GET', '/api/branding')).json).slice(0, 2), ['', ''], 'no logo by default');
+    assert.equal((await call('POST', '/api/admin/branding', { jar: user, body: { logoUrl: 'https://cdn.example.com/x.png' } })).status, 403);
+    r = await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: 'https://cdn.example.com/logo.png', iconUrl: 'javascript:alert(1)' } });
+    assert.equal(r.status, 200); assert.equal(r.json.branding.logoUrl, 'https://cdn.example.com/logo.png'); assert.equal(r.json.branding.iconUrl, '');
+    r = await call('GET', '/api/branding'); assert.equal(r.json.logoUrl, 'https://cdn.example.com/logo.png'); assert.ok(/max-age/.test(r.headers.get('cache-control')));
+    await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: '', iconUrl: '' } });
+    assert.equal((await call('GET', '/api/branding')).json.logoUrl, ''); ok('site logo: admin only, links checked, public read');
+
     // --- numbered tests: /pessages/test-N, /sections/test-N, /full-tests/...
     for (const u of ['/pessages/test-1.html', '/pessages/test-3.html', '/pessages/test-21.html', '/sections/test-1.html', '/sections/test-4.html', '/full-tests/reading/', '/full-tests/listening/', '/pessage6.html', '/free/section-2/library-services', '/full-tests/reading.html']) {
       const x = await call('GET', u); assert.equal(x.status, 200, u + ' -> ' + x.status);

@@ -8,6 +8,7 @@
  * No premium or role information is trusted from localStorage: it all comes from /api/auth/me.
  */
 import { getCurrentUser, logout, safeNext, resendVerification } from './auth.js';
+import './assets/js/branding.js';   // the logo chosen in the admin panel
 
 const LEGACY_KEYS = ['ieltsx_logged_in_email', 'userEmail']; // read by ieltsx-data.js to keep test results per user
 let userPromise = null;

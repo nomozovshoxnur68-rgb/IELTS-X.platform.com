@@ -121,8 +121,16 @@ A test's own setting beats its pack's; a pack's setting is inherited by its test
 (`assets/js/full-tests-data.js`: `premium: true` = any paid plan, optional `minPlan: 'max'`).
 Levels: Demo 0, Standard 1, Max 2, Ultra 3 (admin = Ultra; other paid plan names such as "Premium" count as Max).
 Rules are stored in `ieltsx_settings` (run the **v6 part** of `supabase-schema.sql` once on Supabase).
-The Node server refuses locked test pages itself; on Vercel the static test pages are only guarded by
-`assets/js/access-gate.js` (the API is still enforced).
+The Node server refuses locked test pages itself; on Vercel `middleware.js` does it (see "Safety built in").
+
+## Logo (`/admin#branding`)
+
+Upload a **Logo** (wide: sign-in, password and legal pages) and/or an **Icon** (square: the sidebars, the header of every
+test and the browser tab), or paste an https link, then **Save**. One picture is enough: it is used for both. The server keeps
+them in `ieltsx_settings` (`branding`, served by `GET /api/branding`), and `assets/js/branding.js` swaps the IELTSX logo
+and the red placeholder mark of the test pages for them. It is loaded by `site-access.js`, `full-mock/js/bridge.js` and a
+`<script>` tag on the pages without them. **Use the IELTSX logo** puts the built-in logo back.
+
 ## Premium and payments
 
 * Premium pages: `Mock tests.html`, the full tests, anything under `/premium-audio/`

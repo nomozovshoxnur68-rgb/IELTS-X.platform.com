@@ -5199,8 +5199,12 @@ function init() {
   try { applyBrandLogo(); } catch(e) {}
   setupAntiCheat();
   setupHighlighter();
-    // Restore saved theme
-  const savedTheme = localStorage.getItem('cdi_reading_theme') || 'light';
+    // Restore saved theme; no choice made in a test yet = the site's own light / dark setting (as assets/js/theme-init.js)
+  let savedTheme = null; try { savedTheme = localStorage.getItem('cdi_reading_theme'); } catch(e) {}
+  if (!savedTheme) {
+    let site = null; try { site = localStorage.getItem('theme'); } catch(e) {}
+    savedTheme = site === 'dark' || (site !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
   setTheme(savedTheme);
   try { exInitSettingsPrefs({ setTheme: setTheme, zoomText: zoomText }); } catch(e) {}
 

@@ -17,6 +17,8 @@
    ============================================================ */
 (function () {
   'use strict';
+  // the logo chosen in the admin panel replaces the placeholder mark of the header (assets/js/branding.js)
+  if (location.protocol !== 'file:') { try { var bs = document.createElement('script'); bs.src = '/assets/js/branding.js'; bs.defer = true; document.head.appendChild(bs); } catch (e) { /* the placeholder stays */ } }
   var embedded = /[?&]embed=1/.test(location.search) && window.parent !== window;
 
   function post(msg) {

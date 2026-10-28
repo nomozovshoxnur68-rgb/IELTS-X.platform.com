@@ -435,6 +435,12 @@ function normalizePricing(raw) {
   return { currency: 'UZS', usdRate: Number.isFinite(usd) && usd > 0 ? Math.min(Math.round(usd), 1e6) : 0, months, plans,
     contact: cleanTelegram(r.contact, def.contact), instructions: String(r.instructions === undefined ? def.instructions : r.instructions).trim().slice(0, 500) };
 }
+/* ---- site logo (admin panel -> Logo): kept in settings, every page swaps its built-in logo for it (assets/js/branding.js) ---- */
+const cleanBranding = (b) => ({ logoUrl: cleanUrl(b && b.logoUrl), iconUrl: cleanUrl(b && b.iconUrl) });
+async function getBranding() {
+  let s = null; try { s = await store.getSetting('branding'); } catch (e) { /* no logo set */ }
+  return { ...cleanBranding(s), updatedAt: (s && s.updatedAt) || '' };
+}
 async function getPricing() {
   let s = null; try { s = await store.getSetting('pricing-config'); } catch (e) { /* defaults */ }
   return normalizePricing(s && typeof s === 'object' ? s : null);
@@ -1113,6 +1119,7 @@ async function api(req, res, url) {
   }
 
   /* ---- plans + orders (manual payment confirmed by an admin, or by a signed webhook) ---- */
+  if (method === 'GET' && p === '/api/branding') return send(res, 200, await getBranding(), { 'Cache-Control': 'public, max-age=60' });
   if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions }, { 'Cache-Control': 'no-store' }); }
   if (p === '/api/orders' && method === 'POST') {
     const u = await requireUser(req); rateLimit('order:' + u.id, 10, 60 * 60000);
@@ -1262,6 +1269,13 @@ async function api(req, res, url) {
       await store.setSetting('pricing-config', { ...cfg, updatedAt: new Date().toISOString() });
       await audit(admin, 'pricing.save', 'pricing', { months: cfg.months, plans: cfg.plans.map((x) => x.id + ':' + (x.active ? 'on' : 'off') + ':' + x.testsLimit) });
       return send(res, 200, { pricing: cfg });
+    }
+    if (method === 'GET' && p === '/api/admin/branding') return send(res, 200, { branding: await getBranding() }, { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/branding') {
+      const b = cleanBranding(await readJson(req, 16 * 1024));
+      await store.setSetting('branding', { ...b, updatedAt: new Date().toISOString() });
+      await audit(admin, 'branding.save', 'logo', { logo: !!b.logoUrl, icon: !!b.iconUrl });
+      return send(res, 200, { branding: await getBranding() });
     }
     if (method === 'GET' && p === '/api/admin/audit') return send(res, 200, { entries: await store.listAudit(Math.min(500, Number(url.searchParams.get('limit')) || 100)) });
     if (method === 'GET' && p === '/api/admin/users') {
