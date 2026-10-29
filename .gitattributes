@@ -1,0 +1,10 @@
+# never change line endings inside these files (a PDF keeps byte offsets in its xref table)
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.mp3 binary
+*.mp4 binary
+*.woff2 binary
