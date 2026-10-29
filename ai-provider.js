@@ -35,14 +35,22 @@ const MODEL = () => (PROVIDER() === 'mock' ? 'mock' : env('AI_MODEL', '') || wor
 const THINKING = () => { const t = env('AI_THINKING', 'low').toLowerCase(); return ['minimal', 'low', 'medium', 'high'].includes(t) ? t : 'low'; };
 let thinkingParamOk = true;                               // false once the API said it does not know thinkingLevel
 const BASE = () => env('GEMINI_API_BASE', 'https://generativelanguage.googleapis.com').replace(/\/+$/, '');
-const KEY = () => env('GEMINI_API_KEY', '');
+// GEMINI_API_KEY; GOOGLE_API_KEY (the other name Google's own libraries read) is taken when it is the only one
+const KEY = () => env('GEMINI_API_KEY', '') || env('GOOGLE_API_KEY', '');
+/* why the key is not seen: the deployment environment and the NAMES (never the values) of look-alike variables */
+function keyHint() {
+  const where = process.env.VERCEL_ENV ? ` This server is the Vercel "${process.env.VERCEL_ENV}" deployment: the variable must be enabled for that environment, and a new deployment is needed after adding it.` : '';
+  if (process.env.GEMINI_API_KEY != null && !String(process.env.GEMINI_API_KEY).trim()) return ' GEMINI_API_KEY exists but is empty.' + where;
+  const similar = Object.keys(process.env).filter((k) => k !== 'GEMINI_API_KEY' && /gemini|genai|google_?ai|google_?api_?key/i.test(k)).slice(0, 5);
+  return (similar.length ? ` Variables with a similar name were found: ${similar.join(', ')} — the name must be exactly GEMINI_API_KEY.` : '') + where;
+}
 const TIMEOUT = () => Math.max(1000, Number(env('AI_TIMEOUT_MS', process.env.VERCEL ? 50000 : 120000)) || 50000);
 
 function configured() {
   const provider = PROVIDER(), model = MODEL();
   if (provider === 'mock') return { ok: true, provider, model, mock: true };
   if (provider !== 'gemini') return { ok: false, provider, model, problem: `AI_PROVIDER "${provider}" is not supported. Use "gemini".` };
-  if (!KEY()) return { ok: false, provider, model, problem: 'The AI is not set up yet: add GEMINI_API_KEY (from https://aistudio.google.com/apikey) to the server environment — on Vercel: Settings → Environment Variables — then redeploy.' };
+  if (!KEY()) return { ok: false, provider, model, problem: 'The AI is not set up yet: the server does not see GEMINI_API_KEY (from https://aistudio.google.com/apikey). On Vercel: Settings → Environment Variables, then redeploy.' + keyHint() };
   if (!/^[a-z0-9][a-z0-9.\-_]*$/i.test(model)) return { ok: false, provider, model, problem: 'AI_MODEL has an invalid name.' };
   return { ok: true, provider, model };
 }

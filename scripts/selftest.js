@@ -725,6 +725,12 @@ server.listen(0, async () => {
         assert.equal((await call('GET', '/api/admin/ai/status', { jar: user })).status, 403);
         assert.equal((await ai(reading(), user)).status, 403);
         let r = await call('GET', '/api/admin/ai/status', { jar: boss }); assert.equal(r.json.configured, false); assert.ok(/GEMINI_API_KEY/.test(r.json.problem));
+        // why the key is not seen: the deployment environment and look-alike variable NAMES, never their values
+        Object.assign(process.env, { VERCEL_ENV: 'preview', GEMINI_KEY: 'value-must-not-show-123' });
+        r = await call('GET', '/api/admin/ai/status', { jar: boss });
+        assert.ok(/GEMINI_KEY/.test(r.json.problem) && /"preview"/.test(r.json.problem)); assert.ok(!r.text.includes('value-must-not-show-123'));
+        delete process.env.GEMINI_KEY; delete process.env.VERCEL_ENV;
+        process.env.GOOGLE_API_KEY = 'x'; assert.equal((await call('GET', '/api/admin/ai/status', { jar: boss })).json.configured, true, 'GOOGLE_API_KEY is accepted too'); delete process.env.GOOGLE_API_KEY;
         r = await ai(reading()); assert.equal(r.status, 503); assert.ok(/GEMINI_API_KEY/.test(r.json.error));
         // set up: the key goes to Gemini in a header and never comes back to the browser
         Object.assign(process.env, { GEMINI_API_KEY: KEY, GEMINI_API_BASE: `http://127.0.0.1:${gemini.address().port}`, AI_MODEL: 'gemini-test-flash', AI_TIMEOUT_MS: '5000' });
@@ -803,7 +809,7 @@ server.listen(0, async () => {
         r = await ai(reading({ title: 'limit check' })); assert.equal(r.status, 429);
         ok('AI Test Generator: admins only, key stays on the server, answers checked against the source, cache, one run at a time, clear AI errors, uploaded files only');
       } finally {
-        for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_PROVIDER', 'AI_HOURLY_LIMIT']) { if (env0[k] === undefined) delete process.env[k]; else process.env[k] = env0[k]; }
+        for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_PROVIDER', 'AI_HOURLY_LIMIT', 'GOOGLE_API_KEY', 'GEMINI_KEY', 'VERCEL_ENV']) { if (env0[k] === undefined) delete process.env[k]; else process.env[k] = env0[k]; }
         gemini.close();
       }
     }
