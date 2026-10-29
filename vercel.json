@@ -581,7 +581,7 @@
   "functions": {
     "api/index.js": {
       "includeFiles": "{server.js,*.html,data/**,supabase-schema.sql,assets/**}",
-      "maxDuration": 30
+      "maxDuration": 60
     }
   }
 }

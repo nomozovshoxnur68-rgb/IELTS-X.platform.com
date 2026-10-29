@@ -660,7 +660,9 @@ function cleanMaterialData(type, d) {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
       return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
-        answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined };
+        answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined,
+        // where the question came from (printed in the source / written by the AI Test Generator) and, for listening, the second the answer is heard
+        origin: ['source', 'ai'].includes(q.origin) ? q.origin : undefined, at: type === 'listening' && Number(q.at) > 0 ? Math.min(36000, Math.round(Number(q.at))) : undefined };
     }).filter((q) => q.prompt);
   }
   if (type === 'vocab') {
@@ -746,7 +748,7 @@ const publicMaterial = (m, withData) => {
     return withData ? { ...base, data: { kind: base.kind, level: base.level, source: base.source, icon: base.icon, words: d.words || [] } } : base;
   }
   if (!withData) return base;
-  return { ...base, data: { ...d, questions: (d.questions || []).map(({ answer, explanation, evidence, ...q }) => q), transcript: undefined,
+  return { ...base, data: { ...d, questions: (d.questions || []).map(({ answer, explanation, evidence, origin, at, ...q }) => q), transcript: undefined,
     tasks: (d.tasks || []).map(({ sample, ...t }) => ({ ...t, hasSample: !!sample })), parts: (d.parts || []).map(({ sample, ...t }) => ({ ...t, hasSample: !!sample })) } };
 };
 function parseMultipart(buf, contentType) {
@@ -1269,6 +1271,8 @@ async function api(req, res, url) {
   if (p.startsWith('/api/admin/')) {
     const admin = await requireAdmin(req);
     rateLimit('admin:' + admin.id, 600, 60000);
+    // AI Test Generator (ai-generator.js): admins only, like everything here; it never saves or publishes anything itself
+    if (p.startsWith('/api/admin/ai/')) return require('./ai-generator').route(req, res, p, method, { admin, send, readJson, audit, rateLimit, HttpError, UPLOAD_DIR, SUPABASE_URL, MEDIA_BUCKET, IS_VERCEL, USE_SUPABASE, AUDIO_EXT, PDF_EXT });
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {

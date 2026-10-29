@@ -209,7 +209,12 @@
       inp.click();
     });
   }
-  function syncSave() { const b = $('#cb-save'); if (b) { b.disabled = uploading > 0; b.textContent = uploading ? 'Uploading…' : (editingId ? 'Save changes' : 'Create'); } }
+  function syncSave() {
+    const b = $('#cb-save'), pb = $('#cb-publish'); const ai = !!(draft && draft._ai);
+    // a test made with the AI is saved as a Draft; publishing it is a separate, confirmed step
+    if (b) { b.disabled = uploading > 0; b.textContent = uploading ? 'Uploading…' : ai ? 'Save draft' : (editingId ? 'Save changes' : 'Create'); b.classList.toggle('btn-primary', !ai); }
+    if (pb) { pb.hidden = !ai; pb.disabled = uploading > 0; }
+  }
 
   /* ───────── writing chart: "Years: 1961, 1971 …" + one "Name: 10, 30 …" line per series ───────── */
   const chartToText = (c) => (c && c.years ? ['Years: ' + c.years.join(', ')].concat(c.series.map((s) => s.name + ': ' + s.values.join(', '))).join('\n') : '');
@@ -308,7 +313,8 @@
     try { const s = JSON.parse(localStorage.getItem(AUTOSAVE) || 'null'); return s && s.key === key && Date.now() - s.at < 14 * 86400000 ? s : null; } catch (e) { return null; }
   }
   function dropAutosave() { clearTimeout(autosave.t); try { localStorage.removeItem(AUTOSAVE); } catch (e) { /* blocked */ } }
-  function openBuilder(type, item, mode) {
+  function openBuilder(type, item, mode, opts) {
+    opts = opts || {};
     loadRules().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl && draft) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); const pk = document.getElementById('cb-pack-picks'); if (pk && draft) pk.outerHTML = packPicks(); });
     editingId = item ? item.id : null;
     if (impDoc) { impDoc.close(); impDoc = null; }
@@ -316,7 +322,7 @@
     draft.data = draft.data || {};
     if (MODE_TYPES.includes(draft.type)) draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part';
     if (!draft._access) draft._access = item ? accessOf(item) : 'free';   // Free / Standard / Max / Ultra (saving re-applies it)
-    const old = savedDraft(draftKey());
+    const old = opts.fresh ? null : savedDraft(draftKey());   // a test handed over by the AI Test Generator starts clean
     if (old && old.draft && old.draft.type === draft.type && confirm('You have unsaved work on “' + (old.draft.title || 'Untitled') + '” from ' + new Date(old.at).toLocaleString() + '.\n\nOK = continue it    Cancel = start ' + (editingId ? 'from the saved version' : 'a new one'))) {
       draft = old.draft; draft.data = draft.data || {};
     } else if (old) dropAutosave();
@@ -434,7 +440,7 @@
       if (!same) { cur = { type, passage: pass, group: g, blockTitle: q.blockTitle || '', options: [], items: [], _gi: hasGi ? q.gi : undefined }; gs.push(cur); }
       if (shared && !cur.options.length && opts.length) cur.options = opts.slice();
       if (!cur.group && g) cur.group = g; if (!cur.blockTitle && q.blockTitle) cur.blockTitle = q.blockTitle;
-      cur.items.push({ prompt: q.prompt || '', answer: q.answer || '', explanation: q.explanation || '', evidence: q.evidence || '', title: q.title || '', options: shared ? [] : opts.slice() });
+      cur.items.push({ prompt: q.prompt || '', answer: q.answer || '', explanation: q.explanation || '', evidence: q.evidence || '', title: q.title || '', options: shared ? [] : opts.slice(), origin: q.origin, at: q.at });
     });
     return gs;
   }
@@ -453,7 +459,8 @@
     if (isMultiSection()) idx.sort((a, b) => (gs[a].passage - gs[b].passage) || (a - b));
     idx.forEach((i, n) => { const g = gs[i]; const shared = SHARED_OPTS.includes(g.type);
       g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
-        options: (shared ? g.options : it.options || []).map((o) => String(o).trim()).filter(Boolean), answer: normAnswer(g.type, it.answer), explanation: String(it.explanation || '').trim(), evidence: String(it.evidence || '').trim() })); });
+        options: (shared ? g.options : it.options || []).map((o) => String(o).trim()).filter(Boolean), answer: normAnswer(g.type, it.answer), explanation: String(it.explanation || '').trim(), evidence: String(it.evidence || '').trim(),
+        origin: it.origin === 'ai' || it.origin === 'source' ? it.origin : undefined, at: Number(it.at) > 0 ? Number(it.at) : undefined })); });   // where an AI-made question came from, when an answer is heard
     return out;
   }
   function numbering() {
@@ -554,7 +561,9 @@
     const items = g.items.map((it, ii) => {
       const p = `groups.${gi}.items.${ii}`; const multi = g.type === 'mcq' || g.type === 'mcq-multi';
       const prompt = `<textarea class="field gi-prompt" rows="${multi ? 2 : 1}" data-p="${p}.prompt" placeholder="${esc(GROUP_HINT[g.type] ? (g.type === 'tfng' || g.type === 'ynng' ? 'Statement' : multi ? 'Question' : g.type === 'matching' || g.type === 'map' ? 'Item, e.g. Paragraph A' : g.type === 'short' || g.type === 'completion' || g.type === 'gap' || g.type === 'box' ? 'Text with ____ for the gap' : 'Question') : 'Question')}">${esc(it.prompt)}</textarea>`;
-      return `<div class="gi-row"><div class="cb-qn">${qNum(g, ii, range.from)}</div><div class="gi-main">
+      // made by the AI Test Generator: "AI" = written by the AI, "check" = its proof was not found in the passage / transcript
+      const tags = (it.origin === 'ai' ? '<span class="cb-ai-tag" title="Written by the AI">AI</span>' : '') + (it.verified === false ? '<span class="cb-ai-tag warn" title="The AI\'s evidence was not found in the source">check</span>' : '');
+      return `<div class="gi-row"><div class="cb-qn">${qNum(g, ii, range.from)}</div>${tags ? `<div class="cb-ai-tags">${tags}</div>` : ''}<div class="gi-main">
         <div class="gi-line">${prompt}${answerCell(g, gi, it, ii)}</div>
         ${multi ? `<textarea class="field" rows="4" data-lines="1" data-p="${p}.options" placeholder="Options, one per line (A, B, C… in this order)">${esc((it.options || []).join('\n'))}</textarea>` : ''}
         ${L && (g.type === 'gap' || g.type === 'box') ? `<input class="field" data-p="${p}.title" value="${esc(it.title)}" placeholder="Small sub-heading before this line (optional), e.g. Prices">` : ''}
@@ -1183,13 +1192,14 @@
     const t = draft.type, d = draft.data;
     if (t === 'article') { $('#builder-body').innerHTML = articleForm(); return syncSave(); }
     $('#builder-body').innerHTML = `
+      ${draft._ai ? aiBanner() : ''}
       ${t === 'reading' ? readingFormatBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
-      ${MODE_TYPES.includes(t) ? importBlock() : ''}
+      ${MODE_TYPES.includes(t) && !draft._ai ? importBlock() : ''}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(d.mode === 'full' ? 'Pack on the Full Tests page — pick one below, or type a new name for a new pack card' : 'Pack line shown on the card (optional, e.g. Starter Pack)', 'pack', draft.pack, 'list="ix-pack-list" placeholder="' + (d.mode === 'full' ? 'e.g. Pack 5 (empty = Practice)' : 'e.g. Starter Pack') + '" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>${d.mode === 'full' ? packPicks() : ''}
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
       <div class="cb-grid">${t === 'article' || t === 'speaking' || t === 'pdf' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <label class="lbl">Who can open it<select class="field" data-p="_access">${ACCESS.map(([v, l]) => `<option value="${v}" ${(draft._access || (draft.premium ? 'standard' : 'free')) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-        <div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
+        ${draft._ai ? '<div class="muted sm">Saved as a <b>Draft</b> (students do not see it) until you press <b>Publish</b>.</div>' : `<div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>`}</div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
       ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
@@ -1267,8 +1277,20 @@
     if (ng >= 0) return `Grammar point G${ng + 1} needs a title.`;
     return '';
   }
-  async function save() {
+  /* the banner of a test made by the AI Test Generator: where its parts came from and what to check */
+  function aiBanner() {
+    const a = draft._ai; const s = a.stats || {};
+    const what = { complete: 'The questions are the ones printed in your source; the AI added answers and explanations where the key had none, and checked the key.', generate: 'The questions were written by the AI from the ' + (draft.type === 'listening' ? 'transcript' : 'passage') + '.', scanned: 'The passage and the questions were read from a scanned PDF by the AI.' }[a.task] || '';
+    return `<div class="cb-block cb-ai"><div><strong>🤖 Made with the AI Test Generator</strong> <span class="muted sm">(${esc(a.model || 'AI')})</span></div>
+      <div class="sm">${esc(what)} ${draft.type === 'listening' ? 'Answers were checked against the transcript, not against the audio itself.' : 'Answers were checked against the passage text.'}</div>
+      <div class="sm"><b>${s.questions || 0}</b> questions · ${s.fromSource || 0} from the source · ${s.byAi || 0} written by the AI · <b>${s.verified || 0}</b> with their proof found${s.noAnswer ? ` · <b class="warn-text">${s.noAnswer} without an answer</b>` : ''}</div>
+      ${(a.warnings || []).length ? `<details ${a.warnings.length < 6 ? 'open' : ''}><summary class="sm"><b>${a.warnings.length} thing(s) to check</b></summary><ul class="cb-report">${a.warnings.map((w) => `<li class="warn">${esc(w)}</li>`).join('')}</ul></details>` : ''}
+      <div class="muted sm">Read every question before publishing. “AI” = written by the AI; “check” = its proof was not found in the ${draft.type === 'listening' ? 'transcript' : 'passage'}.</div></div>`;
+  }
+  async function save(opts) {
     if (uploading) return;
+    opts = opts && opts.publish !== undefined ? opts : {};
+    if (draft._ai) draft.published = !!opts.publish;   // an AI-made test is never published by saving it
     const d = draft.data;
     if (draft.type === 'reading' || draft.type === 'listening') {
       const issues = validate(); showIssues(issues);
@@ -1310,13 +1332,13 @@
     const access = draft._access;   // Free / Standard / Max / Ultra (articles keep their own Premium tick)
     try {
       const body = JSON.stringify({ type: draft.type, title: draft.title, pack: draft.pack, description: draft.description, premium: access ? access !== 'free' : !!draft.premium, published: draft.published !== false, data: d });
-      const type = draft.type; const wasEdit = !!editingId;
+      const type = draft.type; const wasEdit = !!editingId; const aiDraft = !!draft._ai && draft.published === false;
       const r = editingId ? await api('/api/admin/materials/' + encodeURIComponent(editingId), { method: 'PATCH', body }) : await api('/api/admin/materials', { method: 'POST', body });
       const id = r && r.item && r.item.id;
       // Standard / Max / Ultra are access rules of their own (saving the Free/Premium flag above clears an older rule)
       if (id && access && access !== 'free') { try { await setAccess([id], access); } catch (e) { toast('Saved, but the access level could not be set: ' + e.message, true); } }
       dropAutosave();
-      toast(wasEdit ? 'Saved' : 'Created — students can open it now');
+      toast(aiDraft ? 'Saved as a Draft — students do not see it yet' : wasEdit ? 'Saved' : 'Created — students can open it now');
       $('#builder').classList.remove('open'); draft = null; editingId = null;
       await loadType(type);
     } catch (e) {
@@ -1551,6 +1573,35 @@
     catch (err) { fail(err); }
   }
 
+  /* ───────── for the AI Test Generator (admin-ai.js) ───────── */
+  // the text of a PDF / paste -> passages, question groups (and a transcript), with the same reader as "Fill from a PDF"
+  function readSource(type, mode, text) {
+    const keep = draft; draft = { type, data: { mode } };   // the reader looks at draft.type (listening question types)
+    try {
+      if (type === 'reading') { const r = smartReading(text, mode === 'full'); return { passages: r.passages.map((x) => ({ title: x.title, text: x.passage })).filter((x) => x.text), groups: r.groups, skipped: r.skipped, keyCount: r.keyCount }; }
+      const r = smartListening(text, mode === 'full'); return { passages: [], groups: r.groups, transcript: r.transcript, section: r.section, skipped: r.skipped, keyCount: r.keyCount };
+    } finally { draft = keep; }
+  }
+  // the generator's result -> the normal form, as a Draft, with its warnings on top
+  function openFromAi(p) {
+    openBuilder(p.type, null, p.mode, { fresh: true });
+    const d = draft.data;
+    draft.title = p.title || ''; draft.published = false;
+    draft._ai = { model: p.model, task: p.task, warnings: p.warnings || [], stats: p.stats || {} };
+    if (p.type === 'reading') {
+      const ps = p.passages || [];
+      if (p.mode === 'full') d.passages = [0, 1, 2].map((k) => ({ title: (ps[k] && ps[k].title) || '', passage: (ps[k] && ps[k].passage) || '' }));
+      else d.passage = (ps[0] && ps[0].passage) || '';
+    } else {
+      Object.assign(d, { audioUrl: p.audioUrl || '', audioStart: p.audioStart || 0, audioEnd: p.audioEnd || 0, transcript: p.transcript || '' });
+      if (p.section && p.mode !== 'full') d.sectionLabel = p.section;
+    }
+    draft.groups = (p.groups || []).length ? JSON.parse(JSON.stringify(p.groups)) : [newGroup(p.type === 'listening' ? 'gap' : 'short')];
+    $('#builder-title').textContent = 'Review the AI-made ' + GRID[viewOf(p.type, p.mode)].noun;
+    renderBuilder(); showIssues(validate()); autosave();
+  }
+  window.IXAdmin = { readSource, openFromAi, uploadFile, toast, fail };
+
   const NAMES = Object.keys(TYPES);
   function onHash() { let v = (location.hash || '').slice(1).split('?')[0]; if (v === 'packs' && packList === null) loadPackList(); v = VIEW_FOR[v] || v; if (NAMES.includes(v) && lists[v] === null) loadType(v); }
   window.addEventListener('DOMContentLoaded', () => {
@@ -1558,7 +1609,9 @@
     document.addEventListener('click', onClick); document.addEventListener('click', onPackClick); renderPacks();
     document.addEventListener('input', onInput); document.addEventListener('change', onInput);
     const pk = $('#content-packs'); if (pk) { pk.addEventListener('input', onPackChange); pk.addEventListener('change', onPackChange); }
-    $('#cb-save').addEventListener('click', save);
+    $('#cb-save').addEventListener('click', () => save());
+    const pub = $('#cb-publish');
+    if (pub) pub.addEventListener('click', () => { if (draft && confirm('Publish “' + (draft.title || 'this test') + '”? Students will see it straight away. Have you read every question the AI made?')) save({ publish: true }); });
     document.querySelectorAll('[data-cb-close]').forEach((b) => b.addEventListener('click', closeBuilder));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#builder').classList.contains('open')) closeBuilder(); });
     window.addEventListener('hashchange', onHash); onHash();

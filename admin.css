@@ -280,3 +280,25 @@ code{background:var(--bg);padding:1px 5px;border-radius:4px}
 .cb-crop{position:relative;display:inline-block;max-width:100%;border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:crosshair;touch-action:none;user-select:none;margin:6px 0}
 .cb-crop-canvas{display:block;max-width:100%;height:auto}
 .cb-crop-sel{position:absolute;border:2px solid #2563eb;background:rgba(37,99,235,.15);pointer-events:none}
+
+/* AI Test Generator (admin-ai.js) and AI-made tests in the form */
+.ai-status{margin:0 0 14px;padding:10px 12px;border-radius:10px;font-size:13px;background:var(--bg);border:1px solid var(--line)}
+.ai-status.ok{background:var(--ok-bg);border-color:transparent;color:var(--ok)}
+.ai-status.bad{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.ai-seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ai-types{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.ai-types .chip{display:inline-flex;align-items:center;gap:6px}
+.ai-types .chip input{margin:0}
+.ai-busy{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.ai-spin{width:14px;height:14px;border:2px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:ai-spin .8s linear infinite}
+@keyframes ai-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ai-spin{animation:none}}
+.ai-preview{display:grid;gap:10px;margin-top:12px}
+.ai-group{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.ai-group ol{margin:6px 0 0;padding-left:22px;display:grid;gap:4px;font-size:13px}
+.cb-ai-tag{display:inline-block;margin-left:4px;padding:0 6px;border-radius:99px;font-size:10.5px;font-weight:700;background:var(--info-bg);color:var(--info);vertical-align:1px}
+.cb-ai-tag.src{background:var(--bg);color:var(--muted)}
+.cb-ai-tag.ok{background:var(--ok-bg);color:var(--ok)}
+.cb-ai-tag.warn{background:var(--warn-bg);color:var(--warn)}
+.cb-ai-tags{display:flex;flex-direction:column;gap:3px;flex:none;padding-top:4px}
+.cb-ai{border-color:var(--info);background:rgba(23,92,211,.05)}

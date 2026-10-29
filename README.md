@@ -278,3 +278,35 @@ of restarting the test, and the Writing exam screen uses medium sizes (52 px arr
 * **First visit**: a signed-out visitor who has never been to the site is sent to `/login?next=<the page>` once
   (`site-access.js`, flag `ix-first-visit-done` in localStorage); later visits and search-engine robots are not redirected.
 * **Writing start screen**: the card no longer gets squeezed to the window height (it hid the Start button); the screen scrolls.
+
+## AI Test Generator (`/admin#ai`)
+
+Makes a Reading or Listening test from a PDF, a pasted passage or a recording with an AI (Gemini), and opens it in the normal
+test form as a **Draft**. The admin reads it, fixes it and presses **Save draft** or **Publish** (asks for confirmation).
+Nothing is saved or published by the generator itself; the manual forms are unchanged.
+
+* **Files**: `ai-provider.js` (the AI service: Gemini over REST, or `mock`; one small interface so another provider can be
+  added), `ai-generator.js` (routes, prompts, the JSON schema the model must answer in, the checks, cache), `admin-ai.js`
+  (the page), hooks in `admin-content.js` (`window.IXAdmin`: the PDF reader, open-in-form, Save draft / Publish).
+* **Routes** (inside `/api/admin/`, so `requireAdmin()`, the cross-site check, the admin rate limit and the audit log apply):
+  `GET /api/admin/ai/status`, `POST /api/admin/ai/transcribe`, `POST /api/admin/ai/generate`.
+* **Reading**: the PDF is read in the browser (as in "Fill from a PDF"); the passage text is **not** rewritten by the AI. If the
+  source has questions they are kept word for word (`origin: "source"`) and the AI answers / explains them and checks the answer
+  key (a disagreement is a warning, the key's answer stays). Without questions the AI writes them (`origin: "ai"`) with the chosen
+  difficulty, number and types. A scanned PDF (no text) is uploaded to storage and read by the AI (marked so).
+* **Listening**: the recording is uploaded to the site's storage (kept for playback), sent to Gemini's Files API by the server,
+  transcribed with times (`[m:ss] SPEAKER: text`, editable), and the copy at Gemini is deleted. Questions are checked against the
+  transcript (never "against the audio"); the second an answer is heard is saved as `at` and used by the review screen.
+* **Checks**: every answer must come with the exact words of the source (`evidence`), looked up in the passage / transcript; an
+  answer not found, an option letter that does not exist, a word limit broken, or a question the source does not decide is
+  listed as a warning, and the question is tagged **check** in the form. Types the skill does not have are left out.
+* **Cost / safety**: the key is read only on the server (`GEMINI_API_KEY`, sent to Google in the `x-goog-api-key` header), never
+  in the page. One generation at a time per admin, `AI_HOURLY_LIMIT` per hour (default 30), the same request within an hour comes
+  from the cache (no new AI call). Only files uploaded in this panel are sent (no other websites), audio up to `AI_MAX_AUDIO_MB`
+  (default 60), PDFs up to 30 MB. Clear messages for a missing / wrong key, an unknown model, rate limits, timeouts, blocked or
+  cut-off answers and answers that are not valid JSON (nothing is changed then).
+* **Settings** (see `.env.example`): `GEMINI_API_KEY` (required, https://aistudio.google.com/apikey), `AI_MODEL` (default
+  `gemini-flash-latest`), `AI_PROVIDER` (`gemini`, or `mock` to try the page without a key), `AI_HOURLY_LIMIT`, `AI_MAX_AUDIO_MB`,
+  `AI_TIMEOUT_MS`. On Vercel the function may run 60 s (`vercel.json`); a long recording should be one part at a time
+  (“starts at / ends at”), and recordings / scanned PDFs need Supabase Storage.
+* **Self-test**: `npm test` runs the generator against a local stand-in for the Gemini API (no real AI call).

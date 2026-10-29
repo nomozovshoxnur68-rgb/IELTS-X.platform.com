@@ -46,6 +46,7 @@ function buildBlocks(material) {
   let n = full ? 1 : Math.max(1, parseInt(d.from, 10) || ((part - 1) * 10 + 1))
   const from = n
   const answers = {}
+  const times = {}   // the second of the recording where an answer is heard (set by the AI Test Generator)
   const blocks = []
   let cur = null
   let lastPart = 0
@@ -74,19 +75,20 @@ function buildBlocks(material) {
       const cnt = Math.max(2, want.length)
       const ids = []
       for (let i = 0; i < cnt; i++) ids.push(n + i)
-      ids.forEach((id, i) => { answers[id] = want[i] || '' })
+      ids.forEach((id, i) => { answers[id] = want[i] || ''; if (Number(q.at) > 0) times[id] = Number(q.at) })
       cur.items.push({ ids, prompt: q.prompt || '', options: opts, id: ids[0] })
       cur.to = n + cnt - 1
       n += cnt
       return
     }
     const id = n++
+    if (Number(q.at) > 0) times[id] = Number(q.at)
     if (kind === 'gap' || kind === 'box') answers[id] = String(q.answer || '').trim()
     else answers[id] = (letters(q.answer)[0] || '')
     cur.items.push({ id, prompt: q.prompt || '', options: kind === 'mcq' ? opts : undefined, title: kind === 'gap' || kind === 'box' ? String(q.title || '') : undefined })
     cur.to = id
   })
-  return { part, from, to: n - 1, blocks, answers }
+  return { part, from, to: n - 1, blocks, answers, times }
 }
 
 /** "Speaker: text" lines -> transcript; marks the line that contains each typed answer */
@@ -114,7 +116,7 @@ function buildTranscript(text, part, from, to, answers, full) {
 
 function buildConfig(material) {
   const d = material.data || {}
-  const { part, from, to, blocks, answers } = buildBlocks(material)
+  const { part, from, to, blocks, answers, times } = buildBlocks(material)
   const full = isFull(material)
   const rows = []
   for (let i = from; i <= to; i++) rows.push([i])
@@ -128,7 +130,7 @@ function buildConfig(material) {
     name: String(material.title || 'Listening'),
     audioStart: Math.max(0, +d.audioStart || 0),
     audioEnd: Math.max(0, +d.audioEnd || 0),
-    navGroups: rows, answers,
+    navGroups: rows, answers, answerTimes: times,
     transcript: buildTranscript(d.transcript, part, from, to, answers, full)
   }
   return { cfg, data: { blocks }, part }

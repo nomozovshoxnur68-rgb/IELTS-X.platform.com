@@ -677,6 +677,115 @@ server.listen(0, async () => {
       for (const m of [lp, lf, wf, sf, sp]) await call('DELETE', '/api/admin/materials/' + m.id, { jar: boss });
       ok('Part / Full tests for Reading, Listening, Writing, Speaking + built-in packs managed from the admin panel');
     }
+    // --- AI Test Generator, against a local stand-in for the Gemini API (no real AI is called by the self-test)
+    {
+      const KEY = 'test-gemini-key-123';
+      const PASSAGE = 'The first glass was made in Mesopotamia around 3500 BC. Glass blowing was discovered in the first century BC and made glass cheap. In 1959 Alastair Pilkington introduced the float process, which produces flat glass.';
+      const fake = { mode: 'generate', calls: 0, deleted: [], seenKey: true, lastBody: null, delay: 0 };
+      const reply = (res, status, obj, headers) => { res.writeHead(status, { 'content-type': 'application/json', ...(headers || {}) }); res.end(JSON.stringify(obj)); };
+      const gen = (text, finishReason) => ({ candidates: [{ content: { parts: [{ text }] }, finishReason: finishReason || 'STOP' }] });
+      const gemini = http.createServer((req, res) => {
+        let body = ''; req.on('data', (c) => { body += c; }); req.on('end', async () => {
+          if (req.url.startsWith('/upload/v1beta/files') && req.headers['x-goog-upload-command'] === 'start') return reply(res, 200, {}, { 'x-goog-upload-url': `http://127.0.0.1:${gemini.address().port}/upload-target` });
+          if (req.url === '/upload-target') return reply(res, 200, { file: { name: 'files/abc123', uri: 'https://files.example/abc123', mimeType: 'audio/mp3', state: 'ACTIVE' } });
+          if (req.method === 'DELETE') { fake.deleted.push(req.url); return reply(res, 200, {}); }
+          if (req.headers['x-goog-api-key'] !== KEY) { fake.seenKey = false; return reply(res, 400, { error: { code: 400, message: 'API key not valid. Please pass a valid API key.', status: 'INVALID_ARGUMENT' } }); }
+          fake.calls += 1; fake.lastBody = JSON.parse(body || '{}');
+          if (fake.delay) await new Promise((ok) => setTimeout(ok, fake.delay));
+          const m = fake.mode;
+          if (m === '429') return reply(res, 429, { error: { code: 429, message: 'Resource exhausted', status: 'RESOURCE_EXHAUSTED' } });
+          if (m === '404') return reply(res, 404, { error: { code: 404, message: 'models/x is not found', status: 'NOT_FOUND' } });
+          if (m === 'malformed') return reply(res, 200, gen('Sure! Here are your questions: 1. ...'));
+          if (m === 'recitation') return reply(res, 200, gen('', 'RECITATION'));
+          if (m === 'transcribe') return reply(res, 200, gen(JSON.stringify({ segments: [{ start: 3, part: 1, speaker: 'MAN', text: 'Good morning, my name is Tom Clarke.' }, { start: 9, part: 1, speaker: 'WOMAN', text: 'I live on Mill Street.' }] })));
+          if (m === 'complete') return reply(res, 200, gen(JSON.stringify({ answers: [{ id: 'g1q1', answer: 'TRUE', explanation: 'Line 1.', evidence: 'made in Mesopotamia around 3500 BC' }, { id: 'g1q2', answer: 'TRUE', explanation: 'Line 2.', evidence: 'made glass cheap' }] })));
+          return reply(res, 200, gen(JSON.stringify({ groups: [
+            { type: 'tfng', section: 1, instruction: 'Do the following statements agree with the information given in the passage?', questions: [
+              { prompt: 'Glass was first made in Mesopotamia.', answer: 'T', explanation: 'Sentence 1.', evidence: 'The first glass was made in Mesopotamia', origin: 'ai' },
+              { prompt: 'Pilkington was a Roman.', answer: 'NOT GIVEN', explanation: 'Not stated.', evidence: 'Pilkington was born in Rome', origin: 'ai' }] },
+            { type: 'short', section: 1, instruction: 'Complete the sentence. Write ONE WORD ONLY.', questions: [
+              { prompt: 'The float process produces ____ glass.', answer: 'flat', explanation: 'Last sentence.', evidence: 'which produces flat glass', origin: 'ai' },
+              { prompt: 'Glass blowing made glass ____.', answer: '', explanation: 'Ambiguous.', evidence: '', origin: 'ai' }] },
+            { type: 'essay', section: 1, instruction: 'x', questions: [{ prompt: 'bad type', answer: 'x', explanation: '', evidence: '', origin: 'ai' }] }] })));
+        });
+      });
+      await new Promise((ok) => gemini.listen(0, ok));
+      const env0 = { ...process.env };
+      const ai = (b, j) => call('POST', '/api/admin/ai/generate', { jar: j || boss, body: b });
+      const reading = (extra) => ({ skill: 'reading', mode: 'part', title: 'Glass', count: 4, types: ['tfng', 'short'], passages: [{ title: 'Glass', text: PASSAGE }], ...(extra || {}) });
+      try {
+        // only admins; the server says plainly when the AI is not set up
+        delete process.env.GEMINI_API_KEY; process.env.AI_PROVIDER = 'gemini';
+        assert.equal((await call('GET', '/api/admin/ai/status')).status, 401);
+        assert.equal((await call('GET', '/api/admin/ai/status', { jar: user })).status, 403);
+        assert.equal((await ai(reading(), user)).status, 403);
+        let r = await call('GET', '/api/admin/ai/status', { jar: boss }); assert.equal(r.json.configured, false); assert.ok(/GEMINI_API_KEY/.test(r.json.problem));
+        r = await ai(reading()); assert.equal(r.status, 503); assert.ok(/GEMINI_API_KEY/.test(r.json.error));
+        // set up: the key goes to Gemini in a header and never comes back to the browser
+        Object.assign(process.env, { GEMINI_API_KEY: KEY, GEMINI_API_BASE: `http://127.0.0.1:${gemini.address().port}`, AI_MODEL: 'gemini-test-flash', AI_TIMEOUT_MS: '5000' });
+        r = await call('GET', '/api/admin/ai/status', { jar: boss }); assert.equal(r.json.configured, true); assert.equal(r.json.model, 'gemini-test-flash'); assert.ok(!r.text.includes(KEY));
+        // input checks
+        assert.equal((await ai({ skill: 'maths' })).status, 400);
+        assert.equal((await ai({ skill: 'reading' })).status, 400, 'no passage');
+        assert.equal((await ai({ skill: 'listening' })).status, 400, 'no transcript');
+        // generate: unknown types left out, answers normalised, evidence looked up in the passage, no answer = warning
+        r = await ai(reading()); assert.equal(r.status, 200, r.text); assert.ok(fake.seenKey);
+        assert.ok(fake.lastBody.generationConfig.responseSchema && fake.lastBody.contents[0].parts[0].text.includes('Mesopotamia'));
+        assert.equal(r.json.groups.length, 2); assert.equal(r.json.groups[0].items[0].answer, 'TRUE');
+        assert.equal(r.json.groups[0].items[0].verified, true); assert.equal(r.json.groups[0].items[1].verified, false);
+        assert.ok(r.json.warnings.some((w) => /essay/.test(w)) && r.json.warnings.some((w) => /not found in the passage/.test(w)) && r.json.warnings.some((w) => /no answer/.test(w)));
+        assert.deepEqual([r.json.stats.questions, r.json.stats.byAi, r.json.stats.verified, r.json.stats.noAnswer], [4, 4, 2, 1]);
+        assert.ok(!r.text.includes(KEY));
+        // the same request again: from the cache, no second AI call
+        const before = fake.calls; r = await ai(reading()); assert.equal(r.json.cached, true); assert.equal(fake.calls, before);
+        // the questions of the source: kept word for word; a disagreeing key is kept and reported
+        fake.mode = 'complete';
+        r = await ai(reading({ task: 'complete', groups: [{ type: 'tfng', section: 1, instruction: 'TFNG', items: [{ prompt: 'Glass came from Mesopotamia.', answer: 'FALSE' }, { prompt: 'Blowing made glass cheaper.' }] }] }));
+        assert.equal(r.status, 200, r.text); assert.equal(r.json.groups[0].items[0].prompt, 'Glass came from Mesopotamia.'); assert.equal(r.json.groups[0].items[0].answer, 'FALSE');
+        assert.equal(r.json.groups[0].items[1].answer, 'TRUE'); assert.ok(r.json.groups[0].items.every((it) => it.origin === 'source'));
+        assert.ok(r.json.warnings.some((w) => /answer key says “FALSE”/.test(w)));
+        // AI errors become clear messages; a bad answer is never saved or cached
+        for (const [mode, status, re] of [['malformed', 502, /not valid JSON/], ['429', 429, /rate limit|quota/], ['404', 503, /AI_MODEL/], ['recitation', 422, /published text/]]) {
+          fake.mode = mode; r = await ai(reading({ title: 'err ' + mode })); assert.equal(r.status, status, mode + ' ' + r.text); assert.ok(re.test(r.json.error), mode + ': ' + r.json.error); assert.ok(!r.text.includes(KEY));
+        }
+        process.env.GEMINI_API_KEY = 'wrong-key'; fake.mode = 'generate';
+        r = await ai(reading({ title: 'bad key' })); assert.equal(r.status, 503); assert.ok(/refused the API key/.test(r.json.error)); process.env.GEMINI_API_KEY = KEY;
+        fake.delay = 1500; process.env.AI_TIMEOUT_MS = '600';
+        r = await ai(reading({ title: 'slow' })); assert.equal(r.status, 504); assert.ok(/too long/.test(r.json.error)); process.env.AI_TIMEOUT_MS = '5000';
+        // one generation at a time per admin: a second click while the first runs is refused
+        const [a1, a2] = await Promise.all([ai(reading({ title: 'twice A' })), new Promise((ok) => setTimeout(ok, 200)).then(() => ai(reading({ title: 'twice B' })))]);
+        assert.deepEqual([a1.status, a2.status].sort(), [200, 409]); fake.delay = 0;
+        // listening: only a recording uploaded in this panel is sent to the AI, and the copy there is deleted afterwards
+        const bd = 'AIBOUNDARY'; const mp = (name, bytes) => Buffer.concat([Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="type"\r\n\r\naudio\r\n--${bd}\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: audio/mpeg\r\n\r\n`), bytes, Buffer.from(`\r\n--${bd}--\r\n`)]);
+        const upA = await call('POST', '/api/admin/uploads', { jar: boss, raw: mp('part1.mp3', Buffer.from('ID3fake-audio')), headers: { 'content-type': 'multipart/form-data; boundary=' + bd } });
+        assert.equal(upA.status, 201);
+        const tr = (b) => call('POST', '/api/admin/ai/transcribe', { jar: boss, body: b });
+        assert.equal((await tr({ audioUrl: 'https://evil.example/a.mp3' })).status, 400, 'other websites are not fetched');
+        assert.equal((await tr({ audioUrl: '/uploads/audio/../../data/db.json' })).status, 400, 'not an audio file');
+        assert.equal((await tr({ audioUrl: '/uploads/audio/..%2F..%2Fserver.mp3' })).status, 404);
+        assert.equal((await call('POST', '/api/admin/ai/transcribe', { jar: user, body: { audioUrl: upA.json.url } })).status, 403);
+        fake.mode = 'transcribe'; r = await tr({ audioUrl: upA.json.url });
+        assert.equal(r.status, 200, r.text); assert.equal(r.json.segments.length, 2); assert.equal(r.json.segments[1].start, 9); assert.ok(fake.deleted.some((u) => /files\/abc123/.test(u)), 'the copy at the AI service is deleted');
+        fake.mode = 'generate';   // the listening reply reuses the reading stand-in: a reading type is left out, the check runs against the transcript
+        r = await ai({ skill: 'listening', mode: 'part', count: 2, transcript: r.json.segments });
+        assert.equal(r.status, 200, r.text); assert.ok(r.json.groups.every((g) => g.type === 'gap'), 'completion becomes the listening gap type');
+        assert.ok(r.json.warnings.some((w) => /not in the transcript/.test(w)) && r.json.warnings.some((w) => /tfng/.test(w)));
+        // what is saved keeps where a question came from and when its answer is heard; students never get either
+        const saved = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'AI listening', published: false, data: { audioUrl: 'https://cdn.example.com/a.mp3', questions: [{ type: 'gap', prompt: 'Name ____', answer: 'Tom', origin: 'ai', at: 3 }] } } })).json.item;
+        assert.equal(saved.published, false); assert.equal(saved.data.questions[0].origin, 'ai'); assert.equal(saved.data.questions[0].at, 3);
+        await call('PATCH', '/api/admin/materials/' + saved.id, { jar: boss, body: { published: true } });
+        const pubQ = (await call('GET', '/api/materials/' + saved.id, { jar: boss })).json.item.data.questions[0];
+        assert.ok(pubQ.origin === undefined && pubQ.at === undefined && pubQ.answer === undefined);
+        await call('DELETE', '/api/admin/materials/' + saved.id, { jar: boss });
+        // the hourly limit per admin
+        process.env.AI_HOURLY_LIMIT = '1'; fake.mode = 'generate';
+        r = await ai(reading({ title: 'limit check' })); assert.equal(r.status, 429);
+        ok('AI Test Generator: admins only, key stays on the server, answers checked against the source, cache, one run at a time, clear AI errors, uploaded files only');
+      } finally {
+        for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_PROVIDER', 'AI_HOURLY_LIMIT']) { if (env0[k] === undefined) delete process.env[k]; else process.env[k] = env0[k]; }
+        gemini.close();
+      }
+    }
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');
