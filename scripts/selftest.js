@@ -27,7 +27,8 @@ server.listen(0, async () => {
   let n = 0; const ok = (name) => realLog('  ok  ' + name, ++n);
   try {
     // --- files that must never be downloadable
-    for (const p of ['/data/db.json', '/data/.session-secret', '/server.js', '/package.json', '/.env.example', '/ADMIN_ACCESS.md', '/supabase-schema.sql', '/vercel.json', '/scripts/make-admin.js', '/api/../server.js', '/%2e%2e/server.js', '/..%2fserver.js', '/node_modules/x.js']) {
+    for (const p of ['/data/db.json', '/data/.session-secret', '/server.js', '/package.json', '/.env.example', '/ADMIN_ACCESS.md', '/supabase-schema.sql', '/vercel.json', '/scripts/make-admin.js', '/api/../server.js', '/%2e%2e/server.js', '/..%2fserver.js', '/node_modules/x.js',
+      '/ai-provider.js', '/ai-generator.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js']) {
       const r = await call('GET', p); assert.ok([403, 404].includes(r.status), p + ' -> ' + r.status);
     }
     ok('server code, database and docs are not downloadable');
@@ -681,7 +682,7 @@ server.listen(0, async () => {
     {
       const KEY = 'test-gemini-key-123';
       const PASSAGE = 'The first glass was made in Mesopotamia around 3500 BC. Glass blowing was discovered in the first century BC and made glass cheap. In 1959 Alastair Pilkington introduced the float process, which produces flat glass.';
-      const fake = { mode: 'generate', calls: 0, deleted: [], seenKey: true, lastBody: null, delay: 0 };
+      const fake = { mode: 'generate', calls: 0, deleted: [], seenKey: true, lastBody: null, delay: 0, models: [] };
       const reply = (res, status, obj, headers) => { res.writeHead(status, { 'content-type': 'application/json', ...(headers || {}) }); res.end(JSON.stringify(obj)); };
       const gen = (text, finishReason) => ({ candidates: [{ content: { parts: [{ text }] }, finishReason: finishReason || 'STOP' }] });
       const gemini = http.createServer((req, res) => {
@@ -691,8 +692,12 @@ server.listen(0, async () => {
           if (req.method === 'DELETE') { fake.deleted.push(req.url); return reply(res, 200, {}); }
           if (req.headers['x-goog-api-key'] !== KEY) { fake.seenKey = false; return reply(res, 400, { error: { code: 400, message: 'API key not valid. Please pass a valid API key.', status: 'INVALID_ARGUMENT' } }); }
           fake.calls += 1; fake.lastBody = JSON.parse(body || '{}');
+          const model = (/\/models\/([^:]+):generateContent/.exec(req.url) || [])[1] || ''; fake.models.push(model);
           if (fake.delay) await new Promise((ok) => setTimeout(ok, fake.delay));
           const m = fake.mode;
+          if (m === 'fallback' && model === 'gemini-3.8-flash') return reply(res, 404, { error: { code: 404, message: 'models/gemini-3.8-flash is not found for API version v1beta', status: 'NOT_FOUND' } });
+          if (m === 'thinking400' && fake.lastBody.generationConfig.thinkingConfig) return reply(res, 400, { error: { code: 400, message: 'Invalid JSON payload received. Unknown name "thinkingLevel" at \'generation_config.thinking_config\'', status: 'INVALID_ARGUMENT' } });
+          if (m === 'thought') return reply(res, 200, { candidates: [{ content: { parts: [{ thought: true, text: 'Let me think about the passage…' }, { text: JSON.stringify({ groups: [{ type: 'tfng', section: 1, instruction: 'TFNG', questions: [{ prompt: 'Glass came from Mesopotamia.', answer: 'TRUE', explanation: 'Line 1.', evidence: 'made in Mesopotamia', origin: 'ai' }] }] }) }] }, finishReason: 'STOP' }] });
           if (m === '429') return reply(res, 429, { error: { code: 429, message: 'Resource exhausted', status: 'RESOURCE_EXHAUSTED' } });
           if (m === '404') return reply(res, 404, { error: { code: 404, message: 'models/x is not found', status: 'NOT_FOUND' } });
           if (m === 'malformed') return reply(res, 200, gen('Sure! Here are your questions: 1. ...'));
@@ -731,6 +736,10 @@ server.listen(0, async () => {
         // generate: unknown types left out, answers normalised, evidence looked up in the passage, no answer = warning
         r = await ai(reading()); assert.equal(r.status, 200, r.text); assert.ok(fake.seenKey);
         assert.ok(fake.lastBody.generationConfig.responseSchema && fake.lastBody.contents[0].parts[0].text.includes('Mesopotamia'));
+        // the schema as the API reference writes it (OBJECT / ARRAY / STRING), JSON mode on, no thinking setting for a non-Gemini-3 model
+        const sch = fake.lastBody.generationConfig.responseSchema;
+        assert.equal(sch.type, 'OBJECT'); assert.equal(sch.properties.groups.type, 'ARRAY'); assert.equal(sch.properties.groups.items.properties.questions.items.properties.prompt.type, 'STRING');
+        assert.equal(fake.lastBody.generationConfig.responseMimeType, 'application/json'); assert.equal(fake.lastBody.generationConfig.thinkingConfig, undefined);
         assert.equal(r.json.groups.length, 2); assert.equal(r.json.groups[0].items[0].answer, 'TRUE');
         assert.equal(r.json.groups[0].items[0].verified, true); assert.equal(r.json.groups[0].items[1].verified, false);
         assert.ok(r.json.warnings.some((w) => /essay/.test(w)) && r.json.warnings.some((w) => /not found in the passage/.test(w)) && r.json.warnings.some((w) => /no answer/.test(w)));
@@ -777,6 +786,18 @@ server.listen(0, async () => {
         const pubQ = (await call('GET', '/api/materials/' + saved.id, { jar: boss })).json.item.data.questions[0];
         assert.ok(pubQ.origin === undefined && pubQ.at === undefined && pubQ.answer === undefined);
         await call('DELETE', '/api/admin/materials/' + saved.id, { jar: boss });
+        // no AI_MODEL: Google's recommended Flash model first, the next one when the key may not use it (and it is remembered)
+        delete process.env.AI_MODEL; fake.mode = 'fallback'; fake.models = [];
+        r = await ai(reading({ title: 'fallback' })); assert.equal(r.status, 200, r.text);
+        assert.deepEqual(fake.models.slice(0, 2), ['gemini-3.8-flash', 'gemini-flash-latest']); assert.equal(r.json.model, 'gemini-flash-latest');
+        assert.equal((await call('GET', '/api/admin/ai/status', { jar: boss })).json.model, 'gemini-flash-latest');
+        // a Gemini 3 model: low thinking level; its "thought" parts are not the answer
+        process.env.AI_MODEL = 'gemini-3.8-flash'; fake.mode = 'thought';
+        r = await ai(reading({ title: 'thought' })); assert.equal(r.status, 200, r.text);
+        assert.deepEqual(fake.lastBody.generationConfig.thinkingConfig, { thinkingLevel: 'low' }); assert.equal(r.json.groups[0].items[0].answer, 'TRUE');
+        // an API that does not know thinkingLevel: asked again without it
+        fake.mode = 'thinking400'; fake.calls = 0;
+        r = await ai(reading({ title: 'thinking400' })); assert.equal(r.status, 200, r.text); assert.equal(fake.calls, 2); assert.equal(fake.lastBody.generationConfig.thinkingConfig, undefined);
         // the hourly limit per admin
         process.env.AI_HOURLY_LIMIT = '1'; fake.mode = 'generate';
         r = await ai(reading({ title: 'limit check' })); assert.equal(r.status, 429);

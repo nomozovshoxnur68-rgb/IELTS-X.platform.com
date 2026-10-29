@@ -1539,7 +1539,9 @@ const MIME = {
 };
 // never served: server code, data, docs, secrets, config
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', '.git', '.vscode', '.github']);
-const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example']);
+const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
+  // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
+  'ai-provider.js', 'ai-generator.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;

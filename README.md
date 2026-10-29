@@ -305,8 +305,15 @@ Nothing is saved or published by the generator itself; the manual forms are unch
   from the cache (no new AI call). Only files uploaded in this panel are sent (no other websites), audio up to `AI_MAX_AUDIO_MB`
   (default 60), PDFs up to 30 MB. Clear messages for a missing / wrong key, an unknown model, rate limits, timeouts, blocked or
   cut-off answers and answers that are not valid JSON (nothing is changed then).
-* **Settings** (see `.env.example`): `GEMINI_API_KEY` (required, https://aistudio.google.com/apikey), `AI_MODEL` (default
-  `gemini-flash-latest`), `AI_PROVIDER` (`gemini`, or `mock` to try the page without a key), `AI_HOURLY_LIMIT`, `AI_MAX_AUDIO_MB`,
-  `AI_TIMEOUT_MS`. On Vercel the function may run 60 s (`vercel.json`); a long recording should be one part at a time
+* **Settings** (see `.env.example`): `GEMINI_API_KEY` (required, https://aistudio.google.com/apikey), `AI_MODEL` (empty =
+  `gemini-3.8-flash`, Google's recommended Flash model in Oct 2026; if the key may not use it, `gemini-flash-latest` and
+  `gemini-3.6-flash` are tried and the one that answers is kept), `AI_THINKING` (Gemini 3 thinking level, default `low`),
+  `AI_PROVIDER` (`gemini`, or `mock` to try the page without a key), `AI_HOURLY_LIMIT`, `AI_MAX_AUDIO_MB`, `AI_TIMEOUT_MS`.
+  On Vercel the function may run 60 s (`vercel.json`); a long recording should be one part at a time
   (“starts at / ends at”), and recordings / scanned PDFs need Supabase Storage.
+* **Gemini API**: plain REST, as in https://ai.google.dev/api/generate-content (v1beta `generateContent`, JSON mode with
+  `responseSchema` in OpenAPI form, the resumable Files API for audio / scanned PDFs, `x-goog-api-key` header). No SDK is needed
+  (the official JS SDK is `@google/genai`; the project has no npm packages). "Thought" parts of the answer are skipped.
+* **Private files on Vercel**: `middleware.js` answers 404 for `server.js`, the AI modules, `scripts/`, `data/`, `*.md` …,
+  which Vercel would otherwise serve as static files (the Node server refuses them in `isBlocked()`).
 * **Self-test**: `npm test` runs the generator against a local stand-in for the Gemini API (no real AI call).

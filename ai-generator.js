@@ -33,7 +33,7 @@ const TYPES = {
 };
 const DIFFICULTY = { 'band-5': 'IELTS band 5–5.5 (easier)', 'band-6': 'IELTS band 6–6.5', 'band-7': 'IELTS band 7–7.5', 'band-8': 'IELTS band 8–9 (hardest)' };
 const SHARED = ['matching', 'box', 'map'];
-const AUDIO_MIME = { '.mp3': 'audio/mp3', '.wav': 'audio/wav', '.m4a': 'audio/aac', '.aac': 'audio/aac', '.ogg': 'audio/ogg' };
+const AUDIO_MIME = { '.mp3': 'audio/mp3', '.wav': 'audio/wav', '.m4a': 'audio/m4a', '.aac': 'audio/aac', '.ogg': 'audio/ogg' };   // the audio types of https://ai.google.dev/gemini-api/docs/audio
 const MAX_AUDIO = () => Math.max(1, Number(process.env.AI_MAX_AUDIO_MB) || 60) * 1024 * 1024;
 const MAX_PDF = 30 * 1024 * 1024;
 
@@ -323,7 +323,7 @@ async function route(req, res, p, method, ctx) {
             parts: [{ file: handle }, { text: 'Transcribe this IELTS Listening recording word for word, in segments of one speaker turn. Give the start time of each segment in seconds from the beginning of the file, the speaker (e.g. MAN, WOMAN, or a name) and, when the recording announces it, the IELTS part number (1–4).' + range + ' Do not add, correct or summarise anything.' }] });
           const segs = (Array.isArray(r.json.segments) ? r.json.segments : []).slice(0, 1500).map((s) => ({ start: Math.max(0, Math.round(Number(s && s.start) || 0)), part: clampInt(s && s.part, 0, 4, 0), speaker: str(s && s.speaker, 40), text: str(s && s.text, 1000) })).filter((s) => s.text);
           if (!segs.length) throw new AiError(422, 'The AI found no speech in this recording.', 'empty');
-          return { segments: segs, warnings: (r.json.warnings || []).map((x) => str(x, 300)).slice(0, 20), note: 'Transcript written by the AI from the audio — read it through before using it.', model: c.model };
+          return { segments: segs, warnings: (r.json.warnings || []).map((x) => str(x, 300)).slice(0, 20), note: 'Transcript written by the AI from the audio — read it through before using it.', model: r.model || c.model };
         } finally { await provider.deleteFile(handle); }   // the copy at the AI service is not kept
       });
       remember(k, result);
@@ -347,7 +347,7 @@ async function route(req, res, p, method, ctx) {
             const passages = (Array.isArray(r.json.passages) ? r.json.passages : []).slice(0, 3).map((x) => ({ title: str(x && x.title, 200), passage: str(x && x.text, 25000) })).filter((x) => x.passage);
             if (!passages.length) throw new AiError(422, 'The AI could not read a passage in this PDF.', 'empty');
             const a = adaptGroups({ ...inp, passages: passages.map((x) => ({ text: x.passage })) }, r.json.groups, passages.map((x) => x.passage).join('\n'));
-            return { task: 'scanned', passages, passagesFrom: 'ai', groups: a.groups, warnings: ['The passage text was read from a scanned PDF by the AI: compare it with the original before publishing.'].concat(a.warnings, (r.json.warnings || []).map((x) => str(x, 300))).slice(0, 80), model: c.model };
+            return { task: 'scanned', passages, passagesFrom: 'ai', groups: a.groups, warnings: ['The passage text was read from a scanned PDF by the AI: compare it with the original before publishing.'].concat(a.warnings, (r.json.warnings || []).map((x) => str(x, 300))).slice(0, 80), model: r.model || c.model };
           } finally { await provider.deleteFile(handle); }
         }
         const srcText = inp.skill === 'listening' ? (inp.transcript.length ? inp.transcript.map((s) => s.text).join('\n') : inp.transcriptText) : inp.passages.map((x) => x.text).join('\n');
@@ -355,12 +355,12 @@ async function route(req, res, p, method, ctx) {
           const ids = inp.groups.map((g, gi) => g.items.map((_, ii) => `g${gi + 1}q${ii + 1}`));
           const r = await provider.generateJson({ system: SYSTEM, schema: SCHEMA.complete, mock: MOCK.complete(inp, ids), parts: [{ text: completePrompt(inp, ids) }] });
           const m = mergeComplete(inp, r.json.answers, ids, srcText);
-          return { task: 'complete', groups: m.groups, warnings: m.warnings.concat((r.json.warnings || []).map((x) => str(x, 300))).slice(0, 80), model: c.model };
+          return { task: 'complete', groups: m.groups, warnings: m.warnings.concat((r.json.warnings || []).map((x) => str(x, 300))).slice(0, 80), model: r.model || c.model };
         }
         const r = await provider.generateJson({ system: SYSTEM, schema: SCHEMA.generate(inp.skill), mock: MOCK.generate(inp), parts: [{ text: generatePrompt(inp) }] });
         const a = adaptGroups(inp, r.json.groups, srcText);
         if (!a.groups.length) throw new AiError(422, 'The AI did not write any usable question. Try again, or choose other question types.', 'empty');
-        return { task: 'generate', groups: a.groups, warnings: a.warnings.concat((r.json.warnings || []).map((x) => str(x, 300))).slice(0, 80), model: c.model };
+        return { task: 'generate', groups: a.groups, warnings: a.warnings.concat((r.json.warnings || []).map((x) => str(x, 300))).slice(0, 80), model: r.model || c.model };
       });
       result.stats = stats(result.groups);
       remember(k, result);

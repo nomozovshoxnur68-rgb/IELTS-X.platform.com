@@ -2,8 +2,14 @@
    On Vercel the test pages are static files, so anybody who knew the address could download a locked test with its
    answers (assets/js/access-gate.js only hides the page in the browser). Before Vercel sends a locked page (full tests,
    practice passages / sections, Mock tests, /premium-audio/) this asks the server the same question the page script
-   asks (/api/access/check) with the visitor's session cookie, and sends a visitor who may not open it to the Price page. */
-export const config = { matcher: ['/full-tests/:path*', '/pessages/:path*', '/sections/:path*', '/premium-audio/:path*', '/Mock(.*)', '/mock(.*)'] };
+   asks (/api/access/check) with the visitor's session cookie, and sends a visitor who may not open it to the Price page.
+   It also keeps the server's own files private: Vercel would otherwise send server.js, the AI modules, scripts/ … as
+   static files (the Node server refuses them itself, see isBlocked() in server.js). */
+export const config = { matcher: ['/full-tests/:path*', '/pessages/:path*', '/sections/:path*', '/premium-audio/:path*', '/Mock(.*)', '/mock(.*)',
+  '/server.js', '/ai-provider.js', '/ai-generator.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js',
+  '/supabase-schema.sql', '/vercel.json', '/package.json', '/README.md', '/GOOGLE_SETUP.md', '/VERCEL_SETUP.md', '/scripts/:path*', '/data/:path*', '/reading-src/:path*', '/full-mock/README.md'] };
+
+const PRIVATE = /^\/(?:server|ai-provider|ai-generator|reading-router|listening-router|reading-exam|listening-exam|middleware)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src)\//i;
 
 const GATED = [
   /^\/full-tests\/(reading|listening|writing|speaking)\/test-[^/]+?(\.html)?\/?$/i,
@@ -19,6 +25,7 @@ export default async function middleware(request) {
   const url = new URL(request.url);
   let path;
   try { path = decodeURIComponent(url.pathname).replace(/\/{2,}/g, '/'); } catch (e) { return new Response('Bad request', { status: 400 }); }
+  if (PRIVATE.test(path)) return new Response('Not found', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8', ...noStore } });
   if (!GATED.some((re) => re.test(path))) return next();
   const audio = /^\/premium-audio\//i.test(path);
   // only the session cookie is passed on, so a huge or broken Cookie header cannot make the check fail
