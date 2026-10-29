@@ -187,9 +187,26 @@ function ensureUserMenu() {
 
 window.IELTSXSiteAccess = { currentUser: loadUser, requireLogin, refresh, logout };
 
+/* A visitor who has never been here before (no account on this browser, never sent to the sign-in page) is shown the
+   sign-in page first, once, and comes back to the same page afterwards. Later visits are not interrupted. Search engine
+   robots are left alone, and a browser that blocks storage is never sent (it could not remember the first time). */
+const FIRST_VISIT_KEY = 'ix-first-visit-done';
+function sendFirstVisitToLogin() {
+  if (/bot|crawl|spider|slurp|lighthouse|preview|facebookexternalhit|telegram/i.test(navigator.userAgent || '')) return false;
+  try {
+    if (localStorage.getItem(FIRST_VISIT_KEY) || localStorage.getItem('ieltsx_logged_in_email')) return false;
+    localStorage.setItem(FIRST_VISIT_KEY, String(Date.now()));
+    if (!localStorage.getItem(FIRST_VISIT_KEY)) return false;
+  } catch (e) { return false; }
+  location.replace('/login?next=' + encodeURIComponent(safeNext(location.pathname + location.search + location.hash)));
+  return true;
+}
+
 (async function init() {
   if (document.readyState === 'loading') await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
   ensureUserMenu();
   const user = await refresh();
+  if (user) { try { localStorage.setItem(FIRST_VISIT_KEY, '1'); } catch (e) { /* blocked */ } }
   if (user === null && document.documentElement.hasAttribute('data-require-login')) requireLogin();
+  else if (user === null) sendFirstVisitToLogin();
 })();

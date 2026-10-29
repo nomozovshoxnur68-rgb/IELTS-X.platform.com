@@ -268,7 +268,10 @@
     try { r = await fetch('/api/materials/' + encodeURIComponent(id), { credentials: 'same-origin' }); d = await r.json().catch(() => ({})); }
     catch (e) { return showState('<h2>Cannot reach the server</h2><p>Check your connection and <a href="">try again</a>.</p>'); }
     if (r.status === 401) return showState(`<h2>Please sign in</h2><p>Sign in to read this article.</p><p><a href="/login?next=${encodeURIComponent(location.pathname + location.search)}">Sign in</a></p>`);
-    if (r.status === 403) return showState('<h2>★ Premium article</h2><p>This article is for Premium members.</p><p><a href="/Price">See plans</a></p>');
+    if (r.status === 403) {
+      const plan = (/\b(Standard|Max|Ultra)\b/.exec(d.error || '') || [])[1];
+      return showState(`<h2>🔒 ${esc(plan ? plan + ' article' : 'Premium article')}</h2><p>${esc(d.error || 'This article is for Premium members.')}</p><p><a href="/Price?premium=required${plan ? '&plan=' + plan.toLowerCase() : ''}&next=${encodeURIComponent(location.pathname + location.search)}">See plans</a></p>`);
+    }
     if (!r.ok || !d.item || d.item.type !== 'article') return showState(`<h2>Article not found</h2><p>${esc(d.error || 'It may have been removed.')}</p><p><a href="/study/Tools/Articles">Browse all articles</a></p>`);
     renderMaterial(d.item);
     items = itemsFromMaterial(d.item.data || {});

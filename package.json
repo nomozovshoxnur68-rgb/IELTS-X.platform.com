@@ -11,6 +11,7 @@
     "make-admin": "node scripts/make-admin.js",
     "test": "node scripts/selftest.js",
     "build:packs": "node scripts/build-packs.js",
-    "build:reading": "node scripts/build-reading.js"
+    "build:reading": "node scripts/build-reading.js",
+    "build:samples": "node scripts/make-sample-pdfs.js"
   }
 }

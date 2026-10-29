@@ -315,7 +315,7 @@
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type, mode);
     draft.data = draft.data || {};
     if (MODE_TYPES.includes(draft.type)) draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part';
-    if (draft.type !== 'article' && !draft._access) draft._access = item ? accessOf(item) : 'free';
+    if (!draft._access) draft._access = item ? accessOf(item) : 'free';   // Free / Standard / Max / Ultra (saving re-applies it)
     const old = savedDraft(draftKey());
     if (old && old.draft && old.draft.type === draft.type && confirm('You have unsaved work on “' + (old.draft.title || 'Untitled') + '” from ' + new Date(old.at).toLocaleString() + '.\n\nOK = continue it    Cancel = start ' + (editingId ? 'from the saved version' : 'a new one'))) {
       draft = old.draft; draft.data = draft.data || {};
@@ -482,7 +482,9 @@
       g.items.forEach((it) => {
         const has = String(it.prompt || '').trim(), ans = String(it.answer || '').trim(); const q = 'Question ' + n;
         if (!has && !ans) return;
-        total += 1; perPass[g.passage || 1] += 1;
+        // a "choose TWO" question uses two numbers of the paper
+        const width = g.type === 'mcq-multi' ? Math.max(L ? 2 : 1, gLetters(ans).length) : 1;
+        total += width; perPass[g.passage || 1] += width;
         if (!has) err(q + ' (' + where + '): the question text is empty.', gi);
         else if (!ans) err(q + ' (' + where + '): no correct answer.', gi);
         else {
@@ -602,7 +604,7 @@
   /* options: "A. text", "A) text" and, as printed in PDFs, "A text" / "iv text" */
   const P_OPT = /^\(?([A-J]|[ivx]{1,4})(?:[.)]\s+|\s+(?=[^\s.]))(.+)$/;
   /* numbered questions: "1. text", "Q1) text" and, as printed in PDFs, "1 Text" */
-  const P_NUM = /^(?:Q\s*)?(\d{1,2})(?:\s*[.)\-:]\s*|\s+(?=[A-Za-z"“‘'(]|\d{3,4}\b))(.+)$/i, P_HEAD = /^(?:questions?|savollar)\s+\d+\s*(?:(?:[-–—]|to|dan)\s*\d+)?\b/i;
+  const P_NUM = /^(?:Q\s*)?(\d{1,2})(?:\s*[-–—]\s*\d{1,2}(?=[\s.)]))?(?:\s*[.)\-:]\s*|\s+(?=[A-Za-z"“‘'(]|\d{3,4}\b))(.+)$/i, P_HEAD = /^(?:questions?|savollar)\s+\d+\s*(?:(?:[-–—]|to|dan)\s*\d+)?\b/i;
   /* ───────── Smart paste: an answer key at the end, numbered gaps inside notes / summaries ─────────
      A test copied straight from a PDF usually has the questions WITHOUT answers and an "ANSWERS" /
      "Answer key" section at the very end ("1. TRUE — Para 1: …", "Q7. irrigation — …", "14 iv",
@@ -613,7 +615,9 @@
   const P_INSTR = /^(?:do the following statements|complete the (?:notes|table|summary|sentences|flow-?chart|diagram|form)|complete each sentence|choose the correct (?:letter|heading)|choose (?:two|three|four)\b|which paragraph contains|look at the following|reading passage \d+ has|answer the questions|label the (?:diagram|map|plan|flow)|match each|classify the following)/i;
   const KEY_HEAD = /^(?:answers?|answer\s*key|javoblar|kalit(?:lar)?)(?:\s*[:.]?\s*$|\s+(?:key|with|and|&|for|\u2014|-)\b.*$)/i;   // not "Answer the questions below"
   function keyAnswer(rest) {
-    const r = String(rest || '').replace(/[✓✔]/g, ' ').replace(/\s+/g, ' ').trim(); let m;
+    // "IN EITHER ORDER B C" (the key of a "choose TWO" question): only the letters count
+    const r = String(rest || '').replace(/[✓✔]/g, ' ').replace(/\(?\b(?:in\s+)?(?:either|any)\s+order\b\)?[:,]?/ig, ' ').replace(/\s+/g, ' ').trim(); let m;
+    if ((m = /^([A-J](?:\s*(?:,|&|and|\s)\s*[A-J])+)(?:\s*[—–:-]\s*(.*))?$/.exec(r))) return { ans: m[1].match(/[A-J]/g).join(','), exp: m[2] || '' };   // "B C — paragraph D"
     if ((m = /^paragraph\s+[A-Z]\s*(?:→|->|=>)\s*(\S+)\s*[—–:-]?\s*(.*)$/i.exec(r))) return { ans: m[1], exp: m[2] };
     if ((m = /^paragraph\s+([A-Z])\b\s*[—–:-]?\s*(.*)$/i.exec(r))) return { ans: m[1], exp: m[2] };
     if ((m = /^(not\s+given|true|false|yes|no)\b\s*[—–:-]?\s*(.*)$/i.exec(r))) return { ans: m[1].toUpperCase().replace(/\s+/, ' '), exp: m[2] };
@@ -629,7 +633,7 @@
     for (let i = 0; i < lines.length; i++) { const l = lines[i].trim(); if (KEY_HEAD.test(l) && l.length < 80 && !/write|boxes|choose|sheet/i.test(l)) { at = i; break; } }
     if (at < 0) return { text: lines.join('\n'), key: {} };
     const key = {}; let last = 0, cur = null;
-    const ENTRY = /^\s*(?:Q\s*)?(\d{1,2})(?:\s*(?:\/|&|and|,)\s*(?:Q\s*)?(\d{1,2}))?\s*[.):]?\s+(.+)$/i;
+    const ENTRY = /^\s*(?:Q\s*)?(\d{1,2})(?:\s*(?:\/|&|and|,|[-–])\s*(?:Q\s*)?(\d{1,2}))?\s*[.):]?\s+(.+)$/i;
     let pend = 0;   // a table copied from a PDF puts the number and the answer on separate lines
     lines.slice(at + 1).forEach((l) => {
       const t = l.trim(); if (!t) return;
@@ -664,6 +668,10 @@
       if (!gaps.length) { out.push(...run); run = []; return; }
       // keep the instruction lines in front of the gapped text (the group heading)
       let k = 0; while (k < run.length && (!run[k].trim() || /^(?:complete|choose|write|use|answer|nb\b|using)/i.test(run[k].trim()))) out.push(run[k++]);
+      // and the list of words / endings of the group ("A  water   B  foundations"), printed before or after the text:
+      // before the gap lines, so the questions read it as the group's option list
+      const isOpt = (l) => { const t = l.trim(); return P_OPT.test(t) && (t.length < 60 || /\s{3,}(?:[A-J]|[ivx]{1,4})\s+\S/.test(t)) && !GAP_LINE.test(t); };
+      run.slice(k).forEach((l) => { if (isOpt(l)) out.push(l.trim()); });
       const B = /[.!?;]\s|•|\n\s*\n|\n\s*o\s|\s{3,}/g;
       gaps.forEach((g, i) => {
         const from = i ? gaps[i - 1].e : 0, to = i + 1 < gaps.length ? gaps[i + 1].s : body.length;
@@ -689,11 +697,31 @@
     if (!Object.keys(key).length) { const sk = splitKey(text); text = sk.text; key = sk.key; }
     text = expandGaps(dropWatermarks(text));
     // two option columns on one line ("A poverty        C boats") -> two lines
-    const lines = String(text || '').replace(/\r/g, '').split('\n').reduce((acc, x) => { const parts = x.trim().split(/\s{3,}/); return acc.concat(parts.length > 1 && parts.every((y) => /^(?:[A-J]|[ivx]{1,4})\s+\S/.test(y)) ? parts : [x.trim()]); }, []).filter(Boolean);
+    // a word box printed in columns may come out with single spaces: "A water B foundations C specialists" -> one per line
+    // (split only at the NEXT letter of the list, so an "I" or "A" inside an option stays)
+    const seqSplit = (t) => {
+      const m = /^([A-I])[.)]?\s+\S/.exec(t); if (!m) return [t];
+      const out = []; let rest = t, want = String.fromCharCode(m[1].charCodeAt(0) + 1);
+      for (;;) { const at = rest.search(new RegExp('\\s' + want + '[.)]?\\s+(?=\\S)')); if (at < 0) break; out.push(rest.slice(0, at).trim()); rest = rest.slice(at + 1); want = String.fromCharCode(want.charCodeAt(0) + 1); }
+      out.push(rest.trim());
+      return out.length > 1 && out.every((x) => x.split(/\s+/).length <= 6) ? out : [t];
+    };
+    const lines = String(text || '').replace(/\r/g, '').split('\n').reduce((acc, x) => { const parts = x.trim().split(/\s{3,}/); return acc.concat(parts.length > 1 && parts.every((y) => /^(?:[A-J]|[ivx]{1,4})\s+\S/.test(y)) ? parts : [x.trim()]); }, [])
+      .reduce((acc, x) => acc.concat(P_NUM.test(x) ? [x] : seqSplit(x)), [])
+      .filter((l) => l && !/^[A-L](?:\s+[A-L])+$/.test(l));   // "A   B   C": the letters printed on a map / plan, not options
     let expect = 0;
     const blocks = []; const skipped = []; let blk = null, cur = null, lastField = '';
     const newBlock = (head) => { blk = { head: head || '', shared: [], qs: [] }; blocks.push(blk); return blk; };
-    const fromKey = (q) => { const k = key[q.num]; if (!k) return; if (!q.answer) q.answer = k.ans; if (!q.explanation && k.exp) q.explanation = k.exp; };
+    const fromKey = (q) => {
+      // "Choose TWO letters": one question uses two numbers, and the key may give them one per line (21 B / 22 C)
+      const many = q.options.length >= 2 && !q.answer && (/\bchoose\s+(two|three)\b|\b(two|three)\s+(?:letters|answers|correct)\b/i.exec(blk.head + ' ' + q.prompt) || [])[0];
+      if (many) {
+        const k = /three/i.test(many) ? 3 : 2; const got = [];
+        for (let n = q.num; n < q.num + k; n++) if (key[n]) String(key[n].ans).split(/[^A-J]+/).filter(Boolean).forEach((x) => { if (!got.includes(x)) got.push(x); });
+        if (got.length > 1) { q.answer = got.slice(0, k).join(','); q.explanation = q.explanation || (key[q.num] && key[q.num].exp) || ''; expect = Math.max(expect, q.num + k - 1); return; }
+      }
+      const k = key[q.num]; if (!k) return; if (!q.answer) q.answer = k.ans; if (!q.explanation && k.exp) q.explanation = k.exp;
+    };
     const push = () => { if (cur && cur.prompt) { fromKey(cur); if (cur.answer) blk.qs.push(cur); else skipped.push(cur.prompt); } cur = null; lastField = ''; };
     lines.forEach((l) => {
       let m;
@@ -719,7 +747,8 @@
       if (cur && cur._done) { if (lastField === 'explanation' && !numbered) { cur.explanation += ' ' + l; return; } cur = null; }
       if (cur && cur.answer && lastField === 'explanation' && !numbered) { cur.explanation += ' ' + l; return; }
       if (cur && !cur.answer && !numbered) { cur.prompt += ' ' + l; return; }
-      if (!cur && !numbered && !blk.qs.length && blk.head && !(/\?\s*$/.test(l) && !/^(?:which paragraph|do the following|which section)/i.test(l)) && !/_{2,}/.test(l) && !/^[A-Za-z]/.test(l.slice(0, 1) === '(' ? 'x' : '') ) { blk.head += ' ' + l; return; }
+      // instruction lines under the heading join it ("What do the students say about EACH source?" is one, a question is not)
+      if (!cur && !numbered && !blk.qs.length && blk.head && !(/\?\s*$/.test(l) && !/^(?:which paragraph|do the following|which section)/i.test(l) && !/\b(?:each|following)\b/i.test(l)) && !/_{2,}/.test(l) && !/^[A-Za-z]/.test(l.slice(0, 1) === '(' ? 'x' : '') ) { blk.head += ' ' + l; return; }
       push();
       const num = numbered ? Number(numbered[1]) : expect + 1;
       cur = { num, prompt: (numbered ? numbered[2] : l).trim(), options: [], answer: '', explanation: '', evidence: '' }; lastField = '';
@@ -727,6 +756,13 @@
     });
     push();
     blocks.forEach((b) => b.qs.forEach((q) => { delete q._done; }));
+    // a list of endings / words / features printed AFTER the questions was read as the options of the last one: it is the
+    // group's list (every question is answered with a letter or a roman number)
+    blocks.forEach((b) => {
+      const last = b.qs[b.qs.length - 1];
+      if (b.shared.length || b.qs.length < 2 || !last || last.options.length < 2 || b.qs.slice(0, -1).some((q) => q.options.length)) return;
+      if (b.qs.every((q) => /^[A-Za-z]$/.test(String(q.answer || '').trim()) || ROMANS.test(String(q.answer || '').trim()))) { b.shared = last.options; last.options = []; }
+    });
     const cleanHead = (h) => String(h || '').replace(/^(?:questions?|savollar)\s+\d+\s*(?:(?:[-–—]|to|dan)\s*\d+)?\s*[:.\-–—]?\s*/i, '').replace(/\s*\b(?:TRUE|YES)\s+if the statement[\s\S]*$/i, '').replace(/\s*\b(?:List of (?:Headings|\w+))\s*$/i, '').trim().replace(/^.{0,11}$/, '');   // the player writes “Questions 1–5” and the TRUE/FALSE key itself
     blocks.forEach((b) => { const nm = /(\d+)/.exec(b.head); b.num = nm ? nm[1] : ''; b.head = cleanHead(b.head); });
     return { blocks: blocks.filter((b) => b.qs.length), skipped };
@@ -750,7 +786,8 @@
       const allLetters = b.qs.length && b.qs.every((q) => /^[A-J]$/.test(String(q.answer || '').trim()) && !(q.options || []).length);
       if (allLetters && (!forced || forced === 'auto') && (b.shared.length >= 2 || /paragraph|section|letter|list of|[A-J]\s*[\u2013\u2014-]\s*[A-J]/i.test(b.head))) {
         if (b.shared.length < 2) { const hm = /\bA\s*[\u2013\u2014-]\s*([B-L])\b/.exec(b.head); const last = hm ? hm[1] : b.qs.reduce((mx, q) => (q.answer > mx ? q.answer : mx), 'D'); b.shared = 'ABCDEFGHIJKL'.slice(0, last.charCodeAt(0) - 64).split(''); }
-        b.forceType = 'matching';
+        // "Label the map / plan / diagram": letters on a picture
+        b.forceType = /\blabel\b.{0,30}\b(?:map|plan|diagram)\b|\b(?:map|plan)\b.{0,40}\bletter/i.test(b.head) && b.shared.every((o) => /^[A-L]\.?$/.test(String(o).trim())) ? 'map' : 'matching';
       }
       b.qs.forEach((q) => {
         let type = forced && forced !== 'auto' ? forced : (b.forceType || detectType(q, b.shared));
@@ -928,12 +965,14 @@
       if (!cur) { if (t) { cur = tasks[1] = { n: 1, prompt: [], sample: [] }; } else return; }
       if (mode === 'prompt') {
         if ((m = /you should spend about (\d+) minutes on this task/i.exec(t))) { cur.minutes = Number(m[1]); const rest = t.replace(m[0], '').replace(/^[.\s]+/, ''); if (rest) cur.prompt.push(rest); return; }
-        if ((m = /^write at least (\d+) words\.?$/i.exec(t))) { cur.minWords = Number(m[1]); return; }
+        // "Write at least 150 words." ends the task: what follows (a chart's labels and numbers) is not part of the question
+        if ((m = /^write at least (\d+) words\.?$/i.exec(t))) { cur.minWords = Number(m[1]); mode = 'done'; return; }
         cur.prompt.push(l);
-      } else cur.sample.push(l);
+      } else if (mode === 'sample') cur.sample.push(l);
     });
-    const tidy = (ls) => reflow(ls).replace(/^\s+|\s+$/g, '');
-    return Object.values(tasks).sort((a, b) => a.n - b.n).map((x) => ({ n: x.n, prompt: tidy(x.prompt), sample: tidy(x.sample), minutes: x.minutes, minWords: x.minWords })).filter((x) => x.prompt || x.sample);
+    // a chart drawn in the PDF leaves short labels and numbers in the text: a paragraph with no full stop and few words is one
+    const tidy = (ls, prompt) => reflow(ls).split('\n\n').filter((p) => !prompt || /[.?!:]/.test(p) || p.split(/\s+/).length >= 12).join('\n\n').replace(/^\s+|\s+$/g, '');
+    return Object.values(tasks).sort((a, b) => a.n - b.n).map((x) => ({ n: x.n, prompt: tidy(x.prompt, true), sample: tidy(x.sample), minutes: x.minutes, minWords: x.minWords })).filter((x) => x.prompt || x.sample);
   }
 
   /* Speaking: PART 1 questions, PART 2 cue card, PART 3 questions */
@@ -959,7 +998,7 @@
   /* run the right reader and put the result into the form; returns the lines of the report shown under the import box */
   function fillFromText(text) {
     const t = draft.type, d = draft.data, full = d.mode === 'full'; const rep = []; let skipped = [];
-    const qCount = (gs) => gs.reduce((n, g) => n + g.items.length, 0), withAns = (gs) => gs.reduce((n, g) => n + g.items.filter((it) => String(it.answer || '').trim()).length, 0), withExp = (gs) => gs.reduce((n, g) => n + g.items.filter((it) => String(it.explanation || '').trim()).length, 0);
+    const qCount = (gs) => gs.reduce((n, g) => n + g.items.reduce((k, it) => k + (g.type === 'mcq-multi' ? Math.max(t === 'listening' ? 2 : 1, gLetters(it.answer).length) : 1), 0), 0), withAns = (gs) => qCount(gs.map((g) => ({ ...g, items: g.items.filter((it) => String(it.answer || '').trim()) }))), withExp = (gs) => gs.reduce((n, g) => n + g.items.filter((it) => String(it.explanation || '').trim()).length, 0);
     const words = (s) => String(s || '').split(/\s+/).filter(Boolean).length;
     if (t === 'reading') {
       const r = smartReading(text, full); skipped = r.skipped;
@@ -992,7 +1031,7 @@
   function importBlock() {
     const t = draft.type; const what = { reading: 'the passage' + (draft.data.mode === 'full' ? 's' : '') + ', every question group with its answer and explanation', listening: 'every question group (Parts by their numbers), the answers and explanations from the answer key, the transcript', writing: 'the Task 1 / Task 2 questions, time and word limits, model answers', speaking: 'Part 1 questions, the Part 2 cue card, Part 3 questions' }[t];
     return `<div class="cb-block cb-import"><div class="cb-head"><div><strong>⚡ Fill from a PDF — or paste the whole text</strong><div class="muted sm">Upload the test as it is (no marks needed): ${what} are put into their places. The PDF is read in this browser. Then look through the form and fix what the checker shows.</div></div>
-      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="imp-pdf" type="button">⬆ Upload PDF</button><button class="btn btn-sm" data-cb="imp-toggle" type="button">Paste text</button></div></div>
+      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="imp-pdf" type="button">⬆ Upload PDF</button><button class="btn btn-sm" data-cb="imp-toggle" type="button">Paste text</button><a class="btn btn-sm" href="/assets/samples/${t}-${draft.data.mode === 'full' ? 'full' : 'part'}.pdf" target="_blank" rel="noopener" title="A sample test laid out the way this form reads it — try it, or copy its layout">📄 Sample PDF</a></div></div>
       <div class="muted sm" id="imp-status"></div>
       <div id="imp-box" ${draft._import ? '' : 'hidden'}><textarea class="field cb-mono" id="imp-text" rows="10" placeholder="Paste everything here: the passage, the questions, the ANSWERS / answer key with explanations${t === 'listening' ? ', the transcript' : ''}…">${esc(draft._import || '')}</textarea>
         <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="imp-do" type="button">Fill the form from this text</button><span class="muted sm">Replaces what is in the form now.</span></div></div>
@@ -1125,7 +1164,8 @@
       <div class="cb-block"><div class="cb-head"><div><strong>Article text *</strong><div class="muted sm">Empty line = new paragraph. <code>## Heading</code> for a heading. Use “Insert picture” to put a picture inside the text.</div></div><button class="btn btn-sm" data-cb="body-img" type="button">⬆ Insert picture</button></div><div class="muted sm" id="body-status"></div>
         <textarea class="field cb-passage" id="body-text" rows="16" data-p="data.body" placeholder="Paste the article. Leave an empty line between paragraphs.&#10;Start a line with ## for a heading, e.g.&#10;## The human touch">${esc(d.body)}</textarea></div>
       ${field('Source / reference', 'data.source', d.source, 'placeholder="How to clean a beach. Nature 422, 464-466 (2003)."')}
-      <div class="cb-checks cb-checks-row"><label><input type="checkbox" data-p="premium" ${draft.premium ? 'checked' : ''}> Premium only</label><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>
+      <div class="cb-grid"><label class="lbl">Who can read it<select class="field" data-p="_access">${ACCESS.map(([v, l]) => `<option value="${v}" ${draft._access === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
       ${vocabBlock()}
       ${grammarBlock()}`;
   }

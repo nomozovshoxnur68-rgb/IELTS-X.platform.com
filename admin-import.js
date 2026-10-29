@@ -40,10 +40,13 @@
       if (!sameLine) {
         if (cur) lines.push(cur);
         const prev = cur; const gap = prev ? prev.y - y : 0;
-        cur = { y, size, text: s, xEnd: x + (it.width || 0), blank: !!prev && (gap > Math.max(size, prev.size) * 1.75 || gap < -size * 0.6) };
+        cur = { y, size, text: s, x0: x, xEnd: x + (it.width || 0), blank: !!prev && (gap > Math.max(size, prev.size) * 1.75 || gap < -size * 0.6) };
       } else {
         const space = x - cur.xEnd;
-        if (space > size * 1.6) cur.text = cur.text.replace(/\s+$/, '') + '   ';
+        // a label in the margin ("A" of a paragraph, "12" of a question): pdf.js may have turned the gap after it into a
+        // plain space, so the distance from where the label starts decides
+        const label = /^\s*(?:[A-Za-z]|\d{1,2}|[ivx]{1,4})\s*$/.test(cur.text) && x - cur.x0 > size * 2.2;
+        if (space > size * 1.6 || label) cur.text = cur.text.replace(/\s+$/, '') + '   ';
         else if (space > size * 0.12 && !/\s$/.test(cur.text) && !/^\s/.test(s)) cur.text += ' ';
         cur.text += s; cur.xEnd = Math.max(cur.xEnd, x + (it.width || 0)); cur.size = Math.max(cur.size, size);
       }

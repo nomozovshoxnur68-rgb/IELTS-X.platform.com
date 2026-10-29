@@ -2440,63 +2440,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         });
 
         // ----- ARTICLES DATA -----
-        const articlesData = [
-            { id: 1, title: "The Spinning Jenny", passage: "Passage 1", topic: "History", date: "2025-04-10",
-                image: "https://static-image.ieltsx.com/articles/spinning-jenny-original.avif",
-                description: "An account of how James Hargreaves' invention of the spinning jenny transformed the textile industry and catalyzed the shift from home-based cottage industries to factory-based production.",
-                href: "article1.html" },
-            { id: 2, title: "How to clean a beach", passage: "Passage 1", topic: "History",
-                date: "2025-04-01", image: "/article/images/how to clean a beach.jpg",
-                description: "As oil-spill specialists continue to tackle the Prestige slick, they are drawing on",
-                href: "/collections/article-1.html" },
-            { id: 3, title: "Great Apes and the Push for Legal Rights", passage: "Passage 1", topic: "History",
-                date: "2025-04-15", image: "/article/images/Great Apes and the Push for Legal Rights.jpg",
-                description: "Calls to grant basic legal rights to great apes have grown louder in recent decades.",
-                href: "/collections/article-2.html" },
-            { id: 4, title: "Climate Change and Rising Seas", passage: "Passage 3", topic: "Environment",
-                date: "2025-04-12", image: "article4.png",
-                description: "Analysis of melting ice caps and the potential impact on coastal megacities worldwide.",
-                href: "article4.html" },
-            { id: 5, title: "The Future of Renewable Energy", passage: "Passage 2", topic: "Science",
-                date: "2025-03-28", image: "article5.png",
-                description: "Solar, wind, and battery technologies driving the green transition.",
-                href: "article5.html" },
-            { id: 6, title: "Lake Bosumtwi – the secrets of a crater lake", passage: "Passage 3", topic: "History",
-                date: "2025-03-20", image: "article6.jpg",
-                description: "A major scientific project led by Earth Sciences professor Christopher Scholz represents the first large-scale investigation of Lake Bosumtwi in Ghana",
-                href: "article6.html" },
-            { id: 7, title: "Halley VI Research Station, Antarctica", passage: "Passage 2", topic: "Science", date: "2026-05-17",
-                image: "/article/images/Halley VI Research Station, Antarctica.jpg",
-                description: "The British Antarctic Survey’s new research station at Halley Bay is a portable pod structure that uses scent, colour and curves to take the edge off the world’s longest winter.",
-                href: "/collections/article-5.html" },
-            { id: 8, title: "Lever Brothers’ Sunlight Soap", passage: "Passage 1", topic: "History", date: "2026-05-17",
-                image: "/article/images/Lever Brothers’ Sunlight Soap.jpg",
-                description: "The history of Sunlight Soap and its influence on hygiene, industrial production, marketing, public health, social responsibility, and global consumer culture.",
-                href: "/collections/article-3.html" },
-            { id: 9, title: "Catch of the Day (GM Fish)", passage: "Passage 2", topic: "Technology",
-                date: "2026-05-17", image: "article9.jpg",
-                description: "As the global population grows, the amount of fish consumed by people worldwide has increased steadily.",
-                href: "article9.html" },
-            { id: 10, title: "Leo Burnett: Sultan Of Sell", passage: "Passage 1", topic: "History",
-                date: "2026-05-17", image: "/article/images/Leo Burnett Sultan Of Sell.jpg",
-                description: "How the Chicago adman who created the Marlboro Man, the Jolly Green Giant and Tony the Tiger reshaped modern advertising through the power of visual imagery.",
-                href: "/collections/article-6.html" },
-            { id: 11, title: "Strange symbols may rewrite history", passage: "Passage 2", topic: "Science",
-                date: "2026-05-17", image: "article11.png",
-                description: "STONE Age people 40,000 years ago used a simple form of writing comparable in complexity to the earliest stages of the world's",
-                href: "article11.html" },
-            { id: 12, title: "Brain Preservation & CryonicsHuge leap for brain preservation", passage: "Passage 3",
-                topic: "Science", date: "2026-05-17", image: "article12.png",
-                description: "AN ENTIRE mammalian brain has been successfully preserved using a technique that will now be offered",
-                href: "article12.html" },
-            { id: 13, title: " History of the SS Yongala", passage: "Passage 1", topic: "History",
-                date: "2026-05-17", image: "/article/images/History of the SS Yongala.jpg",
-                description: "The final voyage of the luxury steamliner SS Yongala, its mysterious disappearance, the long search for answers, and its transformation into one of Australia’s greatest dive sites.",
-                href: "/collections/article-4.html" },
-        ];
-
-        // cards whose page does not exist are dropped (they led to the 404 page); articles made in the admin panel are added at the end
-        for (var ai = articlesData.length - 1; ai >= 0; ai--) { if (!/^\/collections\//.test(String(articlesData[ai].href || ''))) articlesData.splice(ai, 1); }
+        // every article is made in the admin panel (admin#articles) and comes from /api/materials?type=article below
+        const articlesData = [];
 
         function renderArticles() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -2513,9 +2458,10 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             else filtered.sort((a, b) => b.id - a.id);
             const container = document.getElementById('articlesGrid');
             if (!container) return;
+            if (!filtered.length) { container.innerHTML = '<div style="grid-column:1/-1;padding:48px 16px;text-align:center;color:var(--text-secondary)">' + (articlesData.length ? 'No articles match your search.' : 'New articles are coming soon.') + '</div>'; return; }
             container.innerHTML = filtered.map(art =>
                 `
-                    <a href="${String(art.href || '#').replace(/\.html(?=$|[?#])/i, '')}" class="group rounded-xl border text-card-foreground flex h-full min-h-[390px] cursor-pointer flex-col overflow-hidden border-border/70 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg" style="text-decoration: none; color: inherit; background: var(--bg-card); border-color: var(--border-color);">
+                    <a href="${art.locked ? art.lockHref : String(art.href || '#').replace(/\.html(?=$|[?#])/i, '')}" class="group rounded-xl border text-card-foreground flex h-full min-h-[390px] cursor-pointer flex-col overflow-hidden border-border/70 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg" style="text-decoration: none; color: inherit; background: var(--bg-card); border-color: var(--border-color);">
                         <div class="relative h-52 overflow-hidden">
                             <img loading="lazy" decoding="async" src="${art.image}" alt="${String(art.title).replace(/"/g, '&quot;')}" onerror="this.style.visibility='hidden'" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"></div>
@@ -2526,7 +2472,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         </div>
                         <div class="flex flex-col p-6 pb-3"><div class="font-semibold line-clamp-2 text-xl leading-snug" style="color: var(--text-primary);">${art.title}</div></div>
                         <div class="p-6 pt-0 pb-4"><div class="text-muted-foreground line-clamp-3 text-base leading-7" style="color: var(--text-secondary);">${art.description}</div></div>
-                        <div class="flex items-center p-6 mt-auto px-6 pb-5 pt-0"><span class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 transition-colors group-hover:text-indigo-800">${art.locked ? '🔒 Get Access' : 'Read article'}<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
+                        <div class="flex items-center p-6 mt-auto px-6 pb-5 pt-0"><span class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 transition-colors group-hover:text-indigo-800">${art.locked ? '🔒 Get Access · ' + art.planLabel : 'Read article'}<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
                     </a>
                 `
             ).join('');
@@ -2599,7 +2545,10 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                     articlesData.push({
                         id: 1000 + items.length - i, title: esc(m.title), passage: esc(m.level || m.passageLabel || 'Passage 1'), topic: esc(cap(m.topic)),
                         date: m.date || m.createdAt, image: esc(m.imageUrl || m.coverUrl || ''), description: esc(m.description || m.lead || m.source || ''),
-                        href: '/collections/article?id=' + encodeURIComponent(m.id), locked: !!m.locked
+                        href: '/collections/article?id=' + encodeURIComponent(m.id), locked: !!m.locked,
+                        // a locked article goes to the Price page of the plan it needs (like the locked test cards)
+                        lockHref: '/Price?premium=required&plan=' + encodeURIComponent(m.plan || 'standard') + '&next=' + encodeURIComponent('/collections/article?id=' + m.id),
+                        planLabel: ({ standard: 'Standard', max: 'Max', ultra: 'Ultra' })[m.plan] || 'Premium'
                     });
                 });
                 if (items.length) renderArticles();

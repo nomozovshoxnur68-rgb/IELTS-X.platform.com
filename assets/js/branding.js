@@ -66,7 +66,7 @@
     function start() {
         if (cached) run(cached);
         if (!window.fetch || location.protocol === 'file:') return;
-        fetch('/api/branding', { credentials: 'same-origin' })
+        fetch('/api/branding', { credentials: 'same-origin', cache: 'no-cache' })
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (d) {
                 if (!d) return;

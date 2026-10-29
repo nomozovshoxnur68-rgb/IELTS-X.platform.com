@@ -205,7 +205,8 @@ server.listen(0, async () => {
     assert.equal((await call('POST', '/api/admin/branding', { jar: user, body: { logoUrl: 'https://cdn.example.com/x.png' } })).status, 403);
     r = await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: 'https://cdn.example.com/logo.png', iconUrl: 'javascript:alert(1)' } });
     assert.equal(r.status, 200); assert.equal(r.json.branding.logoUrl, 'https://cdn.example.com/logo.png'); assert.equal(r.json.branding.iconUrl, '');
-    r = await call('GET', '/api/branding'); assert.equal(r.json.logoUrl, 'https://cdn.example.com/logo.png'); assert.ok(/max-age/.test(r.headers.get('cache-control')));
+    // no-cache: a stale cached answer used to take a just-saved logo off the next page
+    r = await call('GET', '/api/branding'); assert.equal(r.json.logoUrl, 'https://cdn.example.com/logo.png'); assert.ok(/no-cache/.test(r.headers.get('cache-control')));
     await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: '', iconUrl: '' } });
     assert.equal((await call('GET', '/api/branding')).json.logoUrl, ''); ok('site logo: admin only, links checked, public read');
 
@@ -651,6 +652,15 @@ server.listen(0, async () => {
       assert.ok(page.text.includes('"finishUrl":"/full-tests/listening/"'), 'Finish goes back to the Full Listening page');
       assert.ok((await call('GET', lp.href || '/sections/test-' + lp.data.no, { jar: boss })).text.includes('"finishUrl":"/part/practice/listening"'), 'Finish of a section goes back to the practice page');
       for (const f of ['pdf.min.js', 'pdf.worker.min.js']) { const r = await call('GET', '/assets/js/vendor/pdfjs/' + f); assert.equal(r.status, 200, f); assert.ok(/javascript/.test(r.headers.get('content-type') || ''), f + ' type'); }
+      for (const s of ['reading', 'listening', 'writing', 'speaking']) for (const m of ['part', 'full']) { const r = await call('GET', `/assets/samples/${s}-${m}.pdf`); assert.equal(r.status, 200, s + '-' + m); assert.ok(r.text.startsWith('%PDF-'), s + '-' + m + ' is a PDF'); }
+      // a locked article names its plan; the old saved article pages are gone
+      const art = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'article', title: 'Max article', premium: true, data: { lead: 'x', body: 'y' } } })).json.item;
+      await call('POST', '/api/admin/access', { jar: boss, body: { changes: [{ key: 'mat:' + art.id, mode: 'max' }] } });
+      const artPub = (await call('GET', '/api/materials?type=article')).json.items.find((x) => x.id === art.id);
+      assert.ok(artPub.locked && artPub.plan === 'max', 'the list says it is a Max article');
+      assert.equal((await call('GET', '/api/materials/' + art.id)).status, 401);
+      assert.equal((await call('GET', '/collections/article-1')).status, 404);
+      await call('DELETE', '/api/admin/materials/' + art.id, { jar: boss });
       // Part -> Full: the same test moves to the other list (a section number is dropped)
       const moved = (await call('PATCH', '/api/admin/materials/' + lp.id, { jar: boss, body: { data: { ...lp.data, mode: 'full' } } })).json.item;
       assert.equal(moved.data.mode, 'full'); assert.equal(moved.data.no, 0);

@@ -98,8 +98,11 @@ they are saved in `uploads/`.
 Every article page uses the same files: the site shell (sidebar, header, light/dark) like the Articles list,
 `assets/css/article.css` for the reading area and `assets/js/article.js` for Read / Review tabs, text size, font and the word pop-up.
 
-* **Saved articles** `collections/article-1.html` ... `article-6.html`: the text is in the HTML, the word list in
-  `<script type="application/json" id="article-data">` (vocabulary with English / O‘zbekcha / Русский / synonyms, grammar points).
+* The old hand-made article pages (`collections/article-1.html` … `article-6.html`) were removed (October 2026): every article
+  now comes from the admin panel, so every article can be locked. `article.js` still reads an embedded
+  `<script type="application/json" id="article-data">` if a saved page is ever added again.
+* **Lock**: the article form and its card have **Free / Standard / Max / Ultra**. A locked article's card says
+  “🔒 Get Access · Max” and opens the Price page for that plan; the article page itself names the plan it needs.
 * **Admin articles** (`/admin#article` -> **+ New article**): title, topic, level (Passage 1-3), lead, cover picture, the text
   (empty line between paragraphs, `## Heading` for a heading), source, and in the same form the **vocabulary** and **grammar**
   lists. **Paste many** adds a whole list at once: one word per line `word | definition | o‘zbekcha | русский | synonyms | example`
@@ -126,7 +129,8 @@ The Node server refuses locked test pages itself; on Vercel `middleware.js` does
 ## Logo (`/admin#branding`)
 
 Upload a **Logo** (wide: sign-in, password and legal pages) and/or an **Icon** (square: the sidebars, the header of every
-test and the browser tab), or paste an https link, then **Save**. One picture is enough: it is used for both. The server keeps
+test and the browser tab), or paste an https link, then **Save**. PNG, JPG, WebP or SVG (an SVG is turned into a PNG in the
+browser, a big picture is made smaller); `/api/branding` is sent `no-cache`, so a saved logo shows on the next page at once. One picture is enough: it is used for both. The server keeps
 them in `ieltsx_settings` (`branding`, served by `GET /api/branding`), and `assets/js/branding.js` swaps the IELTSX logo
 and the red placeholder mark of the test pages for them. It is loaded by `site-access.js`, `full-mock/js/bridge.js` and a
 `<script>` tag on the pages without them. **Use the IELTSX logo** puts the built-in logo back.
@@ -260,3 +264,17 @@ PDF is not uploaded), drops repeated headers / page numbers and fills the form w
 
 Also: **Finish** on the Listening results goes back to the Listening practice page (a full paper: the Full Listening page) instead
 of restarting the test, and the Writing exam screen uses medium sizes (52 px arrows, 60 px bottom bar).
+
+## Sample PDFs, first visit, Writing start screen (October 2026)
+
+* **Sample PDFs** `assets/samples/{reading,listening,writing,speaking}-{part,full}.pdf` (made by `npm run build:samples`,
+  `scripts/make-sample-pdfs.js`, texts written for IELTSX). Each form of the admin panel links its sample (**📄 Sample PDF**) next
+  to **Upload PDF**; they show the layout the importer reads and cover the question types: True/False/Not Given, Yes/No/Not Given,
+  matching headings (i–vii), matching information (paragraph letters), matching features, sentence endings, multiple choice,
+  choose TWO, sentence / notes / form / summary completion (also with a word list), short answers, map labelling, the answer key
+  in columns, an audioscript with PART 1–4, writing tasks with a chart and model answers, speaking Parts 1–3.
+* The importer also reads: `21–22` question ranges, “IN EITHER ORDER B C” keys, a list of endings / words printed after the
+  questions, word boxes printed in columns, “Label the map” groups (map type), map letters printed on the picture (ignored).
+* **First visit**: a signed-out visitor who has never been to the site is sent to `/login?next=<the page>` once
+  (`site-access.js`, flag `ix-first-visit-done` in localStorage); later visits and search-engine robots are not redirected.
+* **Writing start screen**: the card no longer gets squeezed to the window height (it hid the Start button); the screen scrolls.

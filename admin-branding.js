@@ -47,7 +47,7 @@
 
   function pick() {
     return new Promise((resolve) => {
-      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp';
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.png,.jpg,.jpeg,.webp,.svg,.gif,image/png,image/jpeg,image/webp,image/svg+xml,image/gif';
       inp.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(inp);
       const done = (f) => { try { inp.remove(); } catch (e) { /* gone */ } resolve(f); };
       inp.addEventListener('cancel', () => done(null));
@@ -55,9 +55,27 @@
       inp.click();
     });
   }
+  /* an SVG logo is turned into a PNG (an SVG file can carry scripts, the server never takes one), and a big photo is made
+     smaller in the browser (the server takes up to 3 MB); a transparent background stays transparent */
+  async function prepare(f) {
+    const svg = /\.svg$/i.test(f.name) || f.type === 'image/svg+xml';
+    if (!svg && f.size <= 900 * 1024) return f;
+    // a data: address (the admin page allows data: pictures, not blob:)
+    const url = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(new Error('This picture could not be read.')); fr.readAsDataURL(f); });
+    {
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('This picture could not be opened.')); i.src = url; });
+      let w = img.naturalWidth || 600, h = img.naturalHeight || 160; const k = Math.min(svg ? 4 : 1, 1200 / Math.max(w, h)); w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+      let blob = await new Promise((res) => c.toBlob(res, 'image/png'));
+      if (blob && blob.size > 2.5 * 1024 * 1024) blob = await new Promise((res) => c.toBlob(res, 'image/webp', 0.9));
+      if (!blob) throw new Error('This picture could not be converted.');
+      return new File([blob], f.name.replace(/\.\w+$/, '') + (blob.type === 'image/webp' ? '.webp' : '.png'), { type: blob.type });
+    }
+  }
   async function upload(key) {
-    const f = await pick(); if (!f) return;
-    if (!/\.(png|jpe?g|webp)$/i.test(f.name)) return toast('Use a PNG, JPG or WebP picture.', true);
+    let f = await pick(); if (!f) return;
+    if (!/\.(png|jpe?g|webp|svg|gif)$/i.test(f.name)) return toast('Use a PNG, JPG, WebP or SVG picture.', true);
+    try { f = await prepare(f); } catch (e) { return fail(e); }
     if (f.size > 3 * 1024 * 1024) return toast('The picture is larger than 3 MB. Make it smaller and try again.', true);
     const st = $(`[data-br-status="${key}"]`); busy++; render(); const st2 = $(`[data-br-status="${key}"]`); if (st2) st2.textContent = 'Uploading ' + f.name + ' …';
     try {

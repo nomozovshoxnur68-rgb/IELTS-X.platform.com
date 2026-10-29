@@ -1137,7 +1137,8 @@ async function api(req, res, url) {
   }
 
   /* ---- plans + orders (manual payment confirmed by an admin, or by a signed webhook) ---- */
-  if (method === 'GET' && p === '/api/branding') return send(res, 200, await getBranding(), { 'Cache-Control': 'public, max-age=60' });
+  // no-cache: a browser that kept the old (empty) answer used to take a just-saved logo off the next page it opened
+  if (method === 'GET' && p === '/api/branding') return send(res, 200, await getBranding(), { 'Cache-Control': 'no-cache' });
   if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions }, { 'Cache-Control': 'no-store' }); }
   if (p === '/api/orders' && method === 'POST') {
     const u = await requireUser(req); rateLimit('order:' + u.id, 10, 60 * 60000);
@@ -1229,7 +1230,10 @@ async function api(req, res, url) {
     const u = await currentUser(req);
     if (!m || (m.published === false && !isAdmin(u))) throw new HttpError(404, 'Test not found.');
     const rule = materialRule(m, await accessRules());
-    if (!allowsLevel(rule, userLevel(u))) throw new HttpError(u ? 403 : 401, u ? (rule.plan === 'max' ? 'This test is for Max members.' : 'This test is for Premium members.') : 'Please sign in to open this test.');
+    if (!allowsLevel(rule, userLevel(u))) {
+      const what = m.type === 'article' ? 'article' : 'test'; const plan = ({ standard: 'Standard', max: 'Max', ultra: 'Ultra' })[rule.plan] || 'Premium';
+      throw new HttpError(u ? 403 : 401, u ? `This ${what} is for ${plan} members.` : `Please sign in to open this ${what}.`);
+    }
     const d = m.data || {};
     if (method === 'GET' && !mm[2]) {
       if (m.type === 'vocab') {   // cards are only handed to people who may see them, never cached, and not to scrapers
