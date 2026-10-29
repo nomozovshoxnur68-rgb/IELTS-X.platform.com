@@ -648,6 +648,9 @@ server.listen(0, async () => {
       const page = await call('GET', fl.href, { jar: boss }); assert.equal(page.status, 200);
       assert.ok(page.text.includes('"label":"Full test"') && page.text.indexOf('"partHead":"Part 1"') < page.text.indexOf('"partHead":"Part 2"'), 'parts in order, each with its heading');
       assert.ok(/"from":1,"to":2/.test(page.text), 'a full paper is numbered from 1');
+      assert.ok(page.text.includes('"finishUrl":"/full-tests/listening/"'), 'Finish goes back to the Full Listening page');
+      assert.ok((await call('GET', lp.href || '/sections/test-' + lp.data.no, { jar: boss })).text.includes('"finishUrl":"/part/practice/listening"'), 'Finish of a section goes back to the practice page');
+      for (const f of ['pdf.min.js', 'pdf.worker.min.js']) { const r = await call('GET', '/assets/js/vendor/pdfjs/' + f); assert.equal(r.status, 200, f); assert.ok(/javascript/.test(r.headers.get('content-type') || ''), f + ' type'); }
       // Part -> Full: the same test moves to the other list (a section number is dropped)
       const moved = (await call('PATCH', '/api/admin/materials/' + lp.id, { jar: boss, body: { data: { ...lp.data, mode: 'full' } } })).json.item;
       assert.equal(moved.data.mode, 'full'); assert.equal(moved.data.no, 0);

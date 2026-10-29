@@ -311,6 +311,7 @@
   function openBuilder(type, item, mode) {
     loadRules().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl && draft) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); const pk = document.getElementById('cb-pack-picks'); if (pk && draft) pk.outerHTML = packPicks(); });
     editingId = item ? item.id : null;
+    if (impDoc) { impDoc.close(); impDoc = null; }
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type, mode);
     draft.data = draft.data || {};
     if (MODE_TYPES.includes(draft.type)) draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part';
@@ -344,6 +345,7 @@
     if (uploading && !confirm('A file is still uploading. Close anyway?')) return;
     if (draft && savedDraft(draftKey())) toast('Not saved yet — your work is kept in this browser and offered the next time you open this form.');
     $('#builder').classList.remove('open'); draft = null; editingId = null;
+    if (impDoc) { impDoc.close(); impDoc = null; }
   }
 
   const field = (label, path, val, extra = '') => `<label class="lbl">${label}<input class="field" data-p="${path}" value="${esc(val)}" ${extra}></label>`;
@@ -618,7 +620,9 @@
     if ((m = /^([A-J])((?:\s*(?:,|&|and)\s*[A-J]\b)+)\s*(?:\([^)]*\))?\s*[—–:-]?\s*(.*)$/.exec(r))) return { ans: (m[1] + m[2]).match(/[A-J]/g).join(','), exp: m[3] };
     if ((m = /^([A-J]|i{1,3}|iv|vi{0,3}|ix|xi{0,2}|x)\b\s*(?:\([^)]*\))?\s*[—–:-]?\s*(.*)$/.exec(r))) return { ans: m[1], exp: m[2] };
     if ((m = /^(.+?)(?:\s[—–-]\s|\s\(|:\s|\s{2,})(.*)$/.exec(r)) && m[1].split(/\s+/).length <= 5) return { ans: m[1].replace(/\s*\/\s*/g, '|'), exp: m[2] };
-    const w = r.split(' '); return { ans: w[0], exp: w.slice(1).join(' ') };
+    const w = r.split(' ');
+    if (w.length <= 4) return { ans: r, exp: '' };   // a short typed answer with no explanation: "0781 554 210", "black skirt"
+    return { ans: w[0], exp: w.slice(1).join(' ') };
   }
   function splitKey(text) {
     const lines = String(text || '').replace(/\r/g, '').replace(/\f/g, '\n').split('\n'); let at = -1;
@@ -633,7 +637,8 @@
       if (lone && (Number(lone[1]) > last && Number(lone[1]) <= last + 3 || !last)) { pend = Number(lone[1]); return; }
       if (pend) { const a = keyAnswer(t); cur = { ans: a.ans, exp: a.exp }; key[pend] = cur; last = pend; pend = 0; return; }
       const m = ENTRY.exec(t);
-      if (m && (Number(m[1]) > last && Number(m[1]) <= last + 3 || !last)) {
+      // the next number (a short "11 north" may skip a few: a key that leaves out questions, or two columns read across)
+      if (m && (Number(m[1]) > last && (Number(m[1]) <= last + 3 || (Number(m[1]) <= last + 30 && m[3].split(/\s+/).length <= 4)) || !last)) {
         const a = keyAnswer(m[3]); cur = { ans: a.ans, exp: a.exp }; last = Number(m[2] || m[1]);
         key[Number(m[1])] = cur; if (m[2]) for (let k = Number(m[1]) + 1; k <= Number(m[2]); k++) key[k] = cur;
       } else if (cur && !/^(?:passage|questions?|q\s+answer|#\s*answer)\b/i.test(t)) cur.exp = (cur.exp + ' ' + t).trim();
@@ -664,8 +669,12 @@
         const from = i ? gaps[i - 1].e : 0, to = i + 1 < gaps.length ? gaps[i + 1].s : body.length;
         let left = body.slice(from, g.s); let b, lastB = -1; B.lastIndex = 0; while ((b = B.exec(left))) lastB = b.index + b[0].length; if (lastB >= 0) left = left.slice(lastB);
         let right = body.slice(g.e, to); B.lastIndex = 0; b = B.exec(right); if (b) right = right.slice(0, b.index + 1);
+        // a form / notes line ("Phone: 3 ……", "Address: 2 …… Street") is one question: the next line belongs to it only
+        // when the sentence clearly goes on there (it starts in lower case), the line before only when the gap opens this line
+        const nl = right.indexOf('\n'); if (nl >= 0) { const head = right.slice(0, nl), tail = right.slice(nl + 1); right = /^\s*[a-z(]/.test(tail) && !/[.;:!?]\s*$/.test(head) ? head + ' ' + tail.split('\n')[0] : head; }
+        const pl = left.lastIndexOf('\n'); if (pl >= 0) { const own = left.slice(pl + 1), prev = left.slice(0, pl).split('\n').pop(); left = own.trim() || /[.;:!?]\s*$/.test(prev) ? own : prev + ' ' + own; }
         const clip = (t, end) => { const w = t.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean); return end ? w.slice(-14).join(' ') : w.slice(0, 14).join(' '); };
-        out.push(g.n + '. ' + (clip(left, true) + ' ____ ' + clip(right, false)).replace(/^[•\-\s]+/, '').trim());
+        out.push(g.n + '. ' + (clip(left, true) + ' ____ ' + clip(right, false)).replace(/^[•●▪\-\s]+/, '').replace(/\s*[•●▪]+\s*$/, '').trim());
       });
       run = [];
     };
@@ -746,42 +755,314 @@
       b.qs.forEach((q) => {
         let type = forced && forced !== 'auto' ? forced : (b.forceType || detectType(q, b.shared));
         if (L) type = ({ short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap' })[type] || type;
-        if (!(cur && cur.type === type)) { cur = { type, passage: passage || 1, group: first ? b.head : '', blockTitle: '', options: [], items: [], _num: b.num }; first = false; groups.push(cur); }
+        if (!(cur && cur.type === type)) { cur = { type, passage: passage || 1, group: first ? b.head : '', blockTitle: '', options: [], items: [], _num: b.num, _first: q.num }; first = false; groups.push(cur); }
         if (SHARED_OPTS.includes(type) && !cur.options.length) cur.options = (b.shared.length ? b.shared : q.options).slice();
         cur.items.push({ prompt: q.prompt, answer: normAnswer(type, q.answer), explanation: q.explanation, evidence: q.evidence || '', title: '', options: SHARED_OPTS.includes(type) ? [] : (q.options || []).slice() });
       });
     });
-    if (!keepNum) groups.forEach((g) => { delete g._num; });
+    if (!keepNum) groups.forEach((g) => { delete g._num; delete g._first; });
     return { groups, skipped: raw.skipped };
   }
-  /* a whole full test: PASSAGE 1 / text / Questions 1–13 … / PASSAGE 2 … */
-  function parseFullTest(text) {
-    const sk = splitKey(dropWatermarks(text)); const key = sk.key;
-    const src = sk.text; const re = /^[ \t]*(?:READING[ \t]+)?PASSAGE[ \t]*([123])[ \t]*(?:[:.\-\u2013\u2014][^\n]*)?$|^[^\n]*you should spend about \d+ minutes[^\n]*reading passage[ \t]*([123])\b[^\n]*$/gim; const marks = []; let m;
-    while ((m = re.exec(src))) {
-      const mk = { n: Number(m[1] || m[2]), at: m.index, end: m.index + m[0].length, line: /you should spend/i.test(m[0]) ? '' : m[0].trim() };
-      const prev = marks[marks.length - 1];
-      if (prev && prev.n === mk.n && !src.slice(prev.end, mk.at).trim()) { prev.end = mk.end; continue; }   // "READING PASSAGE 1" + "You should spend …" = one marker
-      marks.push(mk);
-    }
-    if (!marks.length) return null;
-    const passages = [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }]; const groups = []; const skipped = [];
-    marks.forEach((mk, k) => {
-      let chunk = src.slice(mk.end, k + 1 < marks.length ? marks[k + 1].at : src.length).replace(/^\n+/, '');
-      let title = (/^[^\n]*?PASSAGE[ \t]*[123][ \t]*[:.\-–—]+[ \t]*(.+)$/i.exec(mk.line) || [])[1] || '';
-      const ls = chunk.split('\n'); const hi = ls.findIndex((l) => P_HEAD.test(l.trim()) || P_INSTR.test(l.trim()));
-      let ptxt = (hi >= 0 ? ls.slice(0, hi) : ls).join('\n').trim(); const qtxt = hi >= 0 ? ls.slice(hi).join('\n') : '';
-      if (!title) { const first = ptxt.split('\n')[0] || ''; if (first && first.length < 120 && !/[.!?]$/.test(first.trim()) && ptxt.split(/\n\s*\n/).length > 1) { title = first.trim(); ptxt = ptxt.split('\n').slice(1).join('\n').trim(); } }
-      passages[mk.n - 1] = { title: title.trim(), passage: ptxt };
-      if (qtxt) { const r = parseGroups(qtxt, 'auto', mk.n, true, key); r.groups.forEach((g) => groups.push(g)); r.skipped.forEach((x) => skipped.push(x)); }
-    });
-    return { passages, groups, skipped };
+  /* ═════════ Fill the form from a PDF (or its text), no marks needed ═════════
+     The text of a test is cut into its parts the way a person reads it:
+       * the tail sections: ANSWERS / Answer key (answers + explanations, by question number), Transcript / Audioscript,
+         Model answer;
+       * the passage = the long runs of running text (long lines that are not questions, options or instructions);
+       * everything else = the questions, read by parseGroups() ("Questions 1–5" blocks, numbered questions, options,
+         numbered gaps inside notes), each group put into its passage / part by its question numbers. */
+  const TRANS_HEAD = /^(?:audio\s*-?\s*scripts?|tape\s*-?\s*scripts?|transcripts?|recording\s*scripts?|listening\s*scripts?)\b[\s:.\-–—]*(?:for\b.*|test\s*\d.*|\d.*)?$/i;
+  const MODEL_HEAD = /^(?:(?:model|sample|example|suggested)\s+(?:answers?|essays?|responses?|reports?|letters?)|band\s*[5-9](?:\.5)?\s+(?:answers?|samples?|essays?|responses?))\b.{0,40}$/i;
+  const PASS_MARK = /^(?:READING\s+)?PASSAGE\s*([123])\b(?:\s*[:.\-–—]\s*(.*))?$/i;
+  const SPEND = /^you should spend about \d+ minutes on questions?\s*(\d+)\s*[-–—]\s*(\d+)[^\n]*?passage\s*([123])/i;
+  const INTRO = /^(?:you should spend about \d+ minutes\b|reading passage\s*[123]\b.{0,40}$|(?:READING\s+)?PASSAGE\s*[123]\b.{0,60}$|(?:IELTS\s+)?(?:academic\s+)?(?:reading|listening|writing|speaking)(?:\s+test\s*\d*)?\s*$|test\s*\d+\s*$)/i;
+  const PART_MARK = /^(?:part|section)\s*([1-4])\b\s*[:.\-–—]?\s*(.{0,60})$/i;
+  const keyHeadAt = (l) => KEY_HEAD.test(l) && l.length < 80 && !/write|boxes|choose|sheet/i.test(l);
+  /* "1 TRUE   2 FALSE   3 C" (an answer key printed in columns) -> one answer per line */
+  function keyLines(text) {
+    return String(text || '').split('\n').reduce((out, line) => {
+      line.split(/\s{3,}|\t+/).forEach((piece) => {
+        const p = piece.trim(); if (!p) return;
+        const parts = p.split(/\s+(?=(?:Q\s*)?\d{1,2}\s*[.):]?\s+\S)/i); let acc = '', last = 0;
+        parts.forEach((x) => { const n = Number((/^(?:Q\s*)?(\d{1,2})/i.exec(x) || [])[1] || 0); if (acc && n && n > last && n <= last + 3) { out.push(acc); acc = x; last = n; } else { acc = acc ? acc + ' ' + x : x; if (!last && n) last = n; } });
+        if (acc) out.push(acc);
+      });
+      return out;
+    }, []).join('\n');
   }
-  function fullImportBlock() {
-    return `<div class="cb-block cb-import"><div class="cb-head"><div><strong>⚡ Paste the whole test at once (fastest)</strong><div class="muted sm">Passages and all questions in one box. It fills the three passages and every question group for you. <b>Easiest: open the PDF, select all (Ctrl+A), copy and paste it here as it is</b> — if the PDF has an <b>ANSWERS / Answer key</b> section at the end, every answer and explanation is filled in from it, and the words quoted in each explanation are lit up in the passage. Then just look through the groups and fix what the checker shows.</div></div><button class="btn btn-sm btn-primary" data-cb="full-toggle" type="button">Open</button></div>
-      <div id="full-box" hidden><div class="muted sm">A PDF copied as it is works (“READING PASSAGE 1” or “You should spend about 20 minutes … Reading Passage 1” marks each passage; an “ANSWERS” section at the end gives the answers). Or type it: a line <code>PASSAGE 1: Title</code>, then the passage text; then <code>Questions 1–5 …</code> with its questions (as in “Paste many groups”); then <code>PASSAGE 2</code> … and <code>PASSAGE 3</code>. A passage may also have its questions at the very end; in that case the groups are put into the passages by their numbers (1–13, 14–26, 27–40) and you can change a group’s passage with its Passage menu.</div>
-      <textarea class="field" id="full-text" rows="16" placeholder="PASSAGE 1: The history of cakes&#10;Paragraph one…&#10;&#10;A. Paragraph two…&#10;&#10;Questions 1–5 Do the following statements agree with the information in the passage?&#10;1. Glass was first made in Egypt. => TRUE&#10;…&#10;&#10;PASSAGE 2: …"></textarea>
-      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="full-do" type="button">Fill the test from this text</button><span class="muted sm">This replaces the passages and questions already in the form.</span></div></div></div>`;
+  /* the tail sections of the text: answer key, transcript, model answers (each runs to the next one) */
+  function cutSections(text) {
+    const lines = dropWatermarks(text).split('\n'); const heads = [];
+    lines.forEach((l, i) => { const t = l.trim(); if (!t) return; if (keyHeadAt(t)) heads.push({ i, kind: 'key' }); else if (TRANS_HEAD.test(t) && t.length < 70) heads.push({ i, kind: 'transcript' }); });
+    const out = { main: '', key: {}, keyText: '', transcript: '' };
+    const firstAt = heads.length ? heads[0].i : lines.length; out.main = lines.slice(0, firstAt).join('\n');
+    heads.forEach((h, k) => {
+      const body = lines.slice(h.i + 1, k + 1 < heads.length ? heads[k + 1].i : lines.length).join('\n');
+      if (h.kind === 'key') out.keyText += '\n' + body; else out.transcript += (out.transcript ? '\n' : '') + body.trim();
+    });
+    if (out.keyText.trim()) out.key = splitKey('ANSWERS\n' + keyLines(out.keyText)).key;
+    return out;
+  }
+  const GAP_LINE = /\d{1,2}\s*(?:\.{3,}|…+|_{3,})|(?:\.{3,}|…+|_{3,})\s*\d{1,2}\b|_{3,}/;
+  const isQLine = (t) => P_HEAD.test(t) || P_INSTR.test(t) || P_NUM.test(t) || GAP_LINE.test(t) || /^(?:TRUE|FALSE|NOT GIVEN|YES|NO)\b/.test(t) || /^(?:list of\b|nb\b|write\b|choose\b|in boxes\b|answer the\b|look at\b|use no more\b)/i.test(t) || P_ANS.test(t) || P_EXP.test(t);
+  /* a line of the passage: long running text, not a question / instruction (a long "A …" is a paragraph, a short one an option) */
+  const proseLine = (t) => t.length >= 52 && !isQLine(t) && !INTRO.test(t) && !(P_OPT.test(t) && t.length < 78 && !/^[A-J]\s{2,}/.test(t));
+  /* -> { runs: [{ from, to, chars }], lines } ; a run is a stretch of passage text (it ends at the first question line) */
+  function proseRuns(lines) {
+    const runs = []; let cur = null;
+    lines.forEach((l, i) => {
+      const t = l.trim();
+      if (t && (INTRO.test(t) || (isQLine(t) && !proseLine(t)))) { if (cur) { runs.push(cur); cur = null; } return; }
+      if (proseLine(t)) { if (!cur) cur = { from: i, to: i, chars: 0, n: 0 }; cur.to = i; cur.chars += t.length; cur.n += 1; }
+      else if (cur && t && t.length >= 52) { runs.push(cur); cur = null; }   // a long line that is not text (an instruction) ends it too
+    });
+    if (cur) runs.push(cur);
+    // a real passage is long: when there is one, the short runs (a long instruction, an example) are questions;
+    // a short text (one extract, a sample) still gets its longest run as the passage
+    const ok = runs.filter((r) => r.n >= 2 && r.chars >= 160); const big = ok.filter((r) => r.n >= 3 && r.chars >= 450);
+    return big.length ? big : ok.sort((a, b) => b.chars - a.chars).slice(0, 1);
+  }
+  /* PDF lines of a passage -> paragraphs (empty line between) and "A. " paragraph letters, words split at a line end joined */
+  function reflow(lines) {
+    const ts = lines.map((l) => l.replace(/\s+$/, ''));
+    const lens = ts.map((l) => l.trim().length).filter((n) => n > 30).sort((a, b) => a - b); const med = lens[Math.floor(lens.length / 2)] || 80;
+    const paras = []; let cur = '', next = 'A', prevLen = 0;
+    const flush = () => { if (cur.trim()) paras.push(cur.trim()); cur = ''; };
+    ts.forEach((raw) => {
+      const t = raw.trim();
+      if (!t) { flush(); prevLen = 0; return; }
+      if (t === next || t === next + '.') { flush(); cur = next + '. '; next = String.fromCharCode(next.charCodeAt(0) + 1); prevLen = 0; return; }   // a paragraph letter on its own line
+      const m = /^([A-J])(?:\s{2,}|\t|[.)]\s+)(\S.*)$/.exec(t);
+      if (m && m[1] === next && (!cur || /[.!?"”’)]$/.test(cur.trim()))) { flush(); cur = m[1] + '. ' + m[2]; next = String.fromCharCode(next.charCodeAt(0) + 1); prevLen = t.length; return; }
+      const endsSentence = /[.!?"”’:)]$/.test(cur.trim());
+      if (cur && endsSentence && prevLen && prevLen < med * 0.72) flush();          // the short last line of a paragraph
+      if (!cur || /\.\s$/.test(cur)) cur += t;
+      else if (/[a-z]-$/.test(cur) && /^[a-z]/.test(t)) cur = cur.slice(0, -1) + t;  // a word split at the end of a line
+      else cur += ' ' + t;
+      prevLen = t.length;
+    });
+    flush();
+    return paras.join('\n\n');
+  }
+  /* the title right above a passage: a short line that is not an instruction (and not the paragraph letter A) */
+  function titleAbove(lines, at) {
+    for (let i = at - 1; i >= 0 && i >= at - 4; i--) {
+      const t = lines[i].trim(); if (!t) continue;
+      if (INTRO.test(t) || isQLine(t) || t.length > 110 || /^[A-J]$/.test(t)) return null;
+      return { i, text: t.replace(/\s{2,}/g, ' ') };
+    }
+    return null;
+  }
+  const groupNo = (g) => { const m = /(\d+)/.exec(g._num || ''); return m ? Number(m[1]) : Number(g._first) || 0; };
+  /* the question part of a chunk: intro lines left out, and anything before the first question / heading (a book
+     title, a running header) is not a question either */
+  const cleanQText = (lines) => {
+    const ls = lines.filter((l) => !INTRO.test(l.trim()));
+    const first = ls.findIndex((l) => { const t = l.trim(); return P_HEAD.test(t) || P_INSTR.test(t) || P_NUM.test(t) || GAP_LINE.test(t); });
+    return (first > 0 ? ls.slice(first) : first < 0 ? [] : ls).join('\n');
+  };
+
+  /* Reading: part (one passage) or full (three) */
+  function smartReading(text, full) {
+    const sec = cutSections(text); const all = sec.main.split('\n');
+    // passage markers ("READING PASSAGE 2") and "You should spend … Questions 14–26 … Reading Passage 2" give the ranges
+    const ranges = {}; all.forEach((l) => { const m = SPEND.exec(l.trim()); if (m) ranges[m[3]] = [Number(m[1]), Number(m[2])]; });
+    const chunks = [];
+    if (full) {
+      let cur = { n: 1, lines: [], title: '' };
+      all.forEach((l) => { const t = l.trim(); const m = PASS_MARK.exec(t) || (SPEND.exec(t) && [null, SPEND.exec(t)[3], '']);
+        if (m && Number(m[1]) !== cur.n && (cur.lines.some((x) => x.trim()) || Number(m[1]) > 1)) { chunks.push(cur); cur = { n: Number(m[1]), lines: [], title: '' }; }
+        if (m && m[2] && !cur.title) cur.title = m[2].trim();
+        cur.lines.push(l); });
+      chunks.push(cur);
+    } else chunks.push({ n: 1, lines: all, title: '' });
+    const marked = chunks.length > 1;
+    const passages = [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }]; const qparts = []; let pn = 0;
+    chunks.forEach((ch) => {
+      const runs = proseRuns(ch.lines); const used = new Set();
+      // with markers (or a Part test) all long runs of the chunk are its passage; without markers every run is the next
+      // passage (the three longest when there are more)
+      let sets = [runs];
+      if (full && !marked) sets = (runs.length > 3 ? runs.map((r, i) => ({ r, i })).sort((a, b) => b.r.chars - a.r.chars).slice(0, 3).sort((a, b) => a.i - b.i).map((x) => x.r) : runs).map((r) => [r]);
+      sets.forEach((rs) => {
+        if (!rs.length) return;
+        const k = marked ? ch.n - 1 : full ? Math.min(2, pn++) : 0;
+        const title = titleAbove(ch.lines, rs[0].from); if (title) used.add(title.i);
+        const body = []; rs.forEach((r) => { for (let i = r.from; i <= r.to; i++) { used.add(i); body.push(ch.lines[i]); } body.push(''); });
+        passages[k] = { title: (ch.title || (title && title.text) || '').slice(0, 200), passage: reflow(body) };
+      });
+      qparts.push({ n: marked ? ch.n : 0, text: cleanQText(ch.lines.filter((_, i) => !used.has(i))) });
+    });
+    const groups = []; const skipped = [];
+    qparts.forEach((q) => {
+      if (!q.text.trim()) return;
+      const r = parseGroups(q.text, 'auto', q.n || 1, true, sec.key); r.skipped.forEach((x) => skipped.push(x));
+      r.groups.forEach((g) => {
+        const n = groupNo(g);
+        if (full && n) { const hit = Object.entries(ranges).find(([, [a, b]]) => n >= a && n <= b); g.passage = hit ? Number(hit[0]) : n <= 13 ? 1 : n <= 26 ? 2 : 3; }
+        else if (full && !q.n) g.passage = groups.length ? groups[groups.length - 1].passage : 1;
+        delete g._num; delete g._first; groups.push(g);
+      });
+    });
+    return { passages, groups, skipped, keyCount: Object.keys(sec.key).length };
+  }
+
+  /* Listening: questions (parts by their numbers), answer key, transcript */
+  function smartListening(text, full) {
+    const sec = cutSections(text);
+    const lines = sec.main.split('\n').map((l) => { const t = l.trim(); const m = PART_MARK.exec(t); if (!m) return l; return P_HEAD.test(m[2]) ? m[2] : ''; });   // "SECTION 1" lines are not questions
+    const r = parseGroups(cleanQText(lines), 'auto', 1, true, sec.key);
+    let firstNo = 0;
+    r.groups.forEach((g) => { const n = groupNo(g); if (!firstNo && n) firstNo = n; if (full) g.passage = n ? Math.min(4, Math.max(1, Math.ceil(n / 10))) : 1; delete g._num; delete g._first; });
+    // a full transcript keeps "PART 2" lines: the results page makes one tab per part from them
+    const transcript = sec.transcript.split('\n').map((l) => { const m = PART_MARK.exec(l.trim()); return m ? 'PART ' + m[1] : l.trim(); }).filter(Boolean).join('\n');
+    return { groups: r.groups, skipped: r.skipped, transcript, section: firstNo ? 'Section ' + Math.min(4, Math.ceil(firstNo / 10)) : '', keyCount: Object.keys(sec.key).length };
+  }
+
+  /* Writing: "WRITING TASK 1 / 2", the time and word limits, model answers after each task */
+  function smartWriting(text) {
+    const lines = dropWatermarks(text).split('\n'); const tasks = {}; let cur = null, mode = 'prompt';
+    lines.forEach((l) => {
+      const t = l.trim(); let m;
+      if ((m = /^(?:writing\s+)?task\s*([12])\b\s*[:.\-–—]?\s*(.*)$/i.exec(t)) && t.length < 60 && !/model|sample/i.test(t)) { cur = tasks[m[1]] = tasks[m[1]] || { n: Number(m[1]), prompt: [], sample: [] }; mode = 'prompt'; if (m[2]) cur.prompt.push(m[2]); return; }
+      if (MODEL_HEAD.test(t) || /^(?:task\s*[12]\s+)?(?:model|sample)\s+answer/i.test(t)) { const tm = /task\s*([12])/i.exec(t); if (tm) cur = tasks[tm[1]] = tasks[tm[1]] || { n: Number(tm[1]), prompt: [], sample: [] }; if (!cur) cur = tasks[1] = { n: 1, prompt: [], sample: [] }; mode = 'sample'; return; }
+      if (!cur) { if (t) { cur = tasks[1] = { n: 1, prompt: [], sample: [] }; } else return; }
+      if (mode === 'prompt') {
+        if ((m = /you should spend about (\d+) minutes on this task/i.exec(t))) { cur.minutes = Number(m[1]); const rest = t.replace(m[0], '').replace(/^[.\s]+/, ''); if (rest) cur.prompt.push(rest); return; }
+        if ((m = /^write at least (\d+) words\.?$/i.exec(t))) { cur.minWords = Number(m[1]); return; }
+        cur.prompt.push(l);
+      } else cur.sample.push(l);
+    });
+    const tidy = (ls) => reflow(ls).replace(/^\s+|\s+$/g, '');
+    return Object.values(tasks).sort((a, b) => a.n - b.n).map((x) => ({ n: x.n, prompt: tidy(x.prompt), sample: tidy(x.sample), minutes: x.minutes, minWords: x.minWords })).filter((x) => x.prompt || x.sample);
+  }
+
+  /* Speaking: PART 1 questions, PART 2 cue card, PART 3 questions */
+  function smartSpeaking(text) {
+    const lines = dropWatermarks(text).split('\n'); const parts = {}; let cur = null;
+    lines.forEach((l) => {
+      const t = l.trim(); if (!t) return; let m;
+      if ((m = /^part\s*([123])\b\s*[:.\-–—]?\s*(.{0,80})$/i.exec(t))) { cur = parts[m[1]] = parts[m[1]] || { n: Number(m[1]), topic: m[2] || '', lines: [] }; return; }
+      if (!cur) cur = parts[1] = { n: 1, topic: '', lines: [] };
+      cur.lines.push(t);
+    });
+    const qOf = (ls) => ls.map((x) => x.replace(/^(?:[-•●▪*]|\d{1,2}[.)])\s*/, '').trim()).filter((x) => /\?$/.test(x));
+    return Object.values(parts).sort((a, b) => a.n - b.n).map((p) => {
+      if (p.n === 2) {   // the cue card is the whole text; follow-up questions after it stay questions
+        const qs = []; const card = p.lines.filter((x) => { if (/\?$/.test(x) && !/^describe\b/i.test(x)) { qs.push(x.replace(/^(?:[-•●▪*]|\d{1,2}[.)])\s*/, '')); return false; } return true; });
+        return { n: 2, prompt: card.map((x) => x.replace(/^[•●▪*]\s*/, '- ')).join('\n'), questions: qs, topic: p.topic };
+      }
+      const qs = qOf(p.lines); const intro = p.lines.filter((x) => !/\?$/.test(x) && x.length < 80 && !/^(?:[-•●▪*]|\d{1,2}[.)])/.test(x));
+      return { n: p.n, prompt: p.topic || (intro.length && intro.length <= 2 ? intro.join(' · ') : ''), questions: qs, topic: p.topic };
+    }).filter((p) => p.prompt || p.questions.length);
+  }
+
+  /* run the right reader and put the result into the form; returns the lines of the report shown under the import box */
+  function fillFromText(text) {
+    const t = draft.type, d = draft.data, full = d.mode === 'full'; const rep = []; let skipped = [];
+    const qCount = (gs) => gs.reduce((n, g) => n + g.items.length, 0), withAns = (gs) => gs.reduce((n, g) => n + g.items.filter((it) => String(it.answer || '').trim()).length, 0), withExp = (gs) => gs.reduce((n, g) => n + g.items.filter((it) => String(it.explanation || '').trim()).length, 0);
+    const words = (s) => String(s || '').split(/\s+/).filter(Boolean).length;
+    if (t === 'reading') {
+      const r = smartReading(text, full); skipped = r.skipped;
+      if (full) { d.passages = r.passages; r.passages.forEach((p, k) => { if (p.passage) rep.push('Passage ' + (k + 1) + (p.title ? ' “' + p.title + '”' : '') + ': ' + words(p.passage) + ' words'); }); }
+      else { d.passage = r.passages[0].passage; if (r.passages[0].passage) rep.push('Passage' + (r.passages[0].title ? ' “' + r.passages[0].title + '”' : '') + ': ' + words(d.passage) + ' words'); if (!draft.title && r.passages[0].title) draft.title = r.passages[0].title; }
+      if (!rep.length) rep.push('⚠ No passage text found (no long paragraphs). Paste it into the passage box yourself.');
+      draft.groups = r.groups.length ? r.groups : [newGroup('short')];
+      rep.push(qCount(r.groups) + ' questions in ' + r.groups.length + ' group(s)', withAns(r.groups) + ' with an answer' + (r.keyCount ? ' (answer key: ' + r.keyCount + ')' : ''), withExp(r.groups) + ' with an explanation');
+    } else if (t === 'listening') {
+      const r = smartListening(text, full); skipped = r.skipped;
+      draft.groups = r.groups.length ? r.groups : [newGroup('gap')];
+      if (r.transcript) { d.transcript = r.transcript; rep.push('Transcript: ' + words(r.transcript) + ' words'); }
+      if (!full && r.section) { d.sectionLabel = r.section; rep.push('Card tag: ' + r.section + ' (from the question numbers)'); }
+      rep.push(qCount(r.groups) + ' questions in ' + r.groups.length + ' group(s)' + (full ? ' · Parts: ' + [1, 2, 3, 4].map((p) => qCount(r.groups.filter((g) => g.passage === p))).join(' / ') : ''), withAns(r.groups) + ' with an answer' + (r.keyCount ? ' (answer key: ' + r.keyCount + ')' : ''), withExp(r.groups) + ' with an explanation');
+    } else if (t === 'writing') {
+      const ts = smartWriting(text); if (!ts.length) return ['⚠ No “Task 1” / “Task 2” text found.'];
+      d.tasks = ts.map((x) => { const b = blankTask(x.n); return { ...b, prompt: x.prompt, sample: x.sample, minutes: x.minutes || b.minutes, minWords: x.minWords || b.minWords }; });
+      ts.forEach((x) => rep.push('Task ' + x.n + ': ' + words(x.prompt) + ' words of question' + (x.sample ? ' · model answer ' + words(x.sample) + ' words' : '')));
+      if (!full && ts.length > 1) rep.push('Two tasks found: this is a full test. Use “→ Full” on its card after saving, or remove one task.');
+      if (ts.some((x) => x.n === 1)) rep.push('Task 1 chart: pick its page below and add it as the Task 1 picture.');
+    } else if (t === 'speaking') {
+      const ps = smartSpeaking(text); if (!ps.length) return ['⚠ No “Part 1 / Part 2 / Part 3” text found.'];
+      d.parts = ps.map((x) => ({ ...blankPart(x.n), prompt: x.prompt, questions: x.questions }));
+      ps.forEach((x) => rep.push('Part ' + x.n + ': ' + (x.n === 2 ? 'cue card' + (x.questions.length ? ' + ' + x.questions.length + ' questions' : '') : x.questions.length + ' questions')));
+    }
+    if (skipped.length) rep.push('⚠ ' + skipped.length + ' line(s) not understood, e.g. “' + String(skipped[0]).slice(0, 60) + '…” — check the groups');
+    return rep;
+  }
+  let impDoc = null;                                   // the PDF opened in the import block (its pages can be cut into pictures)
+  function importBlock() {
+    const t = draft.type; const what = { reading: 'the passage' + (draft.data.mode === 'full' ? 's' : '') + ', every question group with its answer and explanation', listening: 'every question group (Parts by their numbers), the answers and explanations from the answer key, the transcript', writing: 'the Task 1 / Task 2 questions, time and word limits, model answers', speaking: 'Part 1 questions, the Part 2 cue card, Part 3 questions' }[t];
+    return `<div class="cb-block cb-import"><div class="cb-head"><div><strong>⚡ Fill from a PDF — or paste the whole text</strong><div class="muted sm">Upload the test as it is (no marks needed): ${what} are put into their places. The PDF is read in this browser. Then look through the form and fix what the checker shows.</div></div>
+      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="imp-pdf" type="button">⬆ Upload PDF</button><button class="btn btn-sm" data-cb="imp-toggle" type="button">Paste text</button></div></div>
+      <div class="muted sm" id="imp-status"></div>
+      <div id="imp-box" ${draft._import ? '' : 'hidden'}><textarea class="field cb-mono" id="imp-text" rows="10" placeholder="Paste everything here: the passage, the questions, the ANSWERS / answer key with explanations${t === 'listening' ? ', the transcript' : ''}…">${esc(draft._import || '')}</textarea>
+        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="imp-do" type="button">Fill the form from this text</button><span class="muted sm">Replaces what is in the form now.</span></div></div>
+      <div id="imp-report">${draft._report ? `<ul class="cb-report">${draft._report.map((x) => `<li class="${/^⚠/.test(x) ? 'warn' : ''}">${esc(x)}</li>`).join('')}</ul>` : ''}</div>
+      <div id="imp-pages">${impDoc ? pagesStrip() : ''}</div></div>`;
+  }
+  function pagesStrip() {
+    return `<div class="cb-pages"><span class="muted sm">PDF pages — open one to cut a chart / map / diagram out of it:</span>${Array.from({ length: impDoc.pages }, (_, i) => `<button class="chip" data-cb="imp-page" data-n="${i + 1}" type="button">${i + 1}</button>`).join('')}</div><div id="imp-crop"></div>`;
+  }
+  /* where a picture cut from the PDF can go, for this kind of test */
+  function picTargets() {
+    const t = draft.type, d = draft.data; const out = [];
+    if (t === 'writing') (d.tasks || []).forEach((x, i) => out.push(['task:' + i, (x.title || 'Task ' + (i + 1)) + ' picture']));
+    if (t === 'speaking') (d.parts || []).forEach((x, i) => out.push(['part:' + i, String(x.title || 'Part ' + (i + 1)).split('·')[0].trim() + ' picture']));
+    if (t === 'reading' || t === 'listening') out.push(['images', t === 'listening' ? 'Pictures (map / plan / diagram)' : 'Pictures for the passage']);
+    if (d.mode !== 'full' && (t === 'reading' || t === 'listening' || t === 'writing')) out.push(['cover', 'Card picture']);
+    return out;
+  }
+  async function showPage(n) {
+    const box = $('#imp-crop'); if (!box || !impDoc) return;
+    box.innerHTML = '<div class="muted sm">Drawing page ' + n + ' …</div>';
+    const c = await impDoc.render(n, 2); c.className = 'cb-crop-canvas'; c.dataset.n = n;
+    box.innerHTML = `<div class="muted sm">Page ${n}. Drag over the picture to select it (or use the whole page).</div><div class="cb-crop" id="imp-crop-area"><div class="cb-crop-sel" id="imp-sel" hidden></div></div>
+      <div class="btn-row"><select class="field" id="imp-target" style="width:auto">${picTargets().map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select><button class="btn btn-sm btn-primary" data-cb="imp-cut" type="button">Add selected area</button><button class="btn btn-sm" data-cb="imp-cut" data-whole="1" type="button">Add whole page</button></div>`;
+    $('#imp-crop-area').prepend(c);
+    const area = $('#imp-crop-area'), sel = $('#imp-sel'); let start = null;
+    const pos = (e) => { const r = c.getBoundingClientRect(); return { x: Math.max(0, Math.min(r.width, e.clientX - r.left)), y: Math.max(0, Math.min(r.height, e.clientY - r.top)) }; };
+    area.onpointerdown = (e) => { start = pos(e); area.setPointerCapture(e.pointerId); sel.hidden = false; Object.assign(sel.style, { left: start.x + 'px', top: start.y + 'px', width: '0px', height: '0px' }); e.preventDefault(); };
+    area.onpointermove = (e) => { if (!start) return; const p = pos(e); Object.assign(sel.style, { left: Math.min(p.x, start.x) + 'px', top: Math.min(p.y, start.y) + 'px', width: Math.abs(p.x - start.x) + 'px', height: Math.abs(p.y - start.y) + 'px' }); };
+    area.onpointerup = () => { start = null; if (parseFloat(sel.style.width) < 8 || parseFloat(sel.style.height) < 8) sel.hidden = true; };
+  }
+  async function cutPicture(whole) {
+    const c = $('#imp-crop-area canvas'), sel = $('#imp-sel'); if (!c) return;
+    const r = c.getBoundingClientRect(); const k = c.width / r.width;
+    const box = whole || sel.hidden ? { x: 0, y: 0, w: c.width, h: c.height } : { x: parseFloat(sel.style.left) * k, y: parseFloat(sel.style.top) * k, w: parseFloat(sel.style.width) * k, h: parseFloat(sel.style.height) * k };
+    const out = document.createElement('canvas'); out.width = Math.round(box.w); out.height = Math.round(box.h);
+    out.getContext('2d').drawImage(c, box.x, box.y, box.w, box.h, 0, 0, out.width, out.height);
+    const blob = await new Promise((res) => out.toBlob(res, 'image/jpeg', 0.9)); if (!blob) return toast('Could not make the picture.', true);
+    const file = new File([blob], 'pdf-page-' + c.dataset.n + '.jpg', { type: 'image/jpeg' });
+    const status = $('#imp-status'); uploading++; syncSave(); if (status) status.textContent = 'Uploading the picture …';
+    try {
+      const url = await uploadFile(file); const target = ($('#imp-target') || {}).value || 'images'; const d = draft.data;
+      if (target === 'images') (d.images = d.images || []).push({ url, caption: '', passage: 1 });
+      else if (target === 'cover') d.coverUrl = url;
+      else if (target.startsWith('task:')) d.tasks[Number(target.slice(5))].imageUrl = url;
+      else if (target.startsWith('part:')) d.parts[Number(target.slice(5))].imageUrl = url;
+      toast('Picture added'); renderBuilder(); autosave();
+    } catch (e) { fail(e); } finally { uploading--; syncSave(); if (status) status.textContent = ''; }
+  }
+  async function importPdf() {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.pdf,application/pdf'; inp.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(inp);
+    const file = await new Promise((res) => { inp.onchange = () => res(inp.files && inp.files[0]); inp.addEventListener('cancel', () => res(null)); inp.click(); });
+    inp.remove(); if (!file) return;
+    const status = $('#imp-status'); if (status) status.textContent = 'Reading ' + file.name + ' …';
+    try {
+      if (impDoc) impDoc.close();
+      impDoc = await window.IXImport.open(file);
+      if (impDoc.scanned) { if (status) status.textContent = ''; draft._report = ['⚠ This PDF has no text in it (it is a scanned picture). Copy the text with an OCR tool (e.g. Google Drive → Open with Google Docs) and paste it with “Paste text”. The pages can still be used as pictures below.']; renderBuilder(); return; }
+      runImport(impDoc.text, file.name);
+    } catch (e) { if (status) status.textContent = ''; fail(e); }
+  }
+  function runImport(text, from) {
+    if (!String(text || '').trim()) return toast('Nothing to read: the text is empty.', true);
+    const hasWork = draft.type === 'reading' || draft.type === 'listening' ? (draft.groups || []).some((g) => g.items.some((it) => it.prompt || it.answer)) : false;
+    if (hasWork && !confirm('This replaces the passage(s) and questions already in the form. Continue?')) return;
+    draft._import = text; draft._report = fillFromText(text);
+    if (!String(draft.title || '').trim() && from) draft.title = from.replace(/\.pdf$/i, '').replace(/[_]+/g, ' ').trim().slice(0, 200);   // no title in the text: the file name
+    renderBuilder(); autosave();
+    toast((from ? from + ': ' : '') + draft._report[0]);
+    if (draft.type === 'reading' || draft.type === 'listening') showIssues(validate());
   }
 
   function tasksBlock() {
@@ -862,14 +1143,15 @@
     const t = draft.type, d = draft.data;
     if (t === 'article') { $('#builder-body').innerHTML = articleForm(); return syncSave(); }
     $('#builder-body').innerHTML = `
-      ${t === 'reading' && d.mode !== 'full' ? readingFormatBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
+      ${t === 'reading' ? readingFormatBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
+      ${MODE_TYPES.includes(t) ? importBlock() : ''}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(d.mode === 'full' ? 'Pack on the Full Tests page — pick one below, or type a new name for a new pack card' : 'Pack line shown on the card (optional, e.g. Starter Pack)', 'pack', draft.pack, 'list="ix-pack-list" placeholder="' + (d.mode === 'full' ? 'e.g. Pack 5 (empty = Practice)' : 'e.g. Starter Pack') + '" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>${d.mode === 'full' ? packPicks() : ''}
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
       <div class="cb-grid">${t === 'article' || t === 'speaking' || t === 'pdf' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <label class="lbl">Who can open it<select class="field" data-p="_access">${ACCESS.map(([v, l]) => `<option value="${v}" ${(draft._access || (draft.premium ? 'standard' : 'free')) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
         <div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div></div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
-      ${t === 'reading' ? (d.mode === 'full' ? readingFormatBlock() + fullImportBlock() : '') + (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
+      ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs.">${esc(d.passage)}</textarea></label>`) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
         <label class="lbl">Audio link (https://… or /uploads/…)<input class="field" data-p="data.audioUrl" value="${esc(d.audioUrl)}" placeholder="https://…/recording.mp3"></label>
         <div class="cb-grid"><label class="lbl">Starts at (seconds, 0 = from the beginning)<input class="field" type="number" min="0" data-p="data.audioStart" data-num="1" value="${esc(d.audioStart || 0)}"></label><label class="lbl">Ends at (seconds, 0 = until the end)<input class="field" type="number" min="0" data-p="data.audioEnd" data-num="1" value="${esc(d.audioEnd || 0)}"></label></div>
@@ -1044,7 +1326,7 @@
         const byNum = isFullListening() && ps && ps.value === 'auto';   // a whole listening paper pasted at once: Questions 1-10 = Part 1, 11-20 = Part 2 …
         const passage = ps && ps.value && !byNum ? Number(ps.value) : (last ? last.passage : 1);
         const r = parseGroups($('#bulk-text').value, type, passage, byNum);
-        if (byNum) { let lastN = 0; r.groups.forEach((g) => { const m = /(\d+)/.exec(g._num || ''); const n = m ? Number(m[1]) : lastN; if (n) { g.passage = Math.min(4, Math.max(1, Math.ceil(n / 10))); lastN = n; } else g.passage = lastN ? Math.min(4, Math.ceil(lastN / 10)) : 1; delete g._num; }); }
+        if (byNum) { let lastN = 0; r.groups.forEach((g) => { const n = groupNo(g) || lastN; if (n) { g.passage = Math.min(4, Math.max(1, Math.ceil(n / 10))); lastN = n; } else g.passage = 1; delete g._num; delete g._first; }); }
         if (!r.groups.length) return toast('Nothing to add. Write each question as:  question => answer => explanation  (or with “Answer:” lines).', true);
         draft.groups = draft.groups.filter((g) => g.items.some((it) => it.prompt || it.answer)).concat(r.groups);
         $('#bulk-text').value = ''; $('#bulk-box').hidden = true; refreshQuestions();
@@ -1069,21 +1351,11 @@
         g.items = g.items.filter((it) => it.prompt || it.answer).concat(qs.map((q) => ({ prompt: q.prompt, answer: normAnswer(g.type, q.answer), explanation: q.explanation, evidence: q.evidence || '', title: '', options: shared ? [] : (q.options || []).slice() })));
         refreshQuestions(); toast(qs.length + ' questions added to group ' + (gi + 1) + (raw.skipped.length ? ' · ' + raw.skipped.length + ' line(s) NOT understood: “' + raw.skipped[0].slice(0, 40) + '…”' : ''), !!raw.skipped.length);
       }
-      else if (a === 'full-toggle') { const b = $('#full-box'); b.hidden = !b.hidden; t.textContent = b.hidden ? 'Open' : 'Close'; }
-      else if (a === 'full-do') {
-        const r = parseFullTest($('#full-text').value);
-        if (!r) return toast('Put “PASSAGE 1”, “PASSAGE 2”, “PASSAGE 3” on their own lines to mark where each passage starts.', true);
-        const marked = (($('#full-text').value.match(/^[ \t]*(?:READING[ \t]+)?PASSAGE[ \t]*[123]\b/gim)) || []).length;
-        if (marked > 1 && r.groups.length && r.groups.every((g) => g.passage === r.groups[0].passage) && r.groups[0].passage === 3 && r.passages[0].passage && r.passages[1].passage) {
-          r.groups.forEach((g) => { const m = /(\d+)/.exec(g._num || ''); const n = m ? Number(m[1]) : 0; if (n) g.passage = n <= 13 ? 1 : n <= 26 ? 2 : 3; });
-        }
-        if (draft.groups.some((g) => g.items.some((it) => it.prompt || it.answer)) && !confirm('This replaces the passages and the questions already in the form. Continue?')) return;
-        r.groups.forEach((g) => { delete g._num; });
-        draft.data.passages = r.passages; draft.groups = r.groups.length ? r.groups : [newGroup('short')];
-        renderBuilder(); const nq = r.groups.reduce((n, g) => n + g.items.length, 0);
-        toast(r.passages.filter((x) => x.passage).length + ' passage(s) · ' + nq + ' questions · ' + r.groups.length + ' groups filled in' + (r.skipped.length ? ' · ' + r.skipped.length + ' line(s) NOT understood: “' + r.skipped[0].slice(0, 40) + '…”' : ''), !!r.skipped.length);
-        showIssues(validate());
-      }
+      else if (a === 'imp-pdf') await importPdf();
+      else if (a === 'imp-toggle') { const b = $('#imp-box'); b.hidden = !b.hidden; if (!b.hidden) $('#imp-text').focus(); }
+      else if (a === 'imp-do') runImport($('#imp-text').value);
+      else if (a === 'imp-page') await showPage(Number(t.dataset.n));
+      else if (a === 'imp-cut') await cutPicture(!!t.dataset.whole);
       else if (a === 'pdf-file') { const url = await pickAndUpload('.pdf,application/pdf', $('#pdf-status')); if (url) { draft.data.fileUrl = url; renderBuilder(); } }
       else if (a === 'pdf-file-del') { draft.data.fileUrl = ''; renderBuilder(); }
       else if (a === 'card-img') { const url = await pickAndUpload('image/*', $('#card-img-status')); if (url) { draft.data.coverUrl = url; renderBuilder(); } }

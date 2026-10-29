@@ -242,3 +242,21 @@ The admin menu has two groups: **Tests · Part practice** (`#reading`, `#listeni
 * **Packs** (`#packs`) lists every pack of the four Full Tests pages, the built-in ones too: rename, tier, plan label, section,
   position, hide / show, access, the tests inside, **+ Test** (a new full test in that pack). A built-in pack is changed by an
   override with the same address (kept in `admin-packs`); **Reset** brings back the original.
+
+## Admin: fill a test from its PDF (October 2026)
+
+Every Reading / Listening / Writing / Speaking form (Part and Full) starts with **⚡ Fill from a PDF — or paste the whole text**.
+**Upload PDF** reads the file in the browser (`admin-import.js` + pdf.js in `assets/js/vendor/pdfjs/`, Mozilla, Apache-2.0; the
+PDF is not uploaded), drops repeated headers / page numbers and fills the form with no marks needed:
+
+* **Reading**: the passage = the long runs of running text (title above it, `A.` paragraph letters, words split at line ends
+  joined); a full test is cut at `READING PASSAGE 2/3` (or into its three long texts) and every question group goes to its passage
+  by its numbers. **Listening**: question groups (Parts 1–4 by their numbers), `SECTION 2` lines dropped, the **Audioscript /
+  Transcript** into the transcript. **Writing**: `WRITING TASK 1/2`, time and word limits, **Model answer**. **Speaking**: Part 1
+  questions, Part 2 cue card, Part 3 questions.
+* Answers and explanations come from the **ANSWERS / Answer key** section, also when it is printed in columns (`1 TRUE   2 FALSE`).
+* **PDF pages**: open a page, drag over a chart / map / diagram and add it as a picture (passage, map, Task 1, card).
+* A scanned PDF (no text layer) is reported as such; its pages can still be used as pictures.
+
+Also: **Finish** on the Listening results goes back to the Listening practice page (a full paper: the Full Listening page) instead
+of restarting the test, and the Writing exam screen uses medium sizes (52 px arrows, 60 px bottom bar).

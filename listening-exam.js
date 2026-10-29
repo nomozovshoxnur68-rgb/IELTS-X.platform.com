@@ -122,6 +122,8 @@ function buildConfig(material) {
     id: 'ix-' + String(material.id || 'x').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 24),
     part, from, to,
     label: full ? 'Full test' : undefined,
+    finishUrl: full ? '/full-tests/listening/' : '/part/practice/listening',   // "Finish" on the results screen goes back to the list
+
     minutes: Math.min(60, Math.max(1, parseInt(d.durationMin, 10) || (full ? 30 : 10))),
     name: String(material.title || 'Listening'),
     audioStart: Math.max(0, +d.audioStart || 0),

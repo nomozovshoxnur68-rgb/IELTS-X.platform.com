@@ -1244,6 +1244,12 @@ function finishExam(){
   renderResults();
 }
 function unlockResults(){goToStage('results');renderResults();}
+/* 'Finish' on the results screen: this attempt is done (the result is already saved), so go back to the list the test came from */
+function finishAndLeave(){
+  var url=CFG.finishUrl;
+  if(!url){var p=location.pathname;url=(/^\/(full-tests\/listening|listening)\//i.test(p)||CFG.label)?'/full-tests/listening/':'/part/practice/listening';}
+  window.__cdiIntentionalReload=true;wipeSession();location.href=url;
+}
 function resetExam(){
   /* The confirmation sheet lived on the registration card and went with it, so
      the question is asked plainly instead of silently taking the safe path. */
@@ -1574,7 +1580,7 @@ function renderResults(){
     '<div class="xr-actions">'+
       '<button type="button" class="xr-btn" onclick="window.MockBridge&&MockBridge.reportIssue&&MockBridge.reportIssue()">Report Issue</button>'+
       '<button type="button" class="xr-btn" onclick="ExamApp.reviewExam()">Review Mistakes</button>'+
-      '<button type="button" class="xr-btn dark" onclick="ExamApp.resetExam()">Finish</button>'+
+      '<button type="button" class="xr-btn dark" onclick="ExamApp.finishAndLeave()">Finish</button>'+
     '</div>'+
   '</div>';
 }
@@ -2633,7 +2639,7 @@ window.__mockReview = function(n, ans){
   },60);
 };
 
-return{validateStart,beginListening,beginTest,renderResults,finishExam,jumpToListening,jumpToListeningPart,prevSection,nextSection,toggleFlag,onListeningInput,setDragAnswer,applyHighlight,clearHighlight,addNote,openNote,saveNote,deleteNote,closeNote,toggleAnnoDrawer,jumpToNote,deleteNoteAt,renderNotesDrawer,setVolume,setPlaybackRate,seekAudio,togglePlayPause,dismissWarning,unlockResults,resetExam,reviewExam,confirmSubmit,backToResults,printReport,downloadReport,setTheme,zoomText,toggleFullscreen,toggleTimer,updateListeningNav,jumpToTime,startGatedAudio};
+return{validateStart,beginListening,beginTest,renderResults,finishExam,finishAndLeave,jumpToListening,jumpToListeningPart,prevSection,nextSection,toggleFlag,onListeningInput,setDragAnswer,applyHighlight,clearHighlight,addNote,openNote,saveNote,deleteNote,closeNote,toggleAnnoDrawer,jumpToNote,deleteNoteAt,renderNotesDrawer,setVolume,setPlaybackRate,seekAudio,togglePlayPause,dismissWarning,unlockResults,resetExam,reviewExam,confirmSubmit,backToResults,printReport,downloadReport,setTheme,zoomText,toggleFullscreen,toggleTimer,updateListeningNav,jumpToTime,startGatedAudio};
 })();
 
 // ── DRAG MATCH (pointer-based, robust) ──
