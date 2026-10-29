@@ -119,6 +119,7 @@ async function sb(pathname, options = {}) {
     if (r.status === 401 || r.status === 403 || /invalid api key|jwt/i.test(msg)) throw new HttpError(503, 'The database refused the key. Use the service_role key (not the anon key) as SUPABASE_SERVICE_ROLE_KEY.');
     if (/column .* does not exist|could not find the .* column/i.test(msg)) throw new HttpError(503, 'The database is out of date (a column is missing). Run the whole supabase-schema.sql again in the Supabase SQL editor.');
     if (/relation .* does not exist|could not find the table|schema cache/i.test(msg)) throw new HttpError(503, 'The database tables are missing. Run supabase-schema.sql once in the Supabase SQL editor.');
+    if (/violates check constraint/i.test(msg)) throw new HttpError(503, 'The database does not accept this kind of content yet. Run supabase-schema.sql again in the Supabase SQL editor (its last part allows Writing, Speaking, Articles and PDF).');
     throw new HttpError(500, 'Database error: ' + String(msg).slice(0, 160));
   }
   return data;
@@ -554,7 +555,11 @@ async function ensureBucket() {
 
 /* ───────────────────────── tests created in the admin panel ───────────────────────── */
 const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article', 'vocab', 'pdf'];
-const Q_TYPES = ['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
+/* Every skill comes in two formats: "part" = one passage / section / task / part, a card on the practice page,
+   "full" = a whole paper, listed on the Full Tests page inside its pack. Tests saved before this existed are "part". */
+const MODE_TYPES = ['reading', 'listening', 'writing', 'speaking'];
+const materialMode = (m) => (m && m.data && m.data.mode === 'full' ? 'full' : 'part');
+const Q_TYPES =['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
 const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 const cleanTitle = (v) => String(v || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
@@ -599,6 +604,7 @@ function cleanUrl(v) {
 /* Reading tests get a stable number (test-22, test-23 ... for Part; test-7, test-8 ... for Full) that continues the hand-made pages. */
 async function keepReadingNo(type, data, cur) {
   if (type === 'listening') {   // Listening tests get test-5, test-6 ... after the four hand-made /sections/test-N pages
+    if (data.mode === 'full') { data.no = 0; return data; }   // a full paper (4 parts) opens at /exam/listening/<id>, not as a section
     const L = require('./listening-router');
     if (cur && cur.data && Number(cur.data.no)) { data.no = Number(cur.data.no); return data; }
     data.no = L.nextNumber(ROOT, (await store.listMaterials('listening')).filter((x) => !cur || x.id !== cur.id));
@@ -614,7 +620,10 @@ function cleanMaterialData(type, d) {
   d = d && typeof d === 'object' ? d : {};
   if (type === 'article') return cleanArticleData(d);   // text, cover, vocabulary and grammar (the article reader at /collections/article)
   const out = { durationMin: Math.max(0, Math.min(300, Math.floor(Number(d.durationMin) || 0))), instructions: cut(d.instructions, 3000) };
-  out.images = (Array.isArray(d.images) ? d.images : []).slice(0, 12).map((i) => ({ url: cleanUrl(i && i.url), caption: cut(i && i.caption, 200), passage: [1, 2, 3].includes(Number(i && i.passage)) ? Number(i.passage) : 1 })).filter((i) => i.url);
+  if (MODE_TYPES.includes(type)) out.mode = d.mode === 'full' ? 'full' : 'part';
+  // a picture / question belongs to Passage 1-3 (full reading) or Part 1-4 (full listening)
+  const sections = type === 'listening' ? [1, 2, 3, 4] : [1, 2, 3];
+  out.images = (Array.isArray(d.images) ? d.images : []).slice(0, 12).map((i) => ({ url: cleanUrl(i && i.url), caption: cut(i && i.caption, 200), passage: sections.includes(Number(i && i.passage)) ? Number(i.passage) : 1 })).filter((i) => i.url);
   if (type === 'reading') {
     // Reading comes in two formats: "part" = one passage (like pessages/test-19), "full" = three passages (like full-tests/reading/test-1)
     out.mode = d.mode === 'full' ? 'full' : 'part';
@@ -649,7 +658,7 @@ function cleanMaterialData(type, d) {
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
-      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: [1, 2, 3].includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined };
     }).filter((q) => q.prompt);
@@ -719,7 +728,9 @@ const publicMaterial = (m, withData) => {
   const d = m.data || {};
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
-  if (m.type === 'reading') { base.mode = d.mode === 'full' ? 'full' : 'part'; base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
+  if (MODE_TYPES.includes(m.type)) base.mode = materialMode(m);
+  if (m.type === 'speaking') { base.href = '/test?id=' + encodeURIComponent(m.id); base.partLabels = (d.parts || []).map((t) => t.title || ''); }
+  if (m.type === 'reading') { base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
   if (m.type === 'listening') { base.no = Number(d.no) || 0; base.href = require('./listening-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.sectionLabel = d.sectionLabel || 'Section 1'; base.types = cardTypesOf(d); }
   if (m.type === 'writing') { const ts = d.tasks || []; base.coverUrl = d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl || ''; base.tier = d.tier || 'Tier 1'; base.types = d.cardTypes || [];
     base.taskLabel = ts.length > 1 ? 'Task 1 & 2' : ((ts[0] && ts[0].title) || 'Task 1'); base.href = '/writing/?id=' + encodeURIComponent(m.id); }
@@ -849,7 +860,8 @@ function loadCatalog() {
           return { key: `test:${skill}/${p.slug}/${id}`, id, title: 'Test ' + (n + 1), source: String(t.source || ''), href: String(t.href || ''), tags: t.tags || [],
             def: { locked: t.premium === undefined ? def.locked : !!t.premium, plan: planOf(t.minPlan) || def.plan } };
         });
-        return { key: `pack:${skill}/${p.slug}`, slug: p.slug, title: p.title, tier: p.tier || '', def, tests };
+        const group = (((D.groups || {})[skill] || []).find((g) => (g.packs || []).includes(p.slug)) || {}).title || '';
+        return { key: `pack:${skill}/${p.slug}`, slug: p.slug, title: p.title, tier: p.tier || '', plan: String(p.plan || ''), group, description: String(p.description || ''), def, tests };
       });
       const pc = PRACTICE[skill];
       if (pc) {   // the cards of the practice page (part/practice/<skill>) are managed from the same panel
@@ -918,7 +930,10 @@ function cleanPack(b, cur) {
   b = b || {}; const title = cleanName(b.title !== undefined ? b.title : (cur && cur.title)); if (!title) throw new HttpError(400, 'Pack name is required.');
   const skill = PACK_SKILLS.includes(b.skill) ? b.skill : (cur && cur.skill) || 'reading';
   const pick = (k, n) => (b[k] !== undefined ? cut(b[k], n).trim() : (cur && cur[k]) || '');
-  return { id: (cur && cur.id) || newId(), skill, title, slug: slugOf(title), tier: pick('tier', 20), plan: pick('plan', 12).toUpperCase(), group: pick('group', 60), description: pick('description', 200),
+  // a built-in pack keeps its address when it is renamed: the override stays tied to the slug it was made for
+  const slug = slugOf(b.slug !== undefined ? b.slug : (cur && cur.slug)) || slugOf(title);
+  const order = b.order !== undefined ? Math.max(0, Math.min(999, Math.floor(Number(b.order) || 0))) : (cur && cur.order) || 0;
+  return { id: (cur && cur.id) || newId(), skill, title, slug, tier: pick('tier', 20), plan: pick('plan', 12).toUpperCase(), group: pick('group', 60), description: pick('description', 200), order,
     premium: b.premium !== undefined ? !!b.premium : !!(cur && cur.premium), published: b.published !== undefined ? b.published !== false : !cur || cur.published !== false, createdAt: (cur && cur.createdAt) || new Date().toISOString() };
 }
 async function adminAccessView() {
@@ -927,14 +942,16 @@ async function adminAccessView() {
   const view = (own, parent, def) => { const r = effectiveRule(own, parent, def); return { locked: r.locked, plan: r.plan, mode: modeOf(own) }; };
   const skills = cat.skills.map((sk) => ({
     skill: sk.skill, title: sk.title,
-    packs: sk.packs.map((pk) => ({ key: pk.key, slug: pk.slug, title: pk.title, tier: pk.tier, practice: !!pk.practice, rule: view(rules[pk.key], null, pk.def), def: pk.def,
+    packs: sk.packs.map((pk) => ({ key: pk.key, slug: pk.slug, title: pk.title, tier: pk.tier, plan: pk.plan || '', group: pk.group || '', description: pk.description || '', builtIn: !pk.practice, practice: !!pk.practice, rule: view(rules[pk.key], null, pk.def), def: pk.def,
       tests: pk.tests.map((t) => ({ key: t.key, id: t.id, title: t.title, source: t.source, href: t.href, rule: view(rules[t.key], rules[pk.key], t.def), def: t.def })) }))
   }));
   for (const ap of await getAdminPacks()) {
     const sk = skills.find((x) => x.skill === ap.skill); if (!sk) continue;
-    let pk = sk.packs.find((p) => p.slug === ap.slug || slugOf(p.title) === ap.slug);
-    if (pk) { pk.title = ap.title; pk.tier = ap.tier || pk.tier; continue; }
-    pk = { key: `pack:${ap.skill}/${ap.slug}`, slug: ap.slug, title: ap.title, tier: ap.tier, extra: true, def: { locked: !!ap.premium, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk);
+    let pk = sk.packs.find((p) => !p.practice && (p.slug === ap.slug || slugOf(p.title) === ap.slug));
+    if (!pk) { pk = { key: `pack:${ap.skill}/${ap.slug}`, slug: ap.slug, title: ap.title, tier: ap.tier, extra: true, def: { locked: !!ap.premium, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk); }
+    // the settings made in the Packs page (a built-in pack keeps its tests and address, only its card changes)
+    Object.assign(pk, { title: ap.title, tier: ap.tier || pk.tier, plan: ap.plan || pk.plan || '', group: ap.group || pk.group || '', description: ap.description || pk.description || '',
+      order: ap.order || 0, hidden: ap.published === false, adminId: ap.id });
   }
   const mats = (await store.listMaterials()).filter((m) => m.type !== 'vocab');
   for (const m of mats) {
@@ -943,7 +960,8 @@ async function adminAccessView() {
     let pk = sk.packs.find((p) => p.slug === slug || slugOf(p.title) === slug);
     if (!pk) { pk = { key: `pack:${m.type}/${slug}`, slug, title: m.pack || 'Practice', tier: '', extra: true, def: { locked: false, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk); }
     const parent = rules[pk.key]; const def = { locked: !!m.premium, plan: 'standard' };
-    pk.tests.push({ key: 'mat:' + m.id, id: m.id, title: m.title, source: m.description || '', href: (m.type === 'reading' ? require('./reading-router').hrefFor(m) : m.type === 'listening' ? require('./listening-router').hrefFor(m) : '') || '/test?id=' + m.id, material: true, published: m.published !== false, rule: view(rules['mat:' + m.id], parent, def), def });
+    const href = m.type === 'reading' ? require('./reading-router').hrefFor(m) : m.type === 'listening' ? require('./listening-router').hrefFor(m) : m.type === 'writing' ? '/writing/?id=' + encodeURIComponent(m.id) : '';
+    pk.tests.push({ key: 'mat:' + m.id, id: m.id, title: m.title, source: m.description || '', href: href || '/test?id=' + m.id, material: true, type: m.type, mode: MODE_TYPES.includes(m.type) ? materialMode(m) : '', published: m.published !== false, rule: view(rules['mat:' + m.id], parent, def), def });
   }
   return { skills, plans: ['standard', 'max', 'ultra'] };
 }
@@ -1190,12 +1208,15 @@ async function api(req, res, url) {
   /* ---- public materials (tests the admins added) ---- */
   if (method === 'GET' && p === '/api/packs') {   // the packs the admins made (cards of the Full Tests pages)
     const sk = url.searchParams.get('skill');
-    return send(res, 200, { packs: (await getAdminPacks()).filter((x) => x.published !== false && (!sk || x.skill === sk)) }, { 'Cache-Control': 'no-store, private' });
+    // a hidden pack is only named (so the page can drop a built-in card the admin switched off), never described
+    const packs = (await getAdminPacks()).filter((x) => !sk || x.skill === sk).map((x) => (x.published === false ? { skill: x.skill, slug: x.slug, hidden: true } : x));
+    return send(res, 200, { packs }, { 'Cache-Control': 'no-store, private' });
   }
   if (method === 'GET' && p === '/api/materials') {
     const type = MATERIAL_TYPES.includes(url.searchParams.get('type')) ? url.searchParams.get('type') : '';
+    const mode = ['part', 'full'].includes(url.searchParams.get('mode')) ? url.searchParams.get('mode') : '';   // practice pages ask for "part", the Full Tests pages for "full"
     const u = await currentUser(req); const level = userLevel(u); const rules = await accessRules();
-    const items = (await store.listMaterials(type)).filter((m) => m.published !== false).map((m) => {
+    const items = (await store.listMaterials(type)).filter((m) => m.published !== false && (!mode || !MODE_TYPES.includes(m.type) || materialMode(m) === mode)).map((m) => {
       const r = materialRule(m, rules);
       return { ...publicMaterial(m, false), premium: r.locked, plan: r.plan, locked: !allowsLevel(r, level) };
     });

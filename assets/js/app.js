@@ -1247,7 +1247,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             var ctl = window.AbortController ? new AbortController() : null;
             var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
             var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-            return fetch('/api/materials?type=listening', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+            return fetch('/api/materials?type=listening&mode=part', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
                 .then(function (r) { return r.ok ? r.json() : { items: [] }; })
                 .catch(function () { return { items: [] }; })
                 .then(function (d) {
@@ -1813,7 +1813,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             if (!window.fetch) return Promise.resolve();
             var ctl = window.AbortController ? new AbortController() : null;
             var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
-            return fetch('/api/materials?type=reading', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+            return fetch('/api/materials?type=reading&mode=part', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
                 .then(function (r) { return r.ok ? r.json() : { items: [] }; })
                 .catch(function () { return { items: [] }; })
                 .then(function (d) {
@@ -2280,7 +2280,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             if (!window.fetch) return Promise.resolve();
             var ctl = window.AbortController ? new AbortController() : null;
             var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
-            return fetch('/api/materials?type=writing', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+            return fetch('/api/materials?type=writing&mode=part', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
                 .then(function (r) { return r.ok ? r.json() : { items: [] }; })
                 .catch(function () { return { items: [] }; })
                 .then(function (d) {

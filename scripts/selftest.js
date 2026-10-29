@@ -627,6 +627,43 @@ server.listen(0, async () => {
       }
       assert.ok(checked > 20); ok('browser keys = server keys (' + checked + ' packs and tests)');
     }
+    // --- Part practice / Full tests for all four skills, and built-in packs changed from the admin panel
+    {
+      const mk = async (type, mode, data, pack) => (await call('POST', '/api/admin/materials', { jar: boss, body: { type, title: type + ' ' + mode + ' mode test', pack: pack || '', data: { mode, ...data } } })).json.item;
+      const lp = await mk('listening', 'part', { audioUrl: 'https://example.com/a.mp3', questions: [{ type: 'gap', prompt: 'Name ____', answer: 'Tom' }] });
+      const lf = await mk('listening', 'full', { audioUrl: 'https://example.com/full.mp3', transcript: 'PART 1\nA: My name is Tom\nPART 2\nB: Mill Street', questions: [
+        { type: 'gap', passage: 2, gi: 1, prompt: 'Street ____', answer: 'Mill' }, { type: 'gap', passage: 1, gi: 0, prompt: 'Name ____', answer: 'Tom' }] }, 'Pack 5');
+      const wf = await mk('writing', 'full', { tasks: [{ prompt: 'Task one' }, { prompt: 'Task two', kind: 'task2' }] }, 'Pack 5');
+      const sf = await mk('speaking', 'full', { parts: [{ title: 'Part 1', questions: ['Do you work?'] }, { title: 'Part 2', prompt: 'Describe a book' }] }, 'Jan-August');
+      const sp = await mk('speaking', 'part', { parts: [{ title: 'Part 2', prompt: 'Describe a city' }] });
+      assert.equal(lp.data.mode, 'part'); assert.ok(lp.data.no > 0, 'a section gets its /sections/test-N number');
+      assert.equal(lf.data.mode, 'full'); assert.equal(lf.data.no, 0, 'a full paper is not a section'); assert.equal(lf.data.questions[0].passage, 2, 'Part 4 / 2 kept');
+      const ids = (r) => r.json.items.map((x) => x.id);
+      assert.ok(ids(await call('GET', '/api/materials?type=listening&mode=full')).includes(lf.id) && !ids(await call('GET', '/api/materials?type=listening&mode=full')).includes(lp.id));
+      assert.ok(ids(await call('GET', '/api/materials?type=listening&mode=part')).includes(lp.id) && !ids(await call('GET', '/api/materials?type=listening&mode=part')).includes(lf.id));
+      assert.ok(ids(await call('GET', '/api/materials?type=speaking&mode=full')).includes(sf.id) && ids(await call('GET', '/api/materials?type=speaking&mode=part')).includes(sp.id));
+      assert.ok(ids(await call('GET', '/api/materials?type=writing&mode=full')).includes(wf.id));
+      const fl = (await call('GET', '/api/materials?type=listening&mode=full')).json.items.find((x) => x.id === lf.id);
+      assert.equal(fl.href, '/exam/listening/' + lf.id); assert.equal((await call('GET', '/api/materials?type=speaking')).json.items.find((x) => x.id === sf.id).href, '/test?id=' + sf.id);
+      const page = await call('GET', fl.href, { jar: boss }); assert.equal(page.status, 200);
+      assert.ok(page.text.includes('"label":"Full test"') && page.text.indexOf('"partHead":"Part 1"') < page.text.indexOf('"partHead":"Part 2"'), 'parts in order, each with its heading');
+      assert.ok(/"from":1,"to":2/.test(page.text), 'a full paper is numbered from 1');
+      // Part -> Full: the same test moves to the other list (a section number is dropped)
+      const moved = (await call('PATCH', '/api/admin/materials/' + lp.id, { jar: boss, body: { data: { ...lp.data, mode: 'full' } } })).json.item;
+      assert.equal(moved.data.mode, 'full'); assert.equal(moved.data.no, 0);
+      // a built-in pack: renamed, put first, then hidden (an override with the same slug)
+      const ov = await call('POST', '/api/admin/packs', { jar: boss, body: { skill: 'listening', slug: 'pack-6', title: 'Pack 6 · New name', order: 1, group: 'Recent Exams' } });
+      assert.equal(ov.status, 201); assert.equal(ov.json.pack.slug, 'pack-6', 'the built-in address is kept');
+      let view = (await call('GET', '/api/admin/access', { jar: boss })).json.skills.find((s) => s.skill === 'listening');
+      const p6 = view.packs.find((p) => p.key === 'pack:listening/pack-6'); assert.equal(p6.title, 'Pack 6 · New name'); assert.equal(p6.order, 1); assert.ok(p6.builtIn && p6.adminId);
+      assert.ok(view.packs.find((p) => p.key === 'pack:listening/pack-5').tests.some((t) => t.id === lf.id && t.mode === 'full'));
+      await call('PATCH', '/api/admin/packs/' + ov.json.pack.id, { jar: boss, body: { published: false } });
+      const pub = (await call('GET', '/api/packs?skill=listening')).json.packs.find((x) => x.slug === 'pack-6');
+      assert.ok(pub && pub.hidden && !pub.title, 'a hidden pack is only named');
+      assert.equal((await call('DELETE', '/api/admin/packs/' + ov.json.pack.id, { jar: boss })).status, 200);
+      for (const m of [lp, lf, wf, sf, sp]) await call('DELETE', '/api/admin/materials/' + m.id, { jar: boss });
+      ok('Part / Full tests for Reading, Listening, Writing, Speaking + built-in packs managed from the admin panel');
+    }
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');

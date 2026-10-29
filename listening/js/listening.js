@@ -43,6 +43,7 @@ const ExamApp=(function(){
 const CFG=window.PART_PRACTICE;
 if(!CFG||!CFG.answers||typeof CFG.build!=='function')throw new Error('listening.js: window.PART_PRACTICE is missing or incomplete — define it in the page before this script.');
 const PART_NO=+CFG.part;
+const PART_LABEL=CFG.label||('Part '+PART_NO);   // a full paper (Parts 1-4 on one page) says so instead of 'Part 1'
 const Q_FROM=+CFG.from,Q_TO=+CFG.to;
 const PART_SECS=Math.round((+CFG.minutes||10)*60);
 const LISTENING_ANSWERS=CFG.answers;
@@ -624,7 +625,7 @@ function renderSection(n){
   const [a,b]=NAV_RANGES[n];
   for(let i=a;i<=b;i++){if(state.listeningAnswers[i])setInput(i,state.listeningAnswers[i]);if(state.listeningFlags[i])applyFlagToPill(i);}restoreMultiGroups();
     const pt=document.getElementById('pbar-title'),pd=document.getElementById('pbar-desc');
-  if(pt)pt.textContent='Part '+n;if(pd)pd.textContent='Listen and answer questions '+Q_FROM+'\u2013'+Q_TO+'.';
+  if(pt)pt.textContent=CFG.label||('Part '+n);if(pd)pd.textContent='Listen and answer questions '+Q_FROM+'\u2013'+Q_TO+'.';
   const area=document.getElementById('listening-area');if(area)area.scrollTop=0;
   document.querySelectorAll('#listening-render .gap-input').forEach(gapAutoGrow);
   updateListeningNav();saveState();
@@ -734,7 +735,7 @@ function updateListeningNav(){
   const nav=document.getElementById('listening-nav');if(!nav)return;
   const submitting=isSubmitting();
   const cur=state.currentSection||1,curQ=state.activeQuestion||firstUnanswered(cur);
-  function partLabel(s){return '<span class="section-prefix">Part&nbsp;</span><span class="sectionNr">'+s+'</span>';}
+  function partLabel(s){return CFG.label?'<span class="sectionNr">'+CFG.label.replace(/</g,'&lt;')+'</span>':'<span class="section-prefix">Part&nbsp;</span><span class="sectionNr">'+s+'</span>';}
   function sH(s){
     const groups=NAV_GROUPS[s];
     if(s===cur&&!submitting){
@@ -1560,9 +1561,9 @@ function renderResults(){
   document.getElementById('results-content').innerHTML=
   '<div class="xr-wrap">'+
     '<h1 class="xr-h1">Exam Results</h1>'+
-    '<div class="xr-sec"><span>LISTENING · Part '+PART_NO+' practice</span></div>'+
+    '<div class="xr-sec"><span>LISTENING · '+(CFG.label||'Part '+PART_NO+' practice')+'</span></div>'+
     '<div class="xr-card xr-band">'+
-      '<div class="xr-band-t">Your Score · Part '+PART_NO+'</div>'+
+      '<div class="xr-band-t">Your Score · '+PART_LABEL+'</div>'+
       '<div class="xr-band-n">'+rd.score+'</div>'+
       '<div class="xr-band-o">out of '+rd.total+'</div>'+
       '<div class="xr-band-p">'+pct+'% correct</div>'+
@@ -2347,7 +2348,7 @@ function buildTranscriptPanel(){
   const groups=[];
   TRANSCRIPT.forEach(function(e,i){
     if(e.type==='break'){groups.push({label:e.label||'',items:[]});return;}
-    if(!groups.length)groups.push({label:'Part '+PART_NO+' · Questions '+Q_FROM+'–'+Q_TO,items:[]});
+    if(!groups.length)groups.push({label:PART_LABEL+' · Questions '+Q_FROM+'–'+Q_TO,items:[]});
     groups[groups.length-1].items.push({e:e,i:i});
   });
   let tabs='';

@@ -5,7 +5,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
-  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', reading: 'Part practice cards', readingfull: 'Reading · Full tests', packs: 'Packs (Full Tests cards)', listening: 'Listening cards', writing: 'Writing cards', speaking: 'Speaking cards', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo' };
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo' };
 
   let me = null, users = [], orders = [], audit = [], results = [], stats = null, plans = [];
   let userPage = 1, orderFilter = 'all', activityFilter = '', openUserId = null;

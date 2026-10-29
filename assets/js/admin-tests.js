@@ -17,7 +17,7 @@
     }
     function run() {
         var box = mount(); if (!box) return;
-        fetch('/api/materials?type=' + type, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
+        fetch('/api/materials?type=' + type + '&mode=part', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
             var items = (d.items || []).filter(function (i) { return !(type === 'reading' && i.mode === 'full'); }); if (!items.length) return;   // Full readings are listed on the Full Reading page
             var meta = function (i) {
                 if (type === 'speaking') return (i.parts || 0) + ' part' + (i.parts === 1 ? '' : 's');

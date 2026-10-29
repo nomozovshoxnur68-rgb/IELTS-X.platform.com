@@ -34,25 +34,39 @@ function parseOptions(list) {
 }
 const letters = (ans) => String(ans || '').toUpperCase().split(/[^A-Z]+/).filter(Boolean)
 
+const isFull = (material) => !!(material && material.data && material.data.mode === 'full')
+/* a full paper (Parts 1-4 on one page): every question carries its part in q.passage (1-4) */
+const partOfQ = (q) => Math.min(4, Math.max(1, parseInt(q && q.passage, 10) || 1))
+
 /** questions -> numbered blocks + the answer key */
 function buildBlocks(material) {
   const d = material.data || {}
-  const part = Math.min(4, Math.max(1, parseInt(d.part, 10) || parseInt(String(d.sectionLabel || '').replace(/\D+/g, ''), 10) || 1))
-  let n = Math.max(1, parseInt(d.from, 10) || ((part - 1) * 10 + 1))
+  const full = isFull(material)
+  const part = full ? 1 : Math.min(4, Math.max(1, parseInt(d.part, 10) || parseInt(String(d.sectionLabel || '').replace(/\D+/g, ''), 10) || 1))
+  let n = full ? 1 : Math.max(1, parseInt(d.from, 10) || ((part - 1) * 10 + 1))
   const from = n
   const answers = {}
   const blocks = []
   let cur = null
-  inheritGroups(d.questions).forEach((q) => {
+  let lastPart = 0
+  // a full paper is played in the order of its parts, whatever order the groups were typed in
+  const qs = inheritGroups(d.questions).map((q, i) => ({ q, i })).sort((a, b) => (full ? partOfQ(a.q) - partOfQ(b.q) : 0) || a.i - b.i).map((x) => x.q)
+  // the map pictures of a full paper belong to the part chosen for them (when none was chosen, every map shows them all)
+  const picsByPart = full && (d.images || []).some((im) => Number(im.passage || 1) !== 1)
+  qs.forEach((q) => {
     const kind = KIND_FROM_TYPE[q.type] || 'gap'
     const opts = parseOptions(q.options)
     const gi = (q.gi === undefined || q.gi === null || q.gi === '') ? null : String(q.gi)
-    const key = kind + '|' + (gi === null ? '' : gi) + '|' + (q.group || '') + (kind === 'matching' || kind === 'map' || kind === 'box' ? '|' + JSON.stringify(opts) : '')
+    const qPart = full ? partOfQ(q) : part
+    const key = qPart + '|' + kind + '|' + (gi === null ? '' : gi) + '|' + (q.group || '') + (kind === 'matching' || kind === 'map' || kind === 'box' ? '|' + JSON.stringify(opts) : '')
     const grp = String(q.group || '').trim()
-    const joinable = cur && kind !== 'multi' && (cur.key === key || (gi === null && !grp && cur.kind === kind && (kind === 'gap' || kind === 'mcq' || JSON.stringify(cur.options) === JSON.stringify(opts))))
+    const newPart = full && qPart !== lastPart
+    const joinable = cur && !newPart && kind !== 'multi' && (cur.key === key || (gi === null && !grp && cur.kind === kind && (kind === 'gap' || kind === 'mcq' || JSON.stringify(cur.options) === JSON.stringify(opts))))
     if (!joinable) {
       cur = { key, kind, from: n, to: n, instruction: String(q.group || '').trim() || DEFAULT_INSTR[kind], title: String(q.blockTitle || ''), options: opts, items: [] }
-      if (kind === 'map') cur.images = (d.images || []).map((im) => ({ url: im.url, caption: im.caption || '' }))
+      if (newPart) cur.partHead = 'Part ' + qPart
+      lastPart = qPart
+      if (kind === 'map') cur.images = (d.images || []).filter((im) => !picsByPart || Number(im.passage || 1) === qPart).map((im) => ({ url: im.url, caption: im.caption || '' }))
       blocks.push(cur)
     }
     if (kind === 'multi') {
@@ -76,14 +90,17 @@ function buildBlocks(material) {
 }
 
 /** "Speaker: text" lines -> transcript; marks the line that contains each typed answer */
-function buildTranscript(text, part, from, to, answers) {
-  const out = [{ type: 'break', label: 'Part ' + part + ' \u00b7 Questions ' + from + '\u2013' + to }]
+function buildTranscript(text, part, from, to, answers, full) {
+  const out = full ? [] : [{ type: 'break', label: 'Part ' + part + ' \u00b7 Questions ' + from + '\u2013' + to }]
   const lines = String(text || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
   lines.forEach((l) => {
+    // a full paper: a line "PART 2" (or "Section 2") opens that part's tab of the transcript
+    const pm = full && /^(?:part|section)\s*([1-4])\s*[:.\-\u2013\u2014]?\s*$/i.exec(l)
+    if (pm) { out.push({ type: 'break', label: 'Part ' + pm[1] }); return }
     const m = /^([^:]{1,24}):\s+(.+)$/.exec(l)
     out.push(m ? { sp: m[1].trim(), tx: m[2].trim() } : { sp: '', tx: l })
   })
-  let cursor = 1
+  let cursor = full ? 0 : 1
   Object.keys(answers).map(Number).sort((a, b) => a - b).forEach((id) => {
     const a = String(answers[id] || '').split('|')[0].trim()
     if (!a || /^[A-H]$/.test(a)) return
@@ -98,17 +115,19 @@ function buildTranscript(text, part, from, to, answers) {
 function buildConfig(material) {
   const d = material.data || {}
   const { part, from, to, blocks, answers } = buildBlocks(material)
+  const full = isFull(material)
   const rows = []
   for (let i = from; i <= to; i++) rows.push([i])
   const cfg = {
     id: 'ix-' + String(material.id || 'x').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 24),
     part, from, to,
-    minutes: Math.min(60, Math.max(1, parseInt(d.durationMin, 10) || 10)),
+    label: full ? 'Full test' : undefined,
+    minutes: Math.min(60, Math.max(1, parseInt(d.durationMin, 10) || (full ? 30 : 10))),
     name: String(material.title || 'Listening'),
     audioStart: Math.max(0, +d.audioStart || 0),
     audioEnd: Math.max(0, +d.audioEnd || 0),
     navGroups: rows, answers,
-    transcript: buildTranscript(d.transcript, part, from, to, answers)
+    transcript: buildTranscript(d.transcript, part, from, to, answers, full)
   }
   return { cfg, data: { blocks }, part }
 }
@@ -123,10 +142,10 @@ function renderPage(material) {
     ',"build":null};\nwindow.PART_PRACTICE.build = function (h) { return window.IXListeningRender(window.LISTENING_DATA, ' + part + ')(h); };'
   return tpl
     .replace(/\{\{TITLE\}\}/g, () => esc(material.title || 'Listening'))
-    .replace(/\{\{PARTNO\}\}/g, String(part))
+    .replace(/\{\{PARTNO\}\}/g, isFull(material) ? '1–4' : String(part))
     .replace(/\{\{MINUTES\}\}/g, String(cfg.minutes))
     .replace(/\{\{AUDIO\}\}/g, () => esc(audio))
     .replace('{{DATA_SCRIPT}}', () => script)
 }
 
-module.exports = { renderPage, buildConfig, buildBlocks, parseOptions, KINDS, KIND_FROM_TYPE, DEFAULT_INSTR }
+module.exports = { renderPage, buildConfig, buildBlocks, parseOptions, isFull, KINDS, KIND_FROM_TYPE, DEFAULT_INSTR }

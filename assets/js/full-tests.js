@@ -92,6 +92,11 @@
         (adminPacks || []).forEach(function (ap) {
             var slug = ap.slug || slugify(ap.title);
             var pack = packs.filter(function (p) { return p.slug === slug || slugify(p.title) === slug; })[0];
+            if (ap.hidden) {   // switched off in the admin panel (Packs): the card is left out, also when tests still name it
+                if (pack) pack.hidden = true;
+                else { pack = { slug: slug, title: slug, tests: [], extra: true, hidden: true }; A.assignKeys(SKILL, pack); packs.push(pack); }
+                return;
+            }
             if (!pack) {
                 pack = { slug: slug, title: ap.title, tier: '', plan: '', description: DATA.description, defLocked: !!ap.premium, defPlan: 'standard', tests: [], extra: true };
                 A.assignKeys(SKILL, pack);
@@ -102,13 +107,14 @@
             if (ap.plan) pack.plan = ap.plan;
             if (ap.description) pack.description = ap.description;
             if (ap.group) pack.group = ap.group;
+            if (ap.order) pack.order = ap.order;
         });
         return packs;
     }
 
     function mergeAdminTests(packs, items) {
         (items || []).forEach(function (m) {
-            if (SKILL === 'reading' && m.mode !== 'full') return;   // Part (1 passage) tests live on the Reading practice page; only Full (3 passages) tests belong here
+            if (m.mode && m.mode !== 'full') return;   // Part tests (one passage / section / task / part) live on the practice pages; only Full tests belong here
             var name = String(m.pack || '').trim() || 'Practice';
             var slug = slugify(name);
             var pack = packs.filter(function (p) { return p.slug === slug || slugify(p.title) === slug; })[0];
@@ -165,6 +171,11 @@
             if (practice) practice.packs = practice.packs.concat(rest);
             else groups.push({ title: 'More packs', packs: rest });
         }
+        // a position set in the admin panel (Packs) puts a pack first; the others keep the catalog order
+        groups.forEach(function (g) {
+            g.packs = g.packs.map(function (p, i) { return { p: p, k: p.order ? p.order : 1000 + i }; })
+                .sort(function (a, b) { return a.k - b.k; }).map(function (x) { return x.p; });
+        });
         return groups.filter(function (g) { return g.packs.length; });
     }
 
@@ -177,10 +188,10 @@
     }
 
     function loadAdmin() {
-        if (SKILL === 'speaking' || !window.fetch) return Promise.resolve([]);
+        if (!window.fetch) return Promise.resolve([]);
         var ctl = window.AbortController ? new AbortController() : null;
         var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
-        return fetch('/api/materials?type=' + encodeURIComponent(SKILL), { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+        return fetch('/api/materials?type=' + encodeURIComponent(SKILL) + '&mode=full', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
             .then(function (r) { return r.ok ? r.json() : { items: [] }; })
             .then(function (d) { return Array.isArray(d.items) ? d.items : []; })
             .catch(function () { return []; })
@@ -348,7 +359,8 @@
     root.innerHTML = '<div class="ft-wrap"><div class="ft-skeleton" aria-busy="true"><span></span><span></span><span></span></div></div>';
 
     Promise.all([loadAdmin(), A.load(), loadAdminPacks()]).then(function (res) {
-        var packs = applyAccess(mergeAdminTests(mergeAdminPacks(buildPacks(), res[2]), res[0]), res[1]);
+        var packs = applyAccess(mergeAdminTests(mergeAdminPacks(buildPacks(), res[2]), res[0]), res[1])
+            .filter(function (p) { return !p.hidden; });
         if (VIEW === 'pack') renderPack(packs); else renderList(packs);
     });
 })();

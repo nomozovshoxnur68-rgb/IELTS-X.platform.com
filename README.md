@@ -224,3 +224,21 @@ The admin menu now has three separate places for Reading:
 * **Packs (Full Tests cards)** (`/admin#packs`): create the pack cards of the Full Reading / Listening / Writing / Speaking pages: name, tier, plan label, **section** on the page (Recent Exams / Practice / a new name), description, locked by default, visible. A pack with the same name as a built-in one (e.g. *Pack 4*) takes over that card. Lock / unlock a whole pack or one test in **Access** (new packs are listed there too).
 
 Packs are stored in the settings table (`admin-packs`), so no new SQL is needed.
+
+## Admin: Part practice and Full tests for every skill, all packs in one place (October 2026)
+
+The admin menu has two groups: **Tests · Part practice** (`#reading`, `#listening`, `#writing`, `#speaking`) and
+**Tests · Full tests** (`#readingfull`, `#listeningfull`, `#writingfull`, `#speakingfull`), plus **Packs**.
+
+* **Part** = one passage / one section / one task / one speaking part: a card on the practice page (`/part/practice/<skill>`).
+* **Full** = a whole paper: Reading 3 passages, Listening Parts 1–4 (40 questions, one recording, 30 min, opens at
+  `/exam/listening/<id>`; give each question group its *Part*, or paste the whole paper and the parts are taken from the
+  question numbers), Writing Task 1 + Task 2, Speaking Parts 1–3. Listed on `/full-tests/<skill>/` inside its **Pack**.
+  The format is saved as `data.mode` (`part` / `full`); tests saved earlier count as Part. `GET /api/materials?mode=part|full`.
+* Every card: **Free / Standard / Max / Ultra** menu, Visible / Hidden, Edit, Copy, Open, **→ Full / → Part** (moves it to the
+  other list), Remove. Tick cards (or **All**) for bulk actions: show, hide, access, set pack, move, remove.
+* The form keeps unsaved work in the browser and offers it again the next time it is opened; a failed save shows the reason
+  above the questions and keeps everything typed.
+* **Packs** (`#packs`) lists every pack of the four Full Tests pages, the built-in ones too: rename, tier, plan label, section,
+  position, hide / show, access, the tests inside, **+ Test** (a new full test in that pack). A built-in pack is changed by an
+  override with the same address (kept in `admin-packs`); **Reset** brings back the original.

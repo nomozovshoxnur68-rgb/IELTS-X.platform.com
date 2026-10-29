@@ -9,7 +9,9 @@
   var NUM = { 2: 'TWO', 3: 'THREE', 4: 'FOUR', 5: 'FIVE', 6: 'SIX' };
 
   function head(b, first, last, instr, title) {
-    return '<div class="section-head"' + (b.first ? '' : ' style="margin-top:24px"') + '><div class="num">Questions ' + rng(first, last) + '</div>' +
+    // a full paper (Parts 1-4 on one page): a "Part N" heading opens each part
+    var part = b.partHead ? '<h2 class="ix-part-head" style="margin:' + (b.first ? '0' : '36px') + ' 0 6px;padding-bottom:6px;border-bottom:2px solid currentColor;font-size:20px">' + esc(b.partHead) + '</h2>' : '';
+    return part + '<div class="section-head"' + (b.first || b.partHead ? '' : ' style="margin-top:24px"') + '><div class="num">Questions ' + rng(first, last) + '</div>' +
       (title ? '<h2>' + esc(title) + '</h2>' : '') + (instr ? '<div class="instruction">' + instr + '</div>' : '') + '</div>';
   }
   /* **bold** and _italic_ are the only markup an admin can use in instructions */
