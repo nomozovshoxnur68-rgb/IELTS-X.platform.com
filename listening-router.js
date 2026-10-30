@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { renderPage } = require('./listening-exam');
 
-const FALLBACK_LAST = 4;
+const FALLBACK_LAST = 5;   // sections/test-1 … test-5.html exist as files (on Vercel the folder is not readable, see lastStatic)
 function lastStatic(root) {
   let max = 0;
   try { fs.readdirSync(path.join(root, 'sections')).forEach((f) => { const m = /^test-(\d+)\.html$/i.exec(f); if (m) max = Math.max(max, Number(m[1])); }); } catch (e) { /* serverless: use the fallback */ }

@@ -700,40 +700,47 @@ function cleanMaterialData(type, d) {
   }
   return out;
 }
-/* Built-in tests (reading-src/part: the Reading Part passages written from the PDFs) are added to the materials ONCE, as
-   ordinary admin tests: Published, Free, numbered /pessages/test-N after the tests already there. The keys that were added
-   are kept in the setting "builtin-tests", so a test an admin edited keeps the edits and one an admin removed is not added
-   again. The id comes from the key, so two servers starting at the same moment cannot add a test twice. */
+/* Built-in tests are added to the materials ONCE, as ordinary admin tests:
+     reading-src/part    Reading Part passages written from the PDFs: Published, Free, /pessages/test-N after the tests already there
+     listening-src/part  Listening sections written from the PDFs: Hidden (the audio is added in the panel), /sections/test-N
+   The keys that were added are kept in the setting "builtin-tests", so a test an admin edited keeps the edits and one an admin
+   removed is not added again. The id comes from the key, so two servers starting at the same moment cannot add a test twice. */
 let builtinRun = null; let builtinFailedAt = 0;
 const builtinId = (key) => { const h = crypto.createHash('sha256').update('ieltsx-builtin:' + key).digest('hex');
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-${'89ab'[parseInt(h[16], 16) % 4]}${h.slice(17, 20)}-${h.slice(20, 32)}`; };
+const BUILTIN_SETS = [   // literal require()s, so Vercel bundles the source files with the function
+  { prefix: 'reading-part:', type: 'reading', name: 'Reading Part', src: () => require('./reading-src/part'), no: (all) => require('./reading-router').nextNumber(ROOT, 'part', all) },
+  { prefix: 'listening-part:', type: 'listening', name: 'Listening Part', src: () => require('./listening-src/part'), no: (all) => require('./listening-router').nextNumber(ROOT, all) }
+];
 function seedBuiltinTests() {
   if (builtinRun) return builtinRun;
   if (Date.now() - builtinFailedAt < 5 * 60000) return Promise.resolve();   // the database was not ready: try again in a few minutes
   builtinRun = (async () => {
-    const { LIST, toMaterial } = require('./reading-src/part');
     const saved = (await store.getSetting('builtin-tests')) || {};
     const keys = new Set(Array.isArray(saved.keys) ? saved.keys : []);
-    const todo = LIST.filter((t) => !keys.has('reading-part:' + t.key));
-    if (!todo.length) return;
-    const R = require('./reading-router');
-    const all = await store.listMaterialsRaw('reading');
-    const t0 = Date.now(); let added = 0;
-    for (const [i, t] of todo.entries()) {
-      const id = builtinId('reading-part:' + t.key);
-      if (!all.some((m) => m.id === id)) {
-        const m = toMaterial(t); const data = cleanMaterialData('reading', m.data);
-        data.no = R.nextNumber(ROOT, 'part', all);
-        const at = new Date(t0 - i * 1000).toISOString();   // the first file of the list is the newest card
-        const item = { id, type: 'reading', title: cleanTitle(m.title), pack: '', description: '', content: '', premium: false, published: true, data, createdAt: at, updatedAt: at };
-        try { await store.insertMaterial(item); all.push(item); added++; } catch (e) {
-          if (!(await store.listMaterialsRaw('reading')).some((x) => x.id === id)) throw e;   // another server added it a moment ago: fine
+    let changed = false;
+    for (const set of BUILTIN_SETS) {
+      const { LIST, toMaterial } = set.src();
+      const todo = LIST.filter((t) => !keys.has(set.prefix + t.key));
+      if (!todo.length) continue;
+      const all = await store.listMaterialsRaw(set.type);
+      const t0 = Date.now(); let added = 0;
+      for (const [i, t] of todo.entries()) {
+        const id = builtinId(set.prefix + t.key);
+        if (!all.some((m) => m.id === id)) {
+          const m = toMaterial(t); const data = cleanMaterialData(set.type, m.data);
+          data.no = set.no(all);
+          const at = new Date(t0 - i * 1000).toISOString();   // the first file of the list is the newest card
+          const item = { id, type: set.type, title: cleanTitle(m.title), pack: '', description: '', content: '', premium: false, published: m.published !== false, data, createdAt: at, updatedAt: at };
+          try { await store.insertMaterial(item); all.push(item); added++; } catch (e) {
+            if (!(await store.listMaterialsRaw(set.type)).some((x) => x.id === id)) throw e;   // another server added it a moment ago: fine
+          }
         }
+        keys.add(set.prefix + t.key); changed = true;
       }
-      keys.add('reading-part:' + t.key);
+      if (added) { console.log('Built-in ' + set.name + ' tests added: ' + added); await audit(null, 'material.builtin', added + ' ' + set.name + ' tests', { keys: todo.map((t) => t.key) }); }
     }
-    await store.setSetting('builtin-tests', { keys: [...keys], updatedAt: new Date().toISOString() });
-    if (added) { console.log('Built-in Reading Part tests added: ' + added); await audit(null, 'material.builtin', added + ' Reading Part tests', { keys: todo.map((t) => t.key) }); }
+    if (changed) await store.setSetting('builtin-tests', { keys: [...keys], updatedAt: new Date().toISOString() });
   })().catch((e) => { console.error('Built-in tests were not added (will try again):', e.message); builtinRun = null; builtinFailedAt = Date.now(); });
   return builtinRun;
 }
@@ -1580,7 +1587,7 @@ const MIME = {
   '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.txt': 'text/plain; charset=utf-8', '.map': 'application/json'
 };
 // never served: server code, data, docs, secrets, config
-const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', '.git', '.vscode', '.github']);   // reading-src: test sources with their answers
+const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
   'ai-provider.js', 'ai-generator.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js']);

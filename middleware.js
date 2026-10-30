@@ -7,9 +7,9 @@
    static files (the Node server refuses them itself, see isBlocked() in server.js). */
 export const config = { matcher: ['/full-tests/:path*', '/pessages/:path*', '/sections/:path*', '/premium-audio/:path*', '/Mock(.*)', '/mock(.*)',
   '/server.js', '/ai-provider.js', '/ai-generator.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js',
-  '/supabase-schema.sql', '/vercel.json', '/package.json', '/README.md', '/GOOGLE_SETUP.md', '/VERCEL_SETUP.md', '/scripts/:path*', '/data/:path*', '/reading-src/:path*', '/full-mock/README.md'] };
+  '/supabase-schema.sql', '/vercel.json', '/package.json', '/README.md', '/GOOGLE_SETUP.md', '/VERCEL_SETUP.md', '/scripts/:path*', '/data/:path*', '/reading-src/:path*', '/listening-src/:path*', '/full-mock/README.md'] };
 
-const PRIVATE = /^\/(?:server|ai-provider|ai-generator|reading-router|listening-router|reading-exam|listening-exam|middleware)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src)\//i;
+const PRIVATE = /^\/(?:server|ai-provider|ai-generator|reading-router|listening-router|reading-exam|listening-exam|middleware)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src|listening-src)\//i;
 
 const GATED = [
   /^\/full-tests\/(reading|listening|writing|speaking)\/test-[^/]+?(\.html)?\/?$/i,

@@ -137,6 +137,18 @@ server.listen(0, async () => {
       await call('DELETE', '/api/admin/materials/' + amb.id, { jar: boss });
       assert.equal((await call('GET', '/api/admin/materials', { jar: boss })).json.items.length, keep - 1, 'a removed built-in test is not added again');
       ok('built-in Reading Part tests: added once, numbered 22+, Passage 2 = Q14–26, removable');
+      // the built-in Listening sections (listening-src/part): Hidden until an admin adds the audio, numbered after sections/test-5
+      const LL = require('../listening-src/part').LIST;
+      const ls = (await call('GET', '/api/admin/materials?type=listening', { jar: boss })).json.items;
+      assert.equal(ls.length, LL.length); assert.ok(ls.every((m) => m.published === false && !m.data.audioUrl && m.data.no >= 6 && m.data.mode === 'part'));
+      assert.deepEqual(ls.map((m) => m.data.no).sort((a, b) => a - b), LL.map((_, i) => 6 + i));
+      assert.ok(!(await call('GET', '/api/materials?type=listening')).json.items.some((m) => ls.some((x) => x.id === m.id)), 'hidden from students');
+      const glow = ls.find((m) => m.title === 'Fly Glow Worms');
+      assert.equal((await call('GET', '/sections/test-' + glow.data.no)).status, 404, 'a hidden section does not open for students');
+      pg = await call('GET', '/sections/test-' + glow.data.no, { jar: boss }); assert.equal(pg.status, 200);
+      assert.ok(pg.text.includes('Fly Glow Worms') && pg.text.includes('"from":31') && pg.text.includes('"to":40'), 'Section 4 = Questions 31–40');
+      assert.equal((await call('GET', '/listening-src/part/01-tinned-food.js')).status, 404, 'listening sources are not downloadable');
+      ok('built-in Listening sections: added once as Hidden, numbered after sections/test-5, Section 4 = Q31–40');
     }
     const bd = '----x'; const mp = (name, data, type) => Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="type"\r\n\r\n${type}\r\n--${bd}\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: application/octet-stream\r\n\r\n${data}\r\n--${bd}--\r\n`);
     r = await call('POST', '/api/admin/uploads', { raw: mp('Read ../me.html', '<h1>hi</h1>', 'reading'), headers: { 'content-type': 'multipart/form-data; boundary=' + bd }, jar: boss });

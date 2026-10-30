@@ -340,3 +340,18 @@ Nothing is saved or published by the generator itself; the manual forms are unch
 * **Volume 9**: `full-tests/reading/test-2.html` (the template of `npm run build:reading`) now has the same start screen as the
   other full tests (Instructions / Note / Exam Mode / Start Test) instead of the old name card; the Volume 9 pages were rebuilt.
 * `reading-src/` is never served (the Node server blocks it like `scripts/`; `middleware.js` already did on Vercel).
+
+## Built-in Listening sections (October 2026)
+
+* **30 Listening sections** from the PDFs (26 × Section 4 = Questions 31–40, 3 × Section 1 = Questions 1–10; *The History of
+  Sneakers* and *Beehive discovery* have 7 questions) are in `listening-src/part/` (format at the top of
+  `listening-src/part/index.js`). Like the Reading passages they are added **once** to **Admin → Listening · Part practice**
+  (`/sections/test-6` … in list order on a new site), but **Hidden**: the PDFs have no recording. Open a section → upload the
+  audio or paste its link (and “starts at / ends at” if it is one long file) → **Save** → **Visible**. The admin card says
+  “⚠ no audio” until then.
+* No answer key in the PDF: *The development of Tinned Food*, *Rock Art*, *Beehive discovery*, *Survival Strategies of Male
+  Lizards* (all answers empty) and *Soundscapes* question 40 (“not available” in the key). The form does not save a section with
+  an empty answer, so type them in with the audio. *Ethics In Engineering* had no key either: its answers are the words of the
+  transcript in the PDF (quoted in the explanations).
+* `listening-router.js`: the last hand-made section is `sections/test-5.html` (was 4), so on Vercel – where the folder cannot be
+  read – a new section never gets the number of that page. `listening-src/` is never served (server and `middleware.js`).

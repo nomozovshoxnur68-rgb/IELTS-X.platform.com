@@ -580,7 +580,7 @@
   ],
   "functions": {
     "api/index.js": {
-      "includeFiles": "{server.js,*.html,data/**,supabase-schema.sql,assets/**,reading-src/part/**}",
+      "includeFiles": "{server.js,*.html,data/**,supabase-schema.sql,assets/**,reading-src/part/**,listening-src/part/**}",
       "maxDuration": 60
     }
   }
