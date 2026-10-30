@@ -197,7 +197,8 @@ function build(spec, file) {
   if (a < 0 || b < 0) throw new Error(TEMPLATE + ' has no data script');
   html = html.slice(0, a) + script + html.slice(b);
   const t = esc(spec.title || 'Full Reading Test');
-  html = html.split('Full Reading Test 9').join(t).split('[Demo] Test 9 - P1').join('[Demo] ' + t + ' - P1');
+  // '[Demo] Test 9 - ' is in the header (… - P1) and on the start screen (… - Academic Reading)
+  html = html.split('Full Reading Test 9').join(t).split('[Demo] Test 9 - ').join('[Demo] ' + t + ' - ');
   const outFile = path.join(ROOT, spec.out);
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, html);

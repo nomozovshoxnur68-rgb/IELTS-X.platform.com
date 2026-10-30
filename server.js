@@ -152,10 +152,15 @@ const store = {
     const db = loadDb(); const n = db.users.length; db.users = db.users.filter((u) => u.id !== id); saveDb(db); return db.users.length < n;
   },
   async listMaterials(type) {
+    await seedBuiltinTests();   // the built-in Reading Part tests are added once, before the first list
+    return store.listMaterialsRaw(type);
+  },
+  async listMaterialsRaw(type) {
     if (USE_SUPABASE) return (await sb(`ieltsx_materials?select=*${type ? `&type=eq.${eq(type)}` : ''}&order=createdAt.desc`)) || [];
     return loadDb().materials.filter((m) => !type || m.type === type);
   },
   async getMaterial(id) {
+    await seedBuiltinTests();
     if (USE_SUPABASE) return ((await sb(`ieltsx_materials?select=*&id=eq.${eq(id)}&limit=1`)) || [])[0] || null;
     return loadDb().materials.find((m) => m.id === id) || null;
   },
@@ -658,7 +663,7 @@ function cleanMaterialData(type, d) {
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
-      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: type === 'listening' ? cut(q.blockTitle, 200) : undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined,
         // where the question came from (printed in the source / written by the AI Test Generator) and, for listening, the second the answer is heard
@@ -694,6 +699,43 @@ function cleanMaterialData(type, d) {
     }).filter((t) => t.prompt || t.imageUrl || t.chart);
   }
   return out;
+}
+/* Built-in tests (reading-src/part: the Reading Part passages written from the PDFs) are added to the materials ONCE, as
+   ordinary admin tests: Published, Free, numbered /pessages/test-N after the tests already there. The keys that were added
+   are kept in the setting "builtin-tests", so a test an admin edited keeps the edits and one an admin removed is not added
+   again. The id comes from the key, so two servers starting at the same moment cannot add a test twice. */
+let builtinRun = null; let builtinFailedAt = 0;
+const builtinId = (key) => { const h = crypto.createHash('sha256').update('ieltsx-builtin:' + key).digest('hex');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-${'89ab'[parseInt(h[16], 16) % 4]}${h.slice(17, 20)}-${h.slice(20, 32)}`; };
+function seedBuiltinTests() {
+  if (builtinRun) return builtinRun;
+  if (Date.now() - builtinFailedAt < 5 * 60000) return Promise.resolve();   // the database was not ready: try again in a few minutes
+  builtinRun = (async () => {
+    const { LIST, toMaterial } = require('./reading-src/part');
+    const saved = (await store.getSetting('builtin-tests')) || {};
+    const keys = new Set(Array.isArray(saved.keys) ? saved.keys : []);
+    const todo = LIST.filter((t) => !keys.has('reading-part:' + t.key));
+    if (!todo.length) return;
+    const R = require('./reading-router');
+    const all = await store.listMaterialsRaw('reading');
+    const t0 = Date.now(); let added = 0;
+    for (const [i, t] of todo.entries()) {
+      const id = builtinId('reading-part:' + t.key);
+      if (!all.some((m) => m.id === id)) {
+        const m = toMaterial(t); const data = cleanMaterialData('reading', m.data);
+        data.no = R.nextNumber(ROOT, 'part', all);
+        const at = new Date(t0 - i * 1000).toISOString();   // the first file of the list is the newest card
+        const item = { id, type: 'reading', title: cleanTitle(m.title), pack: '', description: '', content: '', premium: false, published: true, data, createdAt: at, updatedAt: at };
+        try { await store.insertMaterial(item); all.push(item); added++; } catch (e) {
+          if (!(await store.listMaterialsRaw('reading')).some((x) => x.id === id)) throw e;   // another server added it a moment ago: fine
+        }
+      }
+      keys.add('reading-part:' + t.key);
+    }
+    await store.setSetting('builtin-tests', { keys: [...keys], updatedAt: new Date().toISOString() });
+    if (added) { console.log('Built-in Reading Part tests added: ' + added); await audit(null, 'material.builtin', added + ' Reading Part tests', { keys: todo.map((t) => t.key) }); }
+  })().catch((e) => { console.error('Built-in tests were not added (will try again):', e.message); builtinRun = null; builtinFailedAt = Date.now(); });
+  return builtinRun;
 }
 const READING_BANDS = [[39, 9], [37, 8.5], [35, 8], [33, 7.5], [30, 7], [27, 6.5], [23, 6], [19, 5.5], [15, 5], [13, 4.5], [10, 4], [8, 3.5], [6, 3], [4, 2.5]];
 const LISTENING_BANDS = [[39, 9], [37, 8.5], [35, 8], [32, 7.5], [30, 7], [26, 6.5], [23, 6], [18, 5.5], [16, 5], [13, 4.5], [10, 4], [8, 3.5], [6, 3], [4, 2.5]];
@@ -1538,7 +1580,7 @@ const MIME = {
   '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.txt': 'text/plain; charset=utf-8', '.map': 'application/json'
 };
 // never served: server code, data, docs, secrets, config
-const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', '.git', '.vscode', '.github']);
+const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', '.git', '.vscode', '.github']);   // reading-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
   'ai-provider.js', 'ai-generator.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js']);

@@ -75,3 +75,8 @@ Any group can override the standard text with `instruction: '… boxes {R} …'`
 The fastest way there: Admin → Reading → **+ New test** → Full → **Paste the whole test at once** and paste the
 PDF text exactly as it is, **including the ANSWERS section at the end** — answers, explanations and highlights
 are filled in from it. Check the groups, then Save.
+
+## Part practice passages (`reading-src/part/`)
+
+One file per passage (format at the top of `reading-src/part/index.js`). The server adds each one **once** to
+Admin → Reading · Part practice; after that the test is edited in the admin panel, not here.

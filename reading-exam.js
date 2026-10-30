@@ -13,6 +13,11 @@
 const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const safeUrl = (u) => (/^(\/(uploads|assets)\/[^"'<>\s]*|https:\/\/[^"'<>\s]+)$/i.test(String(u || '')) ? String(u) : '');
 const ROMAN = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
+/* the word limit of a completion block, read from its instruction ("ONE WORD ONLY", "NO MORE THAN TWO WORDS" …) */
+const wordLimitOf = (g) => { const s = String(g || '').toUpperCase(); return /\bONE WORD/.test(s) ? 1 : /\bTWO WORDS/.test(s) ? 2 : /\bTHREE WORDS/.test(s) ? 3 : 0; };
+/* a Part test is numbered like its passage in the real paper: Passage 1 = 1–13, Passage 2 = 14–26, Passage 3 = 27–40 */
+const partSlot = (d) => (/3/.test(String(d && d.passageLabel || '')) ? 3 : /2/.test(String(d && d.passageLabel || '')) ? 2 : 1);
+const FIRST_NO = { 1: 1, 2: 14, 3: 27 };
 /* "Questions 1–5" is printed by the player itself, so it is cut off a typed / pasted instruction */
 const cleanInstr = (g) => String(g || '').replace(/^\s*(?:questions?|savollar)\s+\d+\s*(?:[-\u2013\u2014]|to|dan)\s*\d+\s*[:.\-\u2013\u2014]?\s*/i, '').trim();
 
@@ -96,13 +101,18 @@ function passageHtml(d, title) {
   // letter where a run A, B, C … really starts (so "A newborn baby…" is not taken for paragraph A).
   const LET = /^([A-Z])(?:[.)]\s+|\s+(?=[A-Z0-9\u201c"\u2018'(]))([\s\S]*)$/;
   const lettered = new Set();
-  let start = list.findIndex((p, i) => { const a = LET.exec(p), b = list[i + 1] && LET.exec(list[i + 1]); return a && a[1] === 'A' && b && b[1] === 'B'; });
+  // a section may have more than one paragraph ("A …", two plain paragraphs, "B …"): look a few paragraphs ahead for the "B"
+  const nextLetter = (i) => { for (let j = i + 1; j < list.length && j <= i + 4; j++) { const m = LET.exec(list[j]); if (m) return m[1]; } return ''; };
+  let start = list.findIndex((p, i) => { const a = LET.exec(p); return a && a[1] === 'A' && nextLetter(i) === 'B'; });
   if (start < 0) start = list.findIndex((p) => /^A[.)]\s+/.test(p));
   if (start >= 0) { let want = 65; for (let i = start; i < list.length; i++) { const m = LET.exec(list[i]); if (m && m[1].charCodeAt(0) === want) { lettered.add(i); want++; } } }
   const paras = list.map((p, i) => {
     const m = lettered.has(i) ? LET.exec(p) : null;
     if (m) return `<p><strong class="para-letter">${m[1]}</strong> ${esc(m[2]).replace(/\n/g, '<br>')}</p>`;
-    return i === 0 && p.length < 160 && !/[.!?]$/.test(p) ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
+    const sub = /^##\s+(.+)$/.exec(p);   // "## Coasting through history": a bold sub-heading inside the passage
+    if (sub) return `<p class="pass-sub"><strong>${esc(sub[1])}</strong></p>`;
+    // a short first line is the italic line under the title ("Could the vast towers … of the future?" too)
+    return i === 0 && p.length < 160 && !/[.!]$/.test(p) ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
   }).join('');
   return `<div>${imgs}${paras}</div>`;
 }
@@ -134,6 +144,10 @@ function buildSections(questions, startN) {
     const k = type + '|' + gi + '|' + (q.group || '') + '|' + (extra || '');
     if (cur && k === key) return cur;
     cur = { type, num: '', title: defaultTitle[type] || 'Questions', instruction: cleanInstr(q.group) ? esc(cleanInstr(q.group)) : (defaultInstr[type] || ''), items: [] };
+    // the title printed above a summary / flow-chart / table ("How ambergris is formed") or above an option list ("List of Categories")
+    const bt = String(q.blockTitle || '').trim();
+    if (bt && type === 'notes') cur.noteTitle = esc(bt);
+    if (bt && type === 'matching-features') cur.bankLabel = esc(bt);
     key = k; sections.push(cur); return cur;
   };
   for (const q of questions) {
@@ -166,7 +180,7 @@ function buildSections(questions, startN) {
       }
     } else {   // short / completion
       const parts = String(q.prompt || '').split(/_{2,}|\.{4,}|…{2,}/);
-      const sec = open('notes', q); sec.wordLimit = sec.wordLimit || 3;
+      const sec = open('notes', q); sec.wordLimit = sec.wordLimit || wordLimitOf(q.group) || 3;
       sec.items.push({ id: n, answer: String(q.answer || ''), label: esc((parts[0] || '').trim()), after: esc(parts.slice(1).join(' ').trim()) }); n += 1;
     }
   }
@@ -180,7 +194,7 @@ const isFull = (material) => !!(material && material.data && material.data.mode 
 function passagesOf(material) {
   const d = material.data || {};
   const imgs = Array.isArray(d.images) ? d.images : [];
-  if (!isFull(material)) return [{ no: 1, title: material.title, text: d.passage, images: imgs }];
+  if (!isFull(material)) return [{ no: partSlot(d), title: material.title, text: d.passage, images: imgs }];
   const ps = Array.isArray(d.passages) ? d.passages : [];
   return [1, 2, 3].map((i) => {
     const p = ps[i - 1] || {};
@@ -194,9 +208,10 @@ function buildData(material) {
   const full = isFull(material);
   const qs = Array.isArray(d.questions) ? d.questions : [];
   const SECTIONS = { 1: [], 2: [], 3: [] }; const PASSAGES = {}; const VOCAB = {}; const ordered = []; const passText = {};
-  let last = 0;
+  const first = full ? 1 : FIRST_NO[partSlot(d)];   // a Part test of Passage 2 is Questions 14–26
+  let last = first - 1;
   passagesOf(material).forEach((ps) => {
-    const mine = qs.filter((q) => (full ? (Number(q.passage) || 1) : 1) === ps.no);
+    const mine = qs.filter((q) => (full ? (Number(q.passage) || 1) : ps.no) === ps.no);
     mine.forEach((q) => { passText[ordered.length + mine.indexOf(q)] = String(ps.text || ''); });
     if (full && !mine.length && !String(ps.text || '').trim()) return;           // an empty passage is simply left out
     const b = buildSections(mine, last + 1); last = b.total;
@@ -207,14 +222,14 @@ function buildData(material) {
     VOCAB[ps.no] = { passageTitle: passage.title, words: [] };
   });
   // explanation per question number (numbers follow passage order, exactly as the sections above)
-  const expl = {}; let n = 1;
+  const expl = {}; let n = first;
   ordered.forEach((q, k) => {
     const span = q.type === 'mcq-multi' ? Math.max(1, String(q.answer || '').split(/[^A-Za-z]+/).filter(Boolean).length) : 1;
     const hl = (q.explanation || q.evidence) ? evidenceOf(q, passText[k]) : [];
     for (let i = 0; i < span; i++, n++) if (q.explanation || hl.length) expl[n] = { explanation: esc(q.explanation || ''), highlights: hl, paraphraseMap: [], en: esc(q.explanation || ''), uz: '' };
   });
   const dflt = full ? 60 : 20;
-  return { full, SECTIONS, PASSAGES, VOCAB, expl, total: last || 1, minutes: Math.max(1, Math.min(180, Number(d.durationMin) || dflt)) };
+  return { full, SECTIONS, PASSAGES, VOCAB, expl, total: Math.max(1, last - first + 1), slot: full ? 1 : partSlot(d), minutes: Math.max(1, Math.min(180, Number(d.durationMin) || dflt)) };
 }
 
 function buildExamHtml(material, templates) {
@@ -225,7 +240,7 @@ function buildExamHtml(material, templates) {
   const key = 'ieltsx_reading_' + String(material.id).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
   const json = (o) => JSON.stringify(o, null, 1).replace(/</g, '\\u003c').replace(/\u2028|\u2029/g, '');
   const script = 'window.READING_TEST = (function () {\n'
-    + 'const STORAGE_KEY = ' + JSON.stringify(key) + ';\nconst QTOTAL = ' + b.total + ';\nconst PONLY = 1;\n'
+    + 'const STORAGE_KEY = ' + JSON.stringify(key) + ';\nconst QTOTAL = ' + b.total + ';\nconst PONLY = ' + b.slot + ';\n'
     + 'const SECTIONS = ' + json(b.SECTIONS) + ';\n'
     + 'const PASSAGES = ' + json(b.PASSAGES) + ';\n'
     + 'const VOCABULARY_DATA = ' + json(b.VOCAB) + ';\n'
@@ -241,7 +256,7 @@ function buildExamHtml(material, templates) {
   if (b.full) {   // pessages-style full paper (template: full-tests/reading/test-1.html)
     html = html.split('Full Reading Test 8').join(title).split('[Demo] Test 8 - ').join('[Demo] ' + title + ' - ');
   } else {        // single passage (template: pessages/test-19.html)
-    html = html.split('Dark Chocolate&rsquo;s Health-giving Benefits - P2').join(title + ' - P1')
+    html = html.split('Dark Chocolate&rsquo;s Health-giving Benefits - P2').join(title + ' - P' + b.slot)
       .split('Dark Chocolate&rsquo;s Health-giving Benefits').join(title).split('Dark Chocolate\u2019s Health-giving Benefits').join(title);
   }
   html = html.replace(/(href|src)="(?:\.\.\/)+/g, '$1="/');

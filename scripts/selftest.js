@@ -117,7 +117,25 @@ server.listen(0, async () => {
     r = await call('POST', '/api/admin/materials', { body: { type: 'reading', title: 'Test 1', premium: true }, jar: boss }); assert.equal(r.status, 201);
     assert.equal((await call('GET', '/api/materials?type=reading', { jar: user })).json.items[0].locked, true);
     assert.equal((await call('GET', '/api/materials?type=reading', { jar: boss })).json.items[0].locked, false);
-    await call('DELETE', '/api/admin/materials/' + r.json.item.id, { jar: boss }); assert.equal((await call('GET', '/api/admin/materials', { jar: boss })).json.items.length, 0);
+    await call('DELETE', '/api/admin/materials/' + r.json.item.id, { jar: boss });
+    { // the built-in Reading Part tests (reading-src/part) were added once, as ordinary admin tests, numbered after pessages/test-21
+      const { LIST } = require('../reading-src/part');
+      const left = (await call('GET', '/api/admin/materials', { jar: boss })).json.items;
+      assert.ok(!left.some((m) => m.id === r.json.item.id), 'the removed test is gone');
+      const bi = left.filter((m) => m.type === 'reading' && m.data.mode === 'part');
+      assert.equal(bi.length, LIST.length); assert.ok(bi.every((m) => m.published && !m.premium && m.data.no >= 22 && m.data.questions.length >= 12))   // "choose TWO" is one entry;
+      assert.deepEqual(bi.map((m) => m.data.no).sort((a, b) => a - b), LIST.map((_, i) => 22 + i));
+      const amb = bi.find((m) => /^Ambergris/.test(m.title)); assert.equal(amb.data.no, 22, 'the first file is test-22');
+      let pg = await call('GET', '/pessages/test-22'); assert.equal(pg.status, 200); assert.ok(pg.text.includes('Ambergris') && pg.text.includes('const PONLY = 1') && pg.text.includes('"noteTitle": "How ambergris is formed"'));
+      const dc = bi.find((m) => /^Dark Chocolate/.test(m.title));
+      pg = await call('GET', '/pessages/test-' + dc.data.no); assert.ok(pg.text.includes('const PONLY = 2') && pg.text.includes('"id": 14') && pg.text.includes('"id": 26') && !pg.text.includes('"id": 27') && pg.text.includes('QTOTAL = 13'), 'Passage 2 = Questions 14–26');
+      assert.ok(pg.text.includes('"bankLabel": "List of People or Organisations"'));
+      assert.equal((await call('GET', '/reading-src/part/01-ambergris.js')).status, 404, 'test sources (answers) are not downloadable');
+      const keep = (await call('GET', '/api/admin/materials', { jar: boss })).json.items.length;
+      await call('DELETE', '/api/admin/materials/' + amb.id, { jar: boss });
+      assert.equal((await call('GET', '/api/admin/materials', { jar: boss })).json.items.length, keep - 1, 'a removed built-in test is not added again');
+      ok('built-in Reading Part tests: added once, numbered 22+, Passage 2 = Q14–26, removable');
+    }
     const bd = '----x'; const mp = (name, data, type) => Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="type"\r\n\r\n${type}\r\n--${bd}\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: application/octet-stream\r\n\r\n${data}\r\n--${bd}--\r\n`);
     r = await call('POST', '/api/admin/uploads', { raw: mp('Read ../me.html', '<h1>hi</h1>', 'reading'), headers: { 'content-type': 'multipart/form-data; boundary=' + bd }, jar: boss });
     assert.equal(r.status, 201, JSON.stringify(r.json)); assert.ok(!/\.\./.test(r.json.filename));
