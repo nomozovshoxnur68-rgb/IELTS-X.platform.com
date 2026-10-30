@@ -111,8 +111,10 @@ function passageHtml(d, title) {
     if (m) return `<p><strong class="para-letter">${m[1]}</strong> ${esc(m[2]).replace(/\n/g, '<br>')}</p>`;
     const sub = /^##\s+(.+)$/.exec(p);   // "## Coasting through history": a bold sub-heading inside the passage
     if (sub) return `<p class="pass-sub"><strong>${esc(sub[1])}</strong></p>`;
+    const foot = /^\*\s+(.+)$/.exec(p);   // "* state housing: …": a small footnote under the passage
+    if (foot) return `<p class="pass-foot"><small>* ${esc(foot[1])}</small></p>`;
     // a short first line is the italic line under the title ("Could the vast towers … of the future?" too)
-    return i === 0 && p.length < 160 && !/[.!]$/.test(p) ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
+    return i === 0 && p.length < 200 && !/[.!]$/.test(p) ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
   }).join('');
   return `<div>${imgs}${paras}</div>`;
 }

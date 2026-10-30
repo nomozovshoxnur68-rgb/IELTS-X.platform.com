@@ -320,20 +320,23 @@ Nothing is saved or published by the generator itself; the manual forms are unch
 
 ## Built-in Reading Part tests, Volume 9 start screen (October 2026)
 
-* **13 Reading passages** (Ambergris, Dark Chocolate, Asteroid, Growing More for Less, Marketing and the information age,
+* **27 Reading passages** (Ambergris, Dark Chocolate, Asteroid, Growing More for Less, Marketing and the information age,
   Headphones, Termite Mounds, The Clipper Races, Walking and shoes, The Pearl, Ahead of its time, Roller Coaster, Science and
-  Filmmaking) are in `reading-src/part/` — passage, questions, answers, an explanation and the passage words to highlight for
-  every question. They are **not pages**: on its first start the server adds each of them **once** to **Admin → Reading · Part
-  practice** as an ordinary test (Published, Free, `/pessages/test-22` … `test-34` in list order; on a site that already has admin
-  Part tests they continue after them). From then on edit, lock, hide or remove them in the admin panel; changing a file later does
+  Filmmaking; then A new look for Talbot Park, Playing Soccer, The purpose of facial expressions, How do plants talk to each
+  other?, Robert Louis Stevenson, Practical Learning in the Classroom, All in the Family, How to Clean a Beach, William Gilbert
+  and Magnetism, Sign, Baby, Sign!, The Conquest of Malaria in Italy, Why don't we sleep?, Transport during the Roman Empire,
+  What Lucy Taught Us) are in `reading-src/part/` — passage, questions, answers, an explanation and the passage words to
+  highlight for every question. They are **not pages**: on its first start the server adds each of them **once** to **Admin →
+  Reading · Part practice** as an ordinary test (Published, Free, `/pessages/test-22` … `test-48` in list order on a new site;
+  on a site that already has admin Part tests – or the first 13 – the new ones continue after them). From then on edit, lock, hide or remove them in the admin panel; changing a file later does
   not change the saved copy, and a removed test is not added again (the keys are kept in the setting `builtin-tests`). A new file
   added to `reading-src/part/index.js` is added on the next start. Works the same on Supabase (no SQL needed).
 * **Numbering of Part tests** (admin-made too): the Passage tag decides it as in the paper: Passage 1 = Questions 1–13,
   Passage 2 = 14–26, Passage 3 = 27–40 (the page says "Part 2" and the admin form shows the same numbers).
 * Admin Reading groups (completion and matching) have an optional **title** (“How ambergris is formed”, “List of Categories”),
   shown above the notes / the option list; the word limit of a completion block is read from its instruction (ONE WORD ONLY …);
-  `## Sub-heading` lines in a passage become a bold sub-heading; a section with more than one paragraph (A, two plain
-  paragraphs, B …) still gets its letters.
+  `## Sub-heading` lines in a passage become a bold sub-heading and `* note` lines a small footnote; a section with more than
+  one paragraph (A, two plain paragraphs, B …) still gets its letters.
 * **Volume 9**: `full-tests/reading/test-2.html` (the template of `npm run build:reading`) now has the same start screen as the
   other full tests (Instructions / Note / Exam Mode / Start Test) instead of the old name card; the Volume 9 pages were rebuilt.
 * `reading-src/` is never served (the Node server blocks it like `scripts/`; `middleware.js` already did on Vercel).

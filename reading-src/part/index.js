@@ -34,7 +34,21 @@ const LIST = [
   require('./10-the-pearl'),
   require('./11-ahead-of-its-time'),
   require('./12-roller-coaster'),
-  require('./13-science-and-filmmaking')
+  require('./13-science-and-filmmaking'),
+  require('./14-talbot-park'),
+  require('./15-playing-soccer'),
+  require('./16-facial-expressions'),
+  require('./17-plants-talk'),
+  require('./18-robert-louis-stevenson'),
+  require('./19-practical-learning'),
+  require('./20-all-in-the-family'),
+  require('./21-clean-a-beach'),
+  require('./22-william-gilbert'),
+  require('./23-sign-baby-sign'),
+  require('./24-malaria-italy'),
+  require('./25-why-dont-we-sleep'),
+  require('./26-roman-transport'),
+  require('./27-what-lucy-taught-us')
 ];
 
 /* one file -> the test as the admin panel saves it (POST /api/admin/materials) */

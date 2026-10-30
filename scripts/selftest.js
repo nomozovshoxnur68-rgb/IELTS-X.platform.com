@@ -123,7 +123,9 @@ server.listen(0, async () => {
       const left = (await call('GET', '/api/admin/materials', { jar: boss })).json.items;
       assert.ok(!left.some((m) => m.id === r.json.item.id), 'the removed test is gone');
       const bi = left.filter((m) => m.type === 'reading' && m.data.mode === 'part');
-      assert.equal(bi.length, LIST.length); assert.ok(bi.every((m) => m.published && !m.premium && m.data.no >= 22 && m.data.questions.length >= 12))   // "choose TWO" is one entry;
+      // a "choose TWO / THREE" entry is two / three numbered questions: every passage has 13 (Passage 3: 14)
+      const numbered = (m) => m.data.questions.reduce((n, q) => n + (q.type === 'mcq-multi' ? q.answer.split(',').length : 1), 0);
+      assert.equal(bi.length, LIST.length); assert.ok(bi.every((m) => m.published && !m.premium && m.data.no >= 22 && numbered(m) === (m.data.passageLabel === 'Passage 3' ? 14 : 13)));
       assert.deepEqual(bi.map((m) => m.data.no).sort((a, b) => a - b), LIST.map((_, i) => 22 + i));
       const amb = bi.find((m) => /^Ambergris/.test(m.title)); assert.equal(amb.data.no, 22, 'the first file is test-22');
       let pg = await call('GET', '/pessages/test-22'); assert.equal(pg.status, 200); assert.ok(pg.text.includes('Ambergris') && pg.text.includes('const PONLY = 1') && pg.text.includes('"noteTitle": "How ambergris is formed"'));
