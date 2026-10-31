@@ -70,7 +70,16 @@
                 { source: 'Full Reading Test 11', tags: ['Matching Headings', 'True False Not Given', 'Summary Completion'], href: '/full-tests/reading/test-3', premium: true },
                 { source: 'Full Reading Test 14', tags: ['Multiple Choice', 'Matching Information', 'Sentence Completion'], href: '/full-tests/reading/test-4', premium: true }
             ] },
-            { slug: 'pack-6', title: 'Pack 6', tier: 'Tier 3', plan: 'MAX', premium: true, tests: [] },
+            { slug: 'pack-6', title: 'Pack 6', tier: 'Tier 3', plan: 'MAX', premium: true, tests: [
+                /* Pack 6 Full Tests 1–7 ("10 Real Exam Reading Tests", Tests 1–7): full-tests/reading/test-p6-N.html */
+                { source: 'Pack 6 | Full Test 1', tags: ['Notes Completion', 'Matching Headings', 'Diagram Completion'], href: '/full-tests/reading/test-p6-1', premium: true },
+                { source: 'Pack 6 | Full Test 2', tags: ['True False Not Given', 'Matching Information', 'Sentence Endings'], href: '/full-tests/reading/test-p6-2', premium: true },
+                { source: 'Pack 6 | Full Test 3', tags: ['Matching Headings', 'Multiple Choice', 'Yes No Not Given'], href: '/full-tests/reading/test-p6-3', premium: true },
+                { source: 'Pack 6 | Full Test 4', tags: ['Table Completion', 'Matching Headings', 'Short Answer'], href: '/full-tests/reading/test-p6-4', premium: true },
+                { source: 'Pack 6 | Full Test 5', tags: ['Notes Completion', 'Matching Information', 'Matching Features'], href: '/full-tests/reading/test-p6-5', premium: true },
+                { source: 'Pack 6 | Full Test 6', tags: ['True False Not Given', 'Matching Headings', 'Summary Completion'], href: '/full-tests/reading/test-p6-6', premium: true },
+                { source: 'Pack 6 | Full Test 7', tags: ['Notes Completion', 'Matching Information', 'Sentence Endings'], href: '/full-tests/reading/test-p6-7', premium: true }
+            ] },
             { slug: 'volume-8', title: 'Volume 8', tier: 'Tier 2', plan: 'MAX', premium: true, tests: [
                 { source: 'Full Reading Test 8', tags: ['True False Not Given', 'Matching Headings', 'Sentence Completion'], href: '/full-tests/reading/test-1', premium: true }
             ] },
