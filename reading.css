@@ -5098,19 +5098,28 @@ body.dark-mode .results-modal-close:hover{background:rgba(255,255,255,.18)}
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   FLOWER POWER explanation style — red panels, yellow 💡 highlights
+   FLOWER POWER explanation style — panels, yellow 💡 highlights
    with the note opening inline in the passage itself.
+   The panels and buttons speak in the reading screen's own review key
+   (the navy of the score report, light blue in dark mode), not in red:
+   red is the exam's brand and its "wrong answer" colour, and a red
+   explanation next to a red cross read as a second error.
    ═══════════════════════════════════════════════════════════════════ */
 body.review-mode{
-  --fp-accent:#e31837; --fp-accent-dark:#c11530;
-  --fp-light:rgba(227,24,55,.10); --fp-line:rgba(227,24,55,.22);
-  --fp-ink:#1c1c1e; --fp-hl:#ffeb3b;
+  --fp-accent:var(--rvw-key); --fp-accent-dark:var(--rvw-key);
+  --fp-light:var(--rvw-key-wash); --fp-line:var(--rvw-line-2);
+  --fp-ink:var(--rvw-ink); --fp-hl:#ffeb3b;
 }
 body.review-mode.dark-mode{
-  --fp-accent:#ff4f68; --fp-accent-dark:#ff2d4d;
-  --fp-light:rgba(255,79,104,.16); --fp-line:rgba(255,79,104,.30);
-  --fp-ink:#f2f2f7; --fp-hl:#ffd426;
+  --fp-accent:var(--rvw-key); --fp-accent-dark:var(--rvw-key);
+  --fp-light:var(--rvw-key-wash); --fp-line:var(--rvw-line-2);
+  --fp-ink:var(--rvw-ink); --fp-hl:#ffd426;
 }
+/* the Uzbek half of an explanation: a hairline in the panel's own colour (the pages
+   write it with an inline black rule, invisible on the dark screen) */
+.explain-panel .ep-text .ep-uz,.fp-note .ep-uz,
+.explain-panel .ep-text div[style*="border-top"],.fp-note div[style*="border-top"]{
+  margin-top:9px;padding-top:8px;border-top:1px solid var(--fp-line,rgba(0,0,0,.14)) !important}
 
 /* ── the per-question panel in the question pane ── */
 body.review-mode .explain-panel{
@@ -5632,3 +5641,15 @@ body.dark-mode .passage-text .pass-foot{color:var(--ex-ink-2)}
 .rt-table th{overflow-wrap:normal;hyphens:auto;-webkit-hyphens:auto}
 .rt-table .prose-gap{display:inline-flex;max-width:100%}
 .rt-table .gap-input{width:100%;max-width:150px;min-width:56px;box-sizing:border-box}
+
+/* the Uzbek half of an explanation written by scripts/build-reading.js */
+.ep-uz{margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14)}
+body.dark-mode .ep-uz{border-top-color:rgba(255,255,255,.16)}
+
+/* ── Selecting text: only the passage and the questions ──
+   Everything else on the exam screen (header, part bar, footer, arrows, buttons) cannot be
+   selected, so neither the browser's selection nor the Highlight / Note popup appears there. */
+#stage-reading,#stage-reading #passage-pane{-webkit-user-select:none;user-select:none}
+#stage-reading #passage-pane .passage-text,#stage-reading #questions-pane{-webkit-user-select:text;user-select:text}
+#stage-reading #questions-pane button,#stage-reading #passage-pane .passage-text button{-webkit-user-select:none;user-select:none}
+#stage-reading input,#stage-reading textarea{-webkit-user-select:text;user-select:text}

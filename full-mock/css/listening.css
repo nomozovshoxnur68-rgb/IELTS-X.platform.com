@@ -4466,3 +4466,11 @@ html.mock-embed #entry-form,html.mock-embed .entry-tg{display:none!important}
 #mock-exit{position:fixed;right:16px;bottom:16px;z-index:99999;background:#111;color:#fff;border:0;border-radius:4px;
   padding:11px 18px;font:14px Arial,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 #mock-exit:hover{background:#000}
+
+/* ── Selecting text: only the question paper ──
+   The header, the part bar, the footer and the buttons cannot be selected, so neither the
+   browser's selection nor the Highlight / Note popup appears there. */
+#stage-listening{-webkit-user-select:none;user-select:none}
+#stage-listening #listening-render{-webkit-user-select:text;user-select:text}
+#stage-listening #listening-render button,#stage-listening .q-pill,#stage-listening .drag-chip{-webkit-user-select:none;user-select:none}
+#stage-listening input,#stage-listening textarea{-webkit-user-select:text;user-select:text}

@@ -1358,6 +1358,11 @@ function setupHighlighter() {
       if (!sel.rangeCount || sel.isCollapsed) return;
       
       const range = sel.getRangeAt(0);
+      // Highlight and Note exist only on the listening paper itself: the
+      // selection must sit wholly inside #listening-render, and never in a field.
+      const host = document.getElementById('listening-render');
+      const inHost = n => { const el = n && (n.nodeType === 1 ? n : n.parentElement); return !!(host && el && host.contains(el) && !el.closest('input,textarea,select,button')); };
+      if (!inHost(range.startContainer) || !inHost(range.endContainer)) { popup.classList.remove('show'); return; }
       const rect = range.getBoundingClientRect();
 
       // The official adder carries only Note and Highlight. Clear is ours, and
@@ -1429,7 +1434,8 @@ function beginListening(){
   };
   if(window.__cdiReduced)go();else setTimeout(go, 260);
 }
-function confirmSubmit(btn){if(btn&&btn.id==='sub-btn'){if(!btn.dataset.confirm){btn.dataset.confirm='1';btn.style.background='var(--crimson)';btn.style.color='#fff';toast('Click ✓ again to submit your test','warn');setTimeout(()=>{btn.dataset.confirm='';btn.style.background='';btn.style.color='';},3000);return;}finishExam();return;}finishExam();}
+/* One press submits (the ✓ used to need a second press within 3 seconds); only while the test runs, so a double click submits once. */
+function confirmSubmit(btn){if(state.stage!=='listening')return;finishExam();}
 function backToResults(){
   // Move audio controls back to pbar
   const audioEl=document.getElementById('pbar-audio');

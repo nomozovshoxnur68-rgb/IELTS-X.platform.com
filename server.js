@@ -564,7 +564,7 @@ const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article'
    "full" = a whole paper, listed on the Full Tests page inside its pack. Tests saved before this existed are "part". */
 const MODE_TYPES = ['reading', 'listening', 'writing', 'speaking'];
 const materialMode = (m) => (m && m.data && m.data.mode === 'full' ? 'full' : 'part');
-const Q_TYPES =['short', 'completion', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
+const Q_TYPES =['short', 'completion', 'table', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
 const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 const cleanTitle = (v) => String(v || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
@@ -663,7 +663,7 @@ function cleanMaterialData(type, d) {
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
-      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000),
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000), table: t === 'table' ? (cut(q.table, 6000) || undefined) : undefined,
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined,
         // where the question came from (printed in the source / written by the AI Test Generator) and, for listening, the second the answer is heard
@@ -766,7 +766,7 @@ function isCorrect(q, given) {
 /* the question-type chips of a card: what the admin typed, or taken from the questions */
 function cardTypesOf(d) {
   if (Array.isArray(d.cardTypes) && d.cardTypes.length) return d.cardTypes;
-  const L = { short: 'Sentence Completion', completion: 'Completion', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
+  const L = { short: 'Sentence Completion', completion: 'Completion', table: 'Table Completion', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
   const out = [];
   for (const q of require('./reading-exam').inheritGroups(d.questions)) {
     let t = L[q.type];

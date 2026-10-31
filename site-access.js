@@ -9,6 +9,7 @@
  */
 import { getCurrentUser, logout, safeNext, resendVerification } from './auth.js';
 import './assets/js/branding.js';   // the logo chosen in the admin panel
+import './assets/js/no-context-menu.js';   // no right-click menu on the site
 
 const LEGACY_KEYS = ['ieltsx_logged_in_email', 'userEmail']; // read by ieltsx-data.js to keep test results per user
 let userPromise = null;

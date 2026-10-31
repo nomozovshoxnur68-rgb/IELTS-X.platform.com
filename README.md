@@ -355,3 +355,24 @@ Nothing is saved or published by the generator itself; the manual forms are unch
   transcript in the PDF (quoted in the explanations).
 * `listening-router.js`: the last hand-made section is `sections/test-5.html` (was 4), so on Vercel – where the folder cannot be
   read – a new section never gets the number of that page. `listening-src/` is never served (server and `middleware.js`).
+
+## Admin: questions, answers and explanations in three steps; tables; exam fixes (October 2026)
+
+Reading and Listening tests (Part and Full) are filled in the admin panel in three steps, each **by question number**:
+
+1. **Questions**: paste one block of the paper at a time (`From 1`, then `From 7` …) as it is printed: the instruction,
+   the option list / list of headings and the numbered questions, no answers. The type is read from the instruction (or
+   chosen). Pasting the same numbers again replaces that block; a block may be added before the one in front of it.
+2. **Answers**: paste the answer key (`1 governess`, `7 FALSE`, `21-22 B, D`; two columns are fine), or one answer per
+   line from a number. 3. **Explanations**: `1. …` per number, `Evidence: …` sets the passage highlight.
+
+The strip of numbers 1–40 shows what each number still needs. **Everything together** is the old form with every field.
+
+* **Table completion** (Reading and Listening): the table is typed once (first line = column headings, cells split by
+  `|`, `____` = a gap). Every gap is one question, numbered row by row; the student sees a real table.
+* Reading (all engines): the ← → arrows go to the previous / next **question** (into the next part after the last one);
+  ✓ submits with **one** press (Listening too); Highlight / Note only on the passage text and the questions (the rest of
+  the screen cannot be selected; Listening: only the question paper); explanations use the reading screen's blue review
+  colours instead of red.
+* No right-click menu on any page (`assets/js/no-context-menu.js`, loaded by `site-access.js` or its own tag); text
+  fields keep theirs.

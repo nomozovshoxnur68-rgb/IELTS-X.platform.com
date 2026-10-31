@@ -3904,4 +3904,10 @@ body.review-mode #rate-select,body.review-mode .rate-select{
   border-radius:var(--radius);border:1px solid var(--rv-line-2);
   background:var(--rv-paper);color:var(--rv-ink-2);font-family:var(--sans)}
 
-
+/* ── Selecting text: only the question paper ──
+   The header, the part bar, the footer and the buttons cannot be selected, so neither the
+   browser's selection nor the Highlight / Note popup appears there. */
+#stage-listening{-webkit-user-select:none;user-select:none}
+#stage-listening #listening-render{-webkit-user-select:text;user-select:text}
+#stage-listening #listening-render button,#stage-listening .q-pill,#stage-listening .drag-chip{-webkit-user-select:none;user-select:none}
+#stage-listening input,#stage-listening textarea{-webkit-user-select:text;user-select:text}

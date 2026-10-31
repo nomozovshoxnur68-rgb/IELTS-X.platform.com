@@ -131,9 +131,10 @@ function buildSections(questions, startN) {
   questions = inheritGroups(questions);
   const sections = []; let n = startN || 1; let cur = null; let key = '';
   const headings = []; const slots = [];
-  const defaultTitle = { notes: 'Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
+  const defaultTitle = { notes: 'Completion', table: 'Table Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
   const defaultInstr = {
     notes: 'Complete the answers below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    table: 'Complete the table below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
     tfng: 'Do the following statements agree with the information given in the passage? Choose <b>TRUE</b>, <b>FALSE</b> or <b>NOT GIVEN</b>.',
     ynng: 'Do the following statements agree with the views of the writer? Choose <b>YES</b>, <b>NO</b> or <b>NOT GIVEN</b>.',
     mcq: 'Choose the correct letter, <b>A</b>, <b>B</b>, <b>C</b> or <b>D</b>.',
@@ -153,7 +154,20 @@ function buildSections(questions, startN) {
     key = k; sections.push(cur); return cur;
   };
   for (const q of questions) {
-    const t = q.type;
+    // a one-column "table" reads better as notes
+    const t = q.type === 'table' && tableCols(q.table) < 2 ? 'completion' : q.type;
+    if (t === 'table') {
+      const sec = open('table', q); sec.wordLimit = sec.wordLimit || wordLimitOf(q.group) || 3;
+      if (!sec.rows) {   // the first gap of this table: its gaps are numbered from here, row by row
+        const rows = tableRowsOf(q.table); const cols = tableCols(q.table); let g = n;
+        const pad = (r) => r.concat(Array(Math.max(0, cols - r.length)).fill(''));
+        sec.headers = pad(rows[0] || []).map((c) => esc(c));
+        sec.rows = rows.slice(1).map((r) => pad(r).map((c) => esc(c).replace(TABLE_GAP, () => '{{' + (g++) + '}}')));
+        const bt = String(q.blockTitle || '').trim(); if (bt) sec.tableTitle = esc(bt);
+      }
+      sec.items.push({ id: n, answer: String(q.answer || ''), label: '' }); n += 1;
+      continue;
+    }
     if (t === 'tfng' || t === 'ynng') {
       open(t, q).items.push({ id: n, answer: tfWord(q.answer, t === 'ynng'), label: esc(q.prompt) }); n += 1;
     } else if (t === 'mcq') {
@@ -188,6 +202,12 @@ function buildSections(questions, startN) {
   }
   return { sections, headings, slots, total: n - 1 };
 }
+
+/* a table typed in the admin panel: first line = column headings, one row per line, cells split by | (or a tab), ____ = a gap */
+const TABLE_GAP = /_{2,}|\.{4,}|\u2026{2,}/g;
+const tableRowsOf = (t) => String(t || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
+  .map((l) => l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/).map((c) => c.trim()));
+const tableCols = (t) => tableRowsOf(t).reduce((m, r) => Math.max(m, r.length), 0);
 
 const isFull = (material) => !!(material && material.data && material.data.mode === 'full');
 

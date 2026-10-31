@@ -100,7 +100,7 @@ function build(spec, file) {
     const hl = []; cand.forEach((c) => { c = String(c).trim(); if (!c) return; if (hay.includes(norm(c))) hl.push(c); else if (it.ev) warn('Q' + id + ': evidence not found in passage ' + p + ': "' + c.slice(0, 60) + '"'); });
     if (!hl.length && !/^not given/i.test(String(it.a || '')) && !it.noEv) warn('Q' + id + ': nothing to highlight (put the passage words in "quotes" in en, or ev)');
     EXPL[id] = {
-      explanation: esc(en) + (uz ? '<div style="margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.14);"><b>Oʻzbekcha:</b> ' + esc(uz) + '</div>' : ''),
+      explanation: esc(en) + (uz ? '<div class="ep-uz"><b>Oʻzbekcha:</b> ' + esc(uz) + '</div>' : ''),
       highlights: hl, paraphraseMap: [], en: esc(en), uz: esc(uz)
     };
   };

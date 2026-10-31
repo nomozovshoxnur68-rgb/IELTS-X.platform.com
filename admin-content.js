@@ -5,9 +5,9 @@
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const TYPES = { reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', article: 'Articles', pdf: 'PDF materials' };
   const TOPICS = ['General', 'History', 'Science', 'Technology', 'Environment', 'Health', 'Education', 'Society', 'Business', 'Culture', 'Nature', 'Psychology'];
-  const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / table / flow-chart / summary completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
+  const Q_LABEL = { short: 'Short answer / sentence completion', completion: 'Note / form / flow-chart / summary completion', table: 'Table completion (rows and columns)', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (two or more answers)', matching: 'Matching: headings / information / features / sentence endings', map: 'Map / plan / diagram labelling (choose a letter)' };
   /* Listening has its own question types: they are the types of the listening engine (listening/js/listening.js) */
-  const LQ_LABEL = { gap: 'Completion, typed: notes / form / table / sentence / flow-chart', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice, choose TWO / THREE letters', matching: 'Matching: drag the lettered option into the gap', map: 'Map / plan / diagram labelling (tick one letter)', box: 'Completion with a word box (drag a word into the text)' };
+  const LQ_LABEL = { gap: 'Completion, typed: notes / form / sentence / flow-chart', table: 'Table completion, typed (rows and columns)', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice, choose TWO / THREE letters', matching: 'Matching: drag the lettered option into the gap', map: 'Map / plan / diagram labelling (tick one letter)', box: 'Completion with a word box (drag a word into the text)' };
   const qLabels = () => (draft && draft.type === 'listening' ? LQ_LABEL : Q_LABEL);
   const OPT_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
   const lists = { reading: null, listening: null, writing: null, speaking: null, article: null, pdf: null };
@@ -338,7 +338,6 @@
     } else draft.data.images = draft.data.images || [];
     if (draft.type === 'reading') { draft.data.mode = draft.data.mode === 'full' ? 'full' : 'part'; const ps = Array.isArray(draft.data.passages) ? draft.data.passages : []; draft.data.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); }
     if ((draft.type === 'reading' || draft.type === 'listening') && !Array.isArray(draft.groups)) { draft.groups = toGroups(draft.data.questions || []); }   // a restored draft keeps its groups
-    if ((draft.type === 'reading' || draft.type === 'listening') && !draft.groups.length) draft.groups = [newGroup(draft.type === 'listening' ? 'gap' : 'short')];
     if (draft.type === 'speaking' && !(draft.data.parts || []).length) draft.data.parts = blank('speaking', draft.data.mode).data.parts;
     if (draft.type === 'writing') {
       if (!(draft.data.tasks || []).length) draft.data.tasks = blank('writing', draft.data.mode).data.tasks;
@@ -427,8 +426,41 @@
   const ROMANS = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
   const optToken = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})\s*[.):]\s+([\s\S]*)$/.exec(String(o || '')); return m ? { l: m[1], t: m[2] } : { l: /^[A-Za-z]$/.test(String(o || '').trim()) ? String(o).trim() : String.fromCharCode(65 + i), t: String(o || '').trim() }; };
   const newItem = () => ({ prompt: '', answer: '', explanation: '', evidence: '', title: '', options: [] });
-  const newGroup = (type, passage) => ({ type, passage: passage || 1, group: '', blockTitle: '', options: [], items: [newItem()] });
+  const newGroup = (type, passage) => ({ type, passage: passage || 1, group: '', blockTitle: '', table: '', options: [], items: type === 'table' ? [] : [newItem()] });
   const normType = (t) => (draft && draft.type === 'listening' ? (LQ_LABEL[t] ? t : 'gap') : (Q_LABEL[t] ? t : 'short'));
+  /* how many numbers of the paper one question uses: a "choose TWO" question uses two. Before its answer is in, the
+     width comes from the block it was pasted with (w: "Choose TWO letters" / Questions 21–22). */
+  const itemWidth = (g, it) => (g.type === 'mcq-multi' ? Math.max(draft.type === 'listening' ? 2 : 1, gLetters(it.answer).length, Number(it.w) || 1) : 1);
+
+  /* ═════════ Table completion ═════════
+     The table is typed ONCE for the group: the first line is the column headings, then one row per line, cells split
+     by | (or a tab), and ____ for each gap. The questions of the group are its gaps, in reading order (row by row,
+     left to right); each one only needs its answer (and explanation). */
+  const TABLE_GAP = /_{2,}|\.{4,}|…{2,}/;
+  const tableRows = (t) => String(t || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
+    .map((l) => l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/).map((c) => c.trim()));
+  /* the cell text of every gap below the heading line: "Rapid ____" */
+  function tableGaps(t) {
+    const out = [];
+    tableRows(t).slice(1).forEach((row) => row.forEach((c) => {
+      const parts = c.split(new RegExp(TABLE_GAP.source, 'g'));
+      for (let k = 0; k < parts.length - 1; k++) out.push(parts.map((p, j) => p + (j < parts.length - 1 ? (j === k ? '____' : '…') : '')).join('').trim());
+    }));
+    return out;
+  }
+  /* one question per gap: answers stay with their gap; the question text is the gap's cell (so it is never empty) */
+  function syncTable(g) {
+    const gaps = tableGaps(g.table);
+    while (g.items.length < gaps.length) g.items.push(newItem());
+    if (g.items.length > gaps.length) g.items.length = gaps.length;
+    g.items.forEach((it, k) => { it.prompt = gaps[k]; it.options = []; });
+  }
+  /* a table pasted from a PDF / Word: "32 ………", "(32) ____" become ____; cells split by |, tabs or (no other sign) 2+ spaces */
+  function tableFromText(lines) {
+    const raw = lines.map((l) => String(l || '').replace(/\(?\b\d{1,2}\b\)?\s*(?:\.{3,}|…+|_{2,})|(?:\.{3,}|…+|_{2,})\s*\(?\b\d{1,2}\b\)?|_{2,}|\.{4,}|…{2,}/g, '____').trim()).filter(Boolean);
+    const marked = raw.some((l) => /\||\t/.test(l));
+    return raw.map((l) => (marked ? l.replace(/\t+/g, ' | ') : l.split(/\s{2,}/).join(' | '))).join('\n');
+  }
 
   function toGroups(qs) {
     const gs = []; let cur = null;
@@ -437,7 +469,7 @@
       const g = String(q.group || '').trim(); const shared = SHARED_OPTS.includes(type); const opts = Array.isArray(q.options) ? q.options : [];
       const pass = Number(q.passage) || 1;
       const same = cur && cur.type === type && pass === cur.passage && (hasGi ? q.gi === cur._gi : (!g || g === cur.group)) && (!shared || !opts.length || !cur.options.length || JSON.stringify(opts) === JSON.stringify(cur.options));
-      if (!same) { cur = { type, passage: pass, group: g, blockTitle: q.blockTitle || '', options: [], items: [], _gi: hasGi ? q.gi : undefined }; gs.push(cur); }
+      if (!same) { cur = { type, passage: pass, group: g, blockTitle: q.blockTitle || '', table: String(q.table || ''), options: [], items: [], _gi: hasGi ? q.gi : undefined }; gs.push(cur); }
       if (shared && !cur.options.length && opts.length) cur.options = opts.slice();
       if (!cur.group && g) cur.group = g; if (!cur.blockTitle && q.blockTitle) cur.blockTitle = q.blockTitle;
       cur.items.push({ prompt: q.prompt || '', answer: q.answer || '', explanation: q.explanation || '', evidence: q.evidence || '', title: q.title || '', options: shared ? [] : opts.slice(), origin: q.origin, at: q.at });
@@ -458,7 +490,7 @@
     const out = []; const idx = (gs || []).map((_, i) => i);
     if (isMultiSection()) idx.sort((a, b) => (gs[a].passage - gs[b].passage) || (a - b));
     idx.forEach((i, n) => { const g = gs[i]; const shared = SHARED_OPTS.includes(g.type);
-      g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
+      g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), table: g.type === 'table' ? String(g.table || '').trim() : undefined, title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
         options: (shared ? g.options : it.options || []).map((o) => String(o).trim()).filter(Boolean), answer: normAnswer(g.type, it.answer), explanation: String(it.explanation || '').trim(), evidence: String(it.evidence || '').trim(),
         origin: it.origin === 'ai' || it.origin === 'source' ? it.origin : undefined, at: Number(it.at) > 0 ? Number(it.at) : undefined })); });   // where an AI-made question came from, when an answer is heard
     return out;
@@ -468,10 +500,17 @@
     if (draft.type === 'listening' && !isFullListening()) { const part = parseInt(String(draft.data.sectionLabel || '').replace(/\D+/g, ''), 10) || 1; n = (part - 1) * 10 + 1; }
     // a Reading Part test is numbered like its passage in the paper: Passage 2 = Questions 14–26, Passage 3 = 27–40 (reading-exam.js does the same)
     if (draft.type === 'reading' && !isFullReading()) n = ({ 2: 14, 3: 27 })[parseInt(String(draft.data.passageLabel || '').replace(/\D+/g, ''), 10)] || 1;
-    orderedGroups().forEach((i) => { const g = gs[i]; const from = n;
-      g.items.forEach((it) => { n += g.type === 'mcq-multi' ? (draft.type === 'listening' ? Math.max(2, gLetters(it.answer).length) : Math.max(1, gLetters(it.answer).length)) : 1; });
+    // a group added by its numbers ("Questions 14–26" before 1–13 is in) keeps them: the numbers before it stay free
+    orderedGroups().forEach((i) => { const g = gs[i]; if (Number(g.start) > n) n = Number(g.start); const from = n;
+      g.items.forEach((it) => { n += itemWidth(g, it); });
       map[i] = { from, to: Math.max(from, n - 1) }; });
     return map;
+  }
+  /* every question with its number: [{ gi, ii, g, it, n, w }] in the order of the paper */
+  function numberedItems() {
+    const gs = draft.groups || []; const num = numbering(); const out = [];
+    orderedGroups().forEach((gi) => { const g = gs[gi]; let n = num[gi].from; g.items.forEach((it, ii) => { const w = itemWidth(g, it); out.push({ gi, ii, g, it, n, w }); n += w; }); });
+    return out;
   }
 
   /* ───────── checks before saving: every problem listed at once ───────── */
@@ -483,6 +522,12 @@
       const where = 'Group ' + (gi + 1) + ' (' + (qLabels()[g.type] || g.type).split(':')[0] + ')'; const shared = SHARED_OPTS.includes(g.type);
       const filled = g.items.filter((it) => String(it.prompt || '').trim() || String(it.answer || '').trim());
       if (!filled.length) { warn(where + ' is empty and will be left out.', gi); return; }
+      if (g.type === 'table') {
+        const rows = tableRows(g.table);
+        if (rows.length < 2) err(where + ': type the table — the column headings on the first line, then one row per line, cells split by |.', gi);
+        else if (!tableGaps(g.table).length) err(where + ': the table has no gap. Write ____ in each cell where an answer goes.', gi);
+        if (rows.length && rows[0].some((c) => TABLE_GAP.test(c))) warn(where + ': the first line of the table is its column headings; a ____ there is not a question.', gi);
+      }
       if (shared) {
         const ot = (g.options || []).filter(Boolean);
         if (ot.length < 2) err(where + ': type the option list (at least 2 lines) once, at the top of the group.', gi);
@@ -492,7 +537,7 @@
         const has = String(it.prompt || '').trim(), ans = String(it.answer || '').trim(); const q = 'Question ' + n;
         if (!has && !ans) return;
         // a "choose TWO" question uses two numbers of the paper
-        const width = g.type === 'mcq-multi' ? Math.max(L ? 2 : 1, gLetters(ans).length) : 1;
+        const width = itemWidth(g, it);
         total += width; perPass[g.passage || 1] += width;
         if (!has) err(q + ' (' + where + '): the question text is empty.', gi);
         else if (!ans) err(q + ' (' + where + '): no correct answer.', gi);
@@ -515,9 +560,16 @@
           }
           if (L && (g.type === 'gap' || g.type === 'box') && !/_{2,}|\.{4,}|…/.test(has)) warn(q + ' (' + where + '): write ____ where the answer goes, so the student sees the gap.', gi);
         }
-        n += g.type === 'mcq-multi' ? Math.max(L ? 2 : 1, gLetters(ans).length) : 1;
+        n += itemWidth(g, it);
       });
       if (isFullReading() && !String(((draft.data.passages || [])[(g.passage || 1) - 1] || {}).passage || '').trim()) err(where + ' belongs to Passage ' + (g.passage || 1) + ', but that passage has no text.', gi);
+    });
+    // numbers still missing: a block added by its numbers while the one before it is not in yet
+    let expect = null;
+    orderedGroups().forEach((gi) => {
+      const g = gs[gi]; if (!g.items.some((it) => String(it.prompt || '').trim() || String(it.answer || '').trim())) return; const r = num[gi];
+      if (expect !== null && r.from > expect) err('Questions ' + expect + (r.from - 1 > expect ? '–' + (r.from - 1) : '') + ' are missing: add them in “1 · Questions” (saved as it is, the numbers after them would move up).', gi);
+      expect = r.to + 1;
     });
     if (!total) err('Add at least one question with its answer.');
     if (isFullReading() && total && total !== 40) warn('A full reading paper normally has 40 questions; this one has ' + total + ' (Passage 1: ' + perPass[1] + ', 2: ' + perPass[2] + ', 3: ' + perPass[3] + ').');
@@ -544,7 +596,8 @@
     matching: 'List the options / headings ONCE above. Each question is only the item (e.g. Paragraph A) and its letter / number.',
     map: 'List the letters of the map ONCE above (A, B, C…). Each question is the place name and its letter.',
     gap: 'One line of the notes with ____ where the answer goes.',
-    box: 'List the words of the box ONCE above. Each question is a line with ____ and the right word.'
+    box: 'List the words of the box ONCE above. Each question is a line with ____ and the right word.',
+    table: 'Type the table ONCE above (cells split by |, ____ for each gap). Every gap is one question: only its answer is needed.'
   };
   const SHARED_LABEL = { matching: 'Options / headings of this group (typed ONCE, one per line, each with its letter or number)', map: 'Letters on the map (typed ONCE, one per line: A, B, C…)', box: 'Words of the box (typed ONCE, one per line)' };
   const SHARED_PH = { matching: 'A. Paragraph A\nB. Paragraph B\n…   or   i. The cost of change\nii. A new approach', map: 'A\nB\nC\nD\nE\nF\nG\nH', box: 'bridge\ngarden\nmuseum' };
@@ -557,51 +610,265 @@
     if (g.type === 'box') { const ws = (g.options || []).map((o) => String(o).trim()).filter(Boolean); if (ws.length >= 2) return sel(ws); }
     return `<input class="field" data-p="${p}" value="${esc(v)}" placeholder="${g.type === 'mcq' ? 'Letter, e.g. B' : g.type === 'mcq-multi' ? 'Letters, e.g. A,C' : g.type === 'matching' || g.type === 'map' ? 'Letter / number' : 'Correct answer (| = alternatives)'}">`;
   }
-  const qNum = (g, ii, from) => { let n = from; for (let k = 0; k < ii; k++) n += g.type === 'mcq-multi' ? Math.max(draft.type === 'listening' ? 2 : 1, gLetters(g.items[k].answer).length) : 1; return n; };
-  function groupBlock(g, gi, range, total) {
+  const qNum = (g, ii, from) => { let n = from; for (let k = 0; k < ii; k++) n += itemWidth(g, g.items[k]); return n; };
+  function groupBlock(g, gi, range, total, mode) {
     const L = draft.type === 'listening'; const shared = SHARED_OPTS.includes(g.type); const full = isMultiSection();
+    const qOnly = mode === 'q'; const isTable = g.type === 'table';
     const items = g.items.map((it, ii) => {
       const p = `groups.${gi}.items.${ii}`; const multi = g.type === 'mcq' || g.type === 'mcq-multi';
-      const prompt = `<textarea class="field gi-prompt" rows="${multi ? 2 : 1}" data-p="${p}.prompt" placeholder="${esc(GROUP_HINT[g.type] ? (g.type === 'tfng' || g.type === 'ynng' ? 'Statement' : multi ? 'Question' : g.type === 'matching' || g.type === 'map' ? 'Item, e.g. Paragraph A' : g.type === 'short' || g.type === 'completion' || g.type === 'gap' || g.type === 'box' ? 'Text with ____ for the gap' : 'Question') : 'Question')}">${esc(it.prompt)}</textarea>`;
+      const prompt = isTable ? `<div class="field gi-cell" title="The cell of this gap (edit the table above)">${esc(it.prompt)}</div>`
+        : `<textarea class="field gi-prompt" rows="${multi ? 2 : 1}" data-p="${p}.prompt" placeholder="${esc(GROUP_HINT[g.type] ? (g.type === 'tfng' || g.type === 'ynng' ? 'Statement' : multi ? 'Question' : g.type === 'matching' || g.type === 'map' ? 'Item, e.g. Paragraph A' : g.type === 'short' || g.type === 'completion' || g.type === 'gap' || g.type === 'box' ? 'Text with ____ for the gap' : 'Question') : 'Question')}">${esc(it.prompt)}</textarea>`;
       // made by the AI Test Generator: "AI" = written by the AI, "check" = its proof was not found in the passage / transcript
       const tags = (it.origin === 'ai' ? '<span class="cb-ai-tag" title="Written by the AI">AI</span>' : '') + (it.verified === false ? '<span class="cb-ai-tag warn" title="The AI\'s evidence was not found in the source">check</span>' : '');
+      // a "choose TWO / THREE" question uses that many numbers of the paper (until its answer says so itself)
+      const width = g.type === 'mcq-multi' ? `<label class="lbl sm gi-width">Numbers it uses<select class="field" data-p="${p}.w" data-num="1" data-rerender="1">${[2, 3, 4].map((k) => `<option value="${k}" ${itemWidth(g, it) === k ? 'selected' : ''}>${k} (choose ${['', '', 'TWO', 'THREE', 'FOUR'][k]})</option>`).join('')}</select></label>` : '';
       return `<div class="gi-row"><div class="cb-qn">${qNum(g, ii, range.from)}</div>${tags ? `<div class="cb-ai-tags">${tags}</div>` : ''}<div class="gi-main">
-        <div class="gi-line">${prompt}${answerCell(g, gi, it, ii)}</div>
-        ${multi ? `<textarea class="field" rows="4" data-lines="1" data-p="${p}.options" placeholder="Options, one per line (A, B, C… in this order)">${esc((it.options || []).join('\n'))}</textarea>` : ''}
+        <div class="gi-line${qOnly ? ' gi-qonly' : ''}">${prompt}${qOnly ? '' : answerCell(g, gi, it, ii)}</div>
+        ${multi ? `<textarea class="field" rows="4" data-lines="1" data-p="${p}.options" placeholder="Options, one per line (A, B, C… in this order)">${esc((it.options || []).join('\n'))}</textarea>` : ''}${width}
         ${L && (g.type === 'gap' || g.type === 'box') ? `<input class="field" data-p="${p}.title" value="${esc(it.title)}" placeholder="Small sub-heading before this line (optional), e.g. Prices">` : ''}
-        <input class="field gi-exp" data-p="${p}.explanation" value="${esc(it.explanation)}" placeholder="Explanation shown after submitting (optional). Words in &quot;quotes&quot; are lit up in the passage">
-        ${L ? '' : `<input class="field gi-exp gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="Passage words to highlight (optional — copy them exactly; quotes in the explanation are used if empty)">`}</div>
-        <button class="btn btn-sm btn-danger" data-cb="i-del" data-g="${gi}" data-i="${ii}" type="button" title="Delete this question">✕</button></div>`;
+        ${qOnly ? '' : `<input class="field gi-exp" data-p="${p}.explanation" value="${esc(it.explanation)}" placeholder="Explanation shown after submitting (optional). Words in &quot;quotes&quot; are lit up in the passage">`}
+        ${qOnly || L ? '' : `<input class="field gi-exp gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="Passage words to highlight (optional — copy them exactly; quotes in the explanation are used if empty)">`}</div>
+        ${isTable ? '' : `<button class="btn btn-sm btn-danger" data-cb="i-del" data-g="${gi}" data-i="${ii}" type="button" title="Delete this question">✕</button>`}</div>`;
     }).join('');
     const mcqLike = g.type === 'mcq' || g.type === 'mcq-multi';
     return `<div class="cb-group" id="cb-group-${gi}"><div class="cb-ghead"><div class="cb-gtitle"><span class="cb-gno">Group ${gi + 1}</span><span class="cb-grange">Questions ${range.from}–${range.to} · ${g.items.length} question${g.items.length === 1 ? '' : 's'}</span></div>
         <div class="btn-row"><button class="btn btn-sm" data-cb="g-up" data-g="${gi}" type="button" title="Move up">↑</button><button class="btn btn-sm" data-cb="g-down" data-g="${gi}" type="button" title="Move down">↓</button><button class="btn btn-sm" data-cb="g-dup" data-g="${gi}" type="button" title="Copy this group">Copy</button><button class="btn btn-sm btn-danger" data-cb="g-del" data-g="${gi}" type="button">Remove group</button></div></div>
       <div class="cb-row"><select class="field" data-p="groups.${gi}.type" data-rerender="1" title="Type of this group">${Object.entries(qLabels()).map(([k, v]) => `<option value="${k}" ${g.type === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>${full ? passSelect(`groups.${gi}.passage`, g.passage) : ''}</div>
       <input class="field" data-p="groups.${gi}.group" value="${esc(g.group)}" placeholder="${L ? 'Instruction of this block, e.g. Complete the notes below. Write ONE WORD for each answer.' : 'Instruction of this group, e.g. Complete the notes. Write NO MORE THAN TWO WORDS. (“Questions 1–5” is added by itself. Empty = the standard instruction)'}">
-      ${L ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="Title above the block (optional), e.g. Barrington Historical Buildings Tours">`
-        : (g.type === 'completion' || g.type === 'short' || g.type === 'matching') ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="${g.type === 'matching' ? 'Title of the option list (optional), e.g. List of Categories (not used for headings / paragraph letters)' : 'Title above the notes / summary / table (optional), e.g. How ambergris is formed'}">` : ''}
+      ${L ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="Title above the ${isTable ? 'table' : 'block'} (optional), e.g. Barrington Historical Buildings Tours">`
+        : (g.type === 'completion' || g.type === 'short' || g.type === 'matching' || isTable) ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="${g.type === 'matching' ? 'Title of the option list (optional), e.g. List of Categories (not used for headings / paragraph letters)' : isTable ? 'Title above the table (optional), e.g. Specialisation' : 'Title above the notes / summary / table (optional), e.g. How ambergris is formed'}">` : ''}
+      ${isTable ? `<label class="lbl cb-shared">The table, typed ONCE: the column headings on the first line, then one row per line. Split the cells with <code>|</code> and write <code>____</code> in each cell where an answer goes. Every gap is one question, numbered row by row.<textarea class="field cb-table" rows="7" data-p="groups.${gi}.table" placeholder="Specialised ability | Example fish species&#10;Maintains the same ____ over long distances | Swordfish&#10;Rapid ____ | Barracuda&#10;Rapid changes of direction | ____">${esc(g.table)}</textarea></label>${tablePreview(g, range.from)}` : ''}
       ${shared ? `<label class="lbl cb-shared">${SHARED_LABEL[g.type]}<textarea class="field" rows="${g.type === 'matching' ? 6 : 4}" data-lines="1" data-p="groups.${gi}.options" placeholder="${esc(SHARED_PH[g.type])}">${esc((g.options || []).join('\n'))}</textarea></label>
         ${g.type === 'matching' && !L ? `<div class="btn-row"><button class="btn btn-sm" data-cb="g-letters" data-g="${gi}" type="button">Fill paragraph letters A–G</button><button class="btn btn-sm" data-cb="g-letters-9" data-g="${gi}" type="button">A–I</button></div>` : ''}` : ''}
       <div class="gi-list">${items}</div>
-      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="i-add" data-g="${gi}" type="button">+ Question</button><button class="btn btn-sm" data-cb="g-paste" data-g="${gi}" type="button">Paste many into this group</button></div>
-      <div class="cb-bulk" id="gpaste-${gi}" hidden><div class="muted sm"><b>${esc(GROUP_HINT[g.type] || '')}</b><br>One question per line: <code>question =&gt; answer =&gt; explanation</code> (explanation optional). Or blocks: <code>1. text</code> / <code>Answer: …</code> / <code>Explanation: …</code>.${mcqLike ? ' Put the options (<code>A. …</code>) under each question.' : ''}</div>
+      ${isTable ? '' : `<div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="i-add" data-g="${gi}" type="button">+ Question</button>${qOnly ? '' : `<button class="btn btn-sm" data-cb="g-paste" data-g="${gi}" type="button">Paste many into this group</button>`}</div>`}
+      ${isTable || qOnly ? '' : `<div class="cb-bulk" id="gpaste-${gi}" hidden><div class="muted sm"><b>${esc(GROUP_HINT[g.type] || '')}</b><br>One question per line: <code>question =&gt; answer =&gt; explanation</code> (explanation optional). Or blocks: <code>1. text</code> / <code>Answer: …</code> / <code>Explanation: …</code>.${mcqLike ? ' Put the options (<code>A. …</code>) under each question.' : ''}</div>
         <textarea class="field" id="gpaste-text-${gi}" rows="8" placeholder="${g.type === 'tfng' ? 'Glass was first made in Egypt. => TRUE => Paragraph A says so.\nThe factory closed in 1990. => NOT GIVEN' : 'The tour starts in ____ Street => Mill => Speaker says Mill Street.'}"></textarea>
-        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="g-paste-do" data-g="${gi}" type="button">Add to this group</button></div></div>
+        <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="g-paste-do" data-g="${gi}" type="button">Add to this group</button></div></div>`}
     </div>`;
   }
-  function questionsInner() {
+  /* the table as the student will see it, with the numbers of its gaps */
+  function tablePreview(g, from) {
+    const rows = tableRows(g.table); if (rows.length < 2) return '';
+    let n = from; const cols = Math.max(...rows.map((r) => r.length));
+    const cell = (c, head) => { const parts = String(c).split(new RegExp(TABLE_GAP.source, 'g')); return parts.map((x, k) => esc(x) + (k < parts.length - 1 ? (head ? '____' : `<span class="cb-tgap">${n++}</span>`) : '')).join(''); };
+    const tr = (r, head) => '<tr>' + Array.from({ length: cols }, (_, k) => `<${head ? 'th' : 'td'}>${cell(r[k] || '', head)}</${head ? 'th' : 'td'}>`).join('') + '</tr>';
+    return `<div class="cb-tprev"><div class="muted sm">Preview</div><table>${tr(rows[0], true)}${rows.slice(1).map((r) => tr(r, false)).join('')}</table></div>`;
+  }
+
+  /* ═════════ The questions in three steps, by number ═════════
+     1 · Questions: one block of the paper at a time ("Questions 1–6", then 7–13 …), pasted as printed, without answers.
+     2 · Answers: the answer key by question number.  3 · Explanations: by question number.
+     "Everything together" is the form with every field of every question (and the old "Paste many groups"). */
+  const STEPS = [['q', '1 · Questions'], ['a', '2 · Answers'], ['e', '3 · Explanations'], ['all', 'Everything together']];
+  /* the first number of this test: a Reading Part of Passage 2 starts at 14, a Listening Part 3 at 21 */
+  function firstNo() {
+    if (draft.type === 'listening' && !isFullListening()) return ((parseInt(String(draft.data.sectionLabel || '').replace(/\D+/g, ''), 10) || 1) - 1) * 10 + 1;
+    if (draft.type === 'reading' && !isFullReading()) return ({ 2: 14, 3: 27 })[parseInt(String(draft.data.passageLabel || '').replace(/\D+/g, ''), 10)] || 1;
+    return 1;
+  }
+  function lastNo() {
+    if (isFullReading() || isFullListening()) return 40;
+    if (draft.type === 'listening') return firstNo() + 9;
+    return ({ 1: 13, 14: 26, 27: 40 })[firstNo()] || 13;
+  }
+  const hasQ = (g, it) => !!(String(it.prompt || '').trim() || String(it.answer || '').trim());
+  /* 1 2 3 … 40: which numbers have their question, answer and explanation */
+  function numStrip() {
+    const list = numberedItems().filter((x) => hasQ(x.g, x.it)); const by = {};
+    list.forEach((x) => { for (let k = 0; k < x.w; k++) by[x.n + k] = x; });
+    const nums = Object.keys(by).map(Number); const from = Math.min(firstNo(), ...nums), to = Math.max(lastNo(), ...nums);
+    let chips = '';
+    for (let n = from; n <= to; n++) {
+      const x = by[n]; const a = x && String(x.it.answer || '').trim(), e = x && String(x.it.explanation || '').trim();
+      chips += `<span class="cb-num ${!x ? 'miss' : a ? 'ans' : 'q'}${e ? ' exp' : ''}" title="${!x ? 'Question ' + n + ': not added yet' : 'Question ' + n + (a ? ' · answer: ' + esc(x.it.answer) : ' · no answer yet') + (e ? ' · has an explanation' : '')}">${n}</span>`;
+    }
+    const nq = list.reduce((s, x) => s + x.w, 0), na = list.filter((x) => String(x.it.answer || '').trim()).reduce((s, x) => s + x.w, 0), ne = list.filter((x) => String(x.it.explanation || '').trim()).reduce((s, x) => s + x.w, 0);
+    return `<div id="cb-nums" class="cb-nums">${chips}<div class="muted sm cb-nums-sum">${nq} question${nq === 1 ? '' : 's'} · ${na} answer${na === 1 ? '' : 's'} · ${ne} explanation${ne === 1 ? '' : 's'} <span class="cb-legend"><span class="cb-num miss">·</span> not added <span class="cb-num q">·</span> no answer <span class="cb-num ans">·</span> answered <span class="cb-num ans exp">·</span> with explanation</span></div></div>`;
+  }
+  function refreshNums() { const el = $('#cb-nums'); if (el && draft) el.outerHTML = numStrip(); }
+  const typeOptions = (withAuto) => (withAuto ? '<option value="auto">Type: read from the instruction</option>' : '') + Object.entries(qLabels()).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
+  function stepQuestions() {
+    const gs = draft.groups || []; const num = numbering(); const total = gs.reduce((n, g) => n + g.items.length, 0); const L = draft.type === 'listening';
+    const list = numberedItems().filter((x) => hasQ(x.g, x.it)); const next = list.length ? list[list.length - 1].n + list[list.length - 1].w : firstNo();
+    const pass = isMultiSection() ? `<label class="lbl">${L ? 'Part' : 'Passage'}<select class="field" id="rq-pass"><option value="auto">from the numbers (${L ? '1–10 = Part 1 …' : '1–13 = 1, 14–26 = 2, 27–40 = 3'})</option>${(L ? [1, 2, 3, 4] : [1, 2, 3]).map((n) => `<option value="${n}">${L ? 'Part' : 'Passage'} ${n}</option>`).join('')}</select></label>` : '';
+    return `<div class="cb-bulk cb-stepbox"><div class="muted sm"><b>Step 1 — the questions, one block at a time.</b> Paste a block of the paper as it is printed: its instruction, the option list or list of headings (if it has one) and the numbered questions. For notes, summaries and tables the numbered gaps (<code>7 ………</code>) are enough. <b>No answers here</b> — they come in step 2. Pasting the same numbers again replaces that block.</div>
+      <div class="cb-range"><label class="lbl">From question<input class="field" type="number" id="rq-from" min="1" max="60" value="${Math.min(60, next)}"></label><label class="lbl">To (optional)<input class="field" type="number" id="rq-to" min="1" max="60" placeholder="from the text"></label><label class="lbl">Type<select class="field" id="rq-type">${typeOptions(true)}</select></label>${pass}</div>
+      <textarea class="field" id="rq-text" rows="10" placeholder="Questions 1–6&#10;Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.&#10;Beatrix Potter&#10;• She received lessons at home from a 1 ……………&#10;• She wrote in her 2 …………… in code.&#10;&#10;— or —&#10;&#10;Questions 7–13&#10;Do the following statements agree with the information given in Reading Passage 1?&#10;7 Potter's first book was published by her family.&#10;8 …"></textarea>
+      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="rq-add" type="button">Add these questions</button></div></div>
+      ${orderedGroups().map((gi) => groupBlock(gs[gi], gi, num[gi] || { from: 1, to: 1 }, total, 'q')).join('')}
+      <div class="cb-addgroup"><span class="muted sm">Or an empty group to fill by hand:</span><select class="field" id="g-newtype" style="width:auto;max-width:100%">${Object.entries(qLabels()).map(([k, v]) => `<option value="${k}" ${(gs.length && gs[gs.length - 1].type === k) ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select><button class="btn btn-sm btn-primary" data-cb="g-add" type="button">+ Add group</button></div>`;
+  }
+  const shortText = (t, k) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > k ? t.slice(0, k - 1) + '…' : t; };
+  const typeShort = (t) => String(qLabels()[t] || t).split(/[:(]/)[0].trim();
+  function stepAnswers() {
+    const list = numberedItems().filter((x) => hasQ(x.g, x.it));
+    const rows = list.map(({ gi, ii, g, it, n, w }) => `<tr><td class="cb-n">${n}${w > 1 ? '–' + (n + w - 1) : ''}</td><td class="cb-qp">${esc(shortText(it.prompt, 110)) || '<span class="muted">(no text)</span>'}<div class="muted sm">${esc(typeShort(g.type))}</div></td><td class="cb-ac">${answerCell(g, gi, it, ii)}</td></tr>`).join('');
+    return `<div class="cb-bulk cb-stepbox"><div class="muted sm"><b>Step 2 — the answer key.</b> Paste it with the question numbers, as printed: <code>1 governess</code>, <code>7 FALSE</code>, <code>14 iv</code>, <code>21–22 B, D</code> — a key in two columns is fine. Or one answer per line <b>without</b> numbers, starting at question <input class="field cb-inline" type="number" id="ra-from" min="1" max="60" value="${firstNo()}">. Several accepted answers: <code>colour|color</code> (or <code>colour / color</code>).</div>
+      <textarea class="field" id="ra-text" rows="8" placeholder="1 governess&#10;2 diary&#10;7 FALSE&#10;8 NOT GIVEN&#10;14 iv&#10;21-22 B, D"></textarea>
+      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="ra-add" type="button">Put the answers in</button></div></div>
+      ${list.length ? `<table class="cb-ntable"><thead><tr><th>No.</th><th>Question</th><th>Answer</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="muted sm">Add the questions first (step 1).</div>'}`;
+  }
+  function stepExplanations() {
+    const list = numberedItems().filter((x) => hasQ(x.g, x.it)); const L = draft.type === 'listening';
+    const rows = list.map(({ gi, ii, it, n, w }) => { const p = `groups.${gi}.items.${ii}`;
+      return `<tr><td class="cb-n">${n}${w > 1 ? '–' + (n + w - 1) : ''}</td><td class="cb-qp"><b>${esc(it.answer || '—')}</b><div class="muted sm">${esc(shortText(it.prompt, 70))}</div></td><td><textarea class="field" rows="2" data-p="${p}.explanation" placeholder="Why this is the answer (words in &quot;quotes&quot; are lit up in the passage)">${esc(it.explanation)}</textarea>${L ? '' : `<input class="field gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="Passage words to highlight (optional)">`}</td></tr>`; }).join('');
+    return `<div class="cb-bulk cb-stepbox"><div class="muted sm"><b>Step 3 — the explanations</b> (optional), by question number: <code>1. The passage says “…” — so the answer is …</code>. Lines without a number continue the one above. ${L ? '' : 'An <code>Evidence: …</code> line under it sets the words to light up in the passage; otherwise the words in “quotes” are used.'}</div>
+      <textarea class="field" id="re-text" rows="9" placeholder="1. Her parents hired a governess: “She was educated in her parents' house by a governess”.&#10;2. “she began to keep a diary written in a secret code”.${L ? '' : '&#10;Evidence: keep a diary written in a secret code'}"></textarea>
+      <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="re-add" type="button">Put the explanations in</button></div></div>
+      ${list.length ? `<table class="cb-ntable"><thead><tr><th>No.</th><th>Answer</th><th>Explanation</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="muted sm">Add the questions first (step 1).</div>'}`;
+  }
+  function stepAll() {
     const gs = draft.groups || []; const num = numbering(); const total = gs.reduce((n, g) => n + g.items.length, 0);
     const types = Object.entries(qLabels());
-    return `<div class="cb-block"><div class="cb-head"><div><strong>Questions &amp; answers · ${gs.length} group${gs.length === 1 ? '' : 's'} · ${total} question${total === 1 ? '' : 's'}</strong>
-      <div class="muted sm">Add a <b>group</b> for each block of the paper (“Questions 1–5”). Type its heading and its option list <b>once</b>, then only the questions. Several accepted answers: <code>colour|color</code>.</div></div>
-      <div class="btn-row"><button class="btn btn-sm" data-cb="check" type="button">✓ Check</button><button class="btn btn-sm" data-cb="q-bulk" type="button">Paste many groups</button></div></div>
+    return `<div class="btn-row"><button class="btn btn-sm" data-cb="q-bulk" type="button">Paste many groups (questions with their answers)</button></div>
       <div id="bulk-box" class="cb-bulk" hidden><div class="muted sm"><b>Several groups in one go.</b> A line like <code>Questions 1–5 …</code> starts a new group (everything after it up to the next such line). Under it you may put the instruction line, the option list (<code>A. …</code> / <code>i. …</code>) once, then the questions:<br>
         <code>Questions 1–3 Do the following statements agree…</code><br><code>1. Glass was first made in Egypt. =&gt; TRUE =&gt; Paragraph A</code> &nbsp; or &nbsp; <code>1. text</code> + <code>Answer: TRUE</code> + <code>Explanation: …</code><br>The type of each group is detected from the answers; or pick it below.<br>No answers next to the questions? Paste the <b>ANSWERS</b> section (<code>1. TRUE — …</code>, <code>7 irrigation</code>, <code>Q21/Q22. A and C</code>) under them: it is matched by question number. A 4th part <code>=&gt; words to highlight</code> or an <code>Evidence: …</code> line sets the passage highlight; otherwise the words in “quotes” in the explanation are used.</div>
         <textarea class="field" id="bulk-text" rows="14" placeholder="Questions 1–3 Do the following statements agree with the information in the passage?&#10;1. Glass was first made in Egypt. => TRUE => Paragraph A, line 2.&#10;2. The factory closed in 1990. => NOT GIVEN&#10;&#10;Questions 4–6 Complete the notes. Write ONE WORD.&#10;4. The bees live in a ____ => hive"></textarea>
         <div class="btn-row"><select class="field" id="bulk-type" style="width:auto"><option value="auto">Auto-detect the type of each group</option>${types.map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('')}</select>${isFullReading() ? `<select class="field" id="bulk-pass" style="width:auto"><option value="">Passage: as the last group</option><option value="1">Passage 1</option><option value="2">Passage 2</option><option value="3">Passage 3</option></select>` : ''}${isFullListening() ? `<select class="field" id="bulk-pass" style="width:auto"><option value="auto">Part: from the question numbers (1–10 = Part 1 …)</option><option value="1">Part 1</option><option value="2">Part 2</option><option value="3">Part 3</option><option value="4">Part 4</option></select>` : ''}<button class="btn btn-sm btn-primary" data-cb="q-bulk-do" type="button">Add the groups</button></div></div>
+      ${orderedGroups().map((gi) => groupBlock(gs[gi], gi, num[gi] || { from: 1, to: 1 }, total, 'all')).join('')}
+      <div class="cb-addgroup"><span class="muted sm">New group:</span><select class="field" id="g-newtype" style="width:auto;max-width:100%">${types.map(([k, v]) => `<option value="${k}" ${(gs.length && gs[gs.length - 1].type === k) ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select><button class="btn btn-sm btn-primary" data-cb="g-add" type="button">+ Add group</button></div>`;
+  }
+  function questionsInner() {
+    const step = STEPS.some(([k]) => k === draft._step) ? draft._step : 'q';
+    const body = step === 'a' ? stepAnswers() : step === 'e' ? stepExplanations() : step === 'all' ? stepAll() : stepQuestions();
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Questions, answers and explanations</strong>
+      <div class="muted sm">Three steps, each by question number: <b>1</b> the questions of each block (1–6, then 7–13 …), <b>2</b> the answer key, <b>3</b> the explanations. <b>Everything together</b> shows every field of every question at once.</div></div>
+      <div class="btn-row"><button class="btn btn-sm" data-cb="check" type="button">✓ Check</button></div></div>
+      <div class="cb-steps" role="tablist">${STEPS.map(([k, label]) => `<button class="cb-step${k === step ? ' on' : ''}" data-cb="step" data-step="${k}" type="button" role="tab" aria-selected="${k === step}">${label}</button>`).join('')}</div>
+      ${numStrip()}
       <div id="cb-issues"></div>
-      ${gs.map((g, gi) => groupBlock(g, gi, num[gi] || { from: 1, to: 1 }, total)).join('')}
-      <div class="cb-addgroup"><span class="muted sm">New group:</span><select class="field" id="g-newtype" style="width:auto;max-width:100%">${types.map(([k, v]) => `<option value="${k}" ${(gs.length && gs[gs.length - 1].type === k) ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select><button class="btn btn-sm btn-primary" data-cb="g-add" type="button">+ Add group</button></div></div>`;
+      ${body}</div>`;
+  }
+
+  /* ───────── Step 1: a block of questions, by its numbers ───────── */
+  const cleanHeadText = (h) => String(h || '').replace(/^\s*(?:questions?|savollar)\s+\d+\s*(?:(?:[-–—]|to|dan)\s*\d+)?\s*[:.\-–—]?\s*/i, '').trim();
+  /* the type of a block, read from its instruction (and its questions) */
+  function typeFromText(head, b) {
+    const h = String(head || ''); const L = draft.type === 'listening';
+    const opts = b.qs.some((q) => (q.options || []).length >= 2);
+    let t;
+    if (/\bclaims?\b|\bviews?\b.{0,20}\bwriter|writer'?s?\s+(?:views|claims|opinion)|\bYES\b/i.test(h)) t = 'ynng';
+    else if (/agree with the information|\bTRUE\b/i.test(h)) t = 'tfng';
+    else if (/\blabel\b.{0,30}\b(?:map|plan)\b|\b(?:map|plan)\b.{0,40}\bletters?\b/i.test(h) && !opts) t = 'map';
+    else if (/\bchoose\s+(?:two|three|four)\b|\bwhich\s+(?:two|three)\b|\b(?:two|three)\s+letters\b/i.test(h)) t = 'mcq-multi';
+    else if (/heading|which paragraph|which section|correct ending|list of|match each|look at the following|classify|from the box|correct letter,?\s*[A-L]\s*[–—-]\s*[A-L]/i.test(h) || b.shared.length >= 2) t = 'matching';
+    else if (opts || /choose the correct (?:letter|answer)/i.test(h)) t = 'mcq';
+    else if (/complete the (?:notes|summary|flow-?chart|diagram|form|text)/i.test(h)) t = 'completion';
+    else t = 'short';
+    if (L) t = ({ short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap' })[t] || t;
+    return t;
+  }
+  /* "Questions 32–35  Complete the table below …" + the table -> one table group */
+  function tableGroupFrom(lines) {
+    const g = newGroup('table'); const rows = []; let instr = '';
+    lines.forEach((l) => {
+      const t = l.trim(); if (!t) return;
+      if (!rows.length && (P_HEAD.test(t) || P_INSTR.test(t) || /^(?:choose|write|use|nb\b|answer|in boxes|from the)/i.test(t))) { instr += (instr ? ' ' : '') + t; return; }
+      if (!rows.length && !g.blockTitle && t.length < 60 && !/\||\t|\s{2,}/.test(t) && !TABLE_GAP.test(t) && !/\b\d{1,2}\b/.test(t)) { g.blockTitle = t; return; }   // the table's own title
+      rows.push(t);
+    });
+    g.group = cleanHeadText(instr); g.table = tableFromText(rows); syncTable(g);
+    return g;
+  }
+  /* the questions of a pasted block, without answers -> { groups, skipped } */
+  function questionsOnly(text, forced) {
+    const src = String(text || '').replace(/\r/g, '');
+    if (forced === 'table' || (forced === 'auto' && /\bcomplete the table\b|\btable below\b/i.test(src))) { const g = tableGroupFrom(src.split('\n')); return { groups: g.items.length ? [g] : [], skipped: [] }; }
+    const raw = parseRaw(src, null, true); const groups = []; const L = draft.type === 'listening';
+    raw.blocks.forEach((b) => {
+      let type = forced && forced !== 'auto' ? forced : typeFromText(b.head, b);
+      if (L) type = ({ short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap' })[type] || type;
+      if (!L && type === 'gap') type = 'completion';
+      const shared = SHARED_OPTS.includes(type);
+      let opts = b.shared.slice();
+      const last = b.qs[b.qs.length - 1];
+      // a list of endings / words printed after the questions was read as the options of the last one
+      if (shared && !opts.length && last && (last.options || []).length >= 2) { opts = last.options; last.options = []; }
+      if (shared && opts.length < 2 && type !== 'box') { const hm = /\bA\s*[–—-]\s*([B-L])\b/.exec(b.head); if (hm) opts = 'ABCDEFGHIJKL'.slice(0, hm[1].charCodeAt(0) - 64).split(''); }
+      const w = type === 'mcq-multi' ? (/\bthree\b/i.test(b.head) ? 3 : /\bfour\b/i.test(b.head) ? 4 : 2) : 1;
+      groups.push({ type, passage: 1, group: b.head, blockTitle: '', table: '', options: shared ? opts : [],
+        items: b.qs.map((q) => ({ prompt: q.prompt, answer: q.answer ? normAnswer(type, q.answer) : '', explanation: q.explanation || '', evidence: q.evidence || '', title: '', options: shared ? [] : (q.options || []).slice(), w: w > 1 ? w : undefined })) });
+    });
+    return { groups, skipped: raw.skipped };
+  }
+  /* take out the questions numbered from..to (a table goes as a whole); empty groups go too */
+  function dropRange(from, to) {
+    draft.groups = draft.groups.filter((g) => (g.type === 'table' ? String(g.table || '').trim() : g.items.some((it) => hasQ(g, it))));
+    const kill = new Set(numberedItems().filter((x) => x.n <= to && x.n + x.w - 1 >= from).map((x) => x.gi + ':' + x.ii));
+    draft.groups.forEach((g, gi) => { g.items = g.type === 'table' && g.items.some((it, ii) => kill.has(gi + ':' + ii)) ? [] : g.items.filter((it, ii) => !kill.has(gi + ':' + ii)); });
+    draft.groups = draft.groups.filter((g) => g.items.length);
+    return kill.size;
+  }
+  function addQuestionsByRange() {
+    const text = $('#rq-text').value; if (!text.trim()) return toast('Paste the questions of the block first.', true);
+    const from = Math.max(1, parseInt($('#rq-from').value, 10) || firstNo()); const toWant = parseInt($('#rq-to').value, 10) || 0;
+    const r = questionsOnly(text, $('#rq-type').value);
+    if (!r.groups.length) return toast('No questions found. Number them (1 …, 2 …), or write ____ / “7 ………” where each answer goes.', true);
+    const L = draft.type === 'listening'; const ps = $('#rq-pass');
+    const pass = !isMultiSection() ? 1 : ps && ps.value !== 'auto' ? Number(ps.value) : L ? Math.min(4, Math.ceil(from / 10)) : from <= 13 ? 1 : from <= 26 ? 2 : 3;
+    const count = r.groups.reduce((s, g) => s + g.items.reduce((m, it) => m + itemWidth(g, it), 0), 0);
+    const to = Math.max(from + count - 1, toWant || 0);
+    const replaced = dropRange(from, to);
+    r.groups.forEach((g, k) => { g.passage = pass; if (!k) g.start = from; });
+    const num = numbering(); let at = draft.groups.length;
+    for (const gi of orderedGroups()) { const g = draft.groups[gi]; if ((!isMultiSection() || g.passage === pass) && num[gi].from > from) { at = gi; break; } }
+    draft.groups.splice(at, 0, ...r.groups);
+    refreshQuestions(); autosave();
+    const f = $('#rq-from'); if (f) f.value = Math.min(60, from + count);
+    toast('Questions ' + from + '–' + (from + count - 1) + ' added' + (replaced ? ' (replacing ' + replaced + ')' : '') + ' · ' + r.groups.map((g) => typeShort(g.type)).join(', ')
+      + (toWant && toWant !== from + count - 1 ? ' · NOTE: you wrote “to ' + toWant + '”, the text has ' + count + ' question(s)' : '')
+      + (r.skipped.length ? ' · ' + r.skipped.length + ' line(s) NOT understood: “' + r.skipped[0].slice(0, 40) + '…”' : ''), !!(r.skipped.length || (toWant && toWant !== from + count - 1)));
+  }
+
+  /* ───────── Step 2: the answer key, by number ───────── */
+  const KEY_ENTRY = /^(?:Q\s*)?(\d{1,2})(?:\s*(?:\/|&|and|,|[-–—])\s*(?:Q\s*)?(\d{1,2}))?\s*[.):]?\s+(.+)$/i;
+  function answerKeyFrom(text, from) {
+    const lines = String(text || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
+      // "1 governess    21 C" / "1 governess 21 C": two columns of a key read across
+      .reduce((out, l) => out.concat(l.split(/\t+|\s{3,}/)), []).map((l) => l.trim()).filter(Boolean)
+      .reduce((out, l) => { const first = Number((/^(?:Q\s*)?(\d{1,2})\b/i.exec(l) || [])[1] || 0); if (!first) return out.concat(l);
+        const parts = l.split(/\s+(?=(?:Q\s*)?\d{1,2}\s*[.):]?\s+\S)/i); const keep = []; parts.forEach((p) => { const n = Number((/^(?:Q\s*)?(\d{1,2})\b/i.exec(p) || [])[1] || 0); if (keep.length && n > first && n <= 40) keep.push(p); else if (keep.length) keep[keep.length - 1] += ' ' + p; else keep.push(p); }); return out.concat(keep); }, []);
+    const key = {};
+    if (lines.filter((l) => KEY_ENTRY.test(l)).length * 2 >= lines.length) {
+      // raw: the whole answer as typed (a written answer such as "A mental image" is not the letter A)
+      lines.forEach((l) => { const m = KEY_ENTRY.exec(l); if (!m) return; const a = keyAnswer(m[3]); a.raw = m[3].replace(/\s+[—–]\s+.*$/, '').trim(); const n1 = Number(m[1]), n2 = Number(m[2] || m[1]); for (let k = n1; k <= Math.max(n1, n2) && k <= n1 + 4; k++) key[k] = a; });
+    } else lines.forEach((l, i) => { key[from + i] = { ans: l, exp: '', raw: l }; });
+    return key;
+  }
+  function putAnswers(key) {
+    let put = 0; const missing = [];
+    numberedItems().forEach(({ g, it, n, w }) => {
+      if (!hasQ(g, it)) return;
+      let a = '';
+      if (g.type === 'mcq-multi') { const got = []; for (let k = n; k < n + Math.max(1, w); k++) if (key[k]) gLetters(key[k].ans).forEach((x) => { if (!got.includes(x)) got.push(x); }); a = got.join(','); }
+      else if (key[n]) { const typed = ['short', 'completion', 'table', 'gap'].includes(g.type); a = String((typed && key[n].raw) || key[n].ans || '').trim(); if (typed) a = a.replace(/\s*\/\s*|\s+OR\s+/g, '|'); }
+      if (a) { it.answer = normAnswer(g.type, a); put++; } else if (!String(it.answer || '').trim()) missing.push(n);
+    });
+    return { put, missing };
+  }
+
+  /* ───────── Step 3: explanations, by number ───────── */
+  function explanationsFrom(text) {
+    const by = {}; let cur = null;
+    String(text || '').replace(/\r/g, '').split('\n').forEach((l) => {
+      const t = l.trim(); if (!t) return; let m;
+      if ((m = P_EVI.exec(t))) { if (cur) cur.ev = m[1].trim(); return; }
+      if ((m = /^(?:Q(?:uestion)?\s*)?(\d{1,2})(?:\s*(?:[-–—/&,]|and)\s*(?:Q\s*)?(\d{1,2}))?\s*[.):\-–—]?\s+(.+)$/i.exec(t))) {
+        cur = { text: m[3].replace(P_EXP, '$1').trim(), ev: '' }; const n1 = Number(m[1]), n2 = Number(m[2] || m[1]);
+        for (let k = n1; k <= Math.max(n1, n2) && k <= n1 + 4; k++) by[k] = cur; return;
+      }
+      if (cur) cur.text += ' ' + t.replace(P_EXP, '$1');
+    });
+    return by;
+  }
+  function putExplanations(by) {
+    let put = 0; const L = draft.type === 'listening';
+    numberedItems().forEach(({ g, it, n, w }) => {
+      if (!hasQ(g, it)) return; let e = null; for (let k = n; k < n + Math.max(1, w) && !e; k++) e = by[k];
+      if (!e) return; it.explanation = e.text; if (e.ev && !L) it.evidence = e.ev; put++;
+    });
+    return put;
   }
   function questionsBlock() { return `<div id="cb-qwrap">${questionsInner()}</div>`; }
   function refreshQuestions(keepOpen) {
@@ -704,7 +971,7 @@
   }
 
   /* -> { blocks: [{ head, shared: [], qs: [{ prompt, options, answer, explanation }] }], skipped: [lines] } */
-  function parseRaw(text, key) {
+  function parseRaw(text, key, free) {
     key = key || {};
     if (!Object.keys(key).length) { const sk = splitKey(text); text = sk.text; key = sk.key; }
     text = expandGaps(dropWatermarks(text));
@@ -734,12 +1001,12 @@
       }
       const k = key[q.num]; if (!k) return; if (!q.answer) q.answer = k.ans; if (!q.explanation && k.exp) q.explanation = k.exp;
     };
-    const push = () => { if (cur && cur.prompt) { fromKey(cur); if (cur.answer) blk.qs.push(cur); else skipped.push(cur.prompt); } cur = null; lastField = ''; };
+    const push = () => { if (cur && cur.prompt) { fromKey(cur); if (cur.answer || free) blk.qs.push(cur); else skipped.push(cur.prompt); } cur = null; lastField = ''; };
     lines.forEach((l) => {
       let m;
-      if (P_HEAD.test(l) && !l.includes('=>') && (!cur || cur.answer || key[cur.num])) { push(); newBlock(l); return; }
+      if (P_HEAD.test(l) && !l.includes('=>') && (!cur || free || cur.answer || key[cur.num])) { push(); newBlock(l); return; }
       // an instruction line with no "Questions 1–5" above it still starts a new group
-      if (P_INSTR.test(l) && !l.includes('=>') && blk && (blk.qs.length || cur) && (!cur || cur.answer || key[cur.num])) { push(); newBlock(l); return; }
+      if (P_INSTR.test(l) && !l.includes('=>') && blk && (blk.qs.length || cur) && (!cur || free || cur.answer || key[cur.num])) { push(); newBlock(l); return; }
       if (!blk) newBlock('');
       if (l.includes('=>')) {                                            // question => answer => explanation
         push(); const [pr, an, ex, ...ev] = l.split('=>');
@@ -1264,6 +1531,14 @@
       if (!shared) g.items.forEach((it) => { if (!(it.options || []).length && (g.options || []).length && (g.type === 'mcq' || g.type === 'mcq-multi')) it.options = g.options.slice(); });
       g.items.forEach((it) => { it.answer = normAnswer(g.type, it.answer); });
     }
+    if (gt && draft.groups[Number(gt[1])].type === 'table') {
+      const g = draft.groups[Number(gt[1])];
+      if (!String(g.table || '').trim() && g.items.some((it) => String(it.prompt || '').trim())) g.table = (g.blockTitle || 'Notes') + '\n' + g.items.filter((it) => String(it.prompt || '').trim()).map((it) => (TABLE_GAP.test(it.prompt) ? it.prompt : it.prompt + ' ____')).join('\n');
+      syncTable(g);
+    }
+    const tb = /^groups\.(\d+)\.table$/.exec(p);
+    if (tb && e.type === 'change') { syncTable(draft.groups[Number(tb[1])]); refreshQuestions(); return; }
+    if (/\.(answer|explanation)$/.test(p) && e.type === 'change') refreshNums();
     if (el.dataset.rerender && e.type === 'change') { if (p.startsWith('groups.')) refreshQuestions(); else renderBuilder(); }
     else if (/^groups\.\d+\.options$/.test(p) && e.type === 'change') refreshQuestions();   // the answer menus follow the option list
     if (draft.type === 'article' && /^data\.(body|vocabulary\.\d+\.(word|match)|grammar\.\d+\.(match|sourceContext))$/.test(p)) { clearTimeout(onInput.t); onInput.t = setTimeout(refreshFound, 250); }
@@ -1385,6 +1660,19 @@
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
       else if (a === 'check') showIssues(validate(), true);
+      else if (a === 'step') { draft._step = t.dataset.step; refreshQuestions(); autosave(); const w = $('#cb-qwrap'); if (w) w.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      else if (a === 'rq-add') addQuestionsByRange();
+      else if (a === 'ra-add') {
+        const text = $('#ra-text').value; if (!text.trim()) return toast('Paste the answer key first.', true);
+        const r = putAnswers(answerKeyFrom(text, parseInt($('#ra-from').value, 10) || firstNo()));
+        refreshQuestions(); autosave();
+        toast(r.put + ' answer(s) put in' + (r.missing.length ? ' · still without an answer: ' + r.missing.slice(0, 12).join(', ') + (r.missing.length > 12 ? '…' : '') : ' · every question has its answer'), !r.put || !!r.missing.length);
+      }
+      else if (a === 're-add') {
+        const text = $('#re-text').value; if (!text.trim()) return toast('Paste the explanations first.', true);
+        const put = putExplanations(explanationsFrom(text)); refreshQuestions(); autosave();
+        toast(put ? put + ' explanation(s) put in' : 'No numbered explanations found. Start each one with its question number: 1. …', !put);
+      }
       else if (a === 'q-bulk') { const b = $('#bulk-box'); b.hidden = !b.hidden; }
       else if (a === 'q-bulk-do') {
         const type = $('#bulk-type').value; const ps = $('#bulk-pass'); const last = draft.groups[draft.groups.length - 1];

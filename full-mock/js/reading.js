@@ -2775,23 +2775,43 @@ function markCurrentItem(qid) {
   if (slot) slot.classList.add('is-current');
 }
 
+// The ← → arrows step through the questions one at a time, as on the computer-delivered test:
+// the next question of this part, then the first question of the next part. A "choose TWO"
+// pair is one step. (They used to jump a whole part, so on a one-passage Part test they did
+// nothing at all.) The pages still call them nextPart / prevPart.
+function navSteps() {
+  const out = [];
+  PARTS.forEach(p => (NAV_GROUPS[p] || []).forEach(g => out.push(g)));
+  return out;
+}
+function currentStep(steps) {
+  const cur = state.currentPassage || PARTS[0];
+  const q = state.activeQuestion || firstUnanswered(cur);
+  let i = steps.findIndex(g => g.indexOf(q) >= 0 && passageOf(g[0]) === cur);
+  if (i < 0) i = steps.findIndex(g => passageOf(g[0]) === cur);
+  return i;
+}
+
 function updateArrowState() {
-  const cur = state.currentPassage || 1;
+  const steps = navSteps(), i = currentStep(steps);
   const prev = document.querySelector('#qnav-arrows .prev');
   const next = document.querySelector('#qnav-arrows .next');
-  if (prev) prev.disabled = cur <= PARTS[0];
-  if (next) next.disabled = cur >= PARTS[PARTS.length - 1];
+  if (prev) { prev.disabled = i <= 0; prev.title = 'Previous question'; prev.setAttribute('aria-label', 'Previous question'); }
+  if (next) { next.disabled = i < 0 || i >= steps.length - 1; next.title = 'Next question'; next.setAttribute('aria-label', 'Next question'); }
 }
 
-function nextPart() {
-  const cur = state.currentPassage || 1;
-  if (cur < PARTS[PARTS.length - 1]) { switchPassage(cur + 1); const qp = document.getElementById('questions-pane'); if (qp) qp.scrollTop = 0; }
+function stepQuestion(dir) {
+  const steps = navSteps(), i = currentStep(steps), j = i + dir;
+  if (i < 0 || j < 0 || j >= steps.length) return;
+  const qid = steps[j][0];
+  jumpToReading(qid);
+  setActivePill(qid);   // after jumpToReading: moving into another part clears the active question
+  updateReadingNav();
+  const inp = document.getElementById('rq-' + qid);
+  if (inp && /^(INPUT|TEXTAREA|SELECT)$/.test(inp.tagName) && !inp.disabled) { try { inp.focus({ preventScroll: true }); } catch (e) { /* old browser */ } }
 }
-
-function prevPart() {
-  const cur = state.currentPassage || 1;
-  if (cur > PARTS[0]) { switchPassage(cur - 1); const qp = document.getElementById('questions-pane'); if (qp) qp.scrollTop = 0; }
-}
+function nextPart() { stepQuestion(1); }
+function prevPart() { stepQuestion(-1); }
 
 function jumpToReading(qid) {
   let p = passageOf(qid);
@@ -2945,6 +2965,7 @@ function setActivePill(qid) {
   const pill = document.querySelector(`#questions-pane .q-pill[data-qid="${qid}"]`);
   if (pill) pill.classList.add('active');
   markCurrentItem(numId || qid);
+  updateArrowState();
 }
 
 // ====================================================================
@@ -3213,6 +3234,15 @@ function setupHighlighter() {
       if (!sel.rangeCount || sel.isCollapsed) return;
       
       const range = sel.getRangeAt(0);
+      // Highlight and Note exist only on the passage text and the questions: the selection must sit
+      // wholly inside one of the two panes, and never in a field, a button or an explanation.
+      const zone = n => {
+        const el = n && (n.nodeType === 1 ? n : n.parentElement);
+        if (!el || el.closest('input,textarea,select,button,.explain-panel,.explain-trigger-row,.fp-note')) return null;
+        return el.closest('#passage-pane .passage-text, #questions-pane');
+      };
+      const z = zone(range.startContainer);
+      if (!z || z !== zone(range.endContainer)) { popup.classList.remove('show'); return; }
       const rect = range.getBoundingClientRect();
 
       // The official adder carries only Note and Highlight. Clear is ours, and
@@ -3320,34 +3350,9 @@ function beginReading() {
 }
 
 function confirmSubmit(btn) {
-  // Real-exam ✓ icon button: confirm via colour + toast (keeps the two-step safety)
-  if (btn && btn.id === 'sub-btn') {
-    if (!btn.dataset.confirm) {
-      btn.dataset.confirm = '1';
-      btn.classList.add('sub-armed');
-      toast('Press \u2713 once more to submit \u2014 this cannot be undone', 'warn');
-      setTimeout(() => {
-        btn.dataset.confirm = '';
-        btn.classList.remove('sub-armed');
-      }, 3000);
-      return;
-    }
-    finishExam();
-    return;
-  }
-  if (btn && !btn.dataset.confirm) {
-    btn.dataset.confirm = '1';
-    btn.textContent = 'Click again to submit';
-    btn.style.color = 'var(--crimson)';
-    btn.style.borderColor = 'var(--crimson)';
-    setTimeout(() => {
-      btn.dataset.confirm = '';
-      btn.textContent = 'Submit & finish';
-      btn.style.color = '';
-      btn.style.borderColor = '';
-    }, 3000);
-    return;
-  }
+  // One press submits (the ✓ used to need a second press within 3 seconds). Only while the test
+  // is running, so a double click submits once.
+  if (state.stage !== 'reading') return;
   finishExam();
 }
 

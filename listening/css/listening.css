@@ -4489,3 +4489,20 @@ html.mock-embed #entry-form,html.mock-embed .entry-tg{display:none!important}
 .mx-map .mp-sm{font:700 16px Arial,Helvetica,sans-serif;fill:#000;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
 .mx-map .mp-ttl{font:700 22px Arial,Helvetica,sans-serif;fill:#000;text-anchor:middle}
 body.dark-mode .mx-map svg{filter:invert(1) hue-rotate(180deg)}
+
+/* ── Selecting text: only the question paper ──
+   The header, the part bar, the footer and the buttons cannot be selected, so neither the
+   browser's selection nor the Highlight / Note popup appears there. */
+#stage-listening{-webkit-user-select:none;user-select:none}
+#stage-listening #listening-render{-webkit-user-select:text;user-select:text}
+#stage-listening #listening-render button,#stage-listening .q-pill,#stage-listening .drag-chip{-webkit-user-select:none;user-select:none}
+#stage-listening input,#stage-listening textarea{-webkit-user-select:text;user-select:text}
+
+/* ── Table completion (tests made in the admin panel): a real table, a typed gap in its cells ── */
+.ix-ltable-wrap{overflow-x:auto;margin:6px 0 14px}
+.ix-ltable{border-collapse:collapse;min-width:60%;max-width:100%;font-family:Arial,sans-serif;font-size:16px;line-height:24px;color:var(--ink)}
+.ix-ltable th,.ix-ltable td{border:1px solid var(--line-4);padding:8px 12px;text-align:left;vertical-align:top}
+.ix-ltable th{font-weight:700;background:var(--bg-elev)}
+.ix-ltable td{background:var(--paper)}
+.ix-ltable .gap-field{white-space:nowrap}
+.ix-ltable .gap-input{width:110px;min-width:80px}

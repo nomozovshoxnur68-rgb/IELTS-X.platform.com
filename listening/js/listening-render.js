@@ -67,7 +67,26 @@
     }).join('<br>\n<br>');
     return head(b, b.from, b.to, rich(b.instruction), b.title) + pool + h.kbHelp() + '<div class="note-flow">' + lines + '</div>';
   }
-  var BUILD = { gap: gapBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
+  /* a table: the first line is the column headings, then one row per line, cells split by | (or a tab); every ____ is
+     a typed gap, numbered row by row */
+  function tableRows(t) {
+    return String(t || '').replace(/\r/g, '').split('\n').map(function (l) { return l.trim(); }).filter(Boolean)
+      .map(function (l) { return l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/); });
+  }
+  function tableBlock(h, b) {
+    var rows = tableRows(b.table), k = 0;
+    var cols = rows.reduce(function (m, r) { return Math.max(m, r.length); }, 1);
+    var ids = b.items.map(function (it) { return it.id; });
+    var cell = function (c, isHead) {
+      var parts = String(c || '').split(/_{2,}|\.{4,}|\u2026{2,}/);
+      return parts.map(function (p, i) { return esc(p) + (i < parts.length - 1 ? (isHead ? '____' : (k < ids.length ? h.gapInput(ids[k++]) : '')) : ''); }).join('');
+    };
+    var tr = function (r, isHead) { var out = ''; for (var i = 0; i < cols; i++) out += isHead ? '<th>' + cell(r[i], true) + '</th>' : '<td>' + cell(r[i], false) + '</td>'; return '<tr>' + out + '</tr>'; };
+    var table = '<div class="ix-ltable-wrap"><table class="ix-ltable">' + (rows.length ? '<thead>' + tr(rows[0], true) + '</thead>' : '') +
+      '<tbody>' + rows.slice(1).map(function (r) { return tr(r, false); }).join('') + '</tbody></table></div>';
+    return head(b, b.from, b.to, rich(b.instruction), b.title) + table;
+  }
+  var BUILD = { gap: gapBlock, table: tableBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
 
   window.IXListeningRender = function (data, part) {
     return function (h) {

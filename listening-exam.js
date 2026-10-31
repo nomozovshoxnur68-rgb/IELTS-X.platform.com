@@ -7,10 +7,11 @@ const fs = require('fs')
 const path = require('path')
 const { inheritGroups } = require('./reading-exam')
 
-const KINDS = ['gap', 'mcq', 'multi', 'matching', 'map', 'box']
-const KIND_FROM_TYPE = { gap: 'gap', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box' }
+const KINDS = ['gap', 'table', 'mcq', 'multi', 'matching', 'map', 'box']
+const KIND_FROM_TYPE = { gap: 'gap', table: 'table', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box' }
 const DEFAULT_INSTR = {
   gap: 'Complete the notes below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
+  table: 'Complete the table below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
   mcq: 'Choose the correct letter, **A**, **B** or **C**.',
   multi: 'Choose the correct letters.',
   matching: 'Match each item with the correct option. Move the correct answer into the gap.',
@@ -67,6 +68,7 @@ function buildBlocks(material) {
       cur = { key, kind, from: n, to: n, instruction: String(q.group || '').trim() || DEFAULT_INSTR[kind], title: String(q.blockTitle || ''), options: opts, items: [] }
       if (newPart) cur.partHead = 'Part ' + qPart
       lastPart = qPart
+      if (kind === 'table') cur.table = String(q.table || '')
       if (kind === 'map') cur.images = (d.images || []).filter((im) => !picsByPart || Number(im.passage || 1) === qPart).map((im) => ({ url: im.url, caption: im.caption || '' }))
       blocks.push(cur)
     }
@@ -83,7 +85,7 @@ function buildBlocks(material) {
     }
     const id = n++
     if (Number(q.at) > 0) times[id] = Number(q.at)
-    if (kind === 'gap' || kind === 'box') answers[id] = String(q.answer || '').trim()
+    if (kind === 'gap' || kind === 'box' || kind === 'table') answers[id] = String(q.answer || '').trim()
     else answers[id] = (letters(q.answer)[0] || '')
     cur.items.push({ id, prompt: q.prompt || '', options: kind === 'mcq' ? opts : undefined, title: kind === 'gap' || kind === 'box' ? String(q.title || '') : undefined })
     cur.to = id
