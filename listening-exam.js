@@ -72,6 +72,7 @@ function buildBlocks(material) {
     const joinable = cur && !newPart && kind !== 'multi' && (cur.key === key || (gi === null && !grp && cur.kind === kind && (kind === 'gap' || kind === 'mcq' || JSON.stringify(cur.options) === JSON.stringify(opts))))
     if (!joinable) {
       cur = { key, kind, from: n, to: n, instruction: String(q.group || '').trim() || DEFAULT_INSTR[q.type] || DEFAULT_INSTR[kind], title: String(q.blockTitle || ''), options: opts, items: [] }
+      cur.part = qPart
       if (newPart) cur.partHead = 'Part ' + qPart
       lastPart = qPart
       if (kind === 'table') cur.table = String(q.table || '')
@@ -143,7 +144,12 @@ function buildConfig(material) {
     navGroups: rows, answers, answerTimes: times,
     transcript: buildTranscript(d.transcript, part, from, to, answers, full)
   }
-  return { cfg, data: { blocks }, part }
+  // a full paper is shown part by part, as in the computer test (listening.js reads cfg.parts)
+  const parts = []
+  blocks.forEach((b) => { const p = parts.find((x) => x.part === b.part); if (p) { p.from = Math.min(p.from, b.from); p.to = Math.max(p.to, b.to) } else parts.push({ part: b.part, from: b.from, to: b.to }) })
+  const paged = full && parts.length > 1
+  if (paged) cfg.parts = parts
+  return { cfg, data: { blocks, paged }, part }
 }
 
 function renderPage(material) {

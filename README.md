@@ -383,5 +383,12 @@ The strip of numbers 1–40 shows what each number still needs. **Everything tog
   ✓ submits with **one** press (Listening too); Highlight / Note only on the passage text and the questions (the rest of
   the screen cannot be selected; Listening: only the question paper); explanations use the reading screen's blue review
   colours instead of red.
+* **Tables** are edited box by box (+ Row / + Column, one box per cell; a cell may have several lines, `- ` = a bullet, several
+  `____` gaps). The title is printed in the first row, the headings and (optionally) the first column in bold, gaps numbered row
+  by row, as in the computer test. Pasting a whole paper (Fill from a PDF / Paste text / Paste many groups) keeps every line of
+  notes, summaries and tables too; their answers come from the key by number.
+* A **full listening paper** made in the panel is shown part by part (header "Part N", footer Part 1–4, arrows go question by
+  question across the parts). Highlight / Note takes at most 40 words at a time. **One light / dark setting** for the site and
+  every test: choosing it in a test or on the site changes both.
 * No right-click menu on any page (`assets/js/no-context-menu.js`, loaded by `site-access.js` or its own tag); text
   fields keep theirs.

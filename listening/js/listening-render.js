@@ -10,7 +10,7 @@
 
   function head(b, first, last, instr, title) {
     // a full paper (Parts 1-4 on one page): a "Part N" heading opens each part
-    var part = b.partHead ? '<h2 class="ix-part-head" style="margin:' + (b.first ? '0' : '36px') + ' 0 6px;padding-bottom:6px;border-bottom:2px solid currentColor;font-size:20px">' + esc(b.partHead) + '</h2>' : '';
+    var part = b.partHead && !b.paged ? '<h2 class="ix-part-head" style="margin:' + (b.first ? '0' : '36px') + ' 0 6px;padding-bottom:6px;border-bottom:2px solid currentColor;font-size:20px">' + esc(b.partHead) + '</h2>' : '';
     return part + '<div class="section-head"' + (b.first || b.partHead ? '' : ' style="margin-top:24px"') + '><div class="num">Questions ' + rng(first, last) + '</div>' +
       (instr ? '<div class="instruction">' + instr + '</div>' : '') + (title ? '<h2>' + esc(title) + '</h2>' : '') + '</div>';   // as printed: the instruction, then the title of the notes
   }
@@ -67,29 +67,38 @@
     }).join('<br>\n<br>');
     return head(b, b.from, b.to, rich(b.instruction), b.title) + pool + h.kbHelp() + '<div class="note-flow">' + lines + '</div>';
   }
-  /* a table: the first line is the column headings, then one row per line, cells split by | (or a tab); every ____ is
-     a typed gap, numbered row by row */
-  function tableRows(t) {
-    return String(t || '').replace(/\r/g, '').split('\n').map(function (l) { return l.trim(); }).filter(Boolean)
-      .map(function (l) { return l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/); });
+  var GAP = /_{2,}|\.{4,}|\u2026{2,}/g, BUL = /^\s*[-\u2013\u2022\u25cf\u25aa\u25e6\u00b7*]\s*/;
+  /* a table: { rows, head, rowHead } saved as JSON (a cell may have several lines, "- " = a bullet), or, in older tests,
+     "a | b" rows with the headings first. Every ____ is a typed gap, numbered row by row; the title is the first row. */
+  function tableOf(t) {
+    var s = String(t || '').trim();
+    if (s.charAt(0) === '{') { try { var o = JSON.parse(s); if (Array.isArray(o.rows)) return { rows: o.rows, head: o.head !== false, rowHead: !!o.rowHead }; } catch (e) { /* old rows */ } }
+    return { rows: s.replace(/\r/g, '').split('\n').map(function (l) { return l.trim(); }).filter(Boolean)
+      .map(function (l) { return l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/); }), head: true, rowHead: false };
   }
   function tableBlock(h, b) {
-    var rows = tableRows(b.table), k = 0;
-    var cols = rows.reduce(function (m, r) { return Math.max(m, r.length); }, 1);
-    var ids = b.items.map(function (it) { return it.id; });
+    var tb = tableOf(b.table), k = 0, ids = b.items.map(function (it) { return it.id; });
+    var cols = tb.rows.reduce(function (m, r) { return Math.max(m, r.length); }, 1);
     var cell = function (c, isHead) {
-      var parts = String(c || '').split(/_{2,}|\.{4,}|\u2026{2,}/);
-      return parts.map(function (p, i) { return esc(p) + (i < parts.length - 1 ? (isHead ? '____' : (k < ids.length ? h.gapInput(ids[k++]) : '')) : ''); }).join('');
+      var html = '', ul = false;
+      String(c == null ? '' : c).split('\n').map(function (l) { return l.trim(); }).filter(Boolean).forEach(function (l) {
+        var bullet = BUL.test(l), t = esc(bullet ? l.replace(BUL, '') : l).replace(GAP, function () { return isHead ? '____' : (k < ids.length ? h.gapInput(ids[k++]) : ''); });
+        if (bullet) { if (!ul) { html += '<ul class="ix-tul">'; ul = true; } html += '<li>' + t + '</li>'; }
+        else { if (ul) { html += '</ul>'; ul = false; } html += '<div class="ix-tline">' + t + '</div>'; }
+      });
+      return html + (ul ? '</ul>' : '');
     };
-    var tr = function (r, isHead) { var out = ''; for (var i = 0; i < cols; i++) out += isHead ? '<th>' + cell(r[i], true) + '</th>' : '<td>' + cell(r[i], false) + '</td>'; return '<tr>' + out + '</tr>'; };
-    var table = '<div class="ix-ltable-wrap"><table class="ix-ltable">' + (rows.length ? '<thead>' + tr(rows[0], true) + '</thead>' : '') +
-      '<tbody>' + rows.slice(1).map(function (r) { return tr(r, false); }).join('') + '</tbody></table></div>';
-    return head(b, b.from, b.to, rich(b.instruction), b.title) + table;
+    var tr = function (r, i) {
+      var out = '';
+      for (var c = 0; c < cols; c++) { var th = (i === 0 && tb.head) || (c === 0 && tb.rowHead); out += (th ? '<th>' : '<td>') + cell(r[c], i === 0 && tb.head) + (th ? '</th>' : '</td>'); }
+      return '<tr>' + out + '</tr>';
+    };
+    var title = b.title ? '<tr><th class="ix-ttitle" colspan="' + cols + '">' + esc(b.title) + '</th></tr>' : '';
+    return head(b, b.from, b.to, rich(b.instruction), '') + '<div class="ix-ltable-wrap"><table class="ix-ltable">' + title + tb.rows.map(tr).join('') + '</table></div>';
   }
   /* a block typed as text: notes ("- " bullet, "## " sub-heading, other lines as they are), sentences (one per line),
      a summary (running text, an empty line = a new paragraph) or a flow-chart (one box per line). Every ____ is a gap,
      numbered in order: typed (text) or a drop zone for a word of the box (textbox). */
-  var GAP = /_{2,}|\.{4,}|\u2026{2,}/g, BUL = /^\s*[-\u2013\u2022\u25cf\u25aa\u25e6\u00b7*]\s*/;
   function textBody(h, b, drop) {
     var ids = b.items.map(function (it) { return it.id; }), k = 0;
     var fill = function (s) { return esc(s).replace(GAP, function () { return k < ids.length ? (drop ? h.dropInline(ids[k++]) : h.gapInput(ids[k++])) : ''; }); };
@@ -105,17 +114,24 @@
       return '<div class="ix-line">' + fill(l) + '</div>';
     }).join('') + '</div>';
   }
-  function textBlock(h, b) { return head(b, b.from, b.to, rich(b.instruction), b.title) + textBody(h, b, false); }
+  function textBlock(h, b) { return '<div class="ix-textblock">' + head(b, b.from, b.to, rich(b.instruction), b.title) + textBody(h, b, false) + '</div>'; }
   function textBoxBlock(h, b) {
     var words = b.options.map(function (o) { return esc(o.t); });
     var pool = '<div class="opt-box drag-pool ix-pool-below" id="pool-bx' + b.from + '" data-pool="pool-bx' + b.from + '">' + h.poolChips('bx' + b.from, words) + '</div>';
-    return head(b, b.from, b.to, rich(b.instruction), b.title) + h.kbHelp() + textBody(h, b, true) + pool;
+    return '<div class="ix-textblock">' + head(b, b.from, b.to, rich(b.instruction), b.title) + h.kbHelp() + textBody(h, b, true) + pool + '</div>';
   }
   var BUILD = { gap: gapBlock, table: tableBlock, text: textBlock, textbox: textBoxBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
 
   window.IXListeningRender = function (data, part) {
     return function (h) {
-      var html = (data.blocks || []).map(function (b, i) { b.first = i === 0; var f = BUILD[b.kind]; return f ? f(h, b) : ''; }).join('');
+      // a full paper shown part by part: each part in its own container (listening.js shows one at a time)
+      var html = '', open = 0;
+      (data.blocks || []).forEach(function (b, i) {
+        b.first = i === 0; b.paged = !!data.paged;
+        if (data.paged && b.part !== open) { html += (open ? '</div>' : '') + '<div class="ix-part" data-ix-part="' + b.part + '">'; open = b.part; b.first = true; }
+        var f = BUILD[b.kind]; html += f ? f(h, b) : '';
+      });
+      if (open) html += '</div>';
       return '<div class="section-block" id="listening-part-' + part + '">' + html + '</div>';
     };
   };

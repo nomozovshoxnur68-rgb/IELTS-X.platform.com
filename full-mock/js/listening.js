@@ -6433,6 +6433,7 @@ function clearHighlight() {
   syncAnnotations();
 }
 
+const HL_MAX_WORDS = 40;   // the longest selection that can be highlighted or noted
 function setupHighlighter() {
   const popup = document.getElementById('hl-popup');
   if (!popup) return;
@@ -6462,6 +6463,11 @@ function setupHighlighter() {
       const host = document.getElementById('listening-render');
       const inHost = n => { const el = n && (n.nodeType === 1 ? n : n.parentElement); return !!(host && el && host.contains(el) && !el.closest('input,textarea,select,button')); };
       if (!inHost(range.startContainer) || !inHost(range.endContainer)) { popup.classList.remove('show'); return; }
+      // at most HL_MAX_WORDS words at a time: a longer selection is dropped (and cannot be copied)
+      if (sel.toString().trim().split(/\s+/).filter(Boolean).length > HL_MAX_WORDS) {
+        sel.removeAllRanges(); popup.classList.remove('show');
+        toast('You can highlight up to ' + HL_MAX_WORDS + ' words at a time.', 'warn'); return;
+      }
       const rect = range.getBoundingClientRect();
 
       // Plain text offers Note + Highlight; a selection on an existing highlight
@@ -6580,7 +6586,7 @@ function resetExamLegacy(){
     onGo:function(){window.__cdiIntentionalReload=true;wipeSession();location.reload();}
   });
 }
-function setTheme(name){document.body.classList.remove('dark-mode','theme-sepia');if(name==='dark')document.body.classList.add('dark-mode');else if(name==='sepia')document.body.classList.add('theme-sepia');document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('active',d.dataset.theme===name));localStorage.setItem('cdi_reading_theme',name);}
+function setTheme(name){document.body.classList.remove('dark-mode','theme-sepia');if(name==='dark')document.body.classList.add('dark-mode');else if(name==='sepia')document.body.classList.add('theme-sepia');document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('active',d.dataset.theme===name));localStorage.setItem('cdi_reading_theme',name);if(name==='dark'||name==='light'){try{localStorage.setItem('theme',name);}catch(e){}}}
 let currentTextZoom=0;
 function zoomText(step){currentTextZoom+=step;if(currentTextZoom<-3)currentTextZoom=-3;if(currentTextZoom>8)currentTextZoom=8;document.documentElement.style.setProperty('--text-zoom',currentTextZoom+'px');}
 
@@ -7897,7 +7903,8 @@ function beginTest(name){
 function init(){
   document.addEventListener('contextmenu',function(e){e.preventDefault();},true);
   setupAntiCheat();setupHighlighter();
-  const savedTheme=localStorage.getItem('cdi_reading_theme')||'light';setTheme(savedTheme);
+  // a theme chosen in a test wins; otherwise the site's own light / dark setting (as assets/js/theme-init.js)
+  const savedTheme=localStorage.getItem('cdi_reading_theme')||(function(){var s=null;try{s=localStorage.getItem('theme');}catch(e){}return s==='dark'||(s!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';})();setTheme(savedTheme);
   applyBrandLogo();
   // TEST HARNESS: ?test=1&stage=<name>&part=<1-4> boots straight to a stage for visual QA.
   // Skips the resume sheet, fullscreen and proctoring so screenshots are deterministic.

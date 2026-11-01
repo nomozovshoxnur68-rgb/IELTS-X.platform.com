@@ -165,11 +165,13 @@ function buildSections(questions, startN) {
     if (t === 'table') {
       const sec = open('table', q); sec.wordLimit = sec.wordLimit || wordLimitOf(q.group) || 3;
       if (!sec.rows) {   // the first gap of this table: its gaps are numbered from here, row by row
-        const rows = tableRowsOf(q.table); const cols = tableCols(q.table); let g = n;
+        const tb = tableOf(q.table); const cols = tableCols(q.table); let g = n;
         const pad = (r) => r.concat(Array(Math.max(0, cols - r.length)).fill(''));
-        sec.headers = pad(rows[0] || []).map((c) => esc(c));
-        sec.rows = rows.slice(1).map((r) => pad(r).map((c) => esc(c).replace(TABLE_GAP, () => '{{' + (g++) + '}}')));
-        const bt = String(q.blockTitle || '').trim(); if (bt) sec.tableTitle = esc(bt);
+        const fill = (s) => esc(s).replace(TABLE_GAP, () => '{{' + (g++) + '}}');
+        if (tb.head) sec.headers = pad(tb.rows[0] || []).map((c) => cellHtml(c, esc));
+        sec.rows = (tb.head ? tb.rows.slice(1) : tb.rows).map((r) => pad(r).map((c) => cellHtml(c, fill)));
+        if (tb.rowHead) sec.rowHeaders = true;   // the first column in bold
+        const bt = String(q.blockTitle || '').trim(); if (bt) sec.tableTitle = esc(bt);   // printed in the first row of the table
       }
       sec.items.push({ id: n, answer: String(q.answer || ''), label: '' }); n += 1;
       continue;
@@ -262,7 +264,23 @@ function buildSections(questions, startN) {
 const TABLE_GAP = /_{2,}|\.{4,}|\u2026{2,}/g;
 const tableRowsOf = (t) => String(t || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
   .map((l) => l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/).map((c) => c.trim()));
-const tableCols = (t) => tableRowsOf(t).reduce((m, r) => Math.max(m, r.length), 0);
+/* the table of an admin test: { rows, head, rowHead } saved as JSON (a cell may have several lines, "- " = a bullet),
+   or, in older tests, "a | b" rows with the column headings on the first line */
+function tableOf(t) {
+  const s = String(t || '').trim();
+  if (s.charAt(0) === '{') { try { const o = JSON.parse(s); if (Array.isArray(o.rows)) return { rows: o.rows.map((r) => (Array.isArray(r) ? r.map((c) => String(c == null ? '' : c)) : [''])), head: o.head !== false, rowHead: !!o.rowHead }; } catch (e) { /* old rows */ } }
+  return { rows: tableRowsOf(s), head: true, rowHead: false };
+}
+const tableCols = (t) => tableOf(t).rows.reduce((m, r) => Math.max(m, r.length), 0);
+/* one cell -> HTML: its lines, bullets as a list, every ____ through fill() */
+function cellHtml(text, fill) {
+  let html = ''; let ul = false;
+  String(text || '').split('\n').map((l) => l.trim()).filter(Boolean).forEach((l) => {
+    if (BULLET.test(l)) { if (!ul) { html += '<ul class="tc-ul">'; ul = true; } html += '<li>' + fill(l.replace(BULLET, '')) + '</li>'; }
+    else { if (ul) { html += '</ul>'; ul = false; } html += '<div class="tc-line">' + fill(l) + '</div>'; }
+  });
+  return html + (ul ? '</ul>' : '');
+}
 /* notes, summaries, sentences, flow-charts typed in the admin panel: the block's text, ____ = a gap. Notes: "- " a bullet,
    "## " a sub-heading; a summary is running text (an empty line = a new paragraph); a flow-chart has one box per line. */
 const TEXT_SEC = { notes: 'notes', summary: 'summary', 'summary-words': 'wordbank', sentence: 'sentence', flowchart: 'flowchart' };

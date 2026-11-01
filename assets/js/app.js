@@ -423,6 +423,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     function setMode(mode) {
       if (MODES.indexOf(mode) === -1) mode = 'system';
       try { localStorage.setItem(KEY, mode); } catch (e) {}
+      // the tests use the site's theme again (until one is chosen inside a test)
+      try { localStorage.removeItem('cdi_reading_theme'); localStorage.removeItem('cdi_reading_theme_pref'); } catch (e) {}
       apply(mode, true);
     }
     function mount() {

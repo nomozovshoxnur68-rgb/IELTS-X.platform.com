@@ -3275,6 +3275,7 @@ function clearHighlight() {
   syncAnnotations();
 }
 
+const HL_MAX_WORDS = 40;   // the longest selection that can be highlighted or noted
 function setupHighlighter() {
   const popup = document.getElementById('hl-popup');
   if (!popup) return;
@@ -3306,6 +3307,11 @@ function setupHighlighter() {
       };
       const z = zone(range.startContainer);
       if (!z || z !== zone(range.endContainer)) { popup.classList.remove('show'); return; }
+      // at most HL_MAX_WORDS words at a time: a longer selection is dropped (and cannot be copied)
+      if (sel.toString().trim().split(/\s+/).filter(Boolean).length > HL_MAX_WORDS) {
+        sel.removeAllRanges(); popup.classList.remove('show');
+        toast('You can highlight up to ' + HL_MAX_WORDS + ' words at a time.', 'warn'); return;
+      }
       const rect = range.getBoundingClientRect();
 
       // The official adder carries only Note and Highlight. Clear is ours, and
@@ -3465,6 +3471,8 @@ function setTheme(name) {
   document.querySelectorAll('#stage-reading .ex-contrast-opt').forEach(b =>
     b.classList.toggle('is-on', b.getAttribute('data-val') === val));
   localStorage.setItem('cdi_reading_theme', name);
+  // light / dark chosen in a test is the site's theme too (sepia exists only in the tests)
+  if (name === 'dark' || name === 'light') { try { localStorage.setItem('theme', name); } catch (e) { /* blocked */ } }
 }
 
 // The official Text size page offers Regular / Large / Extra large, which the

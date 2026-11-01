@@ -355,3 +355,19 @@ input.cb-inline{display:inline-block;width:72px;padding:2px 6px;margin:0 2px}
 .cb-tp-box+.cb-tp-box::before{content:"\2193";position:absolute;left:50%;top:-17px;color:var(--muted)}
 .cb-tp-words{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .cb-tp-words span{border:1px solid var(--line-2);border-radius:6px;padding:1px 10px;background:var(--bg)}
+
+/* ── table editor: one box per cell ── */
+.cb-tedit{display:grid;gap:8px}
+.cb-tgrid-wrap{overflow-x:auto}
+.cb-tgrid{border-collapse:separate;border-spacing:6px;margin:-6px}
+.cb-tgrid td{vertical-align:top;padding:0;min-width:170px}
+.cb-tgrid td.cb-tact{min-width:0;width:1%}
+.cb-tcell{min-height:44px;resize:vertical;font-size:13px;line-height:1.45}
+.cb-tcell.is-head{font-weight:700;background:var(--bg)}
+.cb-tcell.is-bold{font-weight:700}
+.cb-tcoldel td{text-align:center}
+.cb-tcheck{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);margin-left:6px}
+.cb-tprev th,.cb-tprev td{line-height:1.7}
+.cb-tprev ul{margin:0;padding-left:18px}
+.cb-tprev .cb-ttitle{text-align:left;font-size:14px}
+.cb-thelp{font-size:12px;font-weight:600;color:var(--ink-2);line-height:1.6}

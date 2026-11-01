@@ -4515,3 +4515,23 @@ body.dark-mode .mx-map svg{filter:invert(1) hue-rotate(180deg)}
 .ix-notes .subhead:first-child{margin-top:0}
 .ix-summary p{margin:0 0 12px;line-height:2.1}
 .ix-pool-below{margin-top:18px}
+
+/* ── Tables of tests made in the admin panel, as in the computer test: the title in the first row, the headings and
+   the first column in bold, white cells with dark rules, bullets and several gaps in a cell ── */
+.ix-ltable{width:100%;max-width:980px;table-layout:auto;border:1px solid #333}
+.ix-ltable th,.ix-ltable td{border:1px solid #333;padding:10px 14px;background:var(--paper);line-height:1.9}
+.ix-ltable th{font-weight:700;text-align:left}
+.ix-ltable .ix-ttitle{padding:14px}
+.ix-ltable .ix-tul{margin:0;padding:0 0 0 24px}
+.ix-ltable .ix-tul li{margin:2px 0}
+.ix-ltable .ix-tline+.ix-tline,.ix-ltable .ix-tline+.ix-tul,.ix-ltable .ix-tul+.ix-tline{margin-top:4px}
+body.dark-mode .ix-ltable,body.dark-mode .ix-ltable th,body.dark-mode .ix-ltable td{border-color:var(--line-4);background:var(--paper)}
+/* notes and summaries: the title centred over the block */
+.ix-textblock .section-head h2{text-align:center;margin-top:6px}
+.ix-notes .subhead{font-size:16px}
+
+/* dark mode: the header's title, sub-line and clock (they were black on the dark bar) */
+body.dark-mode .hdr-title,body.dark-mode .hdr-subline,body.dark-mode #hdr-clock,body.dark-mode #hdr-clock .ttid-sub-title{color:var(--ex-ink)}
+body.dark-mode #hdr-clock.warn .ttid-sub-title{color:#f0b35a}
+body.dark-mode #hdr-clock.crit .ttid-sub-title{color:#ff7d90}
+body.dark-mode .ix-notes .ix-li::before{color:var(--ex-ink-2)}

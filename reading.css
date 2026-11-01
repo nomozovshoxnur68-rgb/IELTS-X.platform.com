@@ -5663,3 +5663,14 @@ body.dark-mode .ep-uz{border-top-color:rgba(255,255,255,.16)}
 .wb-below .word-tile{margin:0;padding:5px 12px;font-weight:400;border-radius:6px}
 .wb-below .word-tile-id{display:none}
 body.dark-mode .wb-below .word-drop{border-color:#666}
+
+/* ── Tables of tests made in the admin panel: the title in the first row, bullets and several gaps in a cell ── */
+.rt-table .tbl-title{text-align:left}
+.rt-table .tc-ul{margin:0;padding:0 0 0 22px}
+.rt-table .tc-ul li{margin:4px 0}
+.rt-table .tc-line+.tc-line,.rt-table .tc-line+.tc-ul,.rt-table .tc-ul+.tc-line{margin-top:6px}
+.rt-table td,.rt-table th{padding:8px 12px}
+
+/* admin-made tables size their columns to their text (the details column is the widest, as on the paper) */
+.rt-table:has(.tc-line,.tc-ul){table-layout:auto}
+.rt-table:has(.tc-line,.tc-ul) .gap-input{width:120px;max-width:100%}

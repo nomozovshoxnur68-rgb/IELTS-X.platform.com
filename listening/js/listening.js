@@ -49,6 +49,31 @@ const PART_SECS=Math.round((+CFG.minutes||10)*60);
 const LISTENING_ANSWERS=CFG.answers;
 const TRANSCRIPT=CFG.transcript||[];
 const ANSWER_TIMES=CFG.answerTimes||{};
+/* A full paper made in the admin panel (CFG.parts = [{part, from, to}, …]) is shown part by part, as in the computer
+   test: the header says "Part N", the footer lists Parts 1–4 (the current one with its numbers) and only that part's
+   questions are on the screen. Every part stays in the page, so answers, highlights, review and the audio work exactly
+   as for a single part. The arrows go to the previous / next question, across the parts. */
+const PAPER_PARTS=Array.isArray(CFG.parts)&&CFG.parts.length>1?CFG.parts.map(function(p){return {part:+p.part,from:+p.from,to:+p.to};}):null;
+function viewPartOf(q){if(!PAPER_PARTS)return 0;const p=PAPER_PARTS.find(function(x){return q>=x.from&&q<=x.to;});return p?p.part:PAPER_PARTS[0].part;}
+function showPaperPart(p){
+  if(!PAPER_PARTS)return;
+  state.viewPart=p;
+  document.querySelectorAll('#listening-render [data-ix-part]').forEach(function(el){el.hidden=+el.dataset.ixPart!==p;});
+  const pt=document.getElementById('pbar-title');if(pt)pt.textContent='Part '+p;
+  const area=document.getElementById('listening-area');if(area)area.scrollTop=0;
+}
+function paperSteps(){return (NAV_GROUPS[PART_NO]||[]).map(function(g){return g[0];});}
+function stepPaper(dir){
+  const steps=paperSteps();if(!steps.length)return;
+  const vp=state.viewPart||PAPER_PARTS[0].part,inView=steps.filter(function(q){return viewPartOf(q)===vp;});
+  const q=state.activeQuestion&&viewPartOf(state.activeQuestion)===vp?state.activeQuestion:(dir>0?inView[0]-1:inView[0]);
+  let i=steps.indexOf(q);if(i<0)i=dir>0?steps.findIndex(function(x){return x>q;})-1:steps.findIndex(function(x){return x>=q;});
+  const j=i+dir;
+  if(j>=steps.length){LSN.goToSubmission();return;}
+  if(j<0)return;
+  jumpToListening(steps[j]);
+  const inp=document.getElementById('lq-'+steps[j]);if(inp&&inp.tagName==='INPUT'&&inp.type==='text'){try{inp.focus({preventScroll:true});}catch(e){}}
+}
 const NAV_GROUPS={};NAV_GROUPS[PART_NO]=CFG.navGroups||(function(){var a=[];for(var i=Q_FROM;i<=Q_TO;i++)a.push([i]);return a;})();
 /* The recording is the full paper; a part plays only its own window of it.
    ?audioStart=SEC&audioEnd=SEC in the address bar overrides the page, which is
@@ -626,6 +651,7 @@ function renderSection(n){
   for(let i=a;i<=b;i++){if(state.listeningAnswers[i])setInput(i,state.listeningAnswers[i]);if(state.listeningFlags[i])applyFlagToPill(i);}restoreMultiGroups();
     const pt=document.getElementById('pbar-title'),pd=document.getElementById('pbar-desc');
   if(pt)pt.textContent=CFG.label||('Part '+n);if(pd)pd.textContent='Listen and answer questions '+Q_FROM+'\u2013'+Q_TO+'.';
+  if(PAPER_PARTS)showPaperPart(state.viewPart||viewPartOf(state.activeQuestion||Q_FROM));
   const area=document.getElementById('listening-area');if(area)area.scrollTop=0;
   document.querySelectorAll('#listening-render .gap-input').forEach(gapAutoGrow);
   updateListeningNav();saveState();
@@ -750,7 +776,21 @@ function updateListeningNav(){
     return '<div class="bnav-section"><div class="bnav-part other" onclick="ExamApp.jumpToListeningPart('+s+')"><span class="bnav-plabel2">'+partLabel(s)+'<span class="bnav-pscore">'+navScoreLabel(s)+'</span></span></div></div>';
   }
   const submitBtn=!document.body.classList.contains('review-mode')?'<button id="sub-btn"'+(submitting?' class="active"':'')+' onclick="LSN.deliverClick()" title="Go to submission page" aria-label="Go to submission page"><svg class="fa-glyph" width="19" height="19" viewBox="0 0 1792 1792" aria-hidden="true" focusable="false"><g transform="translate(0,1536) scale(1,-1)"><path fill="currentColor" d="M1671 970q0 -40 -28 -68l-724 -724l-136 -136q-28 -28 -68 -28t-68 28l-136 136l-362 362q-28 28 -28 68t28 68l136 136q28 28 68 28t68 -28l294 -295l656 657q28 28 68 28t68 -28l136 -136q28 -28 28 -68z"/></g></svg></button>':'<button id="sub-btn" onclick="ExamApp.backToResults()" style="font-size:14px;width:auto;max-width:none;padding:0 16px;">← Results</button>';
-  nav.innerHTML=sH(PART_NO)+submitBtn;
+  // a full paper: one cell per part; the current one shows its own numbers
+  function sPaper(p){
+    const label='<span class="section-prefix">Part&nbsp;</span><span class="sectionNr">'+p.part+'</span>';
+    if(p.part===state.viewPart&&!submitting){
+      let pills='';
+      NAV_GROUPS[PART_NO].filter(function(g){return g[0]>=p.from&&g[0]<=p.to;}).forEach(function(g){
+        const answered=isAnswered(g[0]);let cls='qpill';if(g[0]===curQ)cls+=' current';if(state.listeningFlags[g[0]])cls+=' flagged';
+        pills+='<div class="qpill-wrap'+(answered?' answered':'')+'"><div class="'+cls+'" onclick="ExamApp.jumpToListening('+g[0]+')">'+g[0]+'</div></div>';
+      });
+      return '<div class="bnav-section sel"><div class="bnav-part cur"><div class="bnav-row"><span class="bnav-plabel">'+label+'</span><div class="bnav-pills">'+pills+'</div></div></div></div>';
+    }
+    let c=0;for(let i=p.from;i<=p.to;i++)if(isAnswered(i))c++;
+    return '<div class="bnav-section"><div class="bnav-part other" onclick="ExamApp.jumpToListeningPart('+p.part+')"><span class="bnav-plabel2">'+label+'<span class="bnav-pscore">'+c+'/'+(p.to-p.from+1)+'</span></span></div></div>';
+  }
+  nav.innerHTML=(PAPER_PARTS?PAPER_PARTS.map(sPaper).join(''):sH(PART_NO))+submitBtn;
   document.querySelectorAll('#listening-render .q-pill').forEach(function(pl){
     pl.classList.toggle('current',parseInt(pl.dataset.qnum,10)===curQ);
   });
@@ -772,8 +812,9 @@ function updateArrowState(){
   const prev=document.querySelector('#qnav-arrows .prev'),next=document.querySelector('#qnav-arrows .next');
   if(prev)prev.disabled=!submitting;
   if(next)next.disabled=submitting;
+  if(PAPER_PARTS&&!submitting&&prev){const st=paperSteps();prev.disabled=!st.length||(state.activeQuestion||st[0])<=st[0];}
 }
-function nextSection(){if(isSubmitting())return;const cur=state.currentSection||1;LSN.goToSubmission();}
+function nextSection(){if(isSubmitting())return;if(PAPER_PARTS){stepPaper(1);return;}const cur=state.currentSection||1;LSN.goToSubmission();}
 
 /* ══════════════════════════════════════════════════════════════════════════
    EXAM-SCREEN CHROME — Options page, Messages page, Notes sidebar, submission
@@ -973,11 +1014,12 @@ var LSN=(function(){
           timeUpAck:function(){timeUpAck();},restorePrefs};
 })();
 window.LSN=LSN;
-function prevSection(){if(isSubmitting()){LSN.backFromSubmission();return;}const cur=state.currentSection||1;}
-function jumpToListeningPart(n){if(isSubmitting())LSN.backFromSubmission();state.activeQuestion=null;renderSection(n);updateArrowState();}
+function prevSection(){if(isSubmitting()){LSN.backFromSubmission();return;}if(PAPER_PARTS){stepPaper(-1);return;}const cur=state.currentSection||1;}
+function jumpToListeningPart(n){if(isSubmitting())LSN.backFromSubmission();state.activeQuestion=null;if(PAPER_PARTS){showPaperPart(+n);updateListeningNav();return;}renderSection(n);updateArrowState();}
 function jumpToListening(qid){
   const numId=parseInt(qid);let s=PART_NO;
   state.activeQuestion=numId;
+  if(PAPER_PARTS&&viewPartOf(numId)!==state.viewPart)showPaperPart(viewPartOf(numId));
   if(s!==state.currentSection){renderSection(s);updateArrowState();setTimeout(()=>doScrollTo(numId),80);}
   else{doScrollTo(numId);updateListeningNav();}
 }
@@ -1113,6 +1155,7 @@ function clearHighlight() {
   syncAnnotations();
 }
 
+const HL_MAX_WORDS = 40;   // the longest selection that can be highlighted or noted
 function setupHighlighter() {
   const popup = document.getElementById('hl-popup');
   if (!popup) return;
@@ -1142,6 +1185,11 @@ function setupHighlighter() {
       const host = document.getElementById('listening-render');
       const inHost = n => { const el = n && (n.nodeType === 1 ? n : n.parentElement); return !!(host && el && host.contains(el) && !el.closest('input,textarea,select,button')); };
       if (!inHost(range.startContainer) || !inHost(range.endContainer)) { popup.classList.remove('show'); return; }
+      // at most HL_MAX_WORDS words at a time: a longer selection is dropped (and cannot be copied)
+      if (sel.toString().trim().split(/\s+/).filter(Boolean).length > HL_MAX_WORDS) {
+        sel.removeAllRanges(); popup.classList.remove('show');
+        toast('You can highlight up to ' + HL_MAX_WORDS + ' words at a time.', 'warn'); return;
+      }
       const rect = range.getBoundingClientRect();
 
       // Plain text offers Note + Highlight; a selection on an existing highlight
@@ -1267,7 +1315,7 @@ function resetExamLegacy(){
     onGo:function(){window.__cdiIntentionalReload=true;wipeSession();location.reload();}
   });
 }
-function setTheme(name){document.body.classList.remove('dark-mode','theme-sepia');if(name==='dark')document.body.classList.add('dark-mode');else if(name==='sepia')document.body.classList.add('theme-sepia');document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('active',d.dataset.theme===name));localStorage.setItem('cdi_reading_theme',name);}
+function setTheme(name){document.body.classList.remove('dark-mode','theme-sepia');if(name==='dark')document.body.classList.add('dark-mode');else if(name==='sepia')document.body.classList.add('theme-sepia');document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('active',d.dataset.theme===name));localStorage.setItem('cdi_reading_theme',name);if(name==='dark'||name==='light'){try{localStorage.setItem('theme',name);}catch(e){}}}
 let currentTextZoom=0;
 function zoomText(step){currentTextZoom+=step;if(currentTextZoom<-3)currentTextZoom=-3;if(currentTextZoom>8)currentTextZoom=8;document.documentElement.style.setProperty('--text-zoom',currentTextZoom+'px');}
 
@@ -2584,7 +2632,8 @@ function beginTest(name){
 function init(){
   document.addEventListener('contextmenu',function(e){e.preventDefault();},true);
   setupAntiCheat();setupHighlighter();
-  const savedTheme=localStorage.getItem('cdi_reading_theme')||'light';setTheme(savedTheme);
+  // a theme chosen in a test wins; otherwise the site's own light / dark setting (as assets/js/theme-init.js)
+  const savedTheme=localStorage.getItem('cdi_reading_theme')||(function(){var s=null;try{s=localStorage.getItem('theme');}catch(e){}return s==='dark'||(s!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';})();setTheme(savedTheme);
   applyBrandLogo();
   // TEST HARNESS: ?test=1&stage=<name>&part=<1-4> boots straight to a stage for visual QA.
   // Skips the resume sheet, fullscreen and proctoring so screenshots are deterministic.

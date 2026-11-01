@@ -104,7 +104,7 @@ function applyTheme(theme, save) {
     const dark = theme === 'dark' || (theme === 'system' && media && media.matches);
     document.documentElement.classList.toggle('dark', dark);
     document.documentElement.classList.toggle('dark-mode', dark);
-    if (save) { try { localStorage.setItem('theme', theme); } catch (e) { /* ignore */ } }
+    if (save) { try { localStorage.setItem('theme', theme); localStorage.removeItem('cdi_reading_theme'); localStorage.removeItem('cdi_reading_theme_pref'); } catch (e) { /* ignore */ } }   // the tests follow the site again
     themeOpts.forEach((o) => o.classList.toggle('bg-muted', o.getAttribute('data-theme') === theme));
     themeOpts.forEach((o) => o.classList.toggle('text-foreground', o.getAttribute('data-theme') === theme));
 }

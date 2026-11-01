@@ -446,18 +446,30 @@
   const TABLE_GAP = /_{2,}|\.{4,}|…{2,}/;
   const tableRows = (t) => String(t || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
     .map((l) => l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/).map((c) => c.trim()));
-  /* the cell text of every gap below the heading line: "Rapid ____" */
-  function tableGaps(t) {
+  /* The table is a grid of cells, edited box by box (g.grid = { rows, head, rowHead }) and saved as JSON in the
+     question's "table". A cell may hold several lines ("- " = a bullet) and gaps ____, as on the paper. head: the first
+     row is the column headings; rowHead: the first column is printed in bold. Older tests saved "a | b" rows. */
+  function parseTable(t) {
+    const s = String(t || '').trim();
+    if (s.charAt(0) === '{') { try { const o = JSON.parse(s); if (Array.isArray(o.rows)) return { rows: o.rows.map((r) => (Array.isArray(r) ? r.map((c) => String(c == null ? '' : c)) : [''])), head: o.head !== false, rowHead: !!o.rowHead }; } catch (e) { /* old rows */ } }
+    return { rows: tableRows(s), head: true, rowHead: false };
+  }
+  const tableJson = (grid) => JSON.stringify({ v: 2, rows: grid.rows, head: grid.head !== false, rowHead: !!grid.rowHead });
+  const gridOf = (g) => g.grid || (g.grid = String(g.table || '').trim() ? parseTable(g.table) : { rows: [['', '', ''], ['', '', '']], head: true, rowHead: true });
+  const gridCols = (grid) => Math.max(1, ...grid.rows.map((r) => r.length));
+  /* the words around every gap, row by row, cell by cell (the heading row has none): "Rapid ____" */
+  function tableGaps(grid) {
     const out = [];
-    tableRows(t).slice(1).forEach((row) => row.forEach((c) => {
-      const parts = c.split(new RegExp(TABLE_GAP.source, 'g'));
-      for (let k = 0; k < parts.length - 1; k++) out.push(parts.map((p, j) => p + (j < parts.length - 1 ? (j === k ? '____' : '…') : '')).join('').trim());
-    }));
+    (grid.rows || []).forEach((row, r) => { if (r === 0 && grid.head !== false) return;
+      row.forEach((c) => String(c || '').split('\n').forEach((l) => out.push(...gapContexts(l.replace(BULLET, ''))))); });
     return out;
   }
-  /* one question per gap: answers stay with their gap; the question text is the gap's cell (so it is never empty) */
+  /* one question per gap: answers stay with their gap; the question text is the words around it (so it is never empty) */
   function syncTable(g) {
-    const gaps = tableGaps(g.table);
+    const grid = gridOf(g); const cols = gridCols(grid);
+    grid.rows.forEach((r) => { while (r.length < cols) r.push(''); });
+    g.table = tableJson(grid);
+    const gaps = tableGaps(grid);
     while (g.items.length < gaps.length) g.items.push(newItem());
     if (g.items.length > gaps.length) g.items.length = gaps.length;
     g.items.forEach((it, k) => { it.prompt = gaps[k]; it.options = []; });
@@ -466,7 +478,8 @@
   function tableFromText(lines) {
     const raw = lines.map((l) => String(l || '').replace(/\(?\b\d{1,2}\b\)?\s*(?:\.{3,}|…+|_{2,})|(?:\.{3,}|…+|_{2,})\s*\(?\b\d{1,2}\b\)?|_{2,}|\.{4,}|…{2,}/g, '____').trim()).filter(Boolean);
     const marked = raw.some((l) => /\||\t/.test(l));
-    return raw.map((l) => (marked ? l.replace(/\t+/g, ' | ') : l.split(/\s{2,}/).join(' | '))).join('\n');
+    const rows = raw.map((l) => (marked ? l.replace(/\t+/g, ' | ') : l.split(/\s{2,}/).join(' | ')).replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*/).map((c) => c.trim()));
+    return { rows: rows.length ? rows : [['', ''], ['', '']], head: true, rowHead: true };
   }
 
   /* ═════════ Text with gaps: notes, summaries, sentences, flow-charts, word boxes ═════════
@@ -531,12 +544,13 @@
   const isInstrLine = (t) => P_HEAD.test(t) || P_INSTR.test(t) || /^(?:choose|write|use|nb\b|answer|in boxes|from the|complete|label|using|move)\b/i.test(t);
   /* "Questions 1–6  Complete the notes below …" + the notes -> one group whose questions are the gaps */
   function textGroupFrom(lines, type) {
-    const g = newGroup(type); let instr = ''; const body = []; const opts = []; const wantsList = type === 'summary-words' || type === 'box';
+    const g = newGroup(type); let instr = ''; const body = []; const opts = []; const inline = []; const wantsList = type === 'summary-words' || type === 'box';
     lines.forEach((raw) => {
       const t = String(raw || '').trim();
       if (!t) { if (body.length) body.push(''); return; }
       if (!body.length && isInstrLine(t)) { instr += (instr ? ' ' : '') + t; return; }
-      const marked = gapsToMarks(t);
+      let marked = gapsToMarks(t);
+      if (marked.includes('=>')) { const [txt, an, ex] = marked.split('=>'); marked = txt.replace(/^\d{1,2}\s*[.)]\s*/, '').trim(); if (!TABLE_GAP.test(marked)) marked += ' ____'; inline.push({ answer: String(an || '').trim(), explanation: String(ex || '').trim() }); }
       if (wantsList && !TABLE_GAP.test(marked)) { const o = optionPieces(t); if (o.length) { opts.push(...o); return; } }
       body.push(marked);
     });
@@ -546,6 +560,7 @@
     if (body.filter(Boolean).length > 1 && type !== 'sentence' && !TABLE_GAP.test(first) && first.length < 90 && !/[.;:,]$/.test(first) && !BULLET.test(first)) { g.blockTitle = first; body.shift(); }
     g.group = cleanHeadText(instr); g.text = shapeText(body, type); if (wantsList) g.options = opts;
     syncText(g);
+    if (inline.length === g.items.length) g.items.forEach((it, k) => { it.answer = finalAnswer(g, inline[k].answer); it.explanation = inline[k].explanation; });
     return g;
   }
   /* a group of an older test (one type for every kind of matching / completion) becomes the type it really is */
@@ -566,6 +581,7 @@
       g.items.forEach((it, k) => Object.assign(it, keep[k] || {}));
     }
     if (g.text === undefined) g.text = '';
+    if (g.type === 'table') gridOf(g);
     return g;
   }
   /* a word typed as the answer of a list-of-words summary is its letter; a letter typed for a word box is its word */
@@ -610,7 +626,7 @@
     const out = []; const idx = (gs || []).map((_, i) => i);
     if (isMultiSection()) idx.sort((a, b) => (gs[a].passage - gs[b].passage) || (a - b));
     idx.forEach((i, n) => { const g = gs[i]; const shared = SHARED_OPTS.includes(g.type);
-      g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), table: g.type === 'table' ? String(g.table || '').trim() : undefined, text: isTextType(g.type) ? String(g.text || '').trim() : undefined, title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
+      g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), table: g.type === 'table' ? (g.grid ? tableJson(g.grid) : String(g.table || '').trim()) : undefined, text: isTextType(g.type) ? String(g.text || '').trim() : undefined, title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
         options: (shared ? g.options : it.options || []).map((o) => String(o).trim()).filter(Boolean), answer: finalAnswer(g, it.answer), explanation: String(it.explanation || '').trim(), evidence: String(it.evidence || '').trim(),
         origin: it.origin === 'ai' || it.origin === 'source' ? it.origin : undefined, at: Number(it.at) > 0 ? Number(it.at) : undefined })); });   // where an AI-made question came from, when an answer is heard
     return out;
@@ -647,10 +663,10 @@
         else if (!textGaps(g.text).length) err(where + ': the text has no gap. Write ____ where each answer goes.', gi);
       }
       if (g.type === 'table') {
-        const rows = tableRows(g.table);
-        if (rows.length < 2) err(where + ': type the table — the column headings on the first line, then one row per line, cells split by |.', gi);
-        else if (!tableGaps(g.table).length) err(where + ': the table has no gap. Write ____ in each cell where an answer goes.', gi);
-        if (rows.length && rows[0].some((c) => TABLE_GAP.test(c))) warn(where + ': the first line of the table is its column headings; a ____ there is not a question.', gi);
+        const grid = gridOf(g); const rows = grid.rows.filter((r) => r.some((c) => String(c || '').trim()));
+        if (rows.length < (grid.head !== false ? 2 : 1)) err(where + ': fill in the table: the column headings, then a row for each line of the table.', gi);
+        else if (!tableGaps(grid).length) err(where + ': the table has no gap. Write ____ in each cell where an answer goes.', gi);
+        if (grid.head !== false && grid.rows[0] && grid.rows[0].some((c) => TABLE_GAP.test(c))) warn(where + ': the first line of the table is its column headings; a ____ there is not a question.', gi);
       }
       if (shared) {
         const ot = (g.options || []).filter(Boolean);
@@ -786,7 +802,7 @@
       <input class="field" data-p="groups.${gi}.group" value="${esc(g.group)}" placeholder="${L ? 'Instruction of this block, e.g. Complete the notes below. Write ONE WORD for each answer.' : 'Instruction of this group, e.g. Complete the notes. Write NO MORE THAN TWO WORDS. (“Questions 1–5” is added by itself. Empty = the standard instruction)'}">
       ${L ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="Title above the ${isTable ? 'table' : 'block'} (optional), e.g. Barrington Historical Buildings Tours">`
         : !['tfng', 'ynng', 'mcq', 'mcq-multi', 'map', 'matching-headings', 'matching-info'].includes(g.type) ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="${g.type === 'matching' || g.type === 'matching-features' ? 'Title of the list (optional), e.g. List of Researchers' : g.type === 'matching-endings' ? 'Title above the sentences (optional)' : isTable ? 'Title above the table (optional), e.g. Specialisation' : 'Title above the notes / summary (optional), e.g. Further advantages of social networks'}">` : ''}
-      ${isTable ? `<label class="lbl cb-shared">The table, typed ONCE: the column headings on the first line, then one row per line. Split the cells with <code>|</code> and write <code>____</code> in each cell where an answer goes. Every gap is one question, numbered row by row.<textarea class="field cb-table" rows="7" data-p="groups.${gi}.table" placeholder="Specialised ability | Example fish species&#10;Maintains the same ____ over long distances | Swordfish&#10;Rapid ____ | Barracuda&#10;Rapid changes of direction | ____">${esc(g.table)}</textarea></label>${tablePreview(g, range.from)}` : ''}
+      ${isTable ? tableEditor(g, gi) + tablePreview(g, range.from) : ''}
       ${isText ? `<label class="lbl cb-shared">${TEXT_HELP[g.type]}<textarea class="field cb-table" rows="${g.type === 'summary' || g.type === 'summary-words' ? 6 : 8}" data-p="groups.${gi}.text" placeholder="${esc(TEXT_PH[g.type] || '')}">${esc(g.text)}</textarea></label>${textPreview(g, range.from)}` : ''}
       ${shared ? `<label class="lbl cb-shared">${SHARED_LABEL[g.type]}<textarea class="field" rows="${g.type === 'matching' ? 6 : 4}" data-lines="1" data-p="groups.${gi}.options" placeholder="${esc(SHARED_PH[g.type])}">${esc((g.options || []).join('\n'))}</textarea></label>
         ${(g.type === 'matching' || g.type === 'matching-info') && !L ? `<div class="btn-row"><button class="btn btn-sm" data-cb="g-letters" data-g="${gi}" type="button">Fill paragraph letters A–G</button><button class="btn btn-sm" data-cb="g-letters-9" data-g="${gi}" type="button">A–I</button></div>` : ''}` : ''}
@@ -811,13 +827,35 @@
     const words = g.type === 'summary-words' || g.type === 'box' ? `<div class="cb-tp-words">${(g.options || []).map(optToken).map((k) => `<span>${esc(k.t || k.l)}</span>`).join('')}</div>` : '';
     return `<div class="cb-tprev cb-txtprev"><div class="muted sm">Preview</div>${g.blockTitle ? `<div class="cb-tp-title">${esc(g.blockTitle)}</div>` : ''}${html}${words}</div>`;
   }
+  /* the table, one box per cell: + Row / + Column, a row or a column taken out, headings and a bold first column */
+  function tableEditor(g, gi) {
+    const grid = gridOf(g); const cols = gridCols(grid); const hd = grid.head !== false;
+    const cell = (r, c) => { const v = String((grid.rows[r] || [])[c] || '');
+      return `<td><textarea class="field cb-tcell${r === 0 && hd ? ' is-head' : c === 0 && grid.rowHead ? ' is-bold' : ''}" rows="${Math.min(8, Math.max(2, v.split('\n').length))}" data-p="groups.${gi}.grid.rows.${r}.${c}" placeholder="${r === 0 && hd ? 'Column heading' : 'Text; ____ = a gap; - = a bullet'}">${esc(v)}</textarea></td>`; };
+    const rows = grid.rows.map((row, r) => `<tr>${Array.from({ length: cols }, (_, c) => cell(r, c)).join('')}<td class="cb-tact">${grid.rows.length > 1 ? `<button class="btn btn-sm btn-danger" data-cb="t-row-del" data-g="${gi}" data-i="${r}" type="button" title="Take out this row">✕</button>` : ''}</td></tr>`).join('');
+    const colDel = cols > 1 ? `<tr class="cb-tcoldel">${Array.from({ length: cols }, (_, c) => `<td><button class="btn btn-sm btn-danger" data-cb="t-col-del" data-g="${gi}" data-i="${c}" type="button">✕ column</button></td>`).join('')}<td></td></tr>` : '';
+    return `<div class="cb-shared cb-tedit"><div class="cb-thelp">The table, one box per cell. Write <code>____</code> where an answer goes: every gap is one question, numbered row by row. A line starting with <code>- </code> is a bullet; a cell can have several lines. The title above is printed in the first row of the table.</div>
+      <div class="cb-tgrid-wrap"><table class="cb-tgrid">${rows}${colDel}</table></div>
+      <div class="btn-row"><button class="btn btn-sm" data-cb="t-row-add" data-g="${gi}" type="button">+ Row</button><button class="btn btn-sm" data-cb="t-col-add" data-g="${gi}" type="button">+ Column</button>
+        <label class="cb-tcheck"><input type="checkbox" data-p="groups.${gi}.grid.head" ${hd ? 'checked' : ''}> First row = column headings</label>
+        <label class="cb-tcheck"><input type="checkbox" data-p="groups.${gi}.grid.rowHead" ${grid.rowHead ? 'checked' : ''}> First column in bold</label></div></div>`;
+  }
+  /* a cell as the student will see it: lines, bullets, gaps */
+  function cellHtml(text, fill) {
+    let html = '', ul = false;
+    String(text || '').split('\n').map((l) => l.trim()).filter(Boolean).forEach((l) => {
+      if (BULLET.test(l)) { if (!ul) { html += '<ul>'; ul = true; } html += '<li>' + fill(l.replace(BULLET, '')) + '</li>'; }
+      else { if (ul) { html += '</ul>'; ul = false; } html += '<div>' + fill(l) + '</div>'; }
+    });
+    return html + (ul ? '</ul>' : '');
+  }
   /* the table as the student will see it, with the numbers of its gaps */
   function tablePreview(g, from) {
-    const rows = tableRows(g.table); if (rows.length < 2) return '';
-    let n = from; const cols = Math.max(...rows.map((r) => r.length));
-    const cell = (c, head) => { const parts = String(c).split(new RegExp(TABLE_GAP.source, 'g')); return parts.map((x, k) => esc(x) + (k < parts.length - 1 ? (head ? '____' : `<span class="cb-tgap">${n++}</span>`) : '')).join(''); };
-    const tr = (r, head) => '<tr>' + Array.from({ length: cols }, (_, k) => `<${head ? 'th' : 'td'}>${cell(r[k] || '', head)}</${head ? 'th' : 'td'}>`).join('') + '</tr>';
-    return `<div class="cb-tprev"><div class="muted sm">Preview</div><table>${tr(rows[0], true)}${rows.slice(1).map((r) => tr(r, false)).join('')}</table></div>`;
+    const grid = gridOf(g); if (!grid.rows.some((r) => r.some((c) => TABLE_GAP.test(c)))) return '';
+    let n = from; const cols = gridCols(grid); const re = new RegExp(TABLE_GAP.source, 'g'); const hd = grid.head !== false;
+    const tr = (r, i) => '<tr>' + Array.from({ length: cols }, (_, k) => { const th = (i === 0 && hd) || (k === 0 && grid.rowHead);
+      return `<${th ? 'th' : 'td'}>${cellHtml(r[k] || '', (s) => esc(s).replace(re, () => (i === 0 && hd ? '____' : `<span class="cb-tgap">${n++}</span>`)))}</${th ? 'th' : 'td'}>`; }).join('') + '</tr>';
+    return `<div class="cb-tprev"><div class="muted sm">Preview</div><table>${g.blockTitle ? `<tr><th colspan="${cols}" class="cb-ttitle">${esc(g.blockTitle)}</th></tr>` : ''}${grid.rows.map(tr).join('')}</table></div>`;
   }
 
   /* ═════════ The questions in three steps, by number ═════════
@@ -943,7 +981,7 @@
       if (!rows.length && !g.blockTitle && t.length < 60 && !/\||\t|\s{2,}/.test(t) && !TABLE_GAP.test(t) && !/\b\d{1,2}\b/.test(t)) { g.blockTitle = t; return; }   // the table's own title
       rows.push(t);
     });
-    g.group = cleanHeadText(instr); g.table = tableFromText(rows); syncTable(g);
+    g.group = cleanHeadText(instr); g.grid = tableFromText(rows); syncTable(g);
     return g;
   }
   /* numbered questions (TRUE / FALSE, multiple choice, matching, short answers) of one block -> groups */
@@ -982,9 +1020,10 @@
   }
   /* take out the questions numbered from..to (a table goes as a whole); empty groups go too */
   function dropRange(from, to) {
-    draft.groups = draft.groups.filter((g) => (g.type === 'table' ? String(g.table || '').trim() : g.items.some((it) => hasQ(g, it))));
+    draft.groups = draft.groups.filter((g) => (g.type === 'table' ? g.items.length : g.items.some((it) => hasQ(g, it))));
     const kill = new Set(numberedItems().filter((x) => x.n <= to && x.n + x.w - 1 >= from).map((x) => x.gi + ':' + x.ii));
-    draft.groups.forEach((g, gi) => { g.items = g.type === 'table' && g.items.some((it, ii) => kill.has(gi + ':' + ii)) ? [] : g.items.filter((it, ii) => !kill.has(gi + ':' + ii)); });
+    // a table / notes / summary block goes as a whole: its questions are the gaps of its text
+    draft.groups.forEach((g, gi) => { g.items = hasFixedItems(g.type) && g.items.some((it, ii) => kill.has(gi + ':' + ii)) ? [] : g.items.filter((it, ii) => !kill.has(gi + ':' + ii)); });
     draft.groups = draft.groups.filter((g) => g.items.length);
     return kill.size;
   }
@@ -1243,7 +1282,34 @@
     return 'short';
   }
   /* -> { groups, skipped } ; forced = 'auto' or a type */
+  /* The questions of a pasted / imported paper -> groups. Blocks of notes, summaries, sentences, flow-charts, word boxes and
+     tables are cut out at their "Questions N–M" line and read as text (every printed line is kept; the answer key gives
+     their answers by number); the other blocks are read question by question (parseItemGroups). */
   function parseGroups(text, forced, passage, keepNum, key) {
+    key = key || {};
+    if (!Object.keys(key).length) { const sk = splitKey(text); text = sk.text; key = sk.key; }
+    const chunks = []; let cur = [];
+    String(text || '').replace(/\r/g, '').split('\n').forEach((l) => { if (P_HEAD.test(l.trim()) && cur.some((x) => x.trim())) { chunks.push(cur); cur = []; } cur.push(l); });
+    chunks.push(cur);
+    const groups = []; let skipped = []; let rest = [];
+    const flush = () => { if (rest.some((l) => l.trim())) { const r = parseItemGroups(rest.join('\n'), forced, passage, keepNum, key); groups.push(...r.groups); skipped = skipped.concat(r.skipped); } rest = []; };
+    chunks.forEach((lines) => {
+      const head = lines.find((l) => P_HEAD.test(l.trim()));
+      const type = head ? (forced && forced !== 'auto' ? forced : guessType(lines)) : '';
+      if (!head || !(type === 'table' || isTextType(type))) { rest.push(...lines); return; }
+      const g = type === 'table' ? tableGroupFrom(lines) : textGroupFrom(lines, type);
+      if (!g.items.length) { rest.push(...lines); return; }
+      flush();
+      const n0 = Number((/(\d+)/.exec(head) || [])[1]) || 0; const typed = type !== 'summary-words' && type !== 'box';
+      g.passage = passage || 1; g._num = n0 ? String(n0) : ''; g._first = n0; if (n0) g.start = n0;   // keeps its printed numbers
+      g.items.forEach((it, k) => { const e = n0 ? key[n0 + k] : null; if (!e) return; if (!String(it.answer || '').trim()) it.answer = finalAnswer(g, typed ? String(e.ans || '').replace(/\s*\/\s*/g, '|') : e.ans); if (e.exp && !it.explanation) it.explanation = e.exp; });
+      groups.push(g);
+    });
+    flush();
+    if (!keepNum) groups.forEach((g) => { delete g._num; delete g._first; });
+    return { groups, skipped };
+  }
+  function parseItemGroups(text, forced, passage, keepNum, key) {
     const raw = parseRaw(text, key); const L = draft && draft.type === 'listening'; const groups = [];
     raw.blocks.forEach((b) => {
       let cur = null, first = true;
@@ -1722,10 +1788,12 @@
     }
     if (gt && hasFixedItems(draft.groups[Number(gt[1])].type)) {
       const g = draft.groups[Number(gt[1])]; const lines = g.items.filter((it) => String(it.prompt || '').trim()).map((it) => (TABLE_GAP.test(it.prompt) ? it.prompt : it.prompt + ' ____'));
-      if (g.type === 'table' && !String(g.table || '').trim() && lines.length) g.table = (g.blockTitle || 'Notes') + '\n' + lines.join('\n');
+      if (g.type === 'table' && !g.grid && !String(g.table || '').trim() && lines.length) g.grid = { rows: [[g.blockTitle || 'Notes']].concat(lines.map((l) => [l])), head: true, rowHead: false };
       if (isTextType(g.type) && !String(g.text || '').trim() && lines.length) g.text = lines.join('\n');
       syncGaps(g);
     }
+    const gd = /^groups\.(\d+)\.grid\./.exec(p);
+    if (gd && e.type === 'change') { syncTable(draft.groups[Number(gd[1])]); refreshQuestions(); return; }
     const tb = /^groups\.(\d+)\.(?:table|text)$/.exec(p);
     if (tb && e.type === 'change') { syncGaps(draft.groups[Number(tb[1])]); refreshQuestions(); return; }
     if (/\.(answer|explanation)$/.test(p) && e.type === 'change') refreshNums();
@@ -1850,6 +1918,14 @@
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
       else if (a === 'check') showIssues(validate(), true);
+      else if (a === 't-row-add' || a === 't-row-del' || a === 't-col-add' || a === 't-col-del') {
+        const g = draft.groups[Number(t.dataset.g)]; const grid = gridOf(g); const cols = gridCols(grid);
+        if (a === 't-row-add') grid.rows.push(Array(cols).fill(''));
+        if (a === 't-row-del' && grid.rows.length > 1) { const r = grid.rows[i]; if (r.some((c) => String(c || '').trim()) && !confirm('Take out row ' + (i + 1) + ' of the table?')) return; grid.rows.splice(i, 1); }
+        if (a === 't-col-add') grid.rows.forEach((r) => r.push(''));
+        if (a === 't-col-del' && cols > 1) { if (grid.rows.some((r) => String(r[i] || '').trim()) && !confirm('Take out column ' + (i + 1) + ' of the table?')) return; grid.rows.forEach((r) => r.splice(i, 1)); }
+        syncTable(g); refreshQuestions(); autosave();
+      }
       else if (a === 'step') { draft._step = t.dataset.step; refreshQuestions(); autosave(); const w = $('#cb-qwrap'); if (w) w.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
       else if (a === 'rq-add') addQuestionsByRange();
       else if (a === 'ra-add') {
