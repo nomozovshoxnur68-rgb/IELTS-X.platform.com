@@ -15,7 +15,7 @@
     function show() { root.classList.remove('ix-gating'); if (style.parentNode) style.parentNode.removeChild(style); }
     var path = location.pathname;
     var ctl = window.AbortController ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctl) ctl.abort(); show(); }, 5000);
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); show(); }, 3000);   // the server and the Vercel middleware refuse the page itself; this is only the friendly redirect
     // ?page=, not ?path=: on Vercel the "/api/:path*" rewrite adds its own "path" to the query string
     fetch('/api/access/check?page=' + encodeURIComponent(path), { credentials: 'same-origin', cache: 'no-store', signal: ctl ? ctl.signal : undefined })
         .then(function (r) { return r.ok ? r.json() : null; })

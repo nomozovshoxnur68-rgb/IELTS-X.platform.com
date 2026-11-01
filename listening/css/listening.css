@@ -4535,3 +4535,10 @@ body.dark-mode .hdr-title,body.dark-mode .hdr-subline,body.dark-mode #hdr-clock,
 body.dark-mode #hdr-clock.warn .ttid-sub-title{color:#f0b35a}
 body.dark-mode #hdr-clock.crit .ttid-sub-title{color:#ff7d90}
 body.dark-mode .ix-notes .ix-li::before{color:var(--ex-ink-2)}
+
+/* ── Dark mode: a black page and no grey patches behind the questions ── */
+body.dark-mode{--ex-ground:#000;--ex-panel:#121417;--ex-panel-2:#1b1e23;--ex-line:#30353c;--ex-line-2:#454b54}
+body.dark-mode,body.dark-mode #stage-listening,body.dark-mode #listening-area{background:#000}
+body.dark-mode .option{background:transparent}
+body.dark-mode .option:hover{background:#15181c}
+body.dark-mode .option.selected{background:#132741}

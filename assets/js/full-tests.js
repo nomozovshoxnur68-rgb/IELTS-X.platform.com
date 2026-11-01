@@ -123,10 +123,11 @@
                 A.assignKeys(SKILL, pack);
                 packs.push(pack);
             }
+            // the same card as a built-in test: "Test N", "Pack 6 | <title>" and the question types (nothing shows it was added in the panel)
             pack.tests.push({
-                source: m.description || 'Added by IELTSX',
-                tags: [], href: m.href || ('/test?id=' + encodeURIComponent(m.id)), premium: !!m.premium, plan: '',
-                adminTitle: m.title, material: true, key: 'mat:' + m.id,
+                source: pack.title + ' | ' + m.title,
+                tags: (m.types || []).slice(0, 3), href: m.href || ('/test?id=' + encodeURIComponent(m.id)), premium: !!m.premium, plan: '',
+                adminTitle: m.title, material: true, key: 'mat:' + m.id, tier: pack.tier || '',
                 rule: { locked: !!m.premium, plan: A.planOf(m.plan) || 'standard' }, allowed: !m.locked
             });
         });
@@ -274,7 +275,7 @@
         var tags = (t.tags || []);
         var shown = tags.slice(0, maxTags).map(function (x) { return '<span class="ft-tag">' + esc(x) + '</span>'; }).join('');
         var more = tags.length > maxTags ? '<span class="ft-tag ft-tag-more">+' + (tags.length - maxTags) + ' more</span>' : '';
-        var title = t.adminTitle || ('Test ' + (i + 1));
+        var title = 'Test ' + (i + 1);
         var source = (info.sourcePrefix || '') + (t.source || '');
         var badge = levelBadge(t.rule, t.tier);
         var finished = t.done ? '<span class="ft-badge ft-badge-done">' + ICON.check + 'Completed</span>' : '';

@@ -123,3 +123,13 @@ html.dark-mode {
 
 /* the hidden attribute must always win (Admin Panel link was visible to guests) */
 [hidden], [data-admin-only][hidden] { display: none !important; }
+
+/* Utilities the card templates use (app.js, practice-cards.js, full-tests.js) that the compiled Tailwind bundle does not
+   have: without aspect-[4/3] every card picture took its own height, so the cards of one grid were all different sizes. */
+.aspect-\[4\/3\]{aspect-ratio:4/3}
+.aspect-\[4\/3\]>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.min-h-\[390px\]{min-height:390px}
+.group:hover .group-hover\:scale-\[1\.03\]{transform:scale(1.03)}
+.\[\&_svg\]\:pointer-events-none svg{pointer-events:none}
+.\[\&_svg\]\:size-4 svg{width:1rem;height:1rem}
+.\[\&_svg\]\:shrink-0 svg{flex-shrink:0}

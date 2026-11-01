@@ -5626,3 +5626,11 @@ body.dark-mode .ep-uz{border-top-color:rgba(255,255,255,.16)}
 #stage-reading #passage-pane .passage-text,#stage-reading #questions-pane{-webkit-user-select:text;user-select:text}
 #stage-reading #questions-pane button,#stage-reading #passage-pane .passage-text button{-webkit-user-select:none;user-select:none}
 #stage-reading input,#stage-reading textarea{-webkit-user-select:text;user-select:text}
+
+/* ── Dark mode: a black page and no grey patches behind the questions ── */
+body.dark-mode{--ex-ground:#000;--ex-panel:#121417;--ex-panel-2:#1b1e23;--ex-line:#30353c;--ex-line-2:#454b54}
+body.dark-mode,body.dark-mode #stage-reading,body.dark-mode .exam-main,body.dark-mode #passage-pane,body.dark-mode #questions-pane{background:#000}
+body.dark-mode .option,body.dark-mode .multi-opts .option,body.dark-mode .tfn-opts .option{background:transparent !important}
+body.dark-mode .option:hover,body.dark-mode .multi-opts .option:hover{background:#15181c !important}
+body.dark-mode .option.selected,body.dark-mode .multi-opts .option.selected,body.dark-mode .tfn-opts .option.selected{background:#132741 !important}
+body.dark-mode .heading-bank-list,body.dark-mode .word-bank-list,body.dark-mode .option-list-box,body.dark-mode .para-heading-slot{background:transparent}

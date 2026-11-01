@@ -4474,3 +4474,10 @@ html.mock-embed #entry-form,html.mock-embed .entry-tg{display:none!important}
 #stage-listening #listening-render{-webkit-user-select:text;user-select:text}
 #stage-listening #listening-render button,#stage-listening .q-pill,#stage-listening .drag-chip{-webkit-user-select:none;user-select:none}
 #stage-listening input,#stage-listening textarea{-webkit-user-select:text;user-select:text}
+
+/* ── Dark mode: a black page and no grey patches behind the questions ── */
+body.dark-mode{--ex-ground:#000;--ex-panel:#121417;--ex-panel-2:#1b1e23;--ex-line:#30353c;--ex-line-2:#454b54}
+body.dark-mode,body.dark-mode #stage-listening,body.dark-mode #listening-area{background:#000}
+body.dark-mode .option{background:transparent}
+body.dark-mode .option:hover{background:#15181c}
+body.dark-mode .option.selected{background:#132741}

@@ -392,3 +392,20 @@ The strip of numbers 1–40 shows what each number still needs. **Everything tog
   every test: choosing it in a test or on the site changes both.
 * No right-click menu on any page (`assets/js/no-context-menu.js`, loaded by `site-access.js` or its own tag); text
   fields keep theirs.
+
+## Speed, loading bar, several workers, cards and logo (November 2026)
+
+* **Loading bar** on every page (`assets/js/loading.js`, first thing in `<head>`): moves while the page loads, while it waits
+  for the server and as soon as a link is clicked. A test page shows a spinner instead of a blank screen while its access is
+  checked (at most 3 s; the server and the Vercel middleware refuse the page itself).
+* **Faster**: the Node server sends pages, styles and scripts compressed (brotli / gzip, made once and kept in memory: e.g.
+  `reading.css` 375 KB -> 81 KB); pictures and fonts are kept by the browser for a day (also on Vercel, `vercel.json`).
+  Pages, styles and scripts are always checked again, so an update is seen at once.
+* **Several workers**: `WEB_CONCURRENCY=4` (or `auto` = one per CPU core) runs that many copies of the server on the same port
+  and restarts one that stops; it needs Supabase (the local `data/db.json` is written by one process). On Vercel nothing is
+  needed: every request gets its own instance and Vercel adds more as visitors come.
+* Home: **Part Practice** (Listening / Reading / Writing / Speaking) replaces "IELTS Courses". Card pictures all have the same
+  4:3 frame (`aspect-[4/3]` was missing from the CSS). A full test made in the admin panel gets the same card as a built-in
+  one (Test N, the pack's tier, "Pack | title", question types). An uploaded logo takes exactly the place of the built-in mark
+  (it grew to the picture's own size in the reading header). Dark mode of the tests: a black page, no grey blocks behind the
+  answer rows.

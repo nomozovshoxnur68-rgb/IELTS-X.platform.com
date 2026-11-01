@@ -20,6 +20,18 @@
         var want = url || img.getAttribute('data-ix-orig');
         if (want && img.getAttribute('src') !== want) img.setAttribute('src', want);
     }
+    /* the size the built-in mark is drawn at: an uploaded logo takes exactly that place, whatever the size of the file
+       (a box without a size of its own, like the header of the reading test, used to grow to the picture's own size) */
+    function markSize(el) {
+        if (!el) return null;
+        var r = el.getBoundingClientRect();
+        if (r.width > 2 && r.height > 2) return [Math.round(r.width), Math.round(r.height)];
+        var cs = getComputedStyle(el), w = parseFloat(cs.width), h = parseFloat(cs.height);   // hidden screen: its CSS size
+        return w > 2 && h > 2 ? [Math.round(w), Math.round(h)] : null;
+    }
+    function sizeStyle(sz) {
+        return 'display:block;object-fit:contain;flex:0 0 auto;' + (sz ? 'width:' + sz[0] + 'px;height:' + sz[1] + 'px' : 'width:auto;height:32px;max-width:100%');
+    }
     function apply(b) {
         var logo = safe(b && b.logoUrl), icon = safe(b && b.iconUrl);
         var mark = icon || logo, word = logo || icon;
@@ -35,7 +47,7 @@
         for (var j = 0; j < boxes.length; j++) {
             var box = boxes[j], pic = box.querySelector('img[data-ix-logo]'), svg = box.querySelector('svg');
             if (mark) {
-                if (!pic) { pic = document.createElement('img'); pic.setAttribute('data-ix-logo', ''); pic.alt = 'Logo'; pic.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block'; box.appendChild(pic); }
+                if (!pic) { pic = document.createElement('img'); pic.setAttribute('data-ix-logo', ''); pic.alt = 'Logo'; pic.style.cssText = sizeStyle(markSize(svg) || markSize(box)); box.appendChild(pic); }
                 if (pic.getAttribute('src') !== mark) pic.setAttribute('src', mark);
                 if (svg) svg.style.display = 'none';
             } else { if (pic) pic.remove(); if (svg) svg.style.display = ''; }
@@ -45,7 +57,7 @@
         for (var k = 0; k < svgs.length; k++) {
             var mk = svgs[k], prev = mk.previousElementSibling, own = prev && prev.hasAttribute('data-ix-logo') ? prev : null;
             if (mark) {
-                if (!own) { own = document.createElement('img'); own.setAttribute('data-ix-logo', ''); own.alt = 'Logo'; own.setAttribute('class', mk.getAttribute('class') || ''); own.style.objectFit = 'contain'; mk.parentNode.insertBefore(own, mk); }
+                if (!own) { own = document.createElement('img'); own.setAttribute('data-ix-logo', ''); own.alt = 'Logo'; own.setAttribute('class', mk.getAttribute('class') || ''); own.style.cssText = sizeStyle(markSize(mk)); mk.parentNode.insertBefore(own, mk); }
                 if (own.getAttribute('src') !== mark) own.setAttribute('src', mark);
                 mk.style.display = 'none';
             } else { if (own) own.remove(); mk.style.display = ''; }

@@ -1629,12 +1629,32 @@ for (const [k, v] of Object.entries(ALIASES)) { if (/\.html$/i.test(k)) { const 
 function cleanUrlPath(p) { return String(p).replace(/\/index\.html$/i, '/').replace(/\.html$/i, '').replace(/^$/, '/'); }
 const encPath = (p) => p.split('/').map((seg) => encodeURIComponent(decodeURIComponent(seg))).join('/');
 
+/* Speed: text files (pages, styles, scripts, data) are sent compressed — brotli or gzip, made once and kept in memory
+   until the file changes — and the browser keeps pictures and fonts for a day instead of asking again on every page.
+   Pages, styles and scripts are always checked again (no-cache: a short 304 when unchanged), so an update is seen at once. */
+const zlib = require('zlib');
+const COMPRESSIBLE = /^(text\/|application\/(javascript|json|xml|manifest\+json)|image\/svg\+xml)/;
+const packed = new Map(); let packedBytes = 0;
+function compressedBody(file, st, enc) {
+  const key = enc + '|' + file + '|' + st.size + '|' + st.mtimeMs;
+  if (packed.has(key)) return packed.get(key);
+  const raw = fs.readFileSync(file);
+  const body = enc === 'br' ? zlib.brotliCompressSync(raw, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } }) : zlib.gzipSync(raw, { level: 6 });
+  if (packedBytes + body.length > 64 * 1024 * 1024) { packed.clear(); packedBytes = 0; }   // keep the memory bounded
+  packed.set(key, body); packedBytes += body.length;
+  return body;
+}
+function cacheFor(ext) {
+  if (ext === '.html' || ext === '.json') return 'no-cache';
+  if (ext === '.css' || ext === '.js' || ext === '.mjs') return 'no-cache';   // always the latest version after an update (a 304 when unchanged)
+  return 'public, max-age=86400, stale-while-revalidate=604800';   // pictures, fonts, audio, PDFs
+}
 function serveFile(req, res, file, extraHeaders = {}) {
   const st = fs.statSync(file); const ext = path.extname(file).toLowerCase();
   const etag = `W/"${st.size.toString(16)}-${Math.floor(st.mtimeMs).toString(16)}"`;
   const hashed = /-[A-Za-z0-9_-]{8}\.(js|css|png|avif)$/.test(file) && file.includes(path.sep + 'assets' + path.sep);
   const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream', ETag: etag, 'Last-Modified': st.mtime.toUTCString(), 'Accept-Ranges': 'bytes',
-    'Cache-Control': hashed ? 'public, max-age=31536000, immutable' : 'no-cache', ...SECURITY_HEADERS, ...extraHeaders };
+    'Cache-Control': hashed ? 'public, max-age=31536000, immutable' : cacheFor(ext), Vary: 'Accept-Encoding', ...SECURITY_HEADERS, ...extraHeaders };
   if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
   const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
   if (range && (range[1] || range[2])) {
@@ -1644,6 +1664,15 @@ function serveFile(req, res, file, extraHeaders = {}) {
     if (start > end || start >= st.size) { res.writeHead(416, { 'Content-Range': `bytes */${st.size}` }); return res.end(); }
     res.writeHead(206, { ...headers, 'Content-Range': `bytes ${start}-${end}/${st.size}`, 'Content-Length': end - start + 1 });
     return req.method === 'HEAD' ? res.end() : fs.createReadStream(file, { start, end }).pipe(res);
+  }
+  const accept = String(req.headers['accept-encoding'] || '');
+  const enc = st.size > 1024 && st.size < 20 * 1024 * 1024 && COMPRESSIBLE.test(headers['Content-Type']) ? (/\bbr\b/.test(accept) ? 'br' : /\bgzip\b/.test(accept) ? 'gzip' : '') : '';
+  if (enc) {
+    try {
+      const body = compressedBody(file, st, enc);
+      res.writeHead(200, { ...headers, 'Content-Encoding': enc, 'Content-Length': body.length });
+      return res.end(req.method === 'HEAD' ? undefined : body);
+    } catch (e) { /* send it as it is */ }
   }
   res.writeHead(200, { ...headers, 'Content-Length': st.size });
   return req.method === 'HEAD' ? res.end() : fs.createReadStream(file).pipe(res);
@@ -1780,12 +1809,29 @@ const requestHandler = async (req, res) => {
 };
 
 if (require.main === module) {
-  if (!USE_SUPABASE) { try { fs.mkdirSync(DATA_DIR, { recursive: true }); if (!fs.existsSync(DB_FILE)) saveDb({ users: [], materials: [], results: [], orders: [], audit: [], settings: {} }); } catch (e) { /* read-only disk */ } }
-  http.createServer(requestHandler).listen(PORT, () => {
-    console.log(`IELTSX server running at http://localhost:${PORT}`);
-    console.log(ADMIN_EMAILS.size ? `Admins: ${[...ADMIN_EMAILS].join(', ')}` : 'No ADMIN_EMAILS set: register an account, then run  node scripts/make-admin.js <email>');
-    if (!GOOGLE_CLIENT_ID) console.log('Google sign-in is off (set GOOGLE_CLIENT_ID to enable it).');
-  });
+  /* Several workers: WEB_CONCURRENCY=4 (or "auto" = one per CPU core) runs that many copies of the server on the same port,
+     so many visitors at once no longer queue behind one process, and a worker that stops is started again. Only with
+     Supabase: the local data file (data/db.json) can be written safely by one process only. On Vercel this setting is not
+     needed: every request already gets its own instance and Vercel adds more as visitors come. */
+  const cluster = require('cluster');
+  const want = String(process.env.WEB_CONCURRENCY || process.env.WORKERS || '').trim().toLowerCase();
+  const workers = want === 'auto' ? require('os').cpus().length : Math.max(1, parseInt(want, 10) || 1);
+  if (workers > 1 && cluster.isPrimary && USE_SUPABASE) {
+    console.log(`IELTSX: ${workers} workers on http://localhost:${PORT}`);
+    for (let i = 0; i < workers; i++) cluster.fork();
+    cluster.on('exit', (w, code, signal) => { console.log(`worker ${w.process.pid} stopped (${signal || code}); starting a new one`); setTimeout(() => cluster.fork(), 1000); });
+  } else {
+    if (workers > 1 && !USE_SUPABASE) console.log('WEB_CONCURRENCY needs Supabase (the local data file is written by one process): running one worker.');
+    if (!USE_SUPABASE) { try { fs.mkdirSync(DATA_DIR, { recursive: true }); if (!fs.existsSync(DB_FILE)) saveDb({ users: [], materials: [], results: [], orders: [], audit: [], settings: {} }); } catch (e) { /* read-only disk */ } }
+    const server = http.createServer(requestHandler);
+    server.keepAliveTimeout = 65000; server.headersTimeout = 66000;   // longer than a typical proxy's, so kept-alive connections are reused
+    server.listen(PORT, () => {
+      if (cluster.isWorker && cluster.worker.id > 1) return;   // one worker says hello
+      console.log(`IELTSX server running at http://localhost:${PORT}`);
+      console.log(ADMIN_EMAILS.size ? `Admins: ${[...ADMIN_EMAILS].join(', ')}` : 'No ADMIN_EMAILS set: register an account, then run  node scripts/make-admin.js <email>');
+      if (!GOOGLE_CLIENT_ID) console.log('Google sign-in is off (set GOOGLE_CLIENT_ID to enable it).');
+    });
+  }
 }
 module.exports = requestHandler;
 module.exports.store = store;

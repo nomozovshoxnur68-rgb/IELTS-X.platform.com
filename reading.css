@@ -5674,3 +5674,16 @@ body.dark-mode .wb-below .word-drop{border-color:#666}
 /* admin-made tables size their columns to their text (the details column is the widest, as on the paper) */
 .rt-table:has(.tc-line,.tc-ul){table-layout:auto}
 .rt-table:has(.tc-line,.tc-ul) .gap-input{width:120px;max-width:100%}
+
+/* ── Dark mode: a black page and no grey patches behind the questions ── */
+body.dark-mode{--ex-ground:#000;--ex-panel:#121417;--ex-panel-2:#1b1e23;--ex-line:#30353c;--ex-line-2:#454b54}
+body.dark-mode,body.dark-mode #stage-reading,body.dark-mode .exam-main,body.dark-mode #passage-pane,body.dark-mode #questions-pane{background:#000}
+body.dark-mode .option,body.dark-mode .multi-opts .option,body.dark-mode .tfn-opts .option{background:transparent !important}
+body.dark-mode .option:hover,body.dark-mode .multi-opts .option:hover{background:#15181c !important}
+body.dark-mode .option.selected,body.dark-mode .multi-opts .option.selected,body.dark-mode .tfn-opts .option.selected{background:#132741 !important}
+body.dark-mode .option.correct{background:rgba(46,125,50,.20) !important}
+body.dark-mode .option.wrong{background:rgba(196,18,48,.20) !important}
+body.dark-mode .heading-bank-list,body.dark-mode .word-bank-list,body.dark-mode .option-list-box{background:transparent}
+body.dark-mode .para-heading-slot{background:transparent}
+body.dark-mode .para-heading-slot.filled{background:var(--ex-panel-2)}
+body.dark-mode .flow-box{background:transparent}

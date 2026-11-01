@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+<script src="/assets/js/loading.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>IELTSX — IELTS Preparation Platform</title>
@@ -473,7 +474,7 @@ class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-l
                     <section class="mb-16">
                         <h2 class="text-2xl font-bold mb-8">Test Packs</h2>
 
-                        <div class="grid md:grid-cols-3 gap-6">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                             <!-- Listening Card -->
                             <div class="test-pack-card p-6 flex flex-col">
@@ -597,30 +598,128 @@ class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-l
                         </div>
                     </section>
 
-                    <!-- IELTS Courses -->
+                    <!-- Part Practice -->
                     <section class="mb-16">
-                        <h2 class="text-2xl font-bold mb-8">IELTS Courses</h2>
+                        <h2 class="text-2xl font-bold mb-8">Part Practice</h2>
 
                         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div class="rounded-xl border bg-card shadow">
-                                <div class="flex flex-col p-6">
-                                    <div class="font-semibold flex items-center" data-premium-card>
-                                        <svg class="h-5 w-5 mr-2 text-yellow-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
+                            <!-- Listening Part Practice -->
+                            <div class="test-pack-card p-6 flex flex-col">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-medium text-lg">Listening</div>
+                                    </div>
+                                    <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-4 flex-1">One part at a time: forms, maps, multiple choice and more.</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
                                         </svg>
-                                        IELTS Listening Course
+                                        10 min
                                     </div>
+                                    <a href="/part/practice/listening"
+                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
+                                        Practice
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="m9 18 6-6-6-6" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
 
-                                    <p class="text-sm text-muted-foreground mt-2 h-10">Focused training on listening
-                                        skills for the IELTS exam.</p>
-
-                                    <div class="flex justify-between mt-4 items-center" data-premium-card>
-                                        <span class="text-xs">8 modules</span>
-                                        <button
-                                            class="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 text-white text-xs h-8 px-3 rounded font-semibold">Unlock</button>
+                            <!-- Reading Part Practice -->
+                            <div class="test-pack-card p-6 flex flex-col">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-medium text-lg">Reading</div>
                                     </div>
+                                    <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 7v14" />
+                                        <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-4 flex-1">One passage with its questions, timed like the real exam.</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg>
+                                        20 min
+                                    </div>
+                                    <a href="/part/practice/reading"
+                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
+                                        Practice
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="m9 18 6-6-6-6" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Writing Part Practice -->
+                            <div class="test-pack-card p-6 flex flex-col">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-medium text-lg">Writing</div>
+                                    </div>
+                                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                        <path d="m15 5 4 4" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-4 flex-1">Task 1 or Task 2 on its own, with a word counter.</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg>
+                                        40 min
+                                    </div>
+                                    <a href="/part/practice/writing"
+                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
+                                        Practice
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="m9 18 6-6-6-6" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Speaking Part Practice -->
+                            <div class="test-pack-card p-6 flex flex-col">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-medium text-lg">Speaking</div>
+                                    </div>
+                                    <svg class="h-5 w-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                        <line x1="12" x2="12" y1="19" y2="22" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-4 flex-1">Part 1, 2 or 3 with timers and model answers.</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg>
+                                        5 min
+                                    </div>
+                                    <a href="/part/practice/speaking"
+                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
+                                        Practice
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="m9 18 6-6-6-6" />
+                                        </svg>
+                                    </a>
                                 </div>
                             </div>
                         </div>

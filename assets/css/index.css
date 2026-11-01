@@ -340,3 +340,9 @@ body {
     width: 0;
     overflow: hidden;
 }
+
+/* a home card lifts a little under the pointer, and its link fills in */
+.test-pack-card:hover{transform:translateY(-2px);border-color:hsl(var(--foreground) / .18)}
+.test-pack-card a[href]{transition:background-color .15s,color .15s,border-color .15s}
+.test-pack-card:hover a[href]{background:hsl(var(--foreground));color:hsl(var(--background));border-color:hsl(var(--foreground))}
+@media (prefers-reduced-motion:reduce){.test-pack-card,.test-pack-card:hover{transform:none;transition:none}}
