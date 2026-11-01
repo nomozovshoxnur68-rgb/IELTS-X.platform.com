@@ -4506,3 +4506,12 @@ body.dark-mode .mx-map svg{filter:invert(1) hue-rotate(180deg)}
 .ix-ltable td{background:var(--paper)}
 .ix-ltable .gap-field{white-space:nowrap}
 .ix-ltable .gap-input{width:110px;min-width:80px}
+
+/* ── Notes / sentences / summaries typed as text (tests made in the admin panel): every line of the paper is shown ── */
+.ix-notes .ix-line,.ix-notes .ix-li{margin:0 0 10px}
+.ix-notes .ix-li{position:relative;padding-left:18px}
+.ix-notes .ix-li::before{content:"\2022";position:absolute;left:3px;top:0}
+.ix-notes .subhead{font-weight:700;margin:16px 0 8px}
+.ix-notes .subhead:first-child{margin-top:0}
+.ix-summary p{margin:0 0 12px;line-height:2.1}
+.ix-pool-below{margin-top:18px}

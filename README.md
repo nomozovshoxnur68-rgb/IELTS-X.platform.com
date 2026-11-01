@@ -368,6 +368,15 @@ Reading and Listening tests (Part and Full) are filled in the admin panel in thr
 
 The strip of numbers 1–40 shows what each number still needs. **Everything together** is the old form with every field.
 
+* **Every question type is its own type.** Reading: True/False/Not Given, Yes/No/Not Given, multiple choice (one / TWO-THREE),
+  matching headings, matching information, matching features, matching sentence endings, note / summary / sentence / table /
+  flow-chart completion, summary with a list of words, short answers, map / diagram labelling. Listening: notes, sentences,
+  summary, table, flow-chart (typed), notes / summary with a box of words, multiple choice, matching, map. Step 1 reads the type
+  from the instruction of each pasted block; older tests are converted when they are opened in the panel.
+* **Notes, summaries, sentences, flow-charts and word boxes are typed as text** with `____` for each gap, so the lines without a
+  gap are kept (a sub-heading, a sentence of the notes). Every gap is one question. A summary with a list of words looks like the
+  computer test: the title, the summary with numbered boxes, the words (without letters) under it; a word typed as the answer
+  becomes its letter.
 * **Table completion** (Reading and Listening): the table is typed once (first line = column headings, cells split by
   `|`, `____` = a gap). Every gap is one question, numbered row by row; the student sees a real table.
 * Reading (all engines): the ← → arrows go to the previous / next **question** (into the next part after the last one);

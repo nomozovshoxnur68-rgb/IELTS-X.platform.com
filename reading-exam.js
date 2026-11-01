@@ -129,12 +129,18 @@ const optTok = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})[.):]\s+([\s\S]*)$/.
 
 function buildSections(questions, startN) {
   questions = inheritGroups(questions);
-  const sections = []; let n = startN || 1; let cur = null; let key = '';
+  const sections = []; let n = startN || 1; let cur = null; let key = ''; const built = new Set();
   const headings = []; const slots = [];
-  const defaultTitle = { notes: 'Completion', table: 'Table Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
+  const defaultTitle = { notes: 'Note Completion', summary: 'Summary Completion', wordbank: 'Summary Completion', sentence: 'Sentence Completion', short: 'Short Answer', flowchart: 'Flow-chart Completion', 'sentence-endings': 'Sentence Endings', table: 'Table Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
   const defaultInstr = {
     notes: 'Complete the answers below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
     table: 'Complete the table below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    summary: 'Complete the summary below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    wordbank: 'Complete the summary using the list of words. Choose the correct answer and move it into the gap.',
+    sentence: 'Complete the sentences below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    short: 'Answer the questions below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    flowchart: 'Complete the flow-chart below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    'sentence-endings': 'Complete each sentence with the correct ending below.',
     tfng: 'Do the following statements agree with the information given in the passage? Choose <b>TRUE</b>, <b>FALSE</b> or <b>NOT GIVEN</b>.',
     ynng: 'Do the following statements agree with the views of the writer? Choose <b>YES</b>, <b>NO</b> or <b>NOT GIVEN</b>.',
     mcq: 'Choose the correct letter, <b>A</b>, <b>B</b>, <b>C</b> or <b>D</b>.',
@@ -166,6 +172,55 @@ function buildSections(questions, startN) {
         const bt = String(q.blockTitle || '').trim(); if (bt) sec.tableTitle = esc(bt);
       }
       sec.items.push({ id: n, answer: String(q.answer || ''), label: '' }); n += 1;
+      continue;
+    }
+    if (TEXT_SEC[t]) {   // the text of the block, its gaps numbered from here
+      const sec = open(TEXT_SEC[t], q);
+      if (!built.has(sec)) {
+        built.add(sec); let g = n; const fill = (s) => esc(s).replace(TABLE_GAP, () => '{{' + (g++) + '}}');
+        const text = String(q.text || '').replace(/\r/g, ''); const bt = String(q.blockTitle || '').trim(); if (bt) sec.noteTitle = esc(bt);
+        if (t === 'summary' || t === 'summary-words') sec.prose = text.split(/\n\s*\n/).map((p) => fill(p.replace(/\s*\n\s*/g, ' ').trim())).filter(Boolean).join('<br><br>');
+        else if (t === 'flowchart') sec.boxes = text.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => fill(l.replace(BULLET, '')));
+        else sec.lines = text.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => { const h = /^##\s*(.*)$/.exec(l); return h ? '## ' + fill(h[1]) : BULLET.test(l) ? '- ' + fill(l.replace(BULLET, '')) : fill(l); });
+        // a list of words: the student moves one into each gap; the words sit under the text, as in the computer test
+        if (t === 'summary-words') { sec.bank = (q.options || []).map(optTok).map((k) => ({ id: String(k.l).toUpperCase(), word: esc(k.t) })); sec.bankBelow = true; }
+        else sec.wordLimit = sec.wordLimit || wordLimitOf(q.group) || 3;
+      }
+      sec.items.push({ id: n, answer: t === 'summary-words' ? String(q.answer || '').trim().toUpperCase() : String(q.answer || ''), label: '' }); n += 1;
+      continue;
+    }
+    if (t === 'matching-headings') {
+      const toks = (q.options || []).map(optTok);
+      if (!headings.length) toks.forEach((k, i) => headings.push({ id: (ROMAN.test(k.l) ? k.l : ROMAN_LIST[i] || String(i + 1)).toLowerCase(), text: esc(k.t) }));
+      const m = /^(?:paragraph|section)?\s*([A-Z])\b/i.exec(String(q.prompt || '').trim());
+      slots.push({ letter: m ? m[1].toUpperCase() : String.fromCharCode(64 + slots.length + 1), qNum: n });
+      open('matching-headings', q).items.push({ id: n, answer: String(q.answer || '').trim().toLowerCase() }); n += 1;
+      continue;
+    }
+    if (t === 'matching-info') {   // which paragraph: the letters only (typed, or "A–H" in the instruction, else A–G)
+      let letters = (q.options || []).map(optTok).map((k) => String(k.l).toUpperCase());
+      if (!letters.length) { const hm = /\bA\s*[\u2013\u2014-]\s*([B-L])\b/.exec(String(q.group || '')); letters = 'ABCDEFGHIJKL'.slice(0, hm ? hm[1].charCodeAt(0) - 64 : 7).split(''); }
+      const sec = open('matching-info', q, letters.join('')); sec.options = letters;
+      sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: esc(q.prompt) }); n += 1;
+      continue;
+    }
+    if (t === 'matching-features' || t === 'matching-endings') {
+      const toks = (q.options || []).map(optTok);
+      if (t === 'matching-features') {
+        const sec = open('matching-features', q, JSON.stringify(toks));
+        sec.bankLabel = sec.bankLabel || 'List of options'; sec.people = toks.map((k) => ({ l: String(k.l).toUpperCase(), name: esc(k.t) }));
+        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: esc(q.prompt) });
+      } else {
+        const sec = open('sentence-endings', q, JSON.stringify(toks)); sec.endings = toks.map((k) => ({ l: String(k.l).toUpperCase(), text: esc(k.t) }));
+        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), stem: esc(q.prompt) });
+      }
+      n += 1;
+      continue;
+    }
+    if (t === 'short') {   // a question (or a sentence with ____) and a typed answer
+      const parts = String(q.prompt || '').split(/_{2,}|\.{4,}|\u2026{2,}/);
+      const sec = open('short', q); sec.wordLimit = sec.wordLimit || wordLimitOf(q.group) || 3;
+      sec.items.push({ id: n, answer: String(q.answer || ''), label: esc((parts[0] || '').trim()), after: esc(parts.slice(1).join(' ').trim()) }); n += 1;
       continue;
     }
     if (t === 'tfng' || t === 'ynng') {
@@ -208,6 +263,11 @@ const TABLE_GAP = /_{2,}|\.{4,}|\u2026{2,}/g;
 const tableRowsOf = (t) => String(t || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
   .map((l) => l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/).map((c) => c.trim()));
 const tableCols = (t) => tableRowsOf(t).reduce((m, r) => Math.max(m, r.length), 0);
+/* notes, summaries, sentences, flow-charts typed in the admin panel: the block's text, ____ = a gap. Notes: "- " a bullet,
+   "## " a sub-heading; a summary is running text (an empty line = a new paragraph); a flow-chart has one box per line. */
+const TEXT_SEC = { notes: 'notes', summary: 'summary', 'summary-words': 'wordbank', sentence: 'sentence', flowchart: 'flowchart' };
+const BULLET = /^\s*[-\u2013\u2022\u25cf\u25aa\u25e6\u00b7*]\s*/;
+const ROMAN_LIST = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii'];
 
 const isFull = (material) => !!(material && material.data && material.data.mode === 'full');
 

@@ -12,7 +12,7 @@
     // a full paper (Parts 1-4 on one page): a "Part N" heading opens each part
     var part = b.partHead ? '<h2 class="ix-part-head" style="margin:' + (b.first ? '0' : '36px') + ' 0 6px;padding-bottom:6px;border-bottom:2px solid currentColor;font-size:20px">' + esc(b.partHead) + '</h2>' : '';
     return part + '<div class="section-head"' + (b.first || b.partHead ? '' : ' style="margin-top:24px"') + '><div class="num">Questions ' + rng(first, last) + '</div>' +
-      (title ? '<h2>' + esc(title) + '</h2>' : '') + (instr ? '<div class="instruction">' + instr + '</div>' : '') + '</div>';
+      (instr ? '<div class="instruction">' + instr + '</div>' : '') + (title ? '<h2>' + esc(title) + '</h2>' : '') + '</div>';   // as printed: the instruction, then the title of the notes
   }
   /* **bold** and _italic_ are the only markup an admin can use in instructions */
   function rich(t) { return esc(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_]+)_(?=[\s).,;:]|$)/g, '$1<em>$2</em>'); }
@@ -86,7 +86,32 @@
       '<tbody>' + rows.slice(1).map(function (r) { return tr(r, false); }).join('') + '</tbody></table></div>';
     return head(b, b.from, b.to, rich(b.instruction), b.title) + table;
   }
-  var BUILD = { gap: gapBlock, table: tableBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
+  /* a block typed as text: notes ("- " bullet, "## " sub-heading, other lines as they are), sentences (one per line),
+     a summary (running text, an empty line = a new paragraph) or a flow-chart (one box per line). Every ____ is a gap,
+     numbered in order: typed (text) or a drop zone for a word of the box (textbox). */
+  var GAP = /_{2,}|\.{4,}|\u2026{2,}/g, BUL = /^\s*[-\u2013\u2022\u25cf\u25aa\u25e6\u00b7*]\s*/;
+  function textBody(h, b, drop) {
+    var ids = b.items.map(function (it) { return it.id; }), k = 0;
+    var fill = function (s) { return esc(s).replace(GAP, function () { return k < ids.length ? (drop ? h.dropInline(ids[k++]) : h.gapInput(ids[k++])) : ''; }); };
+    var text = String(b.text || '').replace(/\r/g, ''), style = b.style;
+    var prose = style === 'summary' || (style === 'box' && !/^\s*[-\u2022]\s/m.test(text));
+    if (prose) return '<div class="note-flow ix-summary">' + text.split(/\n\s*\n/).map(function (p) { return '<p>' + fill(p.replace(/\s*\n\s*/g, ' ').trim()) + '</p>'; }).join('') + '</div>';
+    var lines = text.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+    if (style === 'flowchart') return h.flowChart('', lines.map(function (l) { return fill(l.replace(BUL, '')); }));
+    return '<div class="note-flow ix-notes">' + lines.map(function (l) {
+      var m = /^##\s*(.*)$/.exec(l);
+      if (m) return '<div class="subhead">' + fill(m[1]) + '</div>';
+      if (BUL.test(l)) return '<div class="ix-li">' + fill(l.replace(BUL, '')) + '</div>';
+      return '<div class="ix-line">' + fill(l) + '</div>';
+    }).join('') + '</div>';
+  }
+  function textBlock(h, b) { return head(b, b.from, b.to, rich(b.instruction), b.title) + textBody(h, b, false); }
+  function textBoxBlock(h, b) {
+    var words = b.options.map(function (o) { return esc(o.t); });
+    var pool = '<div class="opt-box drag-pool ix-pool-below" id="pool-bx' + b.from + '" data-pool="pool-bx' + b.from + '">' + h.poolChips('bx' + b.from, words) + '</div>';
+    return head(b, b.from, b.to, rich(b.instruction), b.title) + h.kbHelp() + textBody(h, b, true) + pool;
+  }
+  var BUILD = { gap: gapBlock, table: tableBlock, text: textBlock, textbox: textBoxBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
 
   window.IXListeningRender = function (data, part) {
     return function (h) {

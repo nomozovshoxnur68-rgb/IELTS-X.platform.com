@@ -8,10 +8,16 @@ const path = require('path')
 const { inheritGroups } = require('./reading-exam')
 
 const KINDS = ['gap', 'table', 'mcq', 'multi', 'matching', 'map', 'box']
-const KIND_FROM_TYPE = { gap: 'gap', table: 'table', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box' }
+const TEXT_KINDS = ['notes', 'sentence', 'summary', 'flowchart']   // the block's text is typed once, ____ = a gap
+const KIND_FROM_TYPE = { gap: 'gap', table: 'table', notes: 'text', sentence: 'text', summary: 'text', flowchart: 'text', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box' }
 const DEFAULT_INSTR = {
   gap: 'Complete the notes below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
   table: 'Complete the table below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
+  text: 'Complete the notes below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
+  sentence: 'Complete the sentences below. Write **ONE WORD ONLY** for each answer.',
+  summary: 'Complete the summary below. Write **ONE WORD ONLY** for each answer.',
+  flowchart: 'Complete the flow-chart below. Write **ONE WORD ONLY** for each answer.',
+  textbox: 'Complete the notes below. Choose the correct answer and move it into the gap.',
   mcq: 'Choose the correct letter, **A**, **B** or **C**.',
   multi: 'Choose the correct letters.',
   matching: 'Match each item with the correct option. Move the correct answer into the gap.',
@@ -56,19 +62,20 @@ function buildBlocks(material) {
   // the map pictures of a full paper belong to the part chosen for them (when none was chosen, every map shows them all)
   const picsByPart = full && (d.images || []).some((im) => Number(im.passage || 1) !== 1)
   qs.forEach((q) => {
-    const kind = KIND_FROM_TYPE[q.type] || 'gap'
+    const kind = q.type === 'box' && String(q.text || '').trim() ? 'textbox' : (KIND_FROM_TYPE[q.type] || 'gap')
     const opts = parseOptions(q.options)
     const gi = (q.gi === undefined || q.gi === null || q.gi === '') ? null : String(q.gi)
     const qPart = full ? partOfQ(q) : part
-    const key = qPart + '|' + kind + '|' + (gi === null ? '' : gi) + '|' + (q.group || '') + (kind === 'matching' || kind === 'map' || kind === 'box' ? '|' + JSON.stringify(opts) : '')
+    const key = qPart + '|' + kind + '|' + (gi === null ? '' : gi) + '|' + (q.group || '') + (kind === 'matching' || kind === 'map' || kind === 'box' || kind === 'textbox' ? '|' + JSON.stringify(opts) : '')
     const grp = String(q.group || '').trim()
     const newPart = full && qPart !== lastPart
     const joinable = cur && !newPart && kind !== 'multi' && (cur.key === key || (gi === null && !grp && cur.kind === kind && (kind === 'gap' || kind === 'mcq' || JSON.stringify(cur.options) === JSON.stringify(opts))))
     if (!joinable) {
-      cur = { key, kind, from: n, to: n, instruction: String(q.group || '').trim() || DEFAULT_INSTR[kind], title: String(q.blockTitle || ''), options: opts, items: [] }
+      cur = { key, kind, from: n, to: n, instruction: String(q.group || '').trim() || DEFAULT_INSTR[q.type] || DEFAULT_INSTR[kind], title: String(q.blockTitle || ''), options: opts, items: [] }
       if (newPart) cur.partHead = 'Part ' + qPart
       lastPart = qPart
       if (kind === 'table') cur.table = String(q.table || '')
+      if (kind === 'text' || kind === 'textbox') { cur.text = String(q.text || ''); cur.style = q.type }
       if (kind === 'map') cur.images = (d.images || []).filter((im) => !picsByPart || Number(im.passage || 1) === qPart).map((im) => ({ url: im.url, caption: im.caption || '' }))
       blocks.push(cur)
     }
@@ -85,7 +92,8 @@ function buildBlocks(material) {
     }
     const id = n++
     if (Number(q.at) > 0) times[id] = Number(q.at)
-    if (kind === 'gap' || kind === 'box' || kind === 'table') answers[id] = String(q.answer || '').trim()
+    if (kind === 'textbox') { const a = String(q.answer || '').trim(); const o = /^[A-Za-z]$/.test(a) && opts.find((x) => x.l === a.toUpperCase()); answers[id] = o ? o.t : a }   // the word itself
+    else if (kind === 'gap' || kind === 'box' || kind === 'table' || kind === 'text') answers[id] = String(q.answer || '').trim()
     else answers[id] = (letters(q.answer)[0] || '')
     cur.items.push({ id, prompt: q.prompt || '', options: kind === 'mcq' ? opts : undefined, title: kind === 'gap' || kind === 'box' ? String(q.title || '') : undefined })
     cur.to = id

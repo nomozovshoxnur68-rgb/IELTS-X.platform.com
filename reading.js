@@ -2235,7 +2235,7 @@ const RENDERERS = {
 
   notes:    (sec) => (sec.lines || sec.prose) ? renderNoteLines(sec) : noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0, true),
   summary:  (sec) => (sec.lines || sec.prose) ? renderNoteLines(sec) : noteTitleHTML(sec) + readingProseSummary(sec.items, sec.wordLimit || 0),
-  sentence: (sec) => renderSentenceLines(sec),
+  sentence: (sec) => sec.lines ? renderNoteLines(sec) : renderSentenceLines(sec),
   short:    (sec) => renderSentenceLines(sec),
 
   'mcq-multi':         (sec) => renderMcqMulti(sec),
@@ -2280,6 +2280,9 @@ function bankTiles(sec) {
 }
 function renderWordBank(sec) {
   const prose = fillTokens(sec.prose || '', id => wordDrop(id));
+  // tests made in the admin panel: the title, the summary, then the words (no letters) under it — the computer-test layout
+  if (sec.bankBelow) return `<div class="q-card wb-below">${noteTitleHTML(sec)}<div class="prose-summary">${prose}</div>`
+    + `<div class="word-bank-list">${bankTiles(sec)}</div></div>`;
   return `<div class="q-card">`
     + `<div class="word-bank-list">${bankTiles(sec)}</div>`
     + noteTitleHTML(sec)

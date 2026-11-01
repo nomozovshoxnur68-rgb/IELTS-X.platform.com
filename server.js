@@ -564,8 +564,10 @@ const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article'
    "full" = a whole paper, listed on the Full Tests page inside its pack. Tests saved before this existed are "part". */
 const MODE_TYPES = ['reading', 'listening', 'writing', 'speaking'];
 const materialMode = (m) => (m && m.data && m.data.mode === 'full' ? 'full' : 'part');
-const Q_TYPES =['short', 'completion', 'table', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box'];
-const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box'];
+const Q_TYPES =['short', 'completion', 'table', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box',
+  'notes', 'summary', 'summary-words', 'sentence', 'flowchart', 'matching-headings', 'matching-info', 'matching-features', 'matching-endings'];
+const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box', 'matching-headings', 'matching-info', 'matching-features', 'matching-endings', 'summary-words'];
+const TEXT_Q_TYPES = ['notes', 'summary', 'summary-words', 'sentence', 'flowchart', 'box'];   // the block's text (with its gaps) is typed once
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
 const cleanTitle = (v) => String(v || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
 const cleanList = (v, max, len) => (Array.isArray(v) ? v : String(v || '').split(',')).map((x) => cleanName(x).slice(0, len)).filter(Boolean).slice(0, max);
@@ -663,7 +665,7 @@ function cleanMaterialData(type, d) {
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
-      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000), table: t === 'table' ? (cut(q.table, 6000) || undefined) : undefined,
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000), table: t === 'table' ? (cut(q.table, 6000) || undefined) : undefined, text: TEXT_Q_TYPES.includes(t) ? (cut(q.text, 8000) || undefined) : undefined,
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined,
         // where the question came from (printed in the source / written by the AI Test Generator) and, for listening, the second the answer is heard
@@ -759,14 +761,14 @@ function isCorrect(q, given) {
     return (map[g] || g) === (map[norm(q.answer)] || norm(q.answer));
   }
   if (q.type === 'mcq') return g.charAt(0) === norm(q.answer).charAt(0);
-  if (q.type === 'matching' || q.type === 'map') { const tok = (v) => (norm(v).match(/^[a-z0-9]+/) || [''])[0]; return tok(given) === tok(q.answer); }
+  if (q.type === 'matching' || q.type === 'map' || /^matching-/.test(q.type) || q.type === 'summary-words') { const tok = (v) => (norm(v).match(/^[a-z0-9]+/) || [''])[0]; return tok(given) === tok(q.answer); }
   if (q.type === 'mcq-multi') { const set = (v) => String(v || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).sort().join(','); return set(given) === set(q.answer); }
   return String(q.answer || '').split('|').some((a) => { const n = norm(a); return n && n === g; });
 }
 /* the question-type chips of a card: what the admin typed, or taken from the questions */
 function cardTypesOf(d) {
   if (Array.isArray(d.cardTypes) && d.cardTypes.length) return d.cardTypes;
-  const L = { short: 'Sentence Completion', completion: 'Completion', table: 'Table Completion', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
+  const L = { short: 'Short Answer', completion: 'Completion', table: 'Table Completion', notes: 'Note Completion', summary: 'Summary Completion', 'summary-words': 'Summary Completion', sentence: 'Sentence Completion', flowchart: 'Flow-chart Completion', 'matching-headings': 'Matching Headings', 'matching-info': 'Matching Information', 'matching-features': 'Matching Features', 'matching-endings': 'Sentence Endings', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
   const out = [];
   for (const q of require('./reading-exam').inheritGroups(d.questions)) {
     let t = L[q.type];

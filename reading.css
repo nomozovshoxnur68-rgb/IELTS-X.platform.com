@@ -5653,3 +5653,13 @@ body.dark-mode .ep-uz{border-top-color:rgba(255,255,255,.16)}
 #stage-reading #passage-pane .passage-text,#stage-reading #questions-pane{-webkit-user-select:text;user-select:text}
 #stage-reading #questions-pane button,#stage-reading #passage-pane .passage-text button{-webkit-user-select:none;user-select:none}
 #stage-reading input,#stage-reading textarea{-webkit-user-select:text;user-select:text}
+
+/* ── Summary with a list of words (tests made in the admin panel): title, the summary with its gaps, the words under it ──
+   As in the computer-delivered test: a dashed, wide box for each empty gap with its number, plain word chips without letters. */
+.wb-below .prose-summary{line-height:2.15}
+.wb-below .word-drop{min-width:200px;border-style:dashed;border-color:#8a8a8a}
+.wb-below .word-drop.filled{border-style:solid}
+.wb-below .word-bank-list{margin:20px 0 4px;gap:8px 10px}
+.wb-below .word-tile{margin:0;padding:5px 12px;font-weight:400;border-radius:6px}
+.wb-below .word-tile-id{display:none}
+body.dark-mode .wb-below .word-drop{border-color:#666}
