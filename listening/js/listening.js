@@ -2023,7 +2023,7 @@ function printCertPage(rd,d,rid){
       t('Unanswered',nS,Math.round(nS/tot*100)+'% of the paper')+'</div></div></div>'+
     '<div class="pr-desc"><div class="pr-desc-h">'+bandDescHeading(band)+'</div>'+
     '<p>'+bandDescriptor(band).t+'</p></div>'+
-    '<div class="pr-foot"><span>CDI Materials · @READING_CDI · practice score, not an official IELTS result</span>'+
+    '<div class="pr-foot"><span>IELTSX · practice score, not an official IELTS result</span>'+
     '<span>'+rid+'</span></div></div>';
 }
 

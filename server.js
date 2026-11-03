@@ -83,20 +83,32 @@ if (!SESSION_SECRET && !IS_VERCEL) {
 /* ───────────────────────── storage (local JSON or Supabase) ───────────────────────── */
 function newId() { return crypto.randomUUID(); }
 
+/* The data file is read once and kept in memory; it is read again only when the file changed on disk (size or time),
+   e.g. after `npm run make-admin`. Reading and parsing the whole file on every call made every request slow
+   (several reads per page, each one 5-20 ms as the file grows). */
+let dbCache = null; let dbStamp = '';
+const dbFileStamp = () => { try { const st = fs.statSync(DB_FILE); return st.size + ':' + st.mtimeMs; } catch (e) { return 'none'; } };
 function loadDb() {
+  const stamp = dbFileStamp();
+  if (dbCache && stamp === dbStamp) return dbCache;
+  let db;
   try {
-    const db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     db.users = Array.isArray(db.users) ? db.users : [];
     for (const k of ['materials', 'results', 'orders', 'audit']) db[k] = Array.isArray(db[k]) ? db[k] : [];
     db.settings = db.settings && typeof db.settings === 'object' && !Array.isArray(db.settings) ? db.settings : {};
-    return db;
-  } catch (e) { return { users: [], materials: [], results: [], orders: [], audit: [], settings: {} }; }
+  } catch (e) { db = { users: [], materials: [], results: [], orders: [], audit: [], settings: {} }; }
+  dbCache = db; dbStamp = stamp;
+  return db;
 }
 function saveDb(db) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const tmp = DB_FILE + '.' + process.pid + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
-  fs.renameSync(tmp, DB_FILE);
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    const tmp = DB_FILE + '.' + process.pid + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+    fs.renameSync(tmp, DB_FILE);
+    dbCache = db; dbStamp = dbFileStamp();
+  } catch (e) { dbCache = null; dbStamp = ''; throw e; }   // read the file again next time
 }
 
 async function sb(pathname, options = {}) {
@@ -126,6 +138,19 @@ async function sb(pathname, options = {}) {
 }
 const eq = (v) => encodeURIComponent(String(v));
 const jsonHeaders = { 'Content-Type': 'application/json' };
+/* Supabase: the reads every page makes (logo, prices, packs, the lists of tests) are kept for a few seconds, so one page
+   does not wait for the database again and again. A change made on this server clears them at once; another server
+   (several workers, Vercel) sees it within MEMO_MS. */
+const memo = new Map(); const MEMO_MS = 5000;
+function memoGet(key, load) {
+  const hit = memo.get(key);
+  if (hit && Date.now() - hit.t < MEMO_MS) return hit.p;
+  const p = Promise.resolve().then(load); memo.set(key, { t: Date.now(), p });
+  p.catch(() => { if (memo.get(key) && memo.get(key).p === p) memo.delete(key); });
+  return p;
+}
+const memoClear = (prefix) => { for (const k of [...memo.keys()]) if (k.startsWith(prefix)) memo.delete(k); };
+const MEMO_SETTINGS = new Set(['branding', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules']);
 
 const store = {
   async listUsers() { return USE_SUPABASE ? ((await sb('ieltsx_users?select=*&order=createdAt.desc')) || []) : loadDb().users; },
@@ -156,7 +181,7 @@ const store = {
     return store.listMaterialsRaw(type);
   },
   async listMaterialsRaw(type) {
-    if (USE_SUPABASE) return (await sb(`ieltsx_materials?select=*${type ? `&type=eq.${eq(type)}` : ''}&order=createdAt.desc`)) || [];
+    if (USE_SUPABASE) return memoGet('mat:' + (type || ''), async () => (await sb(`ieltsx_materials?select=*${type ? `&type=eq.${eq(type)}` : ''}&order=createdAt.desc`)) || []);
     return loadDb().materials.filter((m) => !type || m.type === type);
   },
   async getMaterial(id) {
@@ -165,15 +190,18 @@ const store = {
     return loadDb().materials.find((m) => m.id === id) || null;
   },
   async insertMaterial(m) {
-    if (USE_SUPABASE) return ((await sb('ieltsx_materials', { method: 'POST', headers: jsonHeaders, body: JSON.stringify(m) })) || [])[0] || m;
+    memoClear('mat:');
+    if (USE_SUPABASE) { const row = ((await sb('ieltsx_materials', { method: 'POST', headers: jsonHeaders, body: JSON.stringify(m) })) || [])[0] || m; memoClear('mat:'); return row; }
     const db = loadDb(); db.materials.unshift(m); saveDb(db); return m;
   },
   async updateMaterial(id, patch) {
-    if (USE_SUPABASE) return ((await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0] || null;
+    memoClear('mat:');
+    if (USE_SUPABASE) { const row = ((await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0] || null; memoClear('mat:'); return row; }
     const db = loadDb(); const m = db.materials.find((x) => x.id === id); if (!m) return null; Object.assign(m, patch); saveDb(db); return m;
   },
   async deleteMaterial(id) {
-    if (USE_SUPABASE) { await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'DELETE' }); return true; }
+    memoClear('mat:');
+    if (USE_SUPABASE) { await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'DELETE' }); memoClear('mat:'); return true; }
     const db = loadDb(); const n = db.materials.length; db.materials = db.materials.filter((m) => m.id !== id); saveDb(db); return db.materials.length < n;
   },
   /* test results (one row per finished test) */
@@ -221,12 +249,17 @@ const store = {
   },
   /* small key/value settings (the lock / plan rules of the packs and tests) */
   async getSetting(key) {
-    if (USE_SUPABASE) { const row = ((await sb(`ieltsx_settings?select=value&key=eq.${eq(key)}&limit=1`)) || [])[0]; return row ? row.value : null; }
+    if (USE_SUPABASE) {
+      const read = async () => { const row = ((await sb(`ieltsx_settings?select=value&key=eq.${eq(key)}&limit=1`)) || [])[0]; return row ? row.value : null; };
+      return MEMO_SETTINGS.has(key) ? memoGet('set:' + key, read) : read();
+    }
     const v = loadDb().settings[key]; return v === undefined ? null : v;
   },
   async setSetting(key, value) {
+    memoClear('set:' + key);
     if (USE_SUPABASE) {
       await sb('ieltsx_settings?on_conflict=key', { method: 'POST', headers: { ...jsonHeaders, Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ key, value, updatedAt: new Date().toISOString() }) });
+      memoClear('set:' + key);   // a read made while it was being saved kept the old value
       return value;
     }
     const db = loadDb(); db.settings[key] = value; saveDb(db); return value;
@@ -418,9 +451,31 @@ function defaultPricing() {
       const src = planById(id) || { prices: {} };
       return { id, name: PLAN_NAMES[id], active: id !== 'ultra', recommended: id === 'max', tag: id === 'ultra' ? 'Tier 4 Access' : 'Tier 3 Access',
         prices: { ...(src.prices || {}) }, oldPrices: { ...(DEFAULT_OLD[id] || {}) }, testsLimit: 0, features: DEFAULT_FEATURES[id].slice() };
-    })
+    }),
+    // the code the promo strip of the site has always shown; Price control can change, stop or remove it
+    promos: [{ code: 'MAY10', percent: 10, active: true, banner: true, endsAt: '', plans: [] }]
   };
 }
+/* ---- promo codes (Price control): a code takes percent off the price of an order; banner = shown in the promo strip ---- */
+const PROMO_RE = /^[A-Z0-9][A-Z0-9_-]{2,23}$/;
+function cleanPromo(p) {
+  if (!p || typeof p !== 'object') return null;
+  const code = String(p.code || '').trim().toUpperCase().replace(/\s+/g, '');
+  const percent = Math.floor(Number(p.percent));
+  if (!PROMO_RE.test(code) || !(percent >= 1 && percent <= 90)) return null;
+  const end = p.endsAt ? Date.parse(p.endsAt) : NaN;
+  return { code, percent, active: p.active !== false, banner: !!p.banner, endsAt: Number.isFinite(end) ? new Date(end).toISOString() : '',
+    plans: [...new Set((Array.isArray(p.plans) ? p.plans : []).filter((x) => ['standard', 'max', 'ultra'].includes(x)))] };
+}
+const promoLive = (p) => !!p && p.active && (!p.endsAt || Date.parse(p.endsAt) > Date.now());
+const promoFits = (p, planId) => !p.plans.length || p.plans.includes(planId);
+function findPromo(cfg, code) {
+  const want = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+  return want ? (cfg.promos || []).find((p) => p.code === want && promoLive(p)) || null : null;
+}
+const bannerPromo = (cfg) => (cfg.promos || []).find((p) => p.banner && promoLive(p)) || null;
+const promoPublic = (p) => (p ? { code: p.code, percent: p.percent, endsAt: p.endsAt, plans: p.plans } : null);
+const promoPrice = (amount, percent) => Math.max(0, Math.round(amount * (100 - percent) / 100 / 100) * 100);   // to the nearest 100 so'm
 const cleanTelegram = (v, fallback) => { const m = String(v || '').trim().match(/^(?:https?:\/\/)?(?:t\.me\/|telegram\.me\/)?@?([A-Za-z0-9_]{4,32})\/?$/); return m ? 'https://t.me/' + m[1] : fallback; };
 function normalizePricing(raw) {
   const def = defaultPricing(); const r = raw && typeof raw === 'object' ? raw : {};
@@ -438,8 +493,11 @@ function normalizePricing(raw) {
       tag: String(p.tag === undefined ? d.tag : p.tag).trim().slice(0, 40), prices, oldPrices, testsLimit: Number.isFinite(lim) && lim > 0 ? Math.min(lim, 100000) : 0, features };
   });
   const usd = Number(r.usdRate);
+  const promos = (Array.isArray(r.promos) ? r.promos : def.promos).map(cleanPromo).filter(Boolean)
+    .filter((p, i, all) => all.findIndex((x) => x.code === p.code) === i).slice(0, 30);
+  let shown = false; promos.forEach((p) => { if (p.banner && !shown) shown = true; else p.banner = false; });   // one code in the strip
   return { currency: 'UZS', usdRate: Number.isFinite(usd) && usd > 0 ? Math.min(Math.round(usd), 1e6) : 0, months, plans,
-    contact: cleanTelegram(r.contact, def.contact), instructions: String(r.instructions === undefined ? def.instructions : r.instructions).trim().slice(0, 500) };
+    contact: cleanTelegram(r.contact, def.contact), instructions: String(r.instructions === undefined ? def.instructions : r.instructions).trim().slice(0, 500), promos };
 }
 /* ---- site logo (admin panel -> Logo): kept in settings, every page swaps its built-in logo for it (assets/js/branding.js) ---- */
 const cleanBranding = (b) => ({ logoUrl: cleanUrl(b && b.logoUrl), iconUrl: cleanUrl(b && b.iconUrl) });
@@ -1192,18 +1250,41 @@ async function api(req, res, url) {
   /* ---- plans + orders (manual payment confirmed by an admin, or by a signed webhook) ---- */
   // no-cache: a browser that kept the old (empty) answer used to take a just-saved logo off the next page it opened
   if (method === 'GET' && p === '/api/branding') return send(res, 200, await getBranding(), { 'Cache-Control': 'no-cache' });
-  if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions }, { 'Cache-Control': 'no-store' }); }
+  if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions, promo: promoPublic(bannerPromo(cfg)) }, { 'Cache-Control': 'no-store' }); }
+  // a promo code typed on the Price page: is it valid (and for which plans)? Only the code in the promo strip is public.
+  if (method === 'POST' && p === '/api/promo/check') {
+    rateLimit('promo:' + clientIp(req), 30, 15 * 60000);
+    const promo = findPromo(await getPricing(), (await readJson(req)).code);
+    if (!promo) throw new HttpError(404, 'This promo code is not valid or has ended.');
+    return send(res, 200, { promo: promoPublic(promo) });
+  }
   if (p === '/api/orders' && method === 'POST') {
     const u = await requireUser(req); rateLimit('order:' + u.id, 10, 60 * 60000);
     const b = await readJson(req); const cfg = await getPricing(); const plan = cfg.plans.find((x) => x.active && x.id === String(b.plan || '')); const months = Math.floor(Number(b.months));
     if (!plan || !cfg.months.includes(months) || !plan.prices[String(months)]) throw new HttpError(400, 'Choose a plan and a duration.');
+    let promo = null;
+    if (String(b.promo || '').trim()) {
+      promo = findPromo(cfg, b.promo);
+      if (!promo) throw new HttpError(400, 'This promo code is not valid or has ended.');
+      if (!promoFits(promo, plan.id)) throw new HttpError(400, `The code ${promo.code} is for the ${promo.plans.map((x) => PLAN_NAMES[x]).join(' / ')} plan only.`);
+    }
+    const full = plan.prices[String(months)], amount = promo ? promoPrice(full, promo.percent) : full;
     const payment = { contact: cfg.contact, instructions: cfg.instructions };
-    const open = (await store.listOrders({ userId: u.id, status: 'pending', limit: 20 }));
+    let open = (await store.listOrders({ userId: u.id, status: 'pending', limit: 20 }));
     const same = open.find((o) => o.plan === plan.id && o.months === months);
-    if (same) return send(res, 200, { order: same, payment });
+    if (same && same.amount === amount && (same.promoCode || '') === (promo ? promo.code : '')) return send(res, 200, { order: same, payment });
+    if (same) { await store.updateOrder(same.id, { status: 'cancelled' }); open = open.filter((o) => o.id !== same.id); }   // the same plan with another code: the new order replaces it
     if (open.length >= 5) throw new HttpError(429, 'You already have several unpaid orders. Cancel or finish them first.');
     const ref = 'IX-' + crypto.randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
-    const order = await store.insertOrder({ id: newId(), ref, userId: u.id, userEmail: u.email, plan: plan.id, planName: plan.name, months, amount: plan.prices[String(months)], currency: cfg.currency, status: 'pending', createdAt: new Date().toISOString(), paidAt: null });
+    const row = { id: newId(), ref, userId: u.id, userEmail: u.email, plan: plan.id, planName: plan.name, months, amount, currency: cfg.currency, status: 'pending', createdAt: new Date().toISOString(), paidAt: null };
+    const withPromo = promo ? { ...row, promoCode: promo.code, discount: full - amount, fullAmount: full } : row;
+    let order;
+    try { order = await store.insertOrder(withPromo); }
+    catch (e) {   // Supabase without the v8 columns (supabase-schema.sql): the order keeps the lower price, the code goes to the log
+      if (!promo || !(e instanceof HttpError) || !/out of date|column/i.test(e.message)) throw e;
+      order = { ...(await store.insertOrder(row)), promoCode: promo.code, discount: full - amount, fullAmount: full };
+    }
+    if (promo) await audit({ id: u.id, email: u.email }, 'order.promo', ref, { code: promo.code, percent: promo.percent, full, amount });
     return send(res, 201, { order, payment });
   }
   if (p === '/api/orders' && method === 'GET') {
@@ -1347,7 +1428,8 @@ async function api(req, res, url) {
       const cfg = normalizePricing(b && (b.pricing || b));
       if (!cfg.plans.some((x) => x.active)) throw new HttpError(400, 'Keep at least one plan switched on, with a price for at least one duration.');
       await store.setSetting('pricing-config', { ...cfg, updatedAt: new Date().toISOString() });
-      await audit(admin, 'pricing.save', 'pricing', { months: cfg.months, plans: cfg.plans.map((x) => x.id + ':' + (x.active ? 'on' : 'off') + ':' + x.testsLimit) });
+      await audit(admin, 'pricing.save', 'pricing', { months: cfg.months, plans: cfg.plans.map((x) => x.id + ':' + (x.active ? 'on' : 'off') + ':' + x.testsLimit),
+        promos: cfg.promos.map((x) => `${x.code}:${x.percent}%${x.active ? '' : ':off'}${x.banner ? ':strip' : ''}`) });
       return send(res, 200, { pricing: cfg });
     }
     if (method === 'GET' && p === '/api/admin/branding') return send(res, 200, { branding: await getBranding() }, { 'Cache-Control': 'no-store' });
@@ -1356,6 +1438,20 @@ async function api(req, res, url) {
       await store.setSetting('branding', { ...b, updatedAt: new Date().toISOString() });
       await audit(admin, 'branding.save', 'logo', { logo: !!b.logoUrl, icon: !!b.iconUrl });
       return send(res, 200, { branding: await getBranding() });
+    }
+    if (method === 'GET' && p === '/api/admin/site-check') {   // Website check (site-check.js): read only
+      let dbSize = 0; if (!USE_SUPABASE) { try { dbSize = fs.statSync(DB_FILE).size; } catch (e) { /* no file yet */ } }
+      const want = String(process.env.WEB_CONCURRENCY || process.env.WORKERS || '').trim().toLowerCase();
+      let ai = false; try { ai = !!require('./ai-provider').configured().ok; } catch (e) { ai = false; }
+      let promoColumns = true; if (USE_SUPABASE) { try { await sb('ieltsx_orders?select=promoCode,discount,fullAmount&limit=1'); } catch (e) { promoColumns = false; } }
+      const report = await require('./site-check').run({
+        root: ROOT, uploadDir: UPLOAD_DIR, aliasMap, store, isPremium, isAdmin, publicPages: publicUrls(),
+        config: { storage: USE_SUPABASE ? 'supabase' : 'file', vercel: IS_VERCEL, dbSize, sessionSecretFromEnv: !!process.env.SESSION_SECRET,
+          production: IS_VERCEL || process.env.NODE_ENV === 'production' || /^https:\/\//.test(PUBLIC_URL), adminEmails: ADMIN_EMAILS.size, mail: MAIL_READY,
+          publicUrl: PUBLIC_URL, google: !!GOOGLE_CLIENT_ID, ai, paymentWebhook: !!PAYMENT_WEBHOOK_SECRET, promoColumns, pricing: await getPricing(),
+          workers: USE_SUPABASE ? (want === 'auto' ? require('os').cpus().length : Math.max(1, parseInt(want, 10) || 1)) : 1 }
+      }, { fresh: url.searchParams.get('fresh') === '1' });
+      return send(res, 200, report, { 'Cache-Control': 'no-store' });
     }
     if (method === 'GET' && p === '/api/admin/audit') return send(res, 200, { entries: await store.listAudit(Math.min(500, Number(url.searchParams.get('limit')) || 100)) });
     if (method === 'GET' && p === '/api/admin/users') {
@@ -1592,7 +1688,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js']);
+  'ai-provider.js', 'ai-generator.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
@@ -1604,7 +1700,7 @@ function isBlocked(rel) {
 // old links that still exist in saved pages -> the real file
 const ALIASES = {
   '/home': '/index.html', '/features': '/index.html', '/teachers': '/index.html', '/support': '/index.html',
-  '/privacy-policy': '/privacy-policy.html', '/terms-of-service': '/terms-of-service.html', '/feedback': '/index.html', '/favicon.ico': '/assets/ieltsx-only-logo-BajnupZg.png',
+  '/privacy-policy': '/privacy-policy.html', '/terms-of-service': '/terms-of-service.html', '/feedback': '/index.html', '/favicon.ico': '/assets/ieltsx-mark.png',
   '/login': '/login.html', '/account': '/account.html', '/pricing': '/Price.html', '/practice/mock': '/Mock tests.html',
   '/listening.html': '/part/practice/listening.html', '/reading.html': '/part/practice/reading.html', '/writing.html': '/part/practice/writing.html', '/speaking.html': '/part/practice/speaking.html',
   '/full-tests/reading.html': '/full-tests/reading/index.html', '/full-tests/listening.html': '/full-tests/listening/index.html',
@@ -1631,18 +1727,50 @@ const encPath = (p) => p.split('/').map((seg) => encodeURIComponent(decodeURICom
 
 /* Speed: text files (pages, styles, scripts, data) are sent compressed — brotli or gzip, made once and kept in memory
    until the file changes — and the browser keeps pictures and fonts for a day instead of asking again on every page.
-   Pages, styles and scripts are always checked again (no-cache: a short 304 when unchanged), so an update is seen at once. */
+   Pages are always checked again (no-cache: a short 304 when unchanged). The styles and scripts a page loads get
+   ?v=<time of the file> added to their address (versionedPage), so the browser keeps them for a year and loads them
+   again only when the file really changed: moving to another page no longer asks the server about ~25 files. */
 const zlib = require('zlib');
 const COMPRESSIBLE = /^(text\/|application\/(javascript|json|xml|manifest\+json)|image\/svg\+xml)/;
 const packed = new Map(); let packedBytes = 0;
-function compressedBody(file, st, enc) {
-  const key = enc + '|' + file + '|' + st.size + '|' + st.mtimeMs;
+function pack(key, raw, enc) {
   if (packed.has(key)) return packed.get(key);
-  const raw = fs.readFileSync(file);
   const body = enc === 'br' ? zlib.brotliCompressSync(raw, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } }) : zlib.gzipSync(raw, { level: 6 });
   if (packedBytes + body.length > 64 * 1024 * 1024) { packed.clear(); packedBytes = 0; }   // keep the memory bounded
   packed.set(key, body); packedBytes += body.length;
   return body;
+}
+function compressedBody(file, st, enc) {
+  const key = enc + '|' + file + '|' + st.size + '|' + st.mtimeMs;
+  return packed.has(key) ? packed.get(key) : pack(key, fs.readFileSync(file), enc);
+}
+const pages = new Map();   // page file -> { stamp, checked, refs: [[file, mtimeMs]], body: Buffer, tag }
+const fileTime = (f) => { try { return fs.statSync(f).mtimeMs; } catch (e) { return -1; } };
+function versionedPage(file, st) {
+  const stamp = st.size + ':' + st.mtimeMs; const hit = pages.get(file);
+  if (hit && hit.stamp === stamp) {
+    if (Date.now() - hit.checked < 2000) return hit;                       // the files it loads were looked at a moment ago
+    if (hit.refs.every(([f, t]) => fileTime(f) === t)) { hit.checked = Date.now(); return hit; }
+  }
+  const dir = path.dirname(file); const refs = [];
+  const html = fs.readFileSync(file, 'utf8').replace(/<(script|link)\b[^>]*>/gi, (tag, name) => {
+    if (/\btype\s*=\s*["']?module/i.test(tag)) return tag;                       // modules import each other by the plain address: keep one copy
+    if (name.toLowerCase() === 'link' && !/\brel\s*=\s*["']?(stylesheet|preload|modulepreload)/i.test(tag)) return tag;
+    return tag.replace(/(\s(?:src|href)\s*=\s*)(["'])([^"'?#\s]+\.(?:css|js))\2/i, (all, pre, q, url) => {
+      if (/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(url)) return all;                   // another site
+      let f; try { f = url.startsWith('/') ? path.join(ROOT, decodeURIComponent(url)) : path.resolve(dir, decodeURIComponent(url)); } catch (e) { return all; }
+      if (!f.startsWith(ROOT + path.sep)) return all;
+      const t = fileTime(f); if (t < 0) return all;                               // missing here (the server finds another copy): leave it
+      refs.push([f, t]);
+      return pre + q + url + '?v=' + Math.floor(t).toString(36) + q;
+    });
+  });
+  const body = Buffer.from(html);
+  const tag = crypto.createHash('sha1').update(body).digest('base64url').slice(0, 12);
+  const out = { stamp, checked: Date.now(), refs, body, tag };
+  if (pages.size > 500) pages.clear();
+  pages.set(file, out);
+  return out;
 }
 function cacheFor(ext) {
   if (ext === '.html' || ext === '.json') return 'no-cache';
@@ -1651,10 +1779,12 @@ function cacheFor(ext) {
 }
 function serveFile(req, res, file, extraHeaders = {}) {
   const st = fs.statSync(file); const ext = path.extname(file).toLowerCase();
+  if (ext === '.html') return servePage(req, res, file, st, extraHeaders);
   const etag = `W/"${st.size.toString(16)}-${Math.floor(st.mtimeMs).toString(16)}"`;
   const hashed = /-[A-Za-z0-9_-]{8}\.(js|css|png|avif)$/.test(file) && file.includes(path.sep + 'assets' + path.sep);
+  const versioned = (ext === '.css' || ext === '.js') && /[?&]v=[0-9a-z]+(&|$)/.test(String(req.url || '').replace(/^[^?]*/, ''));
   const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream', ETag: etag, 'Last-Modified': st.mtime.toUTCString(), 'Accept-Ranges': 'bytes',
-    'Cache-Control': hashed ? 'public, max-age=31536000, immutable' : cacheFor(ext), Vary: 'Accept-Encoding', ...SECURITY_HEADERS, ...extraHeaders };
+    'Cache-Control': hashed || versioned ? 'public, max-age=31536000, immutable' : cacheFor(ext), Vary: 'Accept-Encoding', ...SECURITY_HEADERS, ...extraHeaders };
   if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
   const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
   if (range && (range[1] || range[2])) {
@@ -1676,6 +1806,19 @@ function serveFile(req, res, file, extraHeaders = {}) {
   }
   res.writeHead(200, { ...headers, 'Content-Length': st.size });
   return req.method === 'HEAD' ? res.end() : fs.createReadStream(file).pipe(res);
+}
+function servePage(req, res, file, st, extraHeaders) {
+  let page;
+  try { page = versionedPage(file, st); } catch (e) { page = { body: fs.readFileSync(file), tag: st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) }; }
+  const etag = `W/"p-${page.tag}"`;
+  const headers = { 'Content-Type': MIME['.html'], ETag: etag, 'Last-Modified': st.mtime.toUTCString(), 'Cache-Control': 'no-cache', Vary: 'Accept-Encoding', ...SECURITY_HEADERS, ...extraHeaders };
+  if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
+  const accept = String(req.headers['accept-encoding'] || '');
+  const enc = page.body.length > 1024 ? (/\bbr\b/.test(accept) ? 'br' : /\bgzip\b/.test(accept) ? 'gzip' : '') : '';
+  let body = page.body;
+  if (enc) { try { body = pack(enc + '|page|' + file + '|' + page.tag, page.body, enc); headers['Content-Encoding'] = enc; } catch (e) { body = page.body; } }
+  res.writeHead(200, { ...headers, 'Content-Length': body.length });
+  return res.end(req.method === 'HEAD' ? undefined : body);
 }
 function notFound(req, res) {
   const page = path.join(ROOT, '404.html');
@@ -1731,6 +1874,10 @@ async function staticFile(req, res, pathname) {
   const needsPremium = isPremiumPath(tl) || gateLocked;
   const needLevel = gateLocked ? levelNeeded(gate) : 1;
   if (needsAdmin || needsPremium) {
+    // a page fetched early by the browser (hover prefetch) must not count as an opened test: it is sent when really opened
+    if (/prefetch|prerender/i.test(String(req.headers['sec-purpose'] || req.headers.purpose || req.headers['x-moz'] || ''))) {
+      res.writeHead(503, { 'Cache-Control': 'no-store', 'Retry-After': '0', ...SECURITY_HEADERS }); return res.end();
+    }
     const u = await currentUser(req);
     const next = encodeURIComponent(pathname);
     if (!isHtml) { // audio, files: no page to redirect to
@@ -1749,6 +1896,16 @@ async function staticFile(req, res, pathname) {
 
 /* ───────────────────────── sitemap (public pages only) ───────────────────────── */
 function sitemap(origin) {
+  const body = publicUrls().map((u) => {
+    let last = '';
+    const rel = decodeURIComponent(u).replace(/\/$/, '/index.html');
+    for (const cand of [rel, rel + '.html']) { try { last = fs.statSync(path.join(ROOT, cand)).mtime.toISOString().slice(0, 10); break; } catch (e) { /* try next */ } }
+    return `  <url><loc>${origin}${u}</loc>${last ? `<lastmod>${last}</lastmod>` : ''}</url>`;
+  }).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+/* the public pages: the sitemap, and the search-engine check of the admin Website check (site-check.js) */
+function publicUrls() {
   const urls = new Set(['/', '/Price', '/Predictions', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
     '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/privacy-policy', '/terms-of-service']);
   for (const dir of ['pessages', 'sections']) {
@@ -1761,13 +1918,7 @@ function sitemap(origin) {
       }
     } catch (e) { /* folder missing */ }
   }
-  const body = [...urls].map((u) => {
-    let last = '';
-    const rel = decodeURIComponent(u).replace(/\/$/, '/index.html');
-    for (const cand of [rel, rel + '.html']) { try { last = fs.statSync(path.join(ROOT, cand)).mtime.toISOString().slice(0, 10); break; } catch (e) { /* try next */ } }
-    return `  <url><loc>${origin}${u}</loc>${last ? `<lastmod>${last}</lastmod>` : ''}</url>`;
-  }).join('\n');
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+  return [...urls];
 }
 
 /* ───────────────────────── server ───────────────────────── */

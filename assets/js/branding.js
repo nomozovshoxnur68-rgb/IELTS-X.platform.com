@@ -9,7 +9,7 @@
     'use strict';
     if (window.__ixBranding) return; window.__ixBranding = true;
     var KEY = 'ix-branding';
-    var MARK = /ieltsx-only-logo/i;                                 // the small square mark (sidebars, headers)
+    var MARK = /ieltsx-only-logo|ieltsx-mark/i;                     // the small square mark (sidebars, headers)
     var WORD = /ieltsx-logo-transparent/i;                          // the wide logo (sign-in and legal pages)
     function safe(u) {
         u = String(u || '');
@@ -25,12 +25,15 @@
     function markSize(el) {
         if (!el) return null;
         var r = el.getBoundingClientRect();
-        if (r.width > 2 && r.height > 2) return [Math.round(r.width), Math.round(r.height)];
-        var cs = getComputedStyle(el), w = parseFloat(cs.width), h = parseFloat(cs.height);   // hidden screen: its CSS size
-        return w > 2 && h > 2 ? [Math.round(w), Math.round(h)] : null;
+        if (r.width > 2 && r.height > 2) return [Math.round(r.width) + 'px', Math.round(r.height) + 'px'];
+        // a hidden screen (the exam bar, the results) has no box yet: its CSS size, kept as written. "100%" stays "100%"
+        // (it used to be read as 100px, so the logo of the writing exam bar grew to 100 x 100)
+        var cs = getComputedStyle(el), w = cs.width, h = cs.height;
+        var ok = function (v) { return /^\d+(\.\d+)?%$/.test(v) || (/px$/.test(v) && parseFloat(v) > 2); };
+        return ok(w) && ok(h) ? [w, h] : null;
     }
     function sizeStyle(sz) {
-        return 'display:block;object-fit:contain;flex:0 0 auto;' + (sz ? 'width:' + sz[0] + 'px;height:' + sz[1] + 'px' : 'width:auto;height:32px;max-width:100%');
+        return 'display:block;object-fit:contain;flex:0 0 auto;' + (sz ? 'width:' + sz[0] + ';height:' + sz[1] : 'width:auto;height:32px;max-width:100%');
     }
     function apply(b) {
         var logo = safe(b && b.logoUrl), icon = safe(b && b.iconUrl);

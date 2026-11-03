@@ -57,23 +57,29 @@ export function removeKnownAccount(uid) {
   try { localStorage.setItem(KNOWN_KEY, JSON.stringify(getKnownAccounts().filter((a) => a.uid !== uid))); } catch (e) { /* ignore */ }
 }
 
+/* the lists of tests kept by the pages (assets/js/app.js, cachedJson) say which cards this account may open: drop them when the account changes */
+function forgetPageCopies() {
+  try { for (let i = sessionStorage.length - 1; i >= 0; i--) { const k = sessionStorage.key(i); if (k && k.startsWith('ix-cache:')) sessionStorage.removeItem(k); } } catch (e) { /* blocked */ }
+}
+
 /* ---- session ---- */
 export async function login(email, password) {
   const { user } = await request('/api/auth/login', { method: 'POST', body: { email, password } });
-  rememberAccount(user);
+  rememberAccount(user); forgetPageCopies();
   return user;
 }
 export async function register(name, email, password) {
   const { user } = await request('/api/auth/register', { method: 'POST', body: { name, email, password } });
-  rememberAccount(user);
+  rememberAccount(user); forgetPageCopies();
   return user;
 }
 export async function loginWithGoogle(credential) {
   const { user } = await request('/api/auth/google', { method: 'POST', body: { credential } });
-  rememberAccount(user);
+  rememberAccount(user); forgetPageCopies();
   return user;
 }
 export async function logout() {
+  forgetPageCopies();
   try { await request('/api/auth/logout', { method: 'POST' }); } catch (e) { /* cookie is cleared by the server when reachable */ }
   ['ieltsx_logged_in_email', 'userEmail', 'ieltsx_current_user', 'ieltsx_premium', 'ieltsx_completed'].forEach((k) => {
     try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) { /* ignore */ }

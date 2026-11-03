@@ -47,13 +47,23 @@
         }).catch(function () { alert('Could not start the download. Please try again.'); });
     }
 
+    /* The five sample cards written into the page had no real files behind them (Download made a one-page PDF with a
+       short text), so only the PDFs added in the admin panel are shown. true = show the old sample cards again. */
+    var SHOW_SAMPLES = window.IELTSX_SHOW_BUILTIN_PDFS === true;
     function run() {
         var grid = document.querySelector('main .grid.items-stretch'); if (!grid || !window.fetch) return;
-        fetch('/api/materials?type=pdf', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) {
-            var items = (d.items || []).slice().sort(function (a, b) { return String(b.createdAt || '').localeCompare(String(a.createdAt || '')); });   // newest first
-            if (!items.length) return;
-            grid.insertAdjacentHTML('afterbegin', items.map(cardHtml).join(''));
-        }).catch(function () { /* the built-in cards still show */ });
+        if (!SHOW_SAMPLES) Array.prototype.forEach.call(grid.children, function (el) { if (!el.hasAttribute('data-ix-pdf')) el.hidden = true; });
+        var IX = window.IELTSX || {};
+        if (IX.skeletonCards) grid.insertAdjacentHTML('afterbegin', IX.skeletonCards(3));
+        var show = function (items) {
+            if (IX.clearSkeletons) IX.clearSkeletons(grid);
+            grid.querySelectorAll('[data-ix-pdf], [data-ix-empty]').forEach(function (el) { el.remove(); });
+            if (items.length) grid.insertAdjacentHTML('afterbegin', items.map(cardHtml).join(''));
+            else if (!SHOW_SAMPLES) grid.insertAdjacentHTML('afterbegin', '<div data-ix-empty class="col-span-full text-center py-12 text-muted-foreground">New PDF materials are coming soon.</div>');
+        };
+        var take = function (d) { return (d.items || []).slice().sort(function (a, b) { return String(b.createdAt || '').localeCompare(String(a.createdAt || '')); }); };   // newest first
+        if (IX.cachedJson) IX.cachedJson('/api/materials?type=pdf', function (d) { show(take(d)); });
+        else fetch('/api/materials?type=pdf', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).then(function (d) { show(take(d)); }).catch(function () { show([]); });
         document.addEventListener('click', function (e) {
             var a = e.target.closest && e.target.closest('[data-ix-dl]'); if (!a) return;
             e.preventDefault(); download(a);

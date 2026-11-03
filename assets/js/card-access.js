@@ -76,11 +76,14 @@
             byTitle[norm(c.title)] = info;
         });
         // cards of tests made in the admin panel: the server already decided who may open them (locked / plan)
-        (window.IELTSX_ADMIN_CARDS || []).forEach(function (c) {
-            var rule = A.rule(null, null, { locked: !!c.premium, plan: A.planOf(c.plan) || 'standard' });
-            var info = { rule: rule, allowed: !c.locked, go: c.href, sig: rule.locked + ':' + rule.plan + ':' + (!c.locked) };
-            byHref[path(c.href)] = info; byTitle[norm(c.title)] = info;
-        });
+        function adminCards() {
+            (window.IELTSX_ADMIN_CARDS || []).forEach(function (c) {
+                var rule = A.rule(null, null, { locked: !!c.premium, plan: A.planOf(c.plan) || 'standard' });
+                var info = { rule: rule, allowed: !c.locked, go: c.href, sig: rule.locked + ':' + rule.plan + ':' + (!c.locked) };
+                byHref[path(c.href)] = info; byTitle[norm(c.title)] = info;
+            });
+        }
+        adminCards();
         // the Plan filter of app.js asks for the real plan of a card
         IX.cardPlanKey = function (item, free) {
             var i = (item && item.href && byHref[path(item.href)]) || (item && item.title && byTitle[norm(item.title)]);
@@ -92,5 +95,7 @@
         var obs = new MutationObserver(function () { if (busy) return; busy = true; obs.disconnect(); try { run(grid); } finally { obs.observe(grid, { childList: true, subtree: true }); busy = false; } });
         run(grid);
         obs.observe(grid, { childList: true, subtree: true });
+        // app.js got a newer list of the admin cards (it drew the cards again): read their locks again
+        IX.refreshCardAccess = function () { adminCards(); run(grid); };
     });
 })();

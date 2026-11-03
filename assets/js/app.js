@@ -869,6 +869,45 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
   window.IELTSX.startCountdown = startCountdown;
   window.IELTSX.completionKey = completionKey;
   window.IELTSX.isFreeItem = isFreeItem;
+
+  /* Speed: the lists of tests and articles (/api/materials) are kept in this tab (sessionStorage) for 10 minutes. A page
+     opened again draws its cards at once from that copy while a new copy is fetched; when the new copy differs, the
+     page draws its cards again (onData(data, first) is called once more). Saving a test or an article in the admin
+     panel makes the copies old (localStorage "ix-materials-changed"). */
+  function cachedJson(url, onData, opts) {
+    opts = opts || {};
+    var key = 'ix-cache:' + url, copy = null, shown = null, first = true;
+    var bust = 0; try { bust = Number(localStorage.getItem('ix-materials-changed')) || 0; } catch (e) { /* blocked */ }
+    try { var c = JSON.parse(sessionStorage.getItem(key) || 'null'); if (c && c.s && Date.now() - c.t < (opts.maxAge || 600000) && c.t > bust) copy = c; } catch (e) { copy = null; }
+    function give(text, data) { if (text === shown) return; shown = text; var f = first; first = false; onData(data, f); }
+    if (copy) { try { give(copy.s, JSON.parse(copy.s)); } catch (e) { copy = null; } }
+    if (!window.fetch) { if (!copy) give('', opts.empty || { items: [] }); return; }
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, opts.timeout || 8000);
+    fetch(url, { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function (text) {
+        clearTimeout(timer);
+        var data = JSON.parse(text);
+        try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), s: text })); } catch (e) { /* full or blocked */ }
+        give(text, data);
+      })
+      .catch(function () { clearTimeout(timer); if (!copy) give('', opts.empty || { items: [] }); });
+  }
+  /* grey placeholder cards with a soft shimmer, drawn while the real cards load (.ix-skel styles: assets/js/loading.js) */
+  function skeletonCards(n, opts) {
+    opts = opts || {};
+    var one = '<div class="h-full" data-ix-skel aria-hidden="true"><div class="ix-skel-card">' +
+      '<div class="ix-skel" style="border-radius:0;aspect-ratio:' + (opts.ratio || '4/3') + '"></div>' +
+      '<div class="ix-skel-body"><div class="ix-skel" style="height:18px;width:82%"></div><div class="ix-skel" style="height:12px;width:55%"></div>' +
+      '<div style="display:flex;gap:6px"><div class="ix-skel" style="height:20px;width:64px;border-radius:6px"></div><div class="ix-skel" style="height:20px;width:84px;border-radius:6px"></div></div>' +
+      '<div class="ix-skel" style="height:32px;width:100%;margin-top:auto;border-radius:6px"></div></div></div></div>';
+    return new Array((n || 6) + 1).join(one);
+  }
+  function clearSkeletons(root) { (root || document).querySelectorAll('[data-ix-skel]').forEach(function (el) { el.remove(); }); }
+  window.IELTSX.cachedJson = cachedJson;
+  window.IELTSX.skeletonCards = skeletonCards;
+  window.IELTSX.clearSkeletons = clearSkeletons;
   // "Get Access" on a locked card sends the visitor to the Price page (same as the Full Tests cards)
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('[data-get-access]');
@@ -1112,7 +1151,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 if (!emptyMsg) {
                     emptyMsg = document.createElement('div');
                     emptyMsg.className = 'col-span-full text-center py-12 text-muted-foreground empty-message';
-                    emptyMsg.textContent = 'No sections match your filters.';
+                    emptyMsg.textContent = cardData.length ? 'No sections match your filters.' : 'New listening sections are coming soon.';
                     grid.appendChild(emptyMsg);
                 }
             } else {
@@ -1244,26 +1283,39 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
 
         /* Listening sections made in the admin panel become cards at the START of this same grid (newest first):
            same card, same filters, same pagination. Card-access.js reads window.IELTSX_ADMIN_CARDS for the lock. */
+        var inited = false;
         function addAdminCards() {
-            if (!window.fetch) return Promise.resolve();
-            var ctl = window.AbortController ? new AbortController() : null;
-            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
+            // grey placeholder cards until the list is here (a list seen a moment ago is drawn at once: IELTSX.cachedJson)
+            var g0 = document.getElementById('card-grid');
+            if (g0 && !g0.children.length) g0.innerHTML = IELTSX.skeletonCards(6);
+            return new Promise(function (resolve) {
+                IELTSX.cachedJson('/api/materials?type=listening&mode=part', function (d, first) {
+                    applyAdminCards(d);
+                    if (first) return resolve();
+                    if (!inited) return;
+                    // the new copy differs: the same card list, read again from the page (the handlers keep the same array)
+                    var list = extractCardData(), fresh = extractCardDataFromDOM();
+                    list.length = 0; Array.prototype.push.apply(list, fresh);
+                    render(list);
+                    if (IELTSX.refreshCardAccess) IELTSX.refreshCardAccess();
+                });
+            });
+        }
+        function applyAdminCards(d) {
             var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-            return fetch('/api/materials?type=listening&mode=part', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
-                .then(function (r) { return r.ok ? r.json() : { items: [] }; })
-                .catch(function () { return { items: [] }; })
-                .then(function (d) {
-                    clearTimeout(timer);
                     var items = d.items || [];
                     window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: m.href || ('/test?id=' + encodeURIComponent(m.id)), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
-                    var grid = document.getElementById('card-grid'); if (!grid || !items.length) return;
+                    var grid = document.getElementById('card-grid'); if (!grid) return;
+                    IELTSX.clearSkeletons(grid);
+                    grid.querySelectorAll('[data-ix-admin]').forEach(function (el) { el.remove(); });
+                    if (!items.length) return;
                     grid.insertAdjacentHTML('afterbegin', items.map(function (m) {
                         var href = m.href || ('/test?id=' + encodeURIComponent(m.id));
                         var media = m.coverUrl
                             ? '<img loading="lazy" decoding="async" src="' + esc(m.coverUrl) + '" alt="' + esc(m.title) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" /><div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>'
                             : '<div class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-500/80 via-teal-500/70 to-green-600/80 dark:from-emerald-600/60 dark:via-teal-600/50 dark:to-green-700/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones w-8 h-8 text-white/90"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg><span class="mt-2 text-white/90 font-medium text-sm text-center px-4 line-clamp-2">' + esc(m.pack || 'Listening') + '</span></div>';
                         var chips = (m.types || []).slice(0, 3).map(function (t) { return '<div class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold border-transparent bg-secondary text-secondary-foreground text-xs">' + esc(t) + '</div>'; }).join('');
-                        return '<div class="h-full" data-pack="' + esc(m.pack || 'Starter Pack') + '" style="opacity: 1; transform: none;"><div class="rounded-xl bg-card text-card-foreground shadow group overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border h-full flex flex-col">' +
+                        return '<div class="h-full" data-ix-admin data-pack="' + esc(m.pack || 'Starter Pack') + '" style="opacity: 1; transform: none;"><div class="rounded-xl bg-card text-card-foreground shadow group overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border h-full flex flex-col">' +
                             '<div class="relative w-full aspect-[4/3] overflow-hidden bg-muted">' + media +
                             '<div class="absolute top-3 left-3 z-10"><span class="inline-flex items-center justify-center rounded-md font-medium border px-2.5 py-0.5 text-xs bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400">' + (m.premium ? 'Premium' : 'Free') + '</span></div>' +
                             '<div class="absolute top-3 right-3 z-10"><div class="inline-flex items-center rounded-md border px-2.5 py-0.5 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 text-xs font-medium shadow-md">' + esc(m.sectionLabel || 'Section 1') + '</div></div></div>' +
@@ -1272,10 +1324,9 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                             '<div class="flex flex-wrap gap-1">' + chips + '</div></div>' +
                             '<div class="flex gap-2 pt-1"><a href="' + esc(href) + '" class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all h-8 rounded-md px-3 text-xs w-full">' + (m.premium ? 'Start' : 'Start Free') + '</a></div></div></div></div>';
                     }).join(''));
-                });
         }
         window.IELTSX_ADMIN_CARDS_READY = addAdminCards();
-        function start() { window.IELTSX_ADMIN_CARDS_READY.then(init, init); }
+        function start() { var go = function () { inited = true; init(); }; window.IELTSX_ADMIN_CARDS_READY.then(go, go); }
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', start);
         } else {
@@ -1630,7 +1681,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
 
             if (total === 0) {
                 grid.innerHTML =
-                    `<div class="col-span-full text-center py-12 text-muted-foreground">No passages match your filters.</div>`;
+                    `<div class="col-span-full text-center py-12 text-muted-foreground">${cardData.length ? 'No passages match your filters.' : 'New reading passages are coming soon.'}</div>`;
                 pageInfo.textContent = `Page 1 of 1`;
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
@@ -1811,15 +1862,20 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
 
         /* Part tests made in the admin panel (Reading - Part) become cards in this same grid:
            same card, same filters, same pagination. Card-access.js reads window.IELTSX_ADMIN_CARDS for the lock. */
+        var inited = false;
         function addAdminCards() {
-            if (!window.fetch) return Promise.resolve();
-            var ctl = window.AbortController ? new AbortController() : null;
-            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
-            return fetch('/api/materials?type=reading&mode=part', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
-                .then(function (r) { return r.ok ? r.json() : { items: [] }; })
-                .catch(function () { return { items: [] }; })
-                .then(function (d) {
-                    clearTimeout(timer);
+            // grey placeholder cards until the list is here (a list seen a moment ago is drawn at once: IELTSX.cachedJson)
+            if (grid && !grid.children.length) grid.innerHTML = IELTSX.skeletonCards(6);
+            return new Promise(function (resolve) {
+                IELTSX.cachedJson('/api/materials?type=reading&mode=part', function (d, first) {
+                    applyAdminCards(d);
+                    if (first) resolve();
+                    else if (inited) { render(); if (IELTSX.refreshCardAccess) IELTSX.refreshCardAccess(); }   // the new copy differs
+                });
+            });
+        }
+        function applyAdminCards(d) {
+                    for (var k = cardData.length - 1; k >= 0; k--) if (cardData[k].admin) cardData.splice(k, 1);
                     var items = (d.items || []).filter(function (m) { return m.mode !== 'full'; });
                     window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: m.href || ('/test?id=' + encodeURIComponent(m.id)), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
                     var made = [];
@@ -1836,10 +1892,9 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         made.push(c);
                     });
                     Array.prototype.unshift.apply(cardData, made);   // newest first
-                });
         }
         window.IELTSX_ADMIN_CARDS_READY = addAdminCards();
-        function start() { window.IELTSX_ADMIN_CARDS_READY.then(init, init); }
+        function start() { var go = function () { inited = true; init(); }; window.IELTSX_ADMIN_CARDS_READY.then(go, go); }
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', start);
         } else {
@@ -2114,6 +2169,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         }
 
         function renderCards() {
+            if (writingLoading && !writingData.length) { document.getElementById('cardsGrid').innerHTML = IELTSX.skeletonCards(6); return; }
             const filtered = getFilteredData();
             const total = filtered.length;
             const totalPages = Math.ceil(total / perPage) || 1;
@@ -2171,7 +2227,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `).join('') || '<div class="col-span-full text-center py-12 text-muted-foreground">' + (writingData.length ? 'No tasks match your filters.' : 'New writing tasks are coming soon.') + '</div>';
 
             document.getElementById('resultCount').textContent = `Showing ${pageItems.length} of ${total} tests`;
             document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages}`;
@@ -2278,15 +2334,12 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
 
         // ─── Init ───
         /* Writing tasks made in the admin panel become cards at the START of the grid (newest first). */
-        window.IELTSX_ADMIN_CARDS_READY = (function () {
-            if (!window.fetch) return Promise.resolve();
-            var ctl = window.AbortController ? new AbortController() : null;
-            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
-            return fetch('/api/materials?type=writing&mode=part', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
-                .then(function (r) { return r.ok ? r.json() : { items: [] }; })
-                .catch(function () { return { items: [] }; })
-                .then(function (d) {
-                    clearTimeout(timer);
+        // grey placeholder cards until the list is here (a list seen a moment ago is drawn at once: IELTSX.cachedJson)
+        var writingLoading = true;
+        window.IELTSX_ADMIN_CARDS_READY = new Promise(function (resolve) {
+                IELTSX.cachedJson('/api/materials?type=writing&mode=part', function (d, first) {
+                    writingLoading = false;
+                    for (var k = writingData.length - 1; k >= 0; k--) if (writingData[k].admin) writingData.splice(k, 1);
                     var items = d.items || [];
                     // writing sets open in the IELTS writing exam screen (/writing/?id=…)
                     var hrefOf = function (m) { return m.href || ('/writing/?id=' + encodeURIComponent(m.id)); };
@@ -2297,9 +2350,11 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         return { id: 1000 + n, title: esc(m.title), task: esc(m.taskLabel || 'Task 1'), tier: esc(m.tier || 'Tier 1'), type: esc((m.types || [])[0] || 'Writing task'), pack: esc(m.pack || 'Practice'), plan: 'Plan A', img: m.coverUrl ? esc(m.coverUrl) : null, href: esc(hrefOf(m)), admin: true };
                     });
                     Array.prototype.unshift.apply(writingData, made);
-                    if (made.length) { currentPage = 1; renderCards(); }
+                    if (first) currentPage = 1;
+                    renderCards();
+                    if (first) resolve(); else if (IELTSX.refreshCardAccess) IELTSX.refreshCardAccess();   // the new copy differs
                 });
-        })();
+        });
         renderCards();
     
   };
@@ -2444,6 +2499,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         // ----- ARTICLES DATA -----
         // every article is made in the admin panel (admin#articles) and comes from /api/materials?type=article below
         const articlesData = [];
+        let articlesLoading = true;   // grey placeholder cards until the list is here
 
         function renderArticles() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -2460,6 +2516,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             else filtered.sort((a, b) => b.id - a.id);
             const container = document.getElementById('articlesGrid');
             if (!container) return;
+            if (articlesLoading && !articlesData.length) { container.innerHTML = IELTSX.skeletonCards(6, { ratio: '16/9' }); return; }
             if (!filtered.length) { container.innerHTML = '<div style="grid-column:1/-1;padding:48px 16px;text-align:center;color:var(--text-secondary)">' + (articlesData.length ? 'No articles match your search.' : 'New articles are coming soon.') + '</div>'; return; }
             container.innerHTML = filtered.map(art =>
                 `
@@ -2536,9 +2593,10 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         activateTab('passages');
 
         // Articles added in the admin panel (they open in /collections/article?id=...)
-        fetch('/api/materials?type=article', { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : { items: [] }; })
-            .then(function (d) {
+        // (a list seen a moment ago is drawn at once and checked again in the background: IELTSX.cachedJson)
+        IELTSX.cachedJson('/api/materials?type=article', function (d) {
+                articlesLoading = false;
+                articlesData.length = 0;
                 const items = d.items || [];
                 const esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
                 const cap = function (s) { s = String(s || '').trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'General'; };
@@ -2553,9 +2611,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         planLabel: ({ standard: 'Standard', max: 'Max', ultra: 'Ultra' })[m.plan] || 'Premium'
                     });
                 });
-                if (items.length) renderArticles();
-            })
-            .catch(function () { /* the saved articles still show */ });
+                renderArticles();
+        });
 
   };
 

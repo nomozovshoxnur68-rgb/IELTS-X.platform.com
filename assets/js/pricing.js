@@ -3,12 +3,14 @@
  * Plans, durations, prices, test counts, features and the Telegram contact come from /api/plans, which the admin
  * panel (Price control) edits. Nothing about prices is written in the HTML any more.
  *
- * Buying: "Get <plan>" opens a small dialog (plan + duration) -> an order with a code is created -> the student pays
- * (Uzcard / Humo / ...) and sends the code to the admin on Telegram -> the admin confirms and the plan turns on.
+ * Buying: "Get <plan>" opens a small dialog (plan + duration + promo code) -> an order with a code is created -> the
+ * student pays (Uzcard / Humo / ...) and sends the code to the admin on Telegram -> the admin confirms and the plan turns on.
+ * Promo codes are made in Price control; the server checks the code (/api/promo/check) and makes the order with the
+ * discount. A link from the promo strip (/Price?promo=CODE) fills the code in.
  */
 (function () {
   'use strict';
-  var state = { data: null, user: undefined, months: 0, cur: 'UZS', status: null, notice: '' };
+  var state = { data: null, user: undefined, months: 0, cur: 'UZS', status: null, notice: '', promo: null, promoCode: '' };
 
   function api(url, opt) {
     opt = opt || {};
@@ -42,6 +44,13 @@
     return old > priceOf(p, m) ? old : 0;
   }
   function sold(d, m) { return d.plans.filter(function (p) { return priceOf(p, m); }); }
+  /* promo code: the same sums as the server (server.js, promoPrice): percent off, to the nearest 100 so'm */
+  function promoFits(pr, planId) { return !!pr && (!pr.plans || !pr.plans.length || pr.plans.indexOf(planId) > -1); }
+  function promoPrice(amount, percent) { return Math.max(0, Math.round(amount * (100 - percent) / 100 / 100) * 100); }
+  function promoPlans(pr) { var n = { standard: 'Standard', max: 'Max', ultra: 'Ultra' }; return pr.plans && pr.plans.length ? pr.plans.map(function (x) { return n[x] || x; }).join(' / ') : 'every plan'; }
+  function checkPromo(code) {
+    return api('/api/promo/check', { method: 'POST', body: { code: code } }).then(function (r) { state.promo = r.promo; state.promoCode = r.promo.code; return r.promo; });
+  }
 
   /* ---------- page ---------- */
   function render() {
@@ -53,6 +62,15 @@
     var m = state.months;
 
     if (state.notice) { var nb = el('div', 'ixp-bar', state.notice); nb.setAttribute('role', 'status'); mount.appendChild(nb); }
+    var pr = state.promo || d.promo;
+    if (pr) {
+      var pb = el('div', 'ixp-bar ixp-promo-bar');
+      pb.appendChild(document.createTextNode('🎁 ' + (state.promo ? 'Promo code ' : 'Use promo code ')));
+      pb.appendChild(el('b', 'ixp-promo-code', pr.code));
+      pb.appendChild(document.createTextNode(' — ' + pr.percent + '% off ' + (promoPlans(pr) === 'every plan' ? 'every plan' : 'the ' + promoPlans(pr) + ' plan') +
+        (state.promo ? '. It is added when you order.' : '. Type it in the order window.') + (pr.endsAt ? ' Ends ' + new Date(pr.endsAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) + '.' : '')));
+      mount.appendChild(pb);
+    }
     if (state.status && state.status.premium && !state.status.admin) mount.appendChild(meStrip(state.status));
 
     var controls = el('div', 'ixp-controls');
@@ -175,23 +193,48 @@
           b.onclick = function () { m = x; choose(); }; durs.appendChild(b);
         });
         box.appendChild(durs);
-        var total = el('div', 'ixp-total'); total.appendChild(el('span', null, 'Total')); total.appendChild(el('span', null, money(priceOf(plan, m), d.currency))); box.appendChild(total);
+
+        // promo code
+        var full = priceOf(plan, m), pr = state.promo, fits = promoFits(pr, plan.id), pay = fits ? promoPrice(full, pr.percent) : full;
+        var promoRow = el('form', 'ixp-promo'); promoRow.noValidate = true;
+        var inp = el('input', 'ixp-promo-in'); inp.type = 'text'; inp.placeholder = 'Promo code'; inp.maxLength = 24; inp.autocomplete = 'off'; inp.spellcheck = false;
+        inp.setAttribute('aria-label', 'Promo code'); inp.value = state.promoCode || '';
+        var apply = el('button', 'ixp-btn alt ixp-promo-btn', pr ? 'Remove' : 'Apply'); apply.type = 'submit';
+        promoRow.appendChild(inp); promoRow.appendChild(apply); box.appendChild(promoRow);
+        var pmsg = el('p', 'ixp-promo-msg' + (pr && !fits ? ' bad' : '')); pmsg.setAttribute('role', 'status');
+        if (pr) pmsg.textContent = fits ? '✓ ' + pr.code + ' — ' + pr.percent + '% off' : pr.code + ' is for the ' + promoPlans(pr) + ' plan only.';
+        box.appendChild(pmsg);
+        if (pr) inp.readOnly = true;
+        promoRow.onsubmit = function (e) {
+          e.preventDefault();
+          if (state.promo) { state.promo = null; state.promoCode = ''; render(); choose(); return; }
+          var code = inp.value.trim(); if (!code) { inp.focus(); return; }
+          apply.disabled = true; pmsg.className = 'ixp-promo-msg'; pmsg.textContent = 'Checking…';
+          checkPromo(code).then(function () { render(); choose(); })
+            .catch(function (x) { apply.disabled = false; pmsg.className = 'ixp-promo-msg bad'; pmsg.textContent = x.message || 'This promo code is not valid.'; inp.focus(); });
+        };
+
+        var total = el('div', 'ixp-total'); total.appendChild(el('span', null, 'Total'));
+        var sum = el('span'); if (pay !== full) { sum.appendChild(el('s', 'ixp-was', money(full, d.currency))); sum.appendChild(document.createTextNode(' ')); }
+        sum.appendChild(document.createTextNode(money(pay, d.currency))); total.appendChild(sum); box.appendChild(total);
+        if (pay !== full) box.appendChild(el('p', 'ixp-facts ixp-save', 'You save ' + money(full - pay, d.currency) + ' with ' + pr.code));
         box.appendChild(el('p', 'ixp-facts', (plan.testsLimit ? nf(plan.testsLimit) + ' premium tests' : 'Unlimited premium tests') + ' · access for ' + monthWord(m)));
         var err = el('p', 'ixp-err'); err.setAttribute('role', 'alert'); box.appendChild(err);
         var go = el('button', 'ixp-btn', user ? 'Continue' : 'Sign in to continue'); go.type = 'button';
         go.onclick = function () {
-          if (!user) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return; }
+          if (!user) { location.href = '/login?next=' + encodeURIComponent(location.pathname + (state.promoCode ? '?promo=' + encodeURIComponent(state.promoCode) : '')); return; }
           go.disabled = true; err.textContent = '';
-          api('/api/orders', { method: 'POST', body: { plan: plan.id, months: m } }).then(function (r) { showOrder(r.order, r.payment, user); })
+          api('/api/orders', { method: 'POST', body: { plan: plan.id, months: m, promo: fits ? pr.code : '' } }).then(function (r) { showOrder(r.order, r.payment, user); })
             .catch(function (e) { err.textContent = e.message; go.disabled = false; });
         };
         box.appendChild(go); go.focus();
       }
       function showOrder(order, payment, who) {
-        head('Your order', order.planName + ' · ' + monthWord(order.months) + ' · ' + money(order.amount, order.currency));
+        head('Your order', order.planName + ' · ' + monthWord(order.months) + ' · ' + money(order.amount, order.currency) +
+          (order.promoCode ? ' (' + order.promoCode + ', you save ' + money(order.discount, order.currency) + ')' : ''));
         box.appendChild(el('div', 'ixp-code', order.ref));
         box.appendChild(el('p', null, payment.instructions));
-        var text = 'IELTSX order ' + order.ref + ' - ' + order.planName + ' ' + order.months + 'm - ' + who.email;
+        var text = 'IELTSX order ' + order.ref + ' - ' + order.planName + ' ' + order.months + 'm - ' + money(order.amount, order.currency) + (order.promoCode ? ' (' + order.promoCode + ')' : '') + ' - ' + who.email;
         var tg = el('a', 'ixp-btn', 'Message ' + handle(payment.contact) + ' on Telegram'); tg.href = payment.contact + '?text=' + encodeURIComponent(text); tg.target = '_blank'; tg.rel = 'noopener noreferrer'; box.appendChild(tg);
         var copy = el('button', 'ixp-btn alt', 'Copy order code'); copy.type = 'button';
         copy.onclick = function () { (navigator.clipboard ? navigator.clipboard.writeText(order.ref) : Promise.reject()).then(function () { copy.textContent = 'Copied'; }, function () { copy.textContent = order.ref; }); };
@@ -214,6 +257,9 @@
     load();
     api('/api/premium/status').then(function (s) { state.status = s; if (state.data) render(); }).catch(function () { });
     var q = new URLSearchParams(location.search), why = q.get('premium');
+    // /Price?promo=CODE (the "Upgrade" link of the promo strip): the code is checked and added to the order window
+    var code = (q.get('promo') || '').trim();
+    if (code) checkPromo(code).then(function () { if (state.data) render(); }).catch(function (e) { state.promoCode = code; state.notice = e.message || 'This promo code is not valid.'; if (state.data) render(); });
     if (why === 'required' || why === 'limit') {
       var need = q.get('plan');
       var msg = why === 'limit' ? 'You have opened all the tests included in your plan. Pick a plan below to unlock more.'

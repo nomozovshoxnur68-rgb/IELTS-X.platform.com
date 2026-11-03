@@ -5,7 +5,22 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
-  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo' };
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', sitecheck: 'Website check' };
+
+  /* A test, article, pack or lock saved here makes the copies of the card lists kept by the student pages old
+     (IELTSX.cachedJson in assets/js/app.js), so the change shows on the next page they open. */
+  if (window.fetch && !window.__ixAdminFetch) {
+    window.__ixAdminFetch = true;
+    const orig = window.fetch;
+    window.fetch = function (url, opt) {
+      const p = orig.apply(this, arguments);
+      const method = String((opt && opt.method) || 'GET').toUpperCase();
+      if (method !== 'GET' && /\/api\/admin\/(materials|access|packs|ai)/.test(String(url && url.url ? url.url : url))) {
+        p.then((r) => { if (r.ok) { try { localStorage.setItem('ix-materials-changed', String(Date.now())); } catch (e) { /* blocked */ } } }, () => {});
+      }
+      return p;
+    };
+  }
 
   let me = null, users = [], orders = [], audit = [], results = [], stats = null, plans = [];
   let userPage = 1, orderFilter = 'all', activityFilter = '', openUserId = null;
@@ -196,7 +211,7 @@
     $('#order-tabs').innerHTML = ['all', 'pending', 'paid', 'rejected', 'cancelled'].map((s) => `<button class="tab${orderFilter === s ? ' active' : ''}" data-order-tab="${s}" type="button">${s[0].toUpperCase() + s.slice(1)}<span class="n">${counts[s] || 0}</span></button>`).join('');
     const list = orders.filter((o) => orderFilter === 'all' || o.status === orderFilter);
     $('#orders-body').innerHTML = list.map((o) =>
-      `<tr><td><strong>${esc(o.ref)}</strong></td><td>${esc(o.userEmail)}</td><td>${esc(o.planName)} · ${o.months} mo</td><td class="nowrap">${money(o.amount, o.currency)}</td>` +
+      `<tr><td><strong>${esc(o.ref)}</strong></td><td>${esc(o.userEmail)}</td><td>${esc(o.planName)} · ${o.months} mo</td><td class="nowrap">${money(o.amount, o.currency)}${o.promoCode ? `<div class="muted sm">${esc(o.promoCode)} · −${money(o.discount, o.currency)}</div>` : ''}</td>` +
       `<td><span class="badge badge-${esc(o.status)}">${esc(o.status)}</span></td><td class="nowrap">${fmtDateTime(o.createdAt)}</td>` +
       `<td>${o.status === 'pending' ? `<div class="actions"><button class="btn btn-sm btn-primary" data-order-approve="${esc(o.id)}" type="button">Confirm payment</button><button class="btn btn-sm btn-danger" data-order-reject="${esc(o.id)}" type="button">Reject</button></div>` : (o.paidAt ? '<span class="muted sm">paid ' + esc(fmtDate(o.paidAt)) + '</span>' : '—')}</td></tr>`).join('')
       || '<tr><td colspan="7" class="empty">No orders here.</td></tr>';

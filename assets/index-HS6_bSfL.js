@@ -8400,7 +8400,7 @@ function ad({user: t}) {
     })
 }
 id.displayName = fe.displayName;
-const sd = "/assets/ieltsx-only-logo-BajnupZg.png"
+const sd = "/assets/ieltsx-mark.png"
   , ld = () => {
     const {data: e, isLoading: t} = Ya();
     return {

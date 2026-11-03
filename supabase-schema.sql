@@ -115,3 +115,10 @@ alter table public.ieltsx_settings enable row level security;
 alter table public.ieltsx_materials drop constraint if exists ieltsx_materials_type_check;
 alter table public.ieltsx_materials add constraint ieltsx_materials_type_check
   check (type in ('reading','listening','writing','speaking','article','vocab','pdf'));
+
+-- ───────────── v8: promo codes on orders (run once on an existing database, safe to run again) ─────────────
+-- The code typed on the Price page, the money it saved and the price before the code. Without these columns an order
+-- with a code is still made at the lower price; the code is then only written in the activity log.
+alter table public.ieltsx_orders add column if not exists "promoCode" text not null default '';
+alter table public.ieltsx_orders add column if not exists "discount" integer not null default 0;
+alter table public.ieltsx_orders add column if not exists "fullAmount" integer not null default 0;

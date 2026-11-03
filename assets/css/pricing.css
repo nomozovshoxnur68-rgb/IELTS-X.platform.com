@@ -12,7 +12,8 @@ html.dark-mode .ixp-bar { background: #3b2f0b; color: #fde68a; }
 
 /* toggles */
 .ixp-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; margin-bottom: 30px; }
-.ixp-seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 14px; border: 1px solid hsl(var(--border)); background: hsl(var(--muted)); }
+.ixp-seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 14px; border: 1px solid hsl(var(--border)); background: hsl(var(--muted));; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.ixp-seg::-webkit-scrollbar { display: none; }
 .ixp-seg button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 0; border-radius: 10px; background: transparent; color: hsl(var(--muted-foreground)); font: 600 14px/1 system-ui, sans-serif; cursor: pointer; transition: background .15s, color .15s, box-shadow .15s; }
 .ixp-seg button:hover { color: hsl(var(--foreground)); }
 .ixp-seg button[aria-pressed="true"] { background: hsl(var(--background)); color: hsl(var(--foreground)); box-shadow: 0 1px 3px rgba(0, 0, 0, .18); }
@@ -91,3 +92,18 @@ html.dark-mode .ixp-yes { color: #4ade80; }
 .ixp-btn:disabled { opacity: .6; cursor: wait; }
 .ixp-code { margin: 0 0 12px; padding: 12px; border-radius: 12px; background: hsl(var(--muted)); font: 700 24px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; text-align: center; }
 .ixp-err { min-height: 0; margin: 0 0 10px; color: #dc2626; }
+
+/* promo code (order window + the note above the plans) */
+.ixp-promo { display: flex; gap: 8px; margin: 2px 0 6px; }
+.ixp-promo-in { flex: 1; min-width: 0; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid hsl(var(--border)); background: hsl(var(--background)); color: hsl(var(--foreground));
+  font: 600 14px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .04em; text-transform: uppercase; outline: none; }
+.ixp-promo-in::placeholder { text-transform: none; letter-spacing: 0; font-family: system-ui, sans-serif; font-weight: 400; }
+.ixp-promo-in:focus { border-color: hsl(var(--primary, 221 83% 53%)); box-shadow: 0 0 0 3px hsl(var(--primary, 221 83% 53%) / .18); }
+.ixp-promo-in[readonly] { background: hsl(var(--muted)); }
+.ixp-dlg .ixp-promo-btn { width: auto; margin: 0; padding: 0 16px; height: 40px; flex: none; }
+.ixp-dlg .ixp-promo-msg { min-height: 18px; margin: 0 0 10px; font-size: 13px; font-weight: 600; color: #16a34a; }
+.ixp-dlg .ixp-promo-msg.bad { color: #dc2626; }
+.ixp-was { font-weight: 500; color: hsl(var(--muted-foreground)); }
+.ixp-dlg .ixp-save { margin: -2px 0 6px; color: #16a34a; font-weight: 600; }
+.ixp-promo-bar { background: linear-gradient(90deg, rgba(124, 58, 237, .12), rgba(37, 99, 235, .12)); color: hsl(var(--foreground)); border: 1px solid rgba(99, 102, 241, .3); }
+.ixp-promo-code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .04em; padding: 1px 7px; border-radius: 6px; background: rgba(99, 102, 241, .16); }

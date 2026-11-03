@@ -40,11 +40,8 @@
         "articles": "/study/Tools/Articles",
         "vocabulary": "/vocabulary",
 
-        // ── account / support ──
+        // ── account ──
         "pricing": "/Price",
-        "telegram": "https://t.me/ieltsxuz",
-        "support": "mailto:support@ieltsx.com",
-        "feedback": "mailto:support@ieltsx.com?subject=IELTSX%20feedback",
         "admin-panel": "/admin"
     };
 

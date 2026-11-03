@@ -8373,7 +8373,7 @@ function rd({user: t}) {
     })
 }
 td.displayName = fe.displayName;
-const nd = "/assets/ieltsx-only-logo-BajnupZg.png"
+const nd = "/assets/ieltsx-mark.png"
   , od = () => {
     const {data: e, isLoading: t} = Ga();
     return {

@@ -409,3 +409,60 @@ The strip of numbers 1–40 shows what each number still needs. **Everything tog
   one (Test N, the pack's tier, "Pack | title", question types). An uploaded logo takes exactly the place of the built-in mark
   (it grew to the picture's own size in the reading header). Dark mode of the tests: a black page, no grey blocks behind the
   answer rows.
+
+## Website check, faster page changes, new Account page (November 2026)
+
+* **Website check** (`/admin#sitecheck`, `admin-sitecheck.js` + server module `site-check.js`, `GET /api/admin/site-check`):
+  a score out of 100 and every finding marked Passed / Note / Warning / Problem in four groups: setup and security (database,
+  session secret, e-mail, PUBLIC_URL, Google, AI, payment webhook, server memory), tests and articles (published Listening
+  without audio, tests without questions or answers, Reading without a passage, articles without a cover, uploaded files that
+  are missing), people and activity (accounts, tests this week, unconfirmed e-mails, orders waiting for payment, plans ending),
+  pages (broken links and pictures in every page, heavy files, title / description / viewport / language of the public pages).
+  The **Speed** table measures the main pages and API answers in the admin's own browser. Read only; the page scan runs in
+  small steps so visitors are not slowed down, and is kept for a minute (`?fresh=1` runs it again).
+* **Moving between pages is faster**:
+  * the server adds `?v=<file time>` to the styles and scripts of every page (`versionedPage` in `server.js`), so the browser
+    keeps them for a year (`immutable`) and asks again only when a file really changed. Before, every page asked the server
+    about ~25 files again (each a round trip). Module scripts keep their plain address (they import each other).
+  * local data file: `data/db.json` is read once and kept in memory until it changes on disk (it was read and parsed several
+    times per request). Supabase: logo, prices, packs, access rules and the test lists are kept for 5 s
+    (`memoGet`; a change made on this server clears them at once).
+  * links are fetched while the pointer rests on them (Chrome / Edge speculation rules, `<link rel=prefetch>` elsewhere;
+    `assets/js/loading.js`). Tests themselves, the API, the admin panel and sign-out are never fetched early, and the server
+    answers 503 to an early fetch of a locked test, so it never counts towards a plan's test allowance.
+* **Part Practice and Articles show at once**: grey placeholder cards (`.ix-skel`, styles in `loading.js`) until the list is
+  there; the list from `/api/materials` is kept in the tab for 10 minutes (`IELTSX.cachedJson` in `assets/js/app.js`), so a
+  page opened again draws its cards immediately and is updated in the background (the cards are drawn again only if the list
+  changed). Saving a test, an article, a pack or a lock in the admin panel makes those copies old; signing in or out drops them.
+  Empty pages say "coming soon" instead of showing an empty grid. The loading bar and spinner use the site's blue.
+* **Account** (`account.html`, `assets/js/account.js`, `assets/css/account.css`): profile card (verified / not, member since),
+  progress from the real results (tests finished, average and best band, time practised, the last five tests), tabs Profile /
+  Security (change password, signs out other devices) / Subscription (plan, days left, test allowance, orders) / Appearance
+  (Light / Dark / System). The made-up "AI usage", "Invites" and the Telegram / Instagram / WhatsApp / Facebook share buttons
+  are gone.
+* **Sidebar**: Support and Feedback (and Telegram on Speaking) are removed from every page. The old `@READING_CDI` /
+  `@ieltsxuz` Telegram promos of the tests, the listening start screen and the Price footer are removed; the brand in those
+  places is IELTSX. The payment contact set in Price control stays.
+* **Logo**: `assets/ieltsx-mark.png` is a real square IELTSX mark (the file used in the sidebars was the wide logo squeezed into
+  a square). The Reading and Writing test headers draw the IELTSX mark instead of a square with a slash. An uploaded logo in
+  the Writing exam bar and results no longer grows to 100 x 100 (the size of a hidden screen was read as 100px).
+* PDF materials show only the PDFs added in the admin panel (the five sample cards downloaded a one-page placeholder; set
+  `window.IELTSX_SHOW_BUILTIN_PDFS = true` to show them again). The Articles "Live Source Feed" tab (sample links to `#`) is
+  hidden. `sections/test-5.html` no longer asks for scripts that do not exist.
+
+## Promo codes (November 2026)
+
+* **Price control → Promo codes** (`admin-pricing.js`): code, discount (1–90 %), optional end date, optional plans
+  (none ticked = every plan), On / Off, and **Strip: Show** for the one code shown in the purple promo strip. The panel shows
+  how many orders used each code. The codes are kept in the pricing settings (`promos`); out of the box there is `MAY10`
+  (10 %, every plan, no end date, in the strip), the code the strip always showed.
+* **Price page** (`assets/js/pricing.js`): the order window has a promo code field; the server checks it
+  (`POST /api/promo/check`, rate limited) and `POST /api/orders` makes the order with the discount (rounded to 100 so'm).
+  The order keeps `promoCode`, `discount` and `fullAmount`; the admin Orders list, the student's account and the Telegram
+  message show them. A wrong, ended or other-plan code is refused by the server. The strip's "Upgrade" link
+  (`/Price?promo=CODE`) fills the code in.
+* **Promo strip** (`assets/js/promo.js`): the real code and percent from `/api/plans` (`promo`); a countdown only when the code
+  has an end date (the old one restarted for every visitor); no working code = no strip (hidden from the first paint by
+  `loading.js`). Clicking the code copies it.
+* **Supabase**: run the **v8 part** of `supabase-schema.sql` once (three columns on `ieltsx_orders`). Until then an order with
+  a code still gets the lower price and the code is written in the activity log; the Website check reminds you.

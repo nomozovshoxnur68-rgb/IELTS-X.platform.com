@@ -1936,7 +1936,7 @@ function renderResultsLegacy(){
       '<button class="btn btn-primary" onclick="ExamApp.reviewExam()">Review Test &amp; Transcript &rarr;</button>'+
     '</div>'+
     '<div class="cert-footer">'+
-      '<span>CDI Materials · @READING_CDI</span>'+
+      '<span>IELTSX</span>'+
       '<span class="cert-id">'+rid+'</span>'+
       '<span>Practice score — not an official IELTS result</span>'+
     '</div>'+
@@ -2208,7 +2208,7 @@ function printCertPage(rd,d,rid){
       t('Unanswered',nS,Math.round(nS/tot*100)+'% of the paper')+'</div></div></div>'+
     '<div class="pr-desc"><div class="pr-desc-h">'+bandDescHeading(band)+'</div>'+
     '<p>'+bandDescriptor(band).t+'</p></div>'+
-    '<div class="pr-foot"><span>CDI Materials · @READING_CDI · practice score, not an official IELTS result</span>'+
+    '<div class="pr-foot"><span>IELTSX · practice score, not an official IELTS result</span>'+
     '<span>'+rid+'</span></div></div>';
 }
 
@@ -2580,7 +2580,7 @@ function buildTranscriptPanel(){
   try{gradeListening().detail.forEach(function(d){verdicts[d.id]=d.status;});}catch(e){}
   let marked=0;
   let h='<div class="tp-hdr"><span class="tp-live-dot"></span>'+
-        '<span class="tp-hdr-lbl">READING_CDI &middot; Transcript</span>'+
+        '<span class="tp-hdr-lbl">IELTSX &middot; Transcript</span>'+
         '<span class="tp-hdr-count" id="tp-hdr-count"></span></div>';
   h+='<div class="tp-offline">'+
        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 8v5"/><path d="M12 16.5h.01"/><circle cx="12" cy="12" r="9"/></svg>'+

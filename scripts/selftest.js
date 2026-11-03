@@ -28,7 +28,7 @@ server.listen(0, async () => {
   try {
     // --- files that must never be downloadable
     for (const p of ['/data/db.json', '/data/.session-secret', '/server.js', '/package.json', '/.env.example', '/ADMIN_ACCESS.md', '/supabase-schema.sql', '/vercel.json', '/scripts/make-admin.js', '/api/../server.js', '/%2e%2e/server.js', '/..%2fserver.js', '/node_modules/x.js',
-      '/ai-provider.js', '/ai-generator.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js']) {
+      '/ai-provider.js', '/ai-generator.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
       const r = await call('GET', p); assert.ok([403, 404].includes(r.status), p + ' -> ' + r.status);
     }
     ok('server code, database and docs are not downloadable');
@@ -242,6 +242,51 @@ server.listen(0, async () => {
     r = await call('GET', '/api/branding'); assert.equal(r.json.logoUrl, 'https://cdn.example.com/logo.png'); assert.ok(/no-cache/.test(r.headers.get('cache-control')));
     await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: '', iconUrl: '' } });
     assert.equal((await call('GET', '/api/branding')).json.logoUrl, ''); ok('site logo: admin only, links checked, public read');
+
+    // --- Website check (admin panel) + speed: versioned styles/scripts, prefetch never opens a locked test
+    assert.equal((await call('GET', '/api/admin/site-check', { jar: user })).status, 403);
+    r = await call('GET', '/api/admin/site-check?fresh=1', { jar: boss }); assert.equal(r.status, 200);
+    assert.ok(r.json.score >= 0 && r.json.score <= 100 && r.json.sections.length >= 4, 'site check report');
+    assert.ok(r.json.sections.every((x) => x.items.every((i) => ['ok', 'info', 'warn', 'fail'].includes(i.level) && i.title)));
+    r = await call('GET', '/'); const vsrc = (r.text.match(/src="([^"]*loading\.js\?v=[0-9a-z]+)"/) || [])[1]; assert.ok(vsrc, 'scripts of a page carry ?v=');
+    r = await call('GET', vsrc); assert.equal(r.status, 200); assert.ok(/immutable/.test(r.headers.get('cache-control')), 'versioned script is kept');
+    assert.ok(/no-cache/.test((await call('GET', '/assets/js/loading.js')).headers.get('cache-control')), 'plain address is checked again');
+    r = await call('GET', '/full-tests/reading/test-1', { jar: user, headers: { 'sec-purpose': 'prefetch' } }); assert.equal(r.status, 503, 'prefetch of a locked test');
+    ok('website check (admin only) + versioned assets + no prefetch of locked tests');
+
+    // --- promo codes (Price control): the strip code is public, the server checks every code and makes the order with the discount
+    const buyer = boss;   // an account with no orders yet (orders are rate limited per account)
+    r = await call('GET', '/api/plans'); assert.deepEqual(r.json.promo, { code: 'MAY10', percent: 10, endsAt: '', plans: [] }, 'MAY10 works out of the box');
+    const std1 = r.json.plans.find((x) => x.id === 'standard').prices['1'];
+    assert.equal((await call('POST', '/api/promo/check', { body: { code: ' may10 ' } })).json.promo.percent, 10);
+    assert.equal((await call('POST', '/api/promo/check', { body: { code: 'NOPE99' } })).status, 404);
+    assert.equal((await call('POST', '/api/orders', { jar: buyer, body: { plan: 'standard', months: 1, promo: 'NOPE99' } })).status, 400, 'a wrong code is refused');
+    r = await call('POST', '/api/orders', { jar: buyer, body: { plan: 'standard', months: 1, promo: 'may10' } });
+    assert.equal(r.status, 201); assert.equal(r.json.order.promoCode, 'MAY10');
+    assert.equal(r.json.order.amount, Math.round(std1 * 0.9 / 100) * 100); assert.equal(r.json.order.discount, std1 - r.json.order.amount); assert.equal(r.json.order.fullAmount, std1);
+    const promoOrder = r.json.order;
+    r = await call('POST', '/api/orders', { jar: buyer, body: { plan: 'standard', months: 1, promo: 'MAY10' } }); assert.equal(r.json.order.id, promoOrder.id, 'the same order again');
+    r = await call('POST', '/api/orders', { jar: buyer, body: { plan: 'standard', months: 1 } }); assert.equal(r.json.order.amount, std1, 'without the code: full price');
+    assert.ok((await call('GET', '/api/orders', { jar: buyer })).json.orders.some((o) => o.id === promoOrder.id && o.status === 'cancelled'), 'the order with the code is replaced');
+    await call('POST', '/api/orders/' + r.json.order.id + '/cancel', { jar: buyer });
+    r = await call('GET', '/api/admin/orders', { jar: boss }); assert.ok(r.json.orders.some((o) => o.promoCode === 'MAY10'), 'admin sees the code');
+    // admin: a code for Max only, ending in the future, shown in the strip; an ended code does nothing
+    assert.equal((await call('POST', '/api/admin/pricing', { jar: user, body: { pricing: { promos: [] } } })).status, 403);
+    const soon = new Date(Date.now() + 3 * 86400000).toISOString();
+    r = await call('POST', '/api/admin/pricing', { jar: boss, body: { pricing: { promos: [
+      { code: 'max-20', percent: 20, active: true, banner: true, endsAt: soon, plans: ['max'] },
+      { code: 'OLD5', percent: 5, active: true, banner: true, endsAt: '2020-01-01T00:00:00Z', plans: [] },
+      { code: 'x', percent: 50 }, { code: 'TOOBIG', percent: 95 }] } } });
+    assert.equal(r.status, 200); assert.deepEqual(r.json.pricing.promos.map((p) => p.code), ['MAX-20', 'OLD5'], 'bad codes are dropped');
+    assert.equal(r.json.pricing.promos.filter((p) => p.banner).length, 1, 'one code in the strip');
+    assert.equal((await call('GET', '/api/plans')).json.promo.code, 'MAX-20');
+    assert.equal((await call('POST', '/api/promo/check', { body: { code: 'OLD5' } })).status, 404, 'an ended code');
+    r = await call('POST', '/api/orders', { jar: buyer, body: { plan: 'standard', months: 1, promo: 'MAX-20' } }); assert.equal(r.status, 400); assert.ok(/Max/.test(r.json.error));
+    await call('POST', '/api/admin/pricing', { jar: boss, body: { pricing: { promos: [] } } });
+    assert.equal((await call('GET', '/api/plans')).json.promo, null, 'no code: no strip');
+    await call('POST', '/api/admin/pricing', { jar: boss, body: { reset: true } });
+    assert.equal((await call('GET', '/api/plans')).json.promo.code, 'MAY10');
+    ok('promo codes: checked by the server, discount on the order, one code in the strip, plan-only and ended codes');
 
     // --- numbered tests: /pessages/test-N, /sections/test-N, /full-tests/...
     for (const u of ['/pessages/test-1.html', '/pessages/test-3.html', '/pessages/test-21.html', '/sections/test-1.html', '/sections/test-4.html', '/full-tests/reading/', '/full-tests/listening/', '/pessage6.html', '/free/section-2/library-services', '/full-tests/reading.html']) {

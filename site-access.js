@@ -91,6 +91,7 @@ document.addEventListener('click', onLogoutClick, true);
 
 function showVerifyBanner(user) {
   if (!user || user.emailVerified || document.getElementById('ix-verify-banner')) return;
+  if (document.getElementById('acc-verify')) return;   // the Account page shows its own notice
   try { if (sessionStorage.getItem('ix-verify-dismissed')) return; } catch (e) { /* ignore */ }
   const bar = document.createElement('div');
   bar.id = 'ix-verify-banner'; bar.setAttribute('role', 'status');

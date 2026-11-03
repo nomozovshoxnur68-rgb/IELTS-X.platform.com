@@ -7294,7 +7294,7 @@ function printCertPage(rd,d,rid){
       t('Unanswered',nS,Math.round(nS/tot*100)+'% of the paper')+'</div></div></div>'+
     '<div class="pr-desc"><div class="pr-desc-h">'+bandDescHeading(band)+'</div>'+
     '<p>'+bandDescriptor(band).t+'</p></div>'+
-    '<div class="pr-foot"><span>CDI Materials · @READING_CDI · practice score, not an official IELTS result</span>'+
+    '<div class="pr-foot"><span>IELTSX · practice score, not an official IELTS result</span>'+
     '<span>'+rid+'</span></div></div>';
 }
 
@@ -7682,7 +7682,7 @@ function buildTranscriptPanel(){
     tabs+='<button type="button" class="tp-tab'+(gi===0?' is-on':'')+'" data-part="'+(gi+1)+'">Part '+(gi+1)+'</button>';
   });
   let h='<div class="tp-hdr"><span class="tp-live-dot"></span>'+
-        '<span class="tp-hdr-lbl">READING_CDI &middot; Transcript</span>'+
+        '<span class="tp-hdr-lbl">IELTSX &middot; Transcript</span>'+
         '<span class="tp-hdr-count" id="tp-hdr-count"></span></div>';
   h+='<div class="tp-tabs">'+tabs+'</div>';
   h+='<div class="tp-wrap"><div class="tp-fade-top"></div><div class="tp-fade-bot"></div><div class="tp-body" id="tp-body">';

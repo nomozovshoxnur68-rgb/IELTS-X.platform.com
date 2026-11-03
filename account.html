@@ -72,6 +72,7 @@
     </style>
     <script src="assets/js/img-fallback.js" defer></script>
 <link rel="stylesheet" href="assets/css/ix-unified.css">
+<link rel="stylesheet" href="assets/css/account.css">
 </head>
 <body class="bg-background antialiased">
     <div id="root" class="min-h-screen w-full">
@@ -89,7 +90,7 @@
                                 <ul class="flex w-full min-w-0 flex-col gap-1">
                                     <li class="group/menu-item relative">
                                         <a class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none transition-all hover:bg-gray-100 hover:text-gray-900 h-12 text-sm md:h-8" href="./">
-                                            <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1"><img src="assets/ieltsx-only-logo-BajnupZg.png" alt="IELTSX" class="size-6"></div>
+                                            <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1"><img src="assets/ieltsx-mark.png" alt="IELTSX" class="size-6"></div>
                                             <div class="grid flex-1 text-left text-sm leading-tight logo-text">
                                                 <span class="truncate font-semibold">IELTSX</span>
                                                 <span class="truncate text-xs text-gray-500" data-plan-label>DEMO</span>
@@ -129,8 +130,7 @@
                                 </div>
                                 <!-- Bottom menu -->
                                 <div class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
-                                    <div class="w-full text-sm"><ul class="flex w-full min-w-0 flex-col gap-1"><li><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="Price"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span class="flex-1 menu-text">Pricing</span></a></li><li hidden data-admin-only><a hidden data-admin-only href="/admin" class="sidebar-link" data-admin-link><span aria-hidden="true">⚙</span><span class="flex-1">Admin Panel</span></a>
-<a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="mailto:support@ieltsx.com"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg><span class="flex-1 menu-text">Support</span></a></li><li><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="/"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span class="flex-1 menu-text">Feedback</span></a></li></ul></div>
+                                    <div class="w-full text-sm"><ul class="flex w-full min-w-0 flex-col gap-1"><li><a class="peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" href="Price"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span class="flex-1 menu-text">Pricing</span></a></li><li hidden data-admin-only><a hidden data-admin-only href="/admin" class="sidebar-link peer/menu-button flex w-full items-center gap-2 rounded-md p-2 hover:bg-gray-100 h-7 text-xs" data-admin-link><span aria-hidden="true">⚙</span><span class="flex-1 menu-text">Admin Panel</span></a></li></ul></div>
                                 </div>
                             </div>
                         </div>
@@ -166,14 +166,134 @@
                         </div>
                     </div>
                 </header>
-                <!-- Account Main Content (Tabs fully functional) -->
-                <div class="flex-1 overflow-auto"><div class="container max-w-7xl mx-auto p-6"><div class="max-w-6xl mx-auto"><div class="flex flex-col md:flex-row gap-6 mb-6"><div class="flex-1"><div class="w-full"><div class="h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground grid grid-cols-4 mb-8"><button data-tab="profile" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Profile</button><button data-tab="appearance" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Appearance</button><button data-tab="subscription" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Subscription</button><button data-tab="invites" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all">Invites</button></div>
-                    <div data-tab-panel="profile" class="space-y-6"><div class="rounded-xl border bg-card shadow"><div class="p-6 pb-2"><div class="font-semibold">Profile Information</div><div class="text-sm text-muted-foreground">Update your personal details</div></div><div class="p-6 pt-0"><form id="profileForm"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-sm font-medium">First Name</label><input class="flex h-9 w-full rounded-md border px-3 py-1 text-sm" value="" data-profile-first placeholder="First name"></div><div><label class="text-sm font-medium">Last Name</label><input class="flex h-9 w-full rounded-md border px-3 py-1 text-sm" value="" data-profile-last placeholder="Last name"></div><div><label class="text-sm font-medium">Email Address</label><input type="email" disabled value="" data-user-email-input class="flex h-9 w-full rounded-md border bg-muted px-3 py-1 text-sm"></div></div><div class="flex justify-end mt-4"><button type="submit" class="bg-primary text-white px-4 py-2 rounded-md text-sm">Save Changes</button></div></form></div></div><div class="rounded-xl border bg-card shadow"><div class="p-6 pb-2"><div class="font-semibold">Active Sessions</div><div class="text-sm text-muted-foreground">Manage your active login sessions</div></div><div class="p-6 pt-0 space-y-3"><div class="flex gap-3 p-3 rounded-lg border"><span class="text-xl">📱</span><div><p class="font-medium text-sm">Chrome on Android</p><p class="text-xs text-muted-foreground">21 days ago</p></div></div><div class="flex gap-3 p-3 rounded-lg border bg-accent/20"><span class="text-xl">🖥️</span><div><p class="font-medium text-sm">Chrome - Windows 10 <span class="ml-2 text-xs bg-primary/10 px-1.5 rounded">Current</span></p><p class="text-xs text-muted-foreground">4 minutes ago</p></div></div></div></div></div>
-                    <div data-tab-panel="appearance" class="hidden space-y-6"><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Interface Settings</div><div class="text-sm text-muted-foreground">Customize your application appearance</div></div><div class="p-6 pt-0 space-y-6"><div class="space-y-3"><div class="grid grid-cols-1 gap-4"><div class="flex items-center justify-between"><div><p class="font-medium">Theme</p><p class="text-sm text-muted-foreground">Switch between light and dark themes</p></div><div class="flex items-center gap-1 text-sm text-muted-foreground border border-border rounded-md p-1" id="theme-selector"><button data-theme="light" class="theme-opt p-1 rounded-sm hover:bg-muted transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button><button data-theme="dark" class="theme-opt p-1 rounded-sm hover:bg-muted transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button><button data-theme="system" class="theme-opt p-1 rounded-sm hover:bg-muted transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></button></div></div><div class="flex items-center justify-between"><div><p class="font-medium">Exam Interface Style</p><p class="text-sm text-muted-foreground">Choose your CD IELTS interface style</p></div><button id="exam-style-btn" class="flex h-9 items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm w-32"><span>IDP</span><svg class="h-4 w-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div></div></div></div></div></div>
-                    <div data-tab-panel="subscription" class="hidden space-y-6"><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">AI Usage</div><div class="text-sm text-muted-foreground">Your monthly AI feature usage</div></div><div class="p-6 pt-0 space-y-6"><div class="space-y-6"><div class="space-y-3"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18"/><path d="m2.3 2.3 7.286 7.286"/><circle cx="11" cy="11" r="2"/></svg><h3 class="font-medium">Writing Check</h3></div><div><div class="flex justify-between text-sm"><span>Used: 0 / 2</span><span class="text-green-600">2 remaining</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-2"><div class="h-full w-0 bg-primary transition-all"></div></div></div></div><div class="space-y-3"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg><h3 class="font-medium">Mock Writing Check</h3></div><div><div class="flex justify-between text-sm"><span>Used: 0 / 2</span><span class="text-green-600">2 remaining</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-2"><div class="h-full w-0 bg-primary transition-all"></div></div></div></div><div class="space-y-3"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg><h3 class="font-medium">Speaking Check</h3></div><div><div class="flex justify-between text-sm"><span>Used: 0 / 0</span><span class="text-red-600">0 remaining</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-2"><div class="h-full w-0 bg-primary"></div></div><div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md"><p class="text-sm text-amber-800 mb-2">You've reached your monthly speaking check limit.</p><button class="h-8 rounded-md px-3 text-xs border bg-background hover:bg-accent">Upgrade to Continue</button></div></div></div></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Subscription & Billing</div><div class="text-sm text-muted-foreground">Manage your subscription plan and payment methods.</div></div><div class="p-6 pt-0 space-y-6"><div class="space-y-3"><h3 class="text-lg font-medium">Current Plan</h3><div class="bg-primary/5 border border-primary/20 rounded-md p-4"><div class="flex justify-between items-start mb-3"><div><h4 class="font-semibold text-lg">DEMO</h4></div><div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold bg-primary text-primary-foreground">ACTIVE</div></div><div class="flex justify-between items-center"><div></div><button class="h-8 rounded-md px-3 text-xs border bg-background hover:bg-accent">Manage Subscription</button></div></div></div><div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4"><div class="flex items-center justify-between gap-4 flex-wrap"><div class="flex items-center gap-3"><div class="bg-blue-100 p-2 rounded-lg"><svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294zM5 21h14"/></svg></div><div><h3 class="text-sm font-medium text-blue-900">Demo Plan - Limited Access</h3><p class="text-xs text-blue-700">Upgrade to Standard for unlimited practice tests and AI feedback</p></div></div><div class="flex gap-2"><button class="h-8 rounded-md px-3 text-xs border border-blue-300 bg-background text-blue-600 hover:bg-blue-50">View Plans</button><button class="h-8 rounded-md px-3 text-xs bg-blue-600 text-white hover:bg-blue-700">Upgrade Now</button></div></div></div></div></div><div id="orders-card" class="rounded-xl border bg-card text-card-foreground shadow mt-6"><div class="p-6"><h3 class="font-semibold leading-none tracking-tight mb-1">Your orders</h3><p class="text-sm text-muted-foreground mb-4">Plans you ordered. We activate them as soon as the payment is confirmed.</p><div id="orders-list" class="space-y-3 text-sm">Loading...</div><a href="/Price" class="inline-block mt-4 text-sm font-medium underline underline-offset-4">Choose a plan</a></div></div>
-</div>
-                    <div data-tab-panel="invites" class="hidden space-y-6"><div><h2 class="text-2xl font-bold mb-4">Invite Your Friends</h2><div class="space-y-4"><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Your Progress</div><div class="text-sm text-muted-foreground">Track your invite progress and claim your reward</div><div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4"><div class="flex items-start gap-3"><div class="bg-blue-100 p-2 rounded-lg"><svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></div><div><h3 class="text-sm font-medium text-blue-900 mb-1">How It Works</h3><ul class="text-xs text-blue-700 space-y-1"><li>• Share your invite link with 10 friends</li><li>• They sign up and get 1 invite credit to start</li><li>• Join @ieltsxuz telegram channel</li><li>• You earn 1 month of STANDARD subscription (one-time reward)</li></ul></div></div></div></div><div class="p-6 pt-0 space-y-4"><div class="space-y-3"><div class="flex justify-between items-center"><span class="text-sm font-medium">Signups</span><span class="text-xl font-bold text-primary">0 / 10</span></div><div class="relative w-full overflow-hidden rounded-full bg-primary/20 h-3"><div class="h-full w-0 bg-primary transition-all"></div></div><p class="text-xs text-muted-foreground text-center">10 more signups needed</p></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Your Invite Link</div><div class="text-sm text-muted-foreground">Share this with your friends to get started</div></div><div class="p-6 pt-0 space-y-4"><div class="space-y-2"><label class="text-sm font-medium">Invite Link</label><div class="flex gap-2"><input id="invite-link-input" class="flex h-9 w-full rounded-md border px-3 py-1 text-sm" readonly value="https://ieltsx.com/login?invite=KDAQ3TFG"><button id="copyInviteLink" class="h-9 w-9 shrink-0 border rounded-md hover:bg-accent"><svg class="h-4 w-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button></div></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="font-semibold leading-none tracking-tight">Share via Social Media</div><div class="text-sm text-muted-foreground">Quick share to your favorite platforms</div></div><div class="p-6 pt-0"><div class="grid grid-cols-2 gap-3"><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="Telegram"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Telegram</button><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="Instagram"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Instagram</button><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="WhatsApp"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>WhatsApp</button><button class="share-social h-9 px-4 py-2 w-full border rounded-md hover:bg-accent flex items-center justify-center gap-2" data-platform="Facebook"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Facebook</button></div></div></div><div class="rounded-xl border bg-card shadow"><div class="flex flex-col space-y-1.5 p-6"><div class="flex items-center gap-2"><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><div class="font-semibold leading-none tracking-tight">Your Statistics</div></div></div><div class="p-6 pt-0"><div class="grid grid-cols-2 gap-4"><div class="text-center p-4 bg-muted rounded-lg"><p class="text-3xl font-bold text-primary">0</p><p class="text-sm text-muted-foreground mt-1">Successful Invites</p></div><div class="text-center p-4 bg-muted rounded-lg"><p class="text-3xl font-bold text-primary">10</p><p class="text-sm text-muted-foreground mt-1">Remaining</p></div></div></div></div></div></div></div>
-                </div></div><div class="rounded-xl border bg-card shadow w-full md:w-80 h-fit"><div class="p-6 text-center"><div class="flex justify-center mb-4"><span class="relative flex h-24 w-24 items-center justify-center rounded-full bg-slate-800 text-white text-4xl font-medium" data-user-initial>?</span></div><div class="font-semibold text-lg" data-user-name>Guest</div><div class="text-sm text-muted-foreground" data-user-email>Not signed in</div><div class="mt-3"><span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs bg-slate-100" data-plan-label>DEMO</span></div></div><div class="p-6 pt-0"><button id="learning-stats-btn" class="w-full border rounded-md py-2 text-sm flex items-center justify-center gap-2 hover:bg-accent"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294zM5 21h14"/></svg> View Learning Statistics</button></div></div></div></div></div></div>
+                <!-- Account (assets/js/account.js fills it from the session, /api/results, /api/premium/status and /api/orders) -->
+                <div class="flex-1 overflow-auto">
+                    <div class="acc">
+                        <section class="acc-hero acc-card">
+                            <div class="acc-hero-main">
+                                <span class="acc-avatar" data-user-initial aria-hidden="true">?</span>
+                                <div class="acc-id">
+                                    <h1 class="acc-name" data-user-name>Guest</h1>
+                                    <p class="acc-email" data-user-email>Not signed in</p>
+                                    <div class="acc-badges">
+                                        <span class="acc-pill plan" data-plan-label>DEMO</span>
+                                        <span class="acc-pill" id="acc-verified" hidden></span>
+                                        <span class="acc-pill muted" id="acc-since" hidden></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="acc-hero-actions">
+                                <a class="acc-btn ghost" href="/study/Tools/Performance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>Performance</a>
+                                <a class="acc-btn" id="acc-upgrade" href="/Price"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294zM5 21h14"/></svg><span>Upgrade</span></a>
+                            </div>
+                        </section>
+
+                        <div class="acc-verify" id="acc-verify" hidden>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <div><strong>Confirm your e-mail address.</strong> We sent you a link when you signed up. It keeps your account safe and lets you reset your password.</div>
+                            <button type="button" class="acc-btn sm" id="acc-verify-send">Send the link again</button>
+                        </div>
+
+                        <section class="acc-stats" aria-label="Your progress">
+                            <div class="acc-stat"><span class="acc-stat-label">Tests finished</span><span class="acc-stat-value" id="st-tests">—</span><span class="acc-stat-sub" id="st-tests-sub">&nbsp;</span></div>
+                            <div class="acc-stat"><span class="acc-stat-label">Average band</span><span class="acc-stat-value" id="st-avg">—</span><span class="acc-stat-sub" id="st-avg-sub">&nbsp;</span></div>
+                            <div class="acc-stat"><span class="acc-stat-label">Best band</span><span class="acc-stat-value" id="st-best">—</span><span class="acc-stat-sub" id="st-best-sub">&nbsp;</span></div>
+                            <div class="acc-stat"><span class="acc-stat-label">Time practised</span><span class="acc-stat-value" id="st-time">—</span><span class="acc-stat-sub" id="st-time-sub">&nbsp;</span></div>
+                        </section>
+
+                        <nav class="acc-tabs" role="tablist" aria-label="Account sections">
+                            <button type="button" role="tab" class="acc-tab" data-tab="profile">Profile</button>
+                            <button type="button" role="tab" class="acc-tab" data-tab="security">Security</button>
+                            <button type="button" role="tab" class="acc-tab" data-tab="subscription">Subscription</button>
+                            <button type="button" role="tab" class="acc-tab" data-tab="appearance">Appearance</button>
+                        </nav>
+
+                        <!-- PROFILE -->
+                        <div class="acc-panel" data-tab-panel="profile" role="tabpanel">
+                            <div class="acc-grid">
+                                <section class="acc-card">
+                                    <h2>Personal details</h2>
+                                    <p class="acc-sub">Your name is shown on your results.</p>
+                                    <form id="profileForm" class="acc-form" novalidate>
+                                        <div class="acc-row">
+                                            <label class="acc-field"><span>First name</span><input data-profile-first autocomplete="given-name" maxlength="60" placeholder="First name"></label>
+                                            <label class="acc-field"><span>Last name</span><input data-profile-last autocomplete="family-name" maxlength="60" placeholder="Last name"></label>
+                                        </div>
+                                        <label class="acc-field"><span>E-mail address</span><input type="email" disabled data-user-email-input></label>
+                                        <div class="acc-actions"><button type="submit" class="acc-btn">Save changes</button></div>
+                                    </form>
+                                </section>
+                                <section class="acc-card">
+                                    <div class="acc-card-head"><div><h2>Recent tests</h2><p class="acc-sub">Your last finished tests on any device.</p></div><a class="acc-link" href="/study/Tools/Performance">See all →</a></div>
+                                    <div id="acc-recent" class="acc-list"><div class="ix-skel" style="height:44px"></div><div class="ix-skel" style="height:44px"></div><div class="ix-skel" style="height:44px"></div></div>
+                                </section>
+                            </div>
+                        </div>
+
+                        <!-- SECURITY -->
+                        <div class="acc-panel" data-tab-panel="security" role="tabpanel" hidden>
+                            <div class="acc-grid">
+                                <section class="acc-card">
+                                    <h2>Change password</h2>
+                                    <p class="acc-sub" id="pwd-sub">Use at least 8 characters. Your other devices are signed out after the change.</p>
+                                    <form id="passwordForm" class="acc-form" novalidate>
+                                        <label class="acc-field" id="pwd-current-row"><span>Current password</span><input type="password" id="pwd-current" autocomplete="current-password"></label>
+                                        <label class="acc-field"><span>New password</span><input type="password" id="pwd-new" autocomplete="new-password" minlength="8"></label>
+                                        <label class="acc-field"><span>Repeat the new password</span><input type="password" id="pwd-repeat" autocomplete="new-password" minlength="8"></label>
+                                        <div class="acc-meter" aria-hidden="true"><i id="pwd-meter"></i></div>
+                                        <div class="acc-actions"><button type="submit" class="acc-btn">Update password</button></div>
+                                    </form>
+                                </section>
+                                <section class="acc-card">
+                                    <h2>Sign-in</h2>
+                                    <p class="acc-sub">Where you are signed in now.</p>
+                                    <div class="acc-device">
+                                        <span class="acc-device-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+                                        <div><div class="acc-device-name" id="acc-device">This device</div><div class="acc-sub">Active now · this browser</div></div>
+                                        <span class="acc-pill ok">Current</span>
+                                    </div>
+                                    <div class="acc-divider"></div>
+                                    <p class="acc-sub">Changing your password signs you out on every other device at once.</p>
+                                    <div class="acc-actions start"><button type="button" class="acc-btn danger ghost" data-action-logout>Log out</button></div>
+                                </section>
+                            </div>
+                        </div>
+
+                        <!-- SUBSCRIPTION -->
+                        <div class="acc-panel" data-tab-panel="subscription" role="tabpanel" hidden>
+                            <div class="acc-grid">
+                                <section class="acc-card acc-plan">
+                                    <h2>Your plan</h2>
+                                    <div class="acc-plan-row">
+                                        <div><div class="acc-plan-name" id="plan-name">Demo</div><div class="acc-sub" id="plan-status">Free practice tests</div></div>
+                                        <span class="acc-pill" id="plan-pill">Free</span>
+                                    </div>
+                                    <div class="acc-meter big" id="plan-meter-wrap" hidden><i id="plan-meter"></i></div>
+                                    <div class="acc-sub" id="plan-quota" hidden></div>
+                                    <div class="acc-actions start"><a class="acc-btn" id="plan-cta" href="/Price">See plans</a></div>
+                                </section>
+                                <section class="acc-card">
+                                    <h2>Your orders</h2>
+                                    <p class="acc-sub">Plans you ordered. We turn them on as soon as the payment is confirmed.</p>
+                                    <div id="orders-list" class="acc-list"><div class="ix-skel" style="height:52px"></div><div class="ix-skel" style="height:52px"></div></div>
+                                </section>
+                            </div>
+                        </div>
+
+                        <!-- APPEARANCE -->
+                        <div class="acc-panel" data-tab-panel="appearance" role="tabpanel" hidden>
+                            <section class="acc-card">
+                                <h2>Theme</h2>
+                                <p class="acc-sub">Choose how IELTSX looks on this device. The tests follow the same theme.</p>
+                                <div class="acc-themes" role="radiogroup" aria-label="Theme">
+                                    <button type="button" class="acc-theme theme-opt" data-theme="light" role="radio"><span class="acc-theme-prev light"><i></i><i></i><i></i></span>Light</button>
+                                    <button type="button" class="acc-theme theme-opt" data-theme="dark" role="radio"><span class="acc-theme-prev dark"><i></i><i></i><i></i></span>Dark</button>
+                                    <button type="button" class="acc-theme theme-opt" data-theme="system" role="radio"><span class="acc-theme-prev system"><i></i><i></i><i></i></span>System</button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>

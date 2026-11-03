@@ -4074,7 +4074,7 @@ function printCertPage(rd, band, d) {
     '<div><div class="l">Test date</div><div class="v">' + certDateStr(d) + '</div></div>' +
     '<div><div class="l">Module</div><div class="v mod">Academic Reading</div></div>' +
     '<div><div class="l">Report no.</div><div class="v" style="font-size:8.2pt;letter-spacing:.03em;white-space:nowrap">' + id + '</div></div></div>';
-  const foot = '<div class="pr-foot"><span>READING CDI · @READING_CDI · practice score, not an official IELTS result</span>' +
+  const foot = '<div class="pr-foot"><span>IELTSX · practice score, not an official IELTS result</span>' +
     '<span>' + id + '</span></div>';
 
   const ticks = [0,1,2,3,4,5,6,7,8,9].map(n =>
