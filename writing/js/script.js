@@ -8,7 +8,7 @@
      3. Chart rendering
      4. Parts, timer, word count, autosave
      5. UI: divider, modals, settings, fullscreen
-     6. AI grading (gradeWithAI) + normalisation + mock
+     6. AI check (the server keeps the key: POST /api/ai/writing, see ai-examiner.js)
      7. Results renderer
      8. Flow control (load -> start -> exam -> submit -> results)
    ========================================================= */
@@ -50,63 +50,11 @@
     exam: null,                       // DEMO_EXAM or the admin test, set by loadExam()
     testsPage: '/part/practice/writing',
     supportEmail: 'support@ieltsx.com',
-
-    /**
-     * AI SETTINGS
-     * --------------------------------------------------------
-     * endpoint : URL of YOUR backend (recommended) that calls the AI model.
-     *            NEVER put a secret API key in browser code in production –
-     *            keep the key on the server and let the endpoint proxy it.
-     *            Leave '' to use the built-in offline MOCK grader (demo only).
-     *
-     * The endpoint receives POST JSON (one request per task):
-     *   { prompt, systemPrompt, examId, taskId, taskType, taskPrompt, chartData, imageUrl,
-     *     answer, wordCount, timeSpentSeconds, model }
-     * and must reply with JSON that matches the schema in AI_SCHEMA below
-     * (either directly, or as a string inside { result | content | text | output }).
-     *
-     * If you need a custom body (e.g. OpenAI / Anthropic format) set
-     * `buildRequestBody(payload)` and `extractText(responseJson)`.
-     */
-    ai: {
-      endpoint: '',                 // e.g. 'https://your-server.com/api/grade-writing'
-      apiKey: '',                   // optional; sent as Bearer token (prefer server-side keys)
-      model: 'default',
-      timeoutMs: 60000,
-      retries: 1,
-      headers: {},                  // extra headers
-      buildRequestBody: null,       // (payload) => object
-      extractText: null,            // (json) => string | object
-      useMockOnError: false,        // true = fall back to mock if the API fails
-    },
-  };
-
-  const AI_SCHEMA = {
-    overall: 6.5,
-    summary: 'string',
-    criteria: {
-      taskAchievement: { band: 6.5, points: ['string'] },
-      coherenceCohesion: { band: 6.5, points: ['string'] },
-      lexicalResource: { band: 6.5, points: ['string'] },
-      grammarAccuracy: { band: 6.5, points: ['string'] },
-    },
-    problems: { language: ['string'], content: ['string'], structure: ['string'] },
-    sampleAnswer: 'string (paragraphs separated by \\n\\n)',
-    keyImprovements: ['string'],
-    plan: [{ title: 'Task Response', text: 'string' }],
+    ai: { endpoint: '/api/ai/writing', timeoutMs: 70000, retries: 1 },
   };
 
   const isTask2 = (task) => task.kind === 'task2';
-  const taskType = (task) => (isTask2(task) ? 'Writing Task 2 (essay)'
-    : 'Academic Writing Task 1' + (task.chart ? ' (line graph)' : task.imageUrl ? ' (visual information)' : ''));
   const firstCriterion = (task) => (isTask2(task) ? 'Task Response' : 'Task Achievement');
-
-  const systemPrompt = (task) =>
-    'You are a certified IELTS examiner. Assess the candidate\'s ' + taskType(task) + ' strictly with the official ' +
-    'IELTS public band descriptors (' + firstCriterion(task) + ', Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy). ' +
-    'Use half-band steps (e.g. 6.5). Quote real mistakes from the candidate text. ' + (task.chart ? 'Be accurate about the chart data. ' : '') +
-    'Respond with ONE valid JSON object only, no markdown, matching exactly this schema ' +
-    '(put the ' + firstCriterion(task) + ' band in criteria.taskAchievement): ' + JSON.stringify(AI_SCHEMA);
 
   /* ---------------------------------------------------------
      2. Utils & Storage
@@ -457,61 +405,27 @@
   }
 
   /* ---------------------------------------------------------
-     6. AI grading
+     6. AI check: one request per task; the server has the key and works out the bands
      --------------------------------------------------------- */
-  function buildUserPrompt(task, p) {
-    const lines = [`TASK TYPE: ${p.taskType}`, `TASK PROMPT: ${p.taskPrompt}`];
-    if (task.chart) {
-      const chartLines = task.chart.series
-        .map((s) => `- ${s.name}: ` + task.chart.years.map((y, i) => `${y}=${s.values[i]}`).join(', '))
-        .join('\n');
-      lines.push(`CHART DATA${task.chart.unit ? ` (${task.chart.unit})` : ''}:\n${chartLines}`);
-    }
-    if (task.imageUrl) lines.push(`TASK PICTURE: ${task.imageUrl}`);
-    lines.push(
-      `MINIMUM WORDS: ${task.minWords}`,
-      `CANDIDATE WORD COUNT: ${p.wordCount}`,
-      `TIME SPENT ON THE WHOLE TEST: ${Math.round(p.timeSpentSeconds / 60)} minutes`,
-      'CANDIDATE ANSWER:\n"""\n' + p.answer + '\n"""',
-      'Return the JSON object now.',
-    );
-    return lines.join('\n\n');
-  }
-
-  function extractJSON(text) {
-    if (text && typeof text === 'object') return text;
-    const str = String(text || '').replace(/```json|```/gi, '');
-    const a = str.indexOf('{'), b = str.lastIndexOf('}');
-    if (a < 0 || b <= a) throw new Error('AI did not return JSON.');
-    return JSON.parse(str.slice(a, b + 1));
-  }
-
   const arr = (v) => (Array.isArray(v) ? v.map(String).filter(Boolean) : (v ? [String(v)] : []));
+  const MIN_WORDS_TO_CHECK = 20;
 
-  /** Accepts several key spellings and always returns a complete, safe object. */
+  /** Always returns a complete, safe object. */
   function normalizeResult(raw) {
     const c = raw.criteria || {};
-    const pick = (...keys) => { for (const k of keys) if (c[k] != null) return c[k]; return {}; };
-    const crit = (o) => ({ band: roundHalf(o.band ?? o.score), points: arr(o.points ?? o.feedback ?? o.comments) });
-    const criteria = {
-      taskAchievement: crit(pick('taskAchievement', 'task_achievement', 'ta', 'taskResponse', 'task_response', 'tr')),
-      coherenceCohesion: crit(pick('coherenceCohesion', 'coherence_cohesion', 'cc')),
-      lexicalResource: crit(pick('lexicalResource', 'lexical_resource', 'lr')),
-      grammarAccuracy: crit(pick('grammarAccuracy', 'grammatical_range_accuracy', 'gra', 'grammar')),
-    };
-    const bands = Object.values(criteria).map((x) => x.band);
-    const avg = bands.reduce((a, b) => a + b, 0) / (bands.length || 1);
-    const pr = raw.problems || {};
+    const crit = (o) => ({ band: roundHalf(o && o.band), comment: String((o && o.comment) || ''), points: arr(o && o.points) });
     return {
-      overall: roundHalf(raw.overall ?? raw.band ?? avg),
+      overall: roundHalf(raw.overall),
       summary: String(raw.summary || ''),
-      criteria,
-      problems: { language: arr(pr.language), content: arr(pr.content), structure: arr(pr.structure) },
-      sampleAnswer: String(raw.sampleAnswer || raw.sample_answer || ''),
-      keyImprovements: arr(raw.keyImprovements || raw.key_improvements),
-      plan: (Array.isArray(raw.plan) ? raw.plan : []).map((p) =>
-        typeof p === 'string' ? { title: '', text: p } : { title: String(p.title || ''), text: String(p.text || p.description || '') }),
-      meta: { source: raw.meta?.source || 'ai' },
+      strengths: arr(raw.strengths),
+      criteria: { taskAchievement: crit(c.taskAchievement), coherenceCohesion: crit(c.coherenceCohesion), lexicalResource: crit(c.lexicalResource), grammarAccuracy: crit(c.grammarAccuracy) },
+      grammar: (Array.isArray(raw.grammar) ? raw.grammar : []).map((g) => ({ wrong: String(g.wrong || ''), correct: String(g.correct || ''), why: String(g.why || '') })),
+      vocabulary: (Array.isArray(raw.vocabulary) ? raw.vocabulary : []).map((v) => ({ word: String(v.word || ''), better: arr(v.better), why: String(v.why || ''), example: String(v.example || '') })),
+      sampleAnswer: String(raw.sampleAnswer || ''),
+      sampleIsModel: !!raw.sampleIsModel,
+      plan: (Array.isArray(raw.plan) ? raw.plan : []).map((p) => ({ title: String(p.title || ''), text: String(p.text || '') })),
+      quota: raw.quota || null,
+      meta: { source: (raw.meta && raw.meta.source) || 'ai' },
     };
   }
 
@@ -522,156 +436,50 @@
     finally { clearTimeout(t); }
   }
 
+  const aiError = (message, status) => { const e = new Error(message); e.status = status; return e; };
+
   /**
-   * Main entry for the AI examiner (one call per task).
+   * The AI check of one task.
    * @param {object} task  one of CONFIG.exam.tasks
    * @param {{answer:string, wordCount:number}} part  the candidate's answer to it
-   * @param {number} timeSpentSeconds
    * @returns {Promise<object>} normalised result
    */
-  async function gradeWithAI(task, part, timeSpentSeconds) {
+  async function gradeWithAI(task, part) {
     const { ai, exam } = CONFIG;
-    if (!part.answer.trim()) return normalizeResult(emptyAnswerResult(task));
-
-    const payload = {
-      prompt: '',
-      systemPrompt: systemPrompt(task),
-      examId: exam.id,
-      taskId: task.id,
-      taskType: taskType(task),
-      taskPrompt: task.prompt,
-      chartData: task.chart || null,
-      imageUrl: task.imageUrl || null,
-      answer: part.answer,
-      wordCount: part.wordCount,
-      timeSpentSeconds,
-      model: ai.model,
-    };
-    payload.prompt = buildUserPrompt(task, payload);
-
-    if (!ai.endpoint) return mockGrade(task, part);
-
-    const body = typeof ai.buildRequestBody === 'function' ? ai.buildRequestBody(payload) : payload;
-    const headers = { 'Content-Type': 'application/json', ...ai.headers };
-    if (ai.apiKey) headers.Authorization = `Bearer ${ai.apiKey}`;
-
+    if (part.wordCount < MIN_WORDS_TO_CHECK) return normalizeResult(emptyAnswerResult(task, part.wordCount));   // nothing to check: no request, no check used
+    const body = exam.materialId
+      ? { materialId: exam.materialId, taskId: task.id, answer: part.answer, lang: prefs.get('ai-lang', 'en') }
+      : { examId: exam.id, title: exam.title, taskKind: task.kind, taskPrompt: task.prompt, chart: task.chart || null, minWords: task.minWords, answer: part.answer, lang: prefs.get('ai-lang', 'en') };
     let lastErr;
     for (let attempt = 0; attempt <= ai.retries; attempt++) {
       try {
-        const res = await fetchWithTimeout(ai.endpoint, { method: 'POST', headers, body: JSON.stringify(body) }, ai.timeoutMs);
-        if (!res.ok) throw new Error(`AI server error ${res.status}`);
-        const json = await res.json();
-        let raw = typeof ai.extractText === 'function'
-          ? ai.extractText(json)
-          : (json.result ?? json.content ?? json.text ?? json.output ?? json.choices?.[0]?.message?.content ?? json);
-        raw = extractJSON(raw);
-        const out = normalizeResult(raw);
-        out.meta.source = 'ai';
-        return out;
+        const res = await fetchWithTimeout(ai.endpoint, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, ai.timeoutMs);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) throw aiError(json.error || `The AI check failed (${res.status}). Please try again.`, res.status);
+        return normalizeResult(json);
       } catch (err) {
-        lastErr = err.name === 'AbortError' ? new Error('AI request timed out.') : err;
-        if (attempt < ai.retries) await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+        lastErr = err.name === 'AbortError' ? aiError('The AI took too long to answer. Please try again.', 504)
+          : err.status ? err : aiError('The server could not be reached. Check your connection and try again.', 0);
+        if (lastErr.status && lastErr.status < 502) break;               // signing in, a limit or a bad request: asking again changes nothing
+        if (attempt < ai.retries) await new Promise((r) => setTimeout(r, 1200));
       }
     }
-    if (ai.useMockOnError) return mockGrade(task, part);
     throw lastErr;
   }
 
-  function emptyAnswerResult(task) {
-    const z = { band: 0, points: ['No answer was submitted.'] };
+  function emptyAnswerResult(task, words) {
+    const z = { band: 0, points: [words ? 'The answer is too short to assess.' : 'No answer was submitted.'] };
     return {
       overall: 0,
-      summary: 'No response was submitted, so the task cannot be assessed (Band 0 on all criteria).',
+      summary: words ? `This answer has only ${words} word${words === 1 ? '' : 's'}, which is too short to assess (Band 0 on all criteria).` : 'No response was submitted, so the task cannot be assessed (Band 0 on all criteria).',
+      strengths: [], grammar: [], vocabulary: [],
       criteria: { taskAchievement: z, coherenceCohesion: z, lexicalResource: z, grammarAccuracy: z },
-      problems: { language: [], content: [isTask2(task)
+      sampleAnswer: '',
+      plan: [{ title: firstCriterion(task), text: isTask2(task)
         ? `Write at least ${task.minWords} words that answer every part of the question with a clear position.`
-        : `Write at least ${task.minWords} words describing the main features and comparing the data.`], structure: [] },
-      sampleAnswer: '', keyImprovements: [], plan: [],
+        : `Write at least ${task.minWords} words describing the main features and comparing the data.` }],
       meta: { source: 'empty' },
     };
-  }
-
-  /** Offline demo grader – replace by a real endpoint in CONFIG.ai.endpoint */
-  async function mockGrade(task, part) {
-    await new Promise((r) => setTimeout(r, 1400));
-    const text = part.answer;
-    const words = part.wordCount;
-    const t2 = isTask2(task);
-    const sentences = text.split(/[.!?]+/).filter((s) => s.trim()).length || 1;
-    const avgLen = words / sentences;
-    const paragraphs = text.split(/\n\s*\n/).filter((s) => s.trim()).length;
-    const linkers = (text.match(/\b(however|whereas|while|in contrast|overall|meanwhile|similarly|by contrast|furthermore|moreover|respectively|therefore|consequently|in addition)\b/gi) || []).length;
-    const low = words < task.minWords;
-
-    let ta, lr, detected, tips;
-    if (!t2) {
-      const years = (text.match(/\b(19|20)\d{2}\b/g) || []).length;
-      const nums = (text.match(/\b\d+(\.\d+)?%?/g) || []).length;
-      const verbs = (text.match(/\b(rose|fell|increased|decreased|declined|climbed|dropped|peaked|remained|fluctuated|stabilised|stabilized|doubled|plummeted)\b/gi) || []).length;
-      const overview = /\boverall\b/i.test(text);
-      ta = 4 + Math.min(2.5, nums / 8) + (low ? -1 : 0.5) + (overview ? 0.5 : 0);
-      lr = 4.5 + Math.min(2.5, verbs * 0.35);
-      detected = `Detected ${years} year references, ${nums} figures, ${linkers} linking devices and ${verbs} trend verbs. `;
-      tips = {
-        ta: [nums >= 6 ? 'Key data points are supported with figures.' : 'Support the main trends with more specific figures.',
-          overview ? 'A clear overview is present.' : 'Add a clear overview paragraph that highlights the main trends.'],
-        lr: verbs >= 5 ? 'Good range of trend vocabulary.' : 'Vary trend verbs and nouns (rose, climbed, a steady decline, levelled off).',
-        content: 'Compare the categories directly, noting where the lines cross or the trends change direction.',
-        structure: 'Use 4 paragraphs: introduction, overview, two detail paragraphs.',
-        keys: ['Clear overview', 'Accurate figures with comparisons', 'Wide range of trend vocabulary', 'Varied complex structures'],
-      };
-    } else {
-      const positions = (text.match(/\b(in my (opinion|view)|i (strongly )?(believe|think|agree|disagree)|i would argue|this essay (will )?(argue|agree|disagree))/gi) || []).length;
-      const examples = (text.match(/\b(for example|for instance|such as)\b/gi) || []).length;
-      const conclusion = /\b(in conclusion|to conclude|to sum up|in summary)\b/i.test(text);
-      const all = text.toLowerCase().match(/[a-z']+/g) || [];
-      const variety = all.length ? new Set(all).size / all.length : 0;
-      ta = 4 + (low ? -1 : 0.5) + Math.min(1.5, positions * 0.5) + Math.min(1, examples * 0.5) + (conclusion ? 0.5 : 0);
-      lr = 4.5 + Math.max(0, Math.min(2.5, (variety - 0.4) * 9));
-      detected = `Detected ${paragraphs} paragraphs, ${positions} position statements, ${examples} examples and ${linkers} linking devices. `;
-      tips = {
-        ta: [positions ? 'Your position is stated.' : 'State your position clearly in the introduction and keep it to the end.',
-          examples >= 2 ? 'Ideas are supported with examples.' : 'Support each main idea with an explanation and a specific example.'],
-        lr: variety > 0.55 ? 'Good variety of vocabulary.' : 'Avoid repeating the same words; use topic-specific collocations.',
-        content: 'Answer every part of the question and develop each idea fully.',
-        structure: 'Use 4–5 paragraphs: introduction, two or three body paragraphs, conclusion.',
-        keys: ['Clear position throughout', 'Fully developed main ideas', 'Precise topic vocabulary', 'Varied complex structures'],
-      };
-    }
-    const cc = 4.5 + Math.min(2, linkers * 0.4) + (paragraphs >= (t2 ? 4 : 3) ? 0.5 : 0);
-    const gra = 4.5 + Math.min(2, (avgLen - 8) / 5) + (/[,;]/.test(text) ? 0.5 : 0);
-    const bands = { ta: roundHalf(ta), cc: roundHalf(cc), lr: roundHalf(lr), gra: roundHalf(gra) };
-
-    return normalizeResult({
-      meta: { source: 'mock' },
-      overall: (bands.ta + bands.cc + bands.lr + bands.gra) / 4,
-      summary: '[DEMO RESULT – offline mock grader, no AI connected] ' +
-        (low ? `Your answer has ${words} words, below the ${task.minWords}-word minimum, which limits ${firstCriterion(task)}. ` : '') +
-        detected + 'Connect your AI endpoint in CONFIG.ai to get a real examiner-style assessment.',
-      criteria: {
-        taskAchievement: { band: bands.ta, points: [...tips.ta, low ? `Under-length response: aim for ${task.minWords + 20}–${task.minWords + 40} words.` : 'Length requirement is met.'] },
-        coherenceCohesion: { band: bands.cc, points: [
-          linkers >= 3 ? 'A reasonable range of linking devices is used.' : 'Use more cohesive devices (whereas, in contrast, moreover).',
-          t2 ? 'Give each body paragraph one central idea with a clear topic sentence.' : 'Group related information into separate paragraphs.'] },
-        lexicalResource: { band: bands.lr, points: [tips.lr, 'Check spelling and collocations carefully.'] },
-        grammarAccuracy: { band: bands.gra, points: [
-          avgLen > 14 ? 'Complex sentences are attempted.' : 'Combine short sentences with relative clauses and participles.',
-          'Proofread for article, tense and preposition errors.'] },
-      },
-      problems: {
-        language: ['Replace repeated words with synonyms.', t2 ? 'Prefer formal academic phrasing to conversational language.' : 'Use precise prepositions: "from 10% to 49%", "at 39%".'],
-        content: [tips.content],
-        structure: [tips.structure],
-      },
-      sampleAnswer: task.sample || '',
-      keyImprovements: tips.keys,
-      plan: [
-        { title: firstCriterion(task), text: t2 ? 'Plan for 5 minutes: decide your position and two supported main ideas before writing.' : 'Always include an overview and compare the data, not just list it.' },
-        { title: 'Lexical Resource', text: t2 ? 'Build topic vocabulary sets (education, environment, technology …).' : 'Build a bank of trend phrases and practise paraphrasing the task wording.' },
-        { title: 'Grammar', text: 'Proofread for tenses, articles and prepositions.' },
-        { title: 'Coherence', text: 'Use signposting and one clear idea per paragraph.' },
-      ],
-    });
   }
 
   /* ---------------------------------------------------------
@@ -692,7 +500,7 @@
   function critCard(iconId, title, c) {
     return `<div class="card">
       <div class="crit-head"><h4>${icon(iconId)} ${esc(title)}</h4><span class="band-badge ${bandClass(c.band)}">Band ${c.band.toFixed(1)}</span></div>
-      ${list(c.points)}
+      ${c.comment ? `<p class="crit-comment">${esc(c.comment)}</p>` : ''}${c.points.length ? list(c.points) : ''}
     </div>`;
   }
 
@@ -705,22 +513,21 @@
       ${critCard('i-book', 'Lexical Resource', c.lexicalResource)}
       ${critCard('i-circle-check', 'Grammatical Range & Accuracy', c.grammarAccuracy)}
     </div>`;
-
-    const p = r.problems;
-    if (p.language.length || p.content.length || p.structure.length) {
-      html += `<div class="card block"><div class="sec-title">${icon('i-circle-alert')} Specific Problems & Improvements</div>`;
-      if (p.language.length) html += `<h5>Language & Style</h5>${list(p.language)}`;
-      if (p.content.length) html += `<h5>Content Development</h5>${list(p.content)}`;
-      if (p.structure.length) html += `<h5>Structural Improvements</h5>${list(p.structure)}`;
-      html += '</div>';
+    if (r.strengths.length) html += `<div class="card block"><div class="sec-title">${icon('i-star')} What You Did Well</div>${list(r.strengths)}</div>`;
+    if (r.grammar.length) {
+      html += `<div class="card block"><div class="sec-title">${icon('i-circle-alert')} Grammar Corrections</div><div class="ai-rows">${
+        r.grammar.map((g) => `<div class="ai-row"><div class="ai-fix"><s>${esc(g.wrong)}</s><span aria-hidden="true">→</span><b>${esc(g.correct)}</b></div>${g.why ? `<p>${esc(g.why)}</p>` : ''}</div>`).join('')}</div></div>`;
+    }
+    if (r.vocabulary.length) {
+      html += `<div class="card block"><div class="sec-title">${icon('i-book')} Vocabulary Upgrades</div><div class="ai-rows">${
+        r.vocabulary.map((v) => `<div class="ai-row"><div class="ai-fix"><s>${esc(v.word)}</s><span aria-hidden="true">→</span><b>${v.better.map(esc).join(', ')}</b></div>${v.why ? `<p>${esc(v.why)}</p>` : ''}${v.example ? `<p class="ai-eg">${esc(v.example)}</p>` : ''}</div>`).join('')}</div></div>`;
     }
     if (r.sampleAnswer) {
-      const paras = r.sampleAnswer.split(/\n\s*\n|\\n\\n/).map((t) => `<p>${esc(t.trim())}</p>`).join('');
-      const keys = r.keyImprovements.length ? `<p><strong>Key Improvements:</strong> ${r.keyImprovements.map((k) => '• ' + esc(k)).join(' ')}</p>` : '';
-      html += `<div class="card block sample"><div class="sec-title">${icon('i-star')} ${r.sampleIsModel ? 'Model Answer' : 'Sample High-Band Answer (Band 9)'}</div>${paras}${keys}</div>`;
+      const paras = r.sampleAnswer.split(/\n\s*\n/).map((t) => `<p>${esc(t.trim())}</p>`).join('');
+      html += `<div class="card block sample"><div class="sec-title">${icon('i-star')} ${r.sampleIsModel ? 'Model Answer' : 'Model Answer (Band 9, written by AI)'}</div>${paras}</div>`;
     }
     if (r.plan.length) {
-      html += `<div class="card block"><div class="sec-title">${icon('i-target')} Personalized Improvement Plan</div><ol>${
+      html += `<div class="card block"><div class="sec-title">${icon('i-target')} Your Next Steps</div><ol>${
         r.plan.map((x) => `<li>${x.title ? `<strong>${esc(x.title)}</strong>: ` : ''}${esc(x.text)}</li>`).join('')}</ol></div>`;
     }
     return html;
@@ -737,6 +544,8 @@
       if (results.length > 1) html += `<div class="task-head"><h3>Part ${i + 1} · ${esc(ts[i].title)}</h3><span>${sub?.parts[i]?.wordCount || 0} words</span></div>`;
       html += taskResultHtml(r, ts[i]);
     });
+    const q = results.map((r) => r.quota).filter(Boolean).pop();
+    html += `<p class="ai-note">This band is an estimate from AI to help you practise, not an official IELTS score.${q && q.limit !== null ? ` AI checks left this month: ${q.remaining} of ${q.limit}.` : ''}</p>`;
     html += `<div class="res-actions">
       <button class="btn-outline" id="reportIssueBtn">Report Issue</button>
       <button class="btn-outline" id="reviewBtn">Review Mistakes</button>
@@ -746,21 +555,25 @@
     bindResultButtons();
   }
 
-  function renderLoading() {
+  function renderLoading(text) {
     $('#resultsContent').innerHTML =
-      `<div class="card loading-box"><div class="spinner"></div><h3>Checking your writing…</h3><p class="muted">The examiner is assessing your answer. Please wait.</p></div>`;
+      `<div class="card loading-box"><div class="spinner"></div><h3>${esc(text || 'Checking your writing…')}</h3><p class="muted">The AI examiner is reading your answer. This usually takes less than a minute.</p></div>`;
   }
 
   function renderError(err) {
+    const next = encodeURIComponent(location.pathname + location.search);
+    const action = err && err.status === 401 ? `<a class="btn-dark" href="/login?next=${next}">Sign in</a>`
+      : err && err.status === 402 ? '<a class="btn-dark" href="/Price">See plans</a>'
+      : '<button class="btn-outline" id="retryBtn">Try again</button>';
     $('#resultsContent').innerHTML =
       `<h2 class="res-title">Exam Results</h2><span class="res-chip">WRITING Section</span>
        <div class="card" style="text-align:center">
-         <h3>No Feedback Available</h3>
-         <p class="muted">Your test has been submitted successfully. Feedback was not generated during submission.</p>
-         <p class="err">${esc(err?.message || 'Unknown error')}</p>
+         <h3>${err && err.status === 401 ? 'Sign in to get AI feedback' : err && err.status === 402 ? 'No AI checks left' : 'No Feedback Yet'}</h3>
+         <p class="muted">Your answer is saved on this device, so nothing is lost.</p>
+         <p class="err">${esc((err && err.message) || 'Unknown error')}</p>
          <div class="res-actions" style="border:0">
-           <button class="btn-outline" id="retryBtn">Try again</button>
-           <button class="btn-outline" id="reportIssueBtn">Report Issue</button>
+           ${action}
+           <button class="btn-outline" id="reviewBtn">See My Answer</button>
            <button class="btn-dark" id="finishBtn">Finish</button>
          </div>
        </div>`;
@@ -870,6 +683,7 @@
       timeSpentSeconds: Math.min(CONFIG.exam.durationMinutes * 60, Math.round((Date.now() - state.startedAt) / 1000)),
     };
     store.set('submission', state.lastSubmission);
+    store.del('result');
     clearDrafts();
     const u = state.user;
     $('#testTakerId').textContent = 'Test taker ID: ' + (u ? u.email || u.id : 'Guest');
@@ -880,32 +694,52 @@
   async function runGrading() {
     renderLoading();
     try {
-      await loadSamples();
-      const sub = state.lastSubmission;
-      const results = await Promise.all(tasks().map((t, i) => gradeWithAI(t, sub.parts[i], sub.timeSpentSeconds)));
-      // the teacher's model answer (admin panel) replaces the generated sample
-      results.forEach((r, i) => { const t = tasks()[i]; if (t.sample && CONFIG.exam.materialId) { r.sampleAnswer = t.sample; r.sampleIsModel = true; } });
+      const sub = state.lastSubmission, ts = tasks();
+      const results = [];
+      // one task after the other: each check is one request of up to a minute
+      for (let i = 0; i < ts.length; i++) {
+        renderLoading(ts.length > 1 ? `Checking Part ${i + 1} of ${ts.length}…` : 'Checking your writing…');
+        results.push(await gradeWithAI(ts[i], sub.parts[i]));
+      }
+      // an unanswered task still shows the teacher's model answer; a checked one got it from the server
+      if (results.some((r) => r.meta.source === 'empty')) {
+        await loadSamples();
+        results.forEach((r, i) => { if (r.meta.source === 'empty' && ts[i].sample && CONFIG.exam.materialId) { r.sampleAnswer = ts[i].sample; r.sampleIsModel = true; } });
+      }
       state.results = results;
       store.set('result', results);
       renderResults(results);
       saveToAccount(results);
+      loadAiStatus();
     } catch (err) {
-      console.error('[AI grading failed]', err);
+      console.error('[AI check failed]', err);
       renderError(err);
     }
   }
 
-  // only real examiner results go to the account (the offline demo grader is not a score)
+  // only a real check goes to the account (an empty part counts as Band 0, as in the exam)
   function saveToAccount(results) {
     const sub = state.lastSubmission;
-    if (!state.user || !results.every((r) => r.meta.source === 'ai')) return;
-    const answered = sub.parts.filter((p) => p.wordCount).length;
-    if (!answered) return;
+    if (!results.some((r) => r.meta.source === 'ai')) return;
     fetch('/api/results', {
-      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ testKey: '/writing/' + (CONFIG.exam.materialId || CONFIG.exam.id), section: 'Writing', bucket: 'Practice',
-        pageLabel: CONFIG.exam.title, scoreCorrect: answered, scoreTotal: tasks().length, band: overallBand(results), durationSec: sub.timeSpentSeconds }),
+        pageLabel: CONFIG.exam.title, scoreCorrect: sub.parts.filter((p) => p.wordCount).length, scoreTotal: tasks().length, band: overallBand(results), durationSec: sub.timeSpentSeconds }),
     }).catch(() => { /* the result is still on screen */ });
+  }
+
+  /* the line on the start screen: how many checks are left, in which language the feedback comes */
+  async function loadAiStatus() {
+    const box = $('#aiStatus'); if (!box) return;
+    let d = null;
+    try { const r = await fetch('/api/ai/status', { credentials: 'same-origin', cache: 'no-store' }); d = r.ok ? await r.json() : null; } catch (e) { /* offline */ }
+    if (!d) { box.textContent = ''; return; }
+    const next = encodeURIComponent(location.pathname + location.search);
+    box.innerHTML = !d.configured ? 'The AI check is not available yet.' + (d.problem ? ` <span class="err">${esc(d.problem)}</span>` : '')
+      : !d.signedIn ? `<a href="/login?next=${next}">Sign in</a> to get AI feedback when you finish.`
+      : d.limit === null ? 'AI feedback is on.'
+      : d.remaining > 0 ? `AI checks left this month: <b>${d.remaining}</b> of ${d.limit}.`
+      : `You have used your AI checks for this month. <a href="/Price">See plans</a>`;
   }
 
   function clearDrafts() {
@@ -946,17 +780,35 @@
       exam.tasks.map((t, i) => `Part ${i + 1}: ${t.title} (at least ${t.minWords} words)`).join(' · ');
     $('#startBtn').disabled = false;
     $('#startBtn').addEventListener('click', beginExam);
+    const langSel = $('#aiLang');
+    if (langSel) { langSel.value = prefs.get('ai-lang', 'en'); langSel.addEventListener('change', () => prefs.set('ai-lang', langSel.value)); }
+    loadAiStatus();
     // remember which part was open when the page is reloaded
     window.addEventListener('pagehide', () => { if (!$('#screen-exam').hidden) store.set('part', state.cur); });
     loadUser();
 
     // Resume a running exam after refresh
     const endsAt = store.get('endsAt');
-    if (endsAt && endsAt > Date.now()) beginExam();
+    if (endsAt && endsAt > Date.now()) { beginExam(); return; }
+    // the last finished attempt can be opened again (its feedback, or the check that did not finish)
+    const lastSub = store.get('submission'), lastRes = store.get('result');
+    if (lastSub && Array.isArray(lastSub.parts) && lastSub.parts.length === exam.tasks.length) {
+      const msg = $('#startMsg');
+      msg.innerHTML = 'You have a finished attempt on this test. <a href="#" id="seeLast">' + (lastRes ? 'See your feedback' : 'Get your AI feedback') + '</a>';
+      msg.hidden = false;
+      $('#seeLast').addEventListener('click', (e) => {
+        e.preventDefault();
+        state.lastSubmission = lastSub; state.submitted = true;
+        const u = state.user; $('#testTakerId').textContent = 'Test taker ID: ' + (u ? u.email || u.id : 'Guest');
+        showScreen('results');
+        const ok = Array.isArray(lastRes) && lastRes.length === exam.tasks.length && lastRes.every((r) => r && r.meta && r.grammar);
+        if (ok) renderResults(lastRes); else runGrading();
+      });
+    }
   }
 
   // Public hooks so you can configure / call the AI from the console or other scripts
-  window.IELTSApp = { CONFIG, DEMO_EXAM, gradeWithAI, normalizeResult, mockGrade, renderResults, state };
+  window.IELTSApp = { CONFIG, DEMO_EXAM, gradeWithAI, normalizeResult, renderResults, state };
 
   document.addEventListener('DOMContentLoaded', init);
 })();

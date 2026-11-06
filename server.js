@@ -745,6 +745,7 @@ function cleanMaterialData(type, d) {
   }
   if (type === 'speaking') {
     // Speaking: Part 1 (questions), Part 2 (cue card), Part 3 (discussion). Optional model-answer audio / text.
+    out.cardTypes = (Array.isArray(d.cardTypes) ? d.cardTypes : String(d.cardTypes || '').split(/[,\n]/)).slice(0, 4).map((x) => cut(x, 40).trim()).filter(Boolean);   // the topic chips of the card
     out.parts = (Array.isArray(d.parts) ? d.parts : []).slice(0, 3).map((t, i) => { t = t || {};
       const qs = (Array.isArray(t.questions) ? t.questions : String(t.questions || '').split('\n')).slice(0, 40).map((x) => cut(x, 400).trim()).filter(Boolean);
       return { id: 'p' + (i + 1), title: cut(t.title, 120) || 'Part ' + (i + 1), prompt: cut(t.prompt, 2000), questions: qs, imageUrl: cleanUrl(t.imageUrl), audioUrl: cleanUrl(t.audioUrl),
@@ -770,7 +771,8 @@ const builtinId = (key) => { const h = crypto.createHash('sha256').update('ielts
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-${'89ab'[parseInt(h[16], 16) % 4]}${h.slice(17, 20)}-${h.slice(20, 32)}`; };
 const BUILTIN_SETS = [   // literal require()s, so Vercel bundles the source files with the function
   { prefix: 'reading-part:', type: 'reading', name: 'Reading Part', src: () => require('./reading-src/part'), no: (all) => require('./reading-router').nextNumber(ROOT, 'part', all) },
-  { prefix: 'listening-part:', type: 'listening', name: 'Listening Part', src: () => require('./listening-src/part'), no: (all) => require('./listening-router').nextNumber(ROOT, all) }
+  { prefix: 'listening-part:', type: 'listening', name: 'Listening Part', src: () => require('./listening-src/part'), no: (all) => require('./listening-router').nextNumber(ROOT, all) },
+  { prefix: 'speaking:', type: 'speaking', name: 'Speaking', src: () => require('./speaking-src/topics'), no: () => 0 }
 ];
 function seedBuiltinTests() {
   if (builtinRun) return builtinRun;
@@ -791,7 +793,7 @@ function seedBuiltinTests() {
           const m = toMaterial(t); const data = cleanMaterialData(set.type, m.data);
           data.no = set.no(all);
           const at = new Date(t0 - i * 1000).toISOString();   // the first file of the list is the newest card
-          const item = { id, type: set.type, title: cleanTitle(m.title), pack: '', description: '', content: '', premium: false, published: m.published !== false, data, createdAt: at, updatedAt: at };
+          const item = { id, type: set.type, title: cleanTitle(m.title), pack: materialPack(m.pack), description: '', content: '', premium: !!m.premium, published: m.published !== false, data, createdAt: at, updatedAt: at };
           try { await store.insertMaterial(item); all.push(item); added++; } catch (e) {
             if (!(await store.listMaterialsRaw(set.type)).some((x) => x.id === id)) throw e;   // another server added it a moment ago: fine
           }
@@ -821,7 +823,19 @@ function isCorrect(q, given) {
   if (q.type === 'mcq') return g.charAt(0) === norm(q.answer).charAt(0);
   if (q.type === 'matching' || q.type === 'map' || /^matching-/.test(q.type) || q.type === 'summary-words') { const tok = (v) => (norm(v).match(/^[a-z0-9]+/) || [''])[0]; return tok(given) === tok(q.answer); }
   if (q.type === 'mcq-multi') { const set = (v) => String(v || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).sort().join(','); return set(given) === set(q.answer); }
-  return String(q.answer || '').split('|').some((a) => { const n = norm(a); return n && n === g; });
+  // "a|b" = either is right; "(the) river" = "river" and "the river"; a hyphen counts as a space (the same rule as the exam engines)
+  const loose = (v) => norm(v).replace(/-+/g, ' ').replace(/\s+/g, ' ').trim();
+  const want = []; String(q.answer || '').split('|').forEach((a) => { want.push(loose(a)); if (a.includes('(')) want.push(loose(a.replace(/\([^)]*\)/g, ' '))); });
+  return want.filter(Boolean).includes(loose(given));
+}
+/* Pre-test: a Part practice pack whose tests have up to 49 questions, numbered from 1 (any skill can be in it) */
+const PRE_TEST_MAX = 49;
+const isPreTestPack = (v) => /^pre[\s_-]*test$/i.test(String(v == null ? '' : v).trim());
+const materialPack = (v) => (isPreTestPack(v) ? 'Pre-test' : cleanName(v));
+function checkPreTest(type, pack, data) {
+  if (!isPreTestPack(pack) || (type !== 'reading' && type !== 'listening')) return;
+  const n = ((data && data.questions) || []).reduce((s, q) => s + (q.type === 'mcq-multi' ? Math.max(1, String(q.answer || '').split(/[^A-Za-z]+/).filter(Boolean).length) : 1), 0);
+  if (n > PRE_TEST_MAX) throw new HttpError(400, `A Pre-test has at most ${PRE_TEST_MAX} questions; this one has ${n}.`);
 }
 /* the question-type chips of a card: what the admin typed, or taken from the questions */
 function cardTypesOf(d) {
@@ -840,7 +854,7 @@ const publicMaterial = (m, withData) => {
   const base = { id: m.id, type: m.type, title: m.title, pack: m.pack || '', description: m.description || '', premium: !!m.premium, published: m.published !== false, createdAt: m.createdAt,
     questionCount: (d.questions || []).length, durationMin: d.durationMin || 0, hasAudio: !!d.audioUrl, tasks: (d.tasks || []).length, parts: (d.parts || []).length };
   if (MODE_TYPES.includes(m.type)) base.mode = materialMode(m);
-  if (m.type === 'speaking') { base.href = '/test?id=' + encodeURIComponent(m.id); base.partLabels = (d.parts || []).map((t) => t.title || ''); }
+  if (m.type === 'speaking') { const ps = d.parts || []; base.href = '/test?id=' + encodeURIComponent(m.id); base.partLabels = ps.map((t) => t.title || ''); base.types = d.cardTypes || []; base.coverUrl = (ps.find((t) => t.imageUrl) || {}).imageUrl || ''; base.questionCount = ps.reduce((n, t) => n + ((t.questions || []).length || 1), 0); }
   if (m.type === 'reading') { base.no = Number(d.no) || 0; base.href = require('./reading-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.passageLabel = d.passageLabel || 'Passage 1'; base.types = cardTypesOf(d); }
   if (m.type === 'listening') { base.no = Number(d.no) || 0; base.href = require('./listening-router').hrefFor(m); base.coverUrl = d.coverUrl || ''; base.sectionLabel = d.sectionLabel || 'Section 1'; base.types = cardTypesOf(d); }
   if (m.type === 'writing') { const ts = d.tasks || []; base.coverUrl = d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl || ''; base.tier = d.tier || 'Tier 1'; base.types = d.cardTypes || [];
@@ -1231,7 +1245,9 @@ async function api(req, res, url) {
     const total = Math.floor(Number(b.scoreTotal)), correct = Math.floor(Number(b.scoreCorrect));
     if (!testKey.startsWith('/') || !section) throw new HttpError(400, 'testKey and section are required.');
     if (!(total >= 1 && total <= 1000) || !(correct >= 0 && correct <= total)) throw new HttpError(400, 'Invalid score.');
-    let band = Number(b.band); if (!(band >= 0 && band <= 9)) band = Math.round((correct / total) * 90) / 10;
+    // the band the exam worked out; without one, the official table (Writing and Speaking only ever come with a band from the examiner)
+    let band = b.band === null || b.band === undefined || b.band === '' ? NaN : Number(b.band);
+    if (!(band >= 0 && band <= 9)) band = section === 'Reading' || section === 'Listening' ? bandFor(section.toLowerCase(), correct, total) : 0;
     const recent = (await store.listResults(u.id, 20)).find((r) => r.testKey === testKey && r.scoreCorrect === correct && r.scoreTotal === total && Date.now() - new Date(r.createdAt).getTime() < 60000);
     if (recent) return send(res, 200, { result: recent, duplicate: true });
     const row = await store.insertResult({ id: newId(), userId: u.id, testKey, section, bucket: b.bucket === 'Mock' ? 'Mock' : 'Practice', pageLabel: cleanName(b.pageLabel).slice(0, 120) || 'Practice test',
@@ -1398,6 +1414,9 @@ async function api(req, res, url) {
     }
     throw new HttpError(405, 'Method not allowed.');
   }
+
+  /* ---- the AI check of Writing and Speaking (ai-examiner.js): any signed-in student, within the checks of the plan ---- */
+  if (p.startsWith('/api/ai/')) return require('./ai-examiner').route(req, res, p, method, url, { store, currentUser, isAdmin, userLevel, materialRule, accessRules, allowsLevel, send, readJson, readBody, rateLimit, HttpError, UPLOAD_DIR });
 
   /* ---- admin ---- */
   if (p.startsWith('/api/admin/')) {
@@ -1606,9 +1625,10 @@ async function api(req, res, url) {
     if (method === 'POST' && p === '/api/admin/materials') {
       const b = await readJson(req, 2 * 1024 * 1024); const type = MATERIAL_TYPES.includes(b.type) ? b.type : 'reading';
       const title = cleanTitle(b.title); if (!title) throw new HttpError(400, 'Title is required.');
-      const now = new Date().toISOString();
-      const item = await store.insertMaterial({ id: newId(), type, title, pack: cleanName(b.pack), description: cut(b.description, 2000), content: '', premium: !!b.premium,
-        published: b.published !== false, data: await keepReadingNo(type, cleanMaterialData(type, b.data), null), createdAt: now, updatedAt: now });
+      const now = new Date().toISOString(); const clean0 = cleanMaterialData(type, b.data);
+      checkPreTest(type, b.pack, clean0);
+      const item = await store.insertMaterial({ id: newId(), type, title, pack: materialPack(b.pack), description: cut(b.description, 2000), content: '', premium: !!b.premium,
+        published: b.published !== false, data: await keepReadingNo(type, clean0, null), createdAt: now, updatedAt: now });
       await audit(admin, 'material.add', title, { type });
       return send(res, 201, { item });
     }
@@ -1621,7 +1641,8 @@ async function api(req, res, url) {
       const id = decodeURIComponent(m[1]); const cur = await store.getMaterial(id); if (!cur) throw new HttpError(404, 'Material not found.');
       const b = await readJson(req, 2 * 1024 * 1024); const patch = { updatedAt: new Date().toISOString() };
       if (b.title !== undefined) { patch.title = cleanTitle(b.title); if (!patch.title) throw new HttpError(400, 'Title is required.'); }
-      if (b.pack !== undefined) patch.pack = cleanName(b.pack);
+      if (b.pack !== undefined) patch.pack = materialPack(b.pack);
+      if (b.data !== undefined || b.pack !== undefined) checkPreTest(cur.type, b.pack !== undefined ? b.pack : cur.pack, b.data !== undefined ? cleanMaterialData(cur.type, b.data) : cur.data);
       if (b.description !== undefined) patch.description = cut(b.description, 2000);
       if (b.premium !== undefined) { patch.premium = !!b.premium; try { const r0 = { ...(await accessRules(true)) }; if (r0['mat:' + id]) { delete r0['mat:' + id]; await store.setSetting('access-rules', { rules: cleanRules(r0), updatedAt: new Date().toISOString() }); rulesCache = { t: 0, v: {} }; } } catch (e) { /* the flag still applies */ } }
       if (b.published !== undefined) patch.published = !!b.published;
@@ -1685,10 +1706,10 @@ const MIME = {
   '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.txt': 'text/plain; charset=utf-8', '.map': 'application/json'
 };
 // never served: server code, data, docs, secrets, config
-const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
+const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;

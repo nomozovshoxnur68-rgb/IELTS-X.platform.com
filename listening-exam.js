@@ -42,6 +42,8 @@ function parseOptions(list) {
 const letters = (ans) => String(ans || '').toUpperCase().split(/[^A-Z]+/).filter(Boolean)
 
 const isFull = (material) => !!(material && material.data && material.data.mode === 'full')
+/* a Part test in the "Pre-test" pack has up to 49 questions, numbered from 1, whatever the section tag says */
+const isPreTest = (material) => !isFull(material) && /^pre[\s_-]*test$/i.test(String((material && material.pack) || '').trim())
 /* a full paper (Parts 1-4 on one page): every question carries its part in q.passage (1-4) */
 const partOfQ = (q) => Math.min(4, Math.max(1, parseInt(q && q.passage, 10) || 1))
 
@@ -49,8 +51,9 @@ const partOfQ = (q) => Math.min(4, Math.max(1, parseInt(q && q.passage, 10) || 1
 function buildBlocks(material) {
   const d = material.data || {}
   const full = isFull(material)
-  const part = full ? 1 : Math.min(4, Math.max(1, parseInt(d.part, 10) || parseInt(String(d.sectionLabel || '').replace(/\D+/g, ''), 10) || 1))
-  let n = full ? 1 : Math.max(1, parseInt(d.from, 10) || ((part - 1) * 10 + 1))
+  const pre = isPreTest(material)
+  const part = full || pre ? 1 : Math.min(4, Math.max(1, parseInt(d.part, 10) || parseInt(String(d.sectionLabel || '').replace(/\D+/g, ''), 10) || 1))
+  let n = full || pre ? 1 : Math.max(1, parseInt(d.from, 10) || ((part - 1) * 10 + 1))
   const from = n
   const answers = {}
   const times = {}   // the second of the recording where an answer is heard (set by the AI Test Generator)
@@ -134,10 +137,10 @@ function buildConfig(material) {
   const cfg = {
     id: 'ix-' + String(material.id || 'x').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 24),
     part, from, to,
-    label: full ? 'Full test' : undefined,
+    label: full ? 'Full test' : isPreTest(material) ? 'Pre-test' : undefined,
     finishUrl: full ? '/full-tests/listening/' : '/part/practice/listening',   // "Finish" on the results screen goes back to the list
 
-    minutes: Math.min(60, Math.max(1, parseInt(d.durationMin, 10) || (full ? 30 : 10))),
+    minutes: Math.min(60, Math.max(1, parseInt(d.durationMin, 10) || (full || isPreTest(material) ? 30 : 10))),
     name: String(material.title || 'Listening'),
     audioStart: Math.max(0, +d.audioStart || 0),
     audioEnd: Math.max(0, +d.audioEnd || 0),
@@ -168,4 +171,4 @@ function renderPage(material) {
     .replace('{{DATA_SCRIPT}}', () => script)
 }
 
-module.exports = { renderPage, buildConfig, buildBlocks, parseOptions, isFull, KINDS, KIND_FROM_TYPE, DEFAULT_INSTR }
+module.exports = { renderPage, buildConfig, buildBlocks, parseOptions, isFull, isPreTest, KINDS, KIND_FROM_TYPE, DEFAULT_INSTR }

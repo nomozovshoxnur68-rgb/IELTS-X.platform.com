@@ -77,7 +77,7 @@ upload **pictures** (maps, diagrams, charts), then add questions with their corr
 `question => answer` lines in one go). Writing: Task 1 / Task 2 prompt, optional chart picture, minimum words, model answer.
 Each test can be **Free / Premium** and **Published / Draft** with one click.
 
-Students open them from the Reading / Listening / Writing practice pages (section "New ... tests") or at `/test?id=...`.
+Students open them from the cards of the practice pages or at `/test?id=...`.
 Reading + listening are **graded on the server** (answers never reach the browser before submitting), get an IELTS band and are
 saved to the account's results. Writing has a timer, word counter and auto-saved draft.
 
@@ -86,8 +86,7 @@ saved to the account's results. Writing has a timer, word counter and auto-saved
 then a results page per task plus the overall Writing band (Task 2 counts twice). For a line graph type the numbers in the task
 (`Years: 1961, 1971 …` and one `Name: 10, 30 …` line per series) and the page draws the chart; otherwise upload a picture.
 The model answer is shown on the results page. `/writing/` without an id is the free demo (car ownership line graph).
-Scoring uses an offline demo grader until an AI endpoint is set in `CONFIG.ai` (top of `writing/js/script.js`);
-only real AI results are saved to the student's account.
+Scoring is the AI check on the server (see **AI check of Writing and Speaking** below); only a real check is saved to the account.
 
 **Uploads on Vercel** go straight from the browser to Supabase Storage (public bucket `ieltsx-media`, created automatically) -
 needs `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` and the **v4 part of `supabase-schema.sql`** (run once). On a normal server
@@ -278,6 +277,38 @@ of restarting the test, and the Writing exam screen uses medium sizes (52 px arr
 * **First visit**: a signed-out visitor who has never been to the site is sent to `/login?next=<the page>` once
   (`site-access.js`, flag `ix-first-visit-done` in localStorage); later visits and search-engine robots are not redirected.
 * **Writing start screen**: the card no longer gets squeezed to the window height (it hid the Start button); the screen scrolls.
+
+## AI check of Writing and Speaking
+
+Students get, for every Writing task and Speaking attempt: a band on each of the **four IELTS criteria** with comments, **grammar corrections**
+(their words, the fix, the rule), **vocabulary upgrades**, feedback, next steps and a **model answer** (the teacher's one when the test has it). The
+feedback comes in English, O'zbekcha or Русский, as the student chooses. The band is an estimate and the pages say so.
+
+* **To switch it on**: set `GEMINI_API_KEY` on the server (the same key as the AI Test Generator; on Vercel: Settings -> Environment Variables, then redeploy). The key never reaches a browser. Without it the pages say the check is not available yet, and admins read what to set.
+* **Files**: `ai-examiner.js` (routes, prompts, schemas, the allowance; server only), `ai-provider.js` (the AI service), `writing/js/script.js` and `assets/js/speaking-exam.js` (the pages).
+* **Routes**: `GET /api/ai/status`, `POST /api/ai/writing`, `POST /api/ai/speaking/transcribe` (one recording, raw bytes), `POST /api/ai/speaking/assess`, `GET /api/ai/history`. All but the status need a signed-in student who may open the test.
+* **Speaking**: one recording per question (a cue card is one recording), converted in the browser to 16 kHz mono WAV so one answer fits a Vercel request (2 minutes 10 seconds at most). Each is written down with notes on pronunciation and fluency, then the transcripts are marked. Recordings are not stored. A student without a microphone can type: pronunciation is then not marked and does not count.
+* **Bands**: the model gives the four criteria; the overall band is worked out on the server with the IELTS rule for averages (6.25 -> 6.5, 6.75 -> 7.0). In a full Writing test Task 2 counts twice.
+* **Allowance per month** (a failed check is not counted, admins have no limit): `AI_CHECKS_FREE` 3, `AI_CHECKS_STANDARD` 30, `AI_CHECKS_MAX` 60, `AI_CHECKS_ULTRA` 200. One Writing task or one Speaking attempt is one check. Usage is kept in the setting `ai-usage:<user id>` with the bands of the last 40 checks (for the Performance page), no texts.
+* **Full Mock**: the results page has **Get AI feedback** for the Writing section (each task is one check; Task 2 counts twice); the feedback stays with the attempt, so it is not asked for twice, and the band goes to the Mock group of the Performance page.
+* **Trying it without a key**: `AI_PROVIDER=mock` answers with placeholder text marked [Test mode].
+
+## Speaking
+
+* **Practice page** (`/part/practice/speaking`): the same cards, filters and pagination as the other skills; every card is a test of **Admin -> Speaking · Part practice**.
+* **Built-in topics**: `speaking-src/topics.js` has six topics, added once as 18 Part cards and 6 Full tests (packs Jan-August, Sep-Dec). Topic 19 is free, the others need a plan. Edit, lock or remove them in the panel, like the built-in Reading passages.
+* **The test** (`/test?id=...`, `assets/js/speaking-exam.js` + `assets/css/speaking-exam.css`): Parts 1-3 with progress, the question read aloud on request, recording with a level meter and a time limit, the Part 2 preparation countdown and notes, typed answers, the AI feedback, and the last feedback kept on the device.
+
+## Pre-test
+
+**Pre-test** is a pack of Part tests with up to **49 questions numbered from 1**, whatever the Passage / Section tag says (the admin form and the server refuse more). It is in the **All Packs** filter of all four practice pages. In the form of a Part test press the **Pre-test** chip under the Pack field (or type the name; "pre test" and "PreTest" are the same pack). The band is scaled to the 40-question table, as for every test that is not 40 questions.
+
+## Bands and results
+
+* **One table everywhere**: the official IELTS Academic Reading and Listening tables (`reading.js`, `listening/js/listening.js`, `listening/js/exam-app.js`, `full-mock/js/*.js`, `assets/js/test-complete.js`, `server.js`). A paper that is not 40 questions is scaled to 40.
+* **One way to compare answers**: capitals, extra spaces, curly quotes, hyphens and a final full stop do not matter; `a|b` = either; `(the) river` = `river` or `the river`.
+* **Saving**: an attempt is saved once (opening its results again adds nothing); tests at `/exam/...` are saved too; a result that could not be sent is kept and sent again on the next page; a finished Full Mock saves Listening and Reading in the Mock group.
+* **Performance page** (`study/Tools/Performance.html`, `performance-dashboard.js`, `assets/css/performance-2.css`): estimated overall band against a target, the four skills with their trend, band over time, the criteria of the AI checks and the weakest one, averages of the last 10 attempts and last 3 mocks, activity and every attempt.
 
 ## AI Test Generator (`/admin#ai`)
 

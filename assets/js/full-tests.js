@@ -188,14 +188,15 @@
             .catch(function () { return []; });
     }
 
+    var adminFailed = false;   // the list of the tests made in the admin panel did not arrive: say so, not "No tests"
     function loadAdmin() {
         if (!window.fetch) return Promise.resolve([]);
         var ctl = window.AbortController ? new AbortController() : null;
-        var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
+        var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
         return fetch('/api/materials?type=' + encodeURIComponent(SKILL) + '&mode=full', { credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
-            .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) { return Array.isArray(d.items) ? d.items : []; })
-            .catch(function () { return []; })
+            .catch(function () { adminFailed = true; return []; })
             .then(function (x) { clearTimeout(timer); return x; });
     }
 
@@ -333,9 +334,9 @@
             });
             var list = state.view === 'list';
             if (!rows.length) {
-                var msg = !pack.tests.length ? 'No tests in this pack yet.' : state.filter === 'completed' && !needle ? 'You have not completed any test in this pack yet.' : 'No tests match your search.';
+                var msg = !pack.tests.length ? (adminFailed ? 'The tests could not be loaded. Please reload the page.' : 'No tests in this pack yet.') : state.filter === 'completed' && !needle ? 'You have not completed any test in this pack yet.' : 'No tests match your search.';
                 box.className = '';
-                box.innerHTML = '<div class="ft-empty"><p class="ft-empty-title">' + esc(msg) + '</p>' + (!pack.tests.length ? '<p>New tests are added regularly.</p>' : '') + '</div>';
+                box.innerHTML = '<div class="ft-empty"><p class="ft-empty-title">' + esc(msg) + '</p>' + (!pack.tests.length && !adminFailed ? '<p>New tests are added regularly.</p>' : '') + '</div>';
             } else {
                 box.className = list ? 'ft-list' : 'ft-grid ft-grid-tests';
                 box.innerHTML = rows.map(function (x) { return testCard(x.t, x.i, list, done); }).join('');

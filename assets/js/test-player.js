@@ -1,4 +1,4 @@
-/* IELTSX — plays what was made in the admin panel: reading, listening (graded on the server) and speaking. Writing sets open in /writing/, articles in /collections/article. */
+/* IELTSX — plays what was made in the admin panel: reading, listening (graded on the server) and speaking (assets/js/speaking-exam.js). Writing sets open in /writing/, articles in /collections/article. */
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -31,7 +31,12 @@
     if (item.type === 'reading' && !new URLSearchParams(location.search).has('simple')) { location.replace(item.href || ('/exam/reading/' + encodeURIComponent(item.id))); return; }   // Reading opens in the real-exam player
     document.title = item.title + ' — IELTSX';
     $('#tp-title').textContent = item.title; $('#tp-back').href = '/part/practice/' + item.type; $('#tp-back').textContent = '← ' + item.type.charAt(0).toUpperCase() + item.type.slice(1) + ' tests';
-    if (item.type === 'speaking') renderSpeaking(); else renderExam();
+    if (item.type === 'speaking') {   // assets/js/speaking-exam.js
+      if (item.mode === 'full') { $('#tp-back').href = '/full-tests/speaking/'; $('#tp-back').textContent = '← Speaking full tests'; }
+      window.IXSpeaking.start({ item, id, main });
+      return;
+    }
+    renderExam();
   }
 
   /* ───────── timer ───────── */
@@ -125,47 +130,5 @@
     $('#tp-prog').textContent = `Score ${d.correct} / ${d.total} · Band ${d.band.toFixed(1)}`;
   }
 
-  /* ───────── safe picture helper ───────── */
-  const safeUrl = (u) => { u = String(u || '').trim(); return (/^\/(uploads|assets)\//.test(u) && !u.includes('..')) || /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : ''; };
-
-  /* ───────── speaking ───────── */
-  function renderSpeaking() {
-    const parts = item.data.parts || []; let cur = 0, rec = null, chunks = [], stream = null, cd = null;
-    main.innerHTML = `<div class="tp-tabs" role="tablist">${parts.map((t, i) => `<button class="tp-tab" role="tab" data-t="${i}" type="button">${esc(t.title)}</button>`).join('')}</div><div id="tp-s"></div>`;
-    const stopAll = () => { clearInterval(cd); cd = null; if (rec && rec.state !== 'inactive') rec.stop(); if (stream) stream.getTracks().forEach((x) => x.stop()); rec = null; stream = null; };
-    const paint = () => {
-      stopAll(); const t = parts[cur];
-      document.querySelectorAll('.tp-tab').forEach((b) => b.classList.toggle('active', Number(b.dataset.t) === cur));
-      const timers = (t.prepSeconds || t.speakSeconds) ? `<div class="tp-stimer"><div id="tp-cd" class="tp-cd">${clock(t.prepSeconds || t.speakSeconds)}</div><div class="btn-row">${t.prepSeconds ? `<button class="tp-btn ghost" data-sc="prep" type="button">Start ${Math.round(t.prepSeconds / 60) || 1}-min preparation</button>` : ''}${t.speakSeconds ? `<button class="tp-btn ghost" data-sc="speak" type="button">Start speaking (${Math.round(t.speakSeconds / 60) || 1} min)</button>` : ''}</div></div>` : '';
-      $('#tp-s').innerHTML = `<div class="tp-exam split"><section class="tp-pane"><h2>${esc(t.title)}</h2>
-        ${t.prompt ? `<div class="tp-cue">${esc(t.prompt).replace(/\n/g, '<br>')}</div>` : ''}
-        ${safeUrl(t.imageUrl) ? `<figure class="tp-fig"><img src="${esc(safeUrl(t.imageUrl))}" alt="" loading="lazy"></figure>` : ''}
-        ${(t.questions || []).length ? `<ol class="tp-sq">${t.questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>` : ''}${timers}</section>
-        <section class="tp-pane"><h3 class="tp-group">Practise out loud</h3><p class="tp-hint">Record yourself, then listen back. The recording stays on your device and is never uploaded.</p>
-        <div class="tp-actions"><button class="tp-btn" id="tp-rec" type="button">● Record</button><button class="tp-btn ghost" id="tp-stop" type="button" disabled>■ Stop</button></div>
-        <audio id="tp-play" controls hidden></audio><div id="tp-recmsg" class="tp-hint"></div>
-        ${safeUrl(t.audioUrl) ? `<details class="tp-trans"><summary>Listen to a model answer</summary><audio controls preload="none" src="${esc(safeUrl(t.audioUrl))}"></audio></details>` : ''}
-        ${t.hasSample ? '<div class="tp-actions"><button class="tp-btn ghost" id="tp-sample" type="button">Show model answer (text)</button></div><div id="tp-sample-box" class="tp-trans" hidden></div>' : ''}</section></div>`;
-      const msg = $('#tp-recmsg');
-      $('#tp-rec').onclick = async () => {
-        if (!navigator.mediaDevices || !window.MediaRecorder) { msg.textContent = 'Recording is not supported in this browser.'; return; }
-        try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { msg.textContent = 'Microphone access was blocked. Allow it in the browser address bar and try again.'; return; }
-        chunks = []; rec = new MediaRecorder(stream); rec.ondataavailable = (e) => chunks.push(e.data);
-        rec.onstop = () => { const a = $('#tp-play'); if (a && chunks.length) { a.src = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' })); a.hidden = false; } const st = $('#tp-stop'), rc = $('#tp-rec'); if (st) st.disabled = true; if (rc) rc.disabled = false; msg.textContent = ''; };
-        rec.start(); $('#tp-rec').disabled = true; $('#tp-stop').disabled = false; msg.textContent = 'Recording…';
-      };
-      $('#tp-stop').onclick = () => { if (rec && rec.state !== 'inactive') rec.stop(); if (stream) stream.getTracks().forEach((x) => x.stop()); };
-      document.querySelectorAll('[data-sc]').forEach((b) => b.addEventListener('click', () => {
-        let left = b.dataset.sc === 'prep' ? t.prepSeconds : t.speakSeconds; clearInterval(cd); const el = $('#tp-cd'); el.textContent = clock(left);
-        cd = setInterval(() => { left--; el.textContent = clock(Math.max(0, left)); if (left <= 0) { clearInterval(cd); try { new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=').play(); } catch (e) { /* silent */ } } }, 1000);
-      }));
-      const sb = $('#tp-sample'); if (sb) sb.onclick = async () => {
-        const box = $('#tp-sample-box'); if (!box.hidden) { box.hidden = true; return; }
-        try { const r = await fetch('/api/materials/' + encodeURIComponent(id) + '/sample', { credentials: 'same-origin' }); const d = await r.json(); const x = (d.samples || []).find((y) => y.id === t.id); box.innerHTML = '<strong>Model answer</strong><div>' + esc(x ? x.sample : '').replace(/\n/g, '<br>') + '</div>'; box.hidden = false; } catch (e) { alert('Could not load the model answer.'); }
-      };
-    };
-    document.querySelectorAll('.tp-tab').forEach((b) => b.addEventListener('click', () => { cur = Number(b.dataset.t); paint(); }));
-    window.addEventListener('pagehide', stopAll); paint();
-  }
   load();
 })();

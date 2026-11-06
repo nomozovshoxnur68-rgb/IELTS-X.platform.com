@@ -288,13 +288,15 @@ const BULLET = /^\s*[-\u2013\u2022\u25cf\u25aa\u25e6\u00b7*]\s*/;
 const ROMAN_LIST = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii'];
 
 const isFull = (material) => !!(material && material.data && material.data.mode === 'full');
+/* a Part test in the "Pre-test" pack has up to 49 questions, numbered from 1, whatever the passage tag says */
+const isPreTest = (material) => !isFull(material) && /^pre[\s_-]*test$/i.test(String((material && material.pack) || '').trim());
 
 /* The passages of a test: one for a "part" test, three for a "full" test. Pictures and questions
    carry the number of the passage they belong to (default 1). */
 function passagesOf(material) {
   const d = material.data || {};
   const imgs = Array.isArray(d.images) ? d.images : [];
-  if (!isFull(material)) return [{ no: partSlot(d), title: material.title, text: d.passage, images: imgs }];
+  if (!isFull(material)) return [{ no: isPreTest(material) ? 1 : partSlot(d), title: material.title, text: d.passage, images: imgs }];
   const ps = Array.isArray(d.passages) ? d.passages : [];
   return [1, 2, 3].map((i) => {
     const p = ps[i - 1] || {};
@@ -308,7 +310,8 @@ function buildData(material) {
   const full = isFull(material);
   const qs = Array.isArray(d.questions) ? d.questions : [];
   const SECTIONS = { 1: [], 2: [], 3: [] }; const PASSAGES = {}; const VOCAB = {}; const ordered = []; const passText = {};
-  const first = full ? 1 : FIRST_NO[partSlot(d)];   // a Part test of Passage 2 is Questions 14–26
+  const pre = isPreTest(material);
+  const first = full || pre ? 1 : FIRST_NO[partSlot(d)];   // a Part test of Passage 2 is Questions 14–26
   let last = first - 1;
   passagesOf(material).forEach((ps) => {
     const mine = qs.filter((q) => (full ? (Number(q.passage) || 1) : ps.no) === ps.no);
@@ -328,8 +331,8 @@ function buildData(material) {
     const hl = (q.explanation || q.evidence) ? evidenceOf(q, passText[k]) : [];
     for (let i = 0; i < span; i++, n++) if (q.explanation || hl.length) expl[n] = { explanation: esc(q.explanation || ''), highlights: hl, paraphraseMap: [], en: esc(q.explanation || ''), uz: '' };
   });
-  const dflt = full ? 60 : 20;
-  return { full, SECTIONS, PASSAGES, VOCAB, expl, total: Math.max(1, last - first + 1), slot: full ? 1 : partSlot(d), minutes: Math.max(1, Math.min(180, Number(d.durationMin) || dflt)) };
+  const dflt = full || pre ? 60 : 20;
+  return { full, SECTIONS, PASSAGES, VOCAB, expl, total: Math.max(1, last - first + 1), slot: full || pre ? 1 : partSlot(d), minutes: Math.max(1, Math.min(180, Number(d.durationMin) || dflt)) };
 }
 
 function buildExamHtml(material, templates) {
@@ -363,4 +366,4 @@ function buildExamHtml(material, templates) {
   return html;
 }
 
-module.exports = { buildExamHtml, buildData, isFull, inheritGroups };
+module.exports = { buildExamHtml, buildData, isFull, isPreTest, inheritGroups };

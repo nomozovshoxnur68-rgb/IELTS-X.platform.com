@@ -6591,7 +6591,25 @@ let currentTextZoom=0;
 function zoomText(step){currentTextZoom+=step;if(currentTextZoom<-3)currentTextZoom=-3;if(currentTextZoom>8)currentTextZoom=8;document.documentElement.style.setProperty('--text-zoom',currentTextZoom+'px');}
 
 // GRADING
-function checkAnswerMatch(given,correct){if(!given)return false;const g=given.toString().trim().toLowerCase();return correct.toString().toLowerCase().split('|').some(a=>a.trim()===g);}
+/* One way of comparing answers, the same in every exam and on the server: capitals, extra spaces, curly quotes,
+   hyphens and a full stop at the end do not matter. "a|b" = either is right; "(the) river" = "river" and "the river". */
+function normAnswer(v) {
+  return String(v == null ? '' : v).normalize('NFKC').toLowerCase()
+    .replace(/[\u2018\u2019\u02bc`]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[\u2010-\u2015-]+/g, ' ')
+    .replace(/^[\s.,;:!?"']+|[\s.,;:!?"']+$/g, '').replace(/\s+/g, ' ').trim();
+}
+function answerVariants(correct) {
+  const out = [];
+  String(correct == null ? '' : correct).split('|').forEach(function (a) {
+    out.push(normAnswer(a.replace(/[()]/g, ' ')));
+    if (a.indexOf('(') !== -1) out.push(normAnswer(a.replace(/\([^)]*\)/g, ' ')));
+  });
+  return out.filter(Boolean);
+}
+function checkAnswerMatch(given, correct) {
+  const g = normAnswer(given);
+  return !!g && answerVariants(correct).indexOf(g) !== -1;
+}
 /* Q1–10 are Part 1, 11–20 Part 2, and so on: the paper is four ten-mark
    sections and every downstream breakdown hangs off that. */
 function partOf(id){return id<=10?1:id<=20?2:id<=30?3:4;}
@@ -6716,7 +6734,26 @@ function lossAnalysis(qs){
   return {missed:missed.length,blank:blank.length,plural,spelling,limitOv,fixable,real,lost,lead,notes};
 }
 
-function bandFor(score){if(score>=39)return 9.0;if(score>=37)return 8.5;if(score>=35)return 8.0;if(score>=33)return 7.5;if(score>=30)return 7.0;if(score>=27)return 6.5;if(score>=23)return 6.0;if(score>=19)return 5.5;if(score>=15)return 5.0;if(score>=13)return 4.5;if(score>=10)return 4.0;if(score>=8)return 3.5;if(score>=6)return 3.0;if(score>0)return 2.5;return 0;}
+function bandFor(score){
+  /* The official IELTS Listening table (40 questions). */
+  if (score >= 39) return 9.0;
+  if (score >= 37) return 8.5;
+  if (score >= 35) return 8.0;
+  if (score >= 32) return 7.5;
+  if (score >= 30) return 7.0;
+  if (score >= 26) return 6.5;
+  if (score >= 23) return 6.0;
+  if (score >= 18) return 5.5;
+  if (score >= 16) return 5.0;
+  if (score >= 13) return 4.5;
+  if (score >= 10) return 4.0;
+  if (score >= 8) return 3.5;
+  if (score >= 6) return 3.0;
+  if (score >= 4) return 2.5;
+  if (score >= 2) return 2.0;
+  if (score >= 1) return 1.0;
+  return 0;
+}
 function bandLabel(b){if(b>=8.5)return'Expert user';if(b>=7.5)return'Very good user';if(b>=6.5)return'Good user';if(b>=5.5)return'Competent user';if(b>=4.5)return'Modest user';if(b>0)return'Limited user';return'No score';}
 /* Chrome tier for the whole document, driven by the band only. Identical
    thresholds to the Writing report so a 7.0 lights the same way in both. */

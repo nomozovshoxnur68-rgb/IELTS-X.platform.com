@@ -410,6 +410,16 @@
     paintGuard(); closeFrame();
     renderReport(); show('scReport');
     sendResults();
+    saveToAccount();
+  }
+  /* Listening and Reading of a finished mock on the student's account (Performance page). A visitor who is not signed in gets a 401 and nothing is kept. */
+  function saveToAccount() {
+    ['listening', 'reading'].forEach((k) => {
+      const R = S.res[k]; if (!R) return;
+      const name = CONFIG.names[k];
+      fetch('/api/results', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testKey: '/full-mock/' + S.testId + '/' + k, section: name, bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · ' + name, scoreCorrect: R.correct, scoreTotal: R.total, band: Number(R.band) }) }).catch(() => { /* the report is still on screen */ });
+    });
   }
   function overallLR() {
     const L = S.res.listening, R = S.res.reading;
@@ -523,12 +533,13 @@
       <div class="rx-trio">
         <div class="rx-mini"><span>Listening</span><b>${L.band}</b><small>${L.correct} / 40</small></div>
         <div class="rx-mini"><span>Reading</span><b>${R.band}</b><small>${R.correct} / 40</small></div>
-        <div class="rx-mini nm"><span>Writing</span><b>Not marked</b><small>${w1} + ${w2} words</small></div>
+        <div class="rx-mini${S.aiW ? '' : ' nm'}"><span>Writing</span><b>${S.aiW ? S.aiW.overall.toFixed(1) : 'Not marked'}</b><small>${w1} + ${w2} words</small></div>
       </div>
       ${sectionCard('Listening', L, 'Part', 4, false)}
       ${sectionCard('Reading', R, 'Passage', 3, true)}
       <div class="rx-sec"><div class="rx-pill">Writing Section</div>
-        <div class="rx-card"><h2>Your answers</h2><p class="rx-hint">Writing is not marked automatically. Your text is saved exactly as typed.</p>
+        <div class="rx-card" id="mockAi">${aiWritingHtml()}</div>
+        <div class="rx-card"><h2>Your answers</h2><p class="rx-hint">Your text is saved exactly as typed.</p>
           <details><summary>Task 1 &middot; ${w1} words</summary><div class="wresp">${esc(S.w.t1) || '<span class="blank">No answer written.</span>'}</div></details>
           <details><summary>Task 2 &middot; ${w2} words</summary><div class="wresp">${esc(S.w.t2) || '<span class="blank">No answer written.</span>'}</div></details></div></div>
       ${viol ? `<p class="rx-hint">Integrity log: ${viol} event${viol === 1 ? '' : 's'} recorded (left full screen, switched tab or blocked shortcuts).</p>` : ''}
@@ -540,6 +551,57 @@
         <button class="rx-btn dark" data-action="finish">Finish</button>
       </div>`;
     paintSendStatus();
+  }
+  /* ------------------------------------- the AI check of the Writing section */
+  const aiCrit = [['taskAchievement', 'Task Response / Achievement'], ['coherenceCohesion', 'Coherence & Cohesion'], ['lexicalResource', 'Lexical Resource'], ['grammarAccuracy', 'Grammatical Range & Accuracy']];
+  function aiTaskHtml(name, r) {
+    const rows = (list, render) => list.map(render).join('');
+    return `<details class="ai-task" open><summary>${esc(name)} &middot; Band ${r.overall.toFixed(1)}</summary>
+      <p class="ai-sum">${esc(r.summary)}</p>
+      <div class="ai-crits">${aiCrit.map(([k, label]) => { const c = (r.criteria || {})[k] || {}; return `<div class="ai-crit"><div><span>${esc(label)}</span><b>${Number(c.band || 0).toFixed(1)}</b></div>${c.comment ? `<p>${esc(c.comment)}</p>` : ''}</div>`; }).join('')}</div>
+      ${(r.grammar || []).length ? `<h3>Grammar corrections</h3>${rows(r.grammar, (g) => `<p class="ai-fix"><s>${esc(g.wrong)}</s> &rarr; <b>${esc(g.correct)}</b>${g.why ? `<br><small>${esc(g.why)}</small>` : ''}</p>`)}` : ''}
+      ${(r.vocabulary || []).length ? `<h3>Vocabulary upgrades</h3>${rows(r.vocabulary, (v) => `<p class="ai-fix"><s>${esc(v.word)}</s> &rarr; <b>${(v.better || []).map(esc).join(', ')}</b>${v.example ? `<br><small>${esc(v.example)}</small>` : ''}</p>`)}` : ''}
+      ${r.sampleAnswer ? `<h3>Model answer</h3><div class="wresp">${esc(r.sampleAnswer)}</div>` : ''}
+      ${(r.plan || []).length ? `<h3>Your next steps</h3><ol>${rows(r.plan, (p) => `<li>${p.title ? `<b>${esc(p.title)}:</b> ` : ''}${esc(p.text)}</li>`)}</ol>` : ''}</details>`;
+  }
+  function aiWritingHtml(note) {
+    if (S.aiW) {
+      return `<h2>AI feedback on your Writing</h2><p class="rx-hint">This band is an estimate from AI to help you practise, not an official IELTS score. Task 2 counts twice as much as Task 1.</p>
+        ${S.aiW.tasks.map((t) => aiTaskHtml(t.name, t.result)).join('')}`;
+    }
+    return `<h2>AI feedback on your Writing</h2><p class="rx-hint">Get a band on the four criteria, grammar corrections, vocabulary upgrades and a model answer. Each task uses one AI check.</p>
+      ${note ? `<p class="ai-err">${note}</p>` : ''}
+      <div class="ai-go"><label>Feedback in <select id="mockAiLang"><option value="en">English</option><option value="uz">O&#699;zbekcha</option><option value="ru">Русский</option></select></label>
+      <button class="rx-btn dark" type="button" data-action="ai-writing">Get AI feedback</button></div>`;
+  }
+  /* one task after the other; what was checked is kept with the attempt, so it is not asked (and counted) twice */
+  async function aiWriting() {
+    const box = $('mockAi'); const w = entryOf('writing', S.pick && S.pick.writing).writing;
+    const lang = ($('mockAiLang') || {}).value || 'en';
+    const list = [['Task 1', 'task1', S.w.t1, w.task1, 150], ['Task 2', 'task2', S.w.t2, w.task2, 250]].filter((x) => words(x[2]) >= 20);
+    if (!list.length) { box.innerHTML = aiWritingHtml('Your answers are too short to check.'); return; }
+    S.aiPart = S.aiPart || {};
+    try {
+      for (const [name, kind, answer, task, minWords] of list) {
+        if (S.aiPart[kind]) continue;
+        box.innerHTML = `<h2>AI feedback on your Writing</h2><p class="rx-hint">Checking ${name}… This usually takes less than a minute.</p>`;
+        const r = await fetch('/api/ai/writing', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ examId: 'mock-' + S.testId, title: (CONFIG.title || 'Full mock') + ' · ' + name, taskKind: kind, taskPrompt: [].concat(task.lines || []).concat(task.alt ? ['(The picture: ' + task.alt + ')'] : []).join('\n'), imageUrl: task.img ? '/full-mock/' + task.img : '', minWords, answer, lang }) });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { const e = new Error(d.error || 'The AI check failed. Please try again.'); e.status = r.status; throw e; }
+        S.aiPart[kind] = { name, result: d }; save();
+      }
+      const tasks = ['task1', 'task2'].map((k) => S.aiPart[k]).filter(Boolean);
+      // Task 2 counts twice; a task left empty counts as Band 0, as in the exam
+      const sum = (S.aiPart.task1 ? S.aiPart.task1.result.overall : 0) + 2 * (S.aiPart.task2 ? S.aiPart.task2.result.overall : 0);
+      S.aiW = { overall: Math.min(9, Math.floor((sum / 3) * 2 + 0.5) / 2), tasks }; save();
+      fetch('/api/results', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testKey: '/full-mock/' + S.testId + '/writing', section: 'Writing', bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · Writing', scoreCorrect: tasks.length, scoreTotal: 2, band: S.aiW.overall }) }).catch(() => { /* still on screen */ });
+      renderReport();
+    } catch (e) {
+      const next = encodeURIComponent(location.pathname + location.search);
+      box.innerHTML = aiWritingHtml(esc(e.message) + (e.status === 401 ? ` <a href="/login?next=${next}">Sign in</a>` : e.status === 402 ? ' <a href="/Price">See plans</a>' : ''));
+    }
   }
   function finishAll() {
     ask('Finish and leave the results page?', 'Finish', () => {
@@ -666,6 +728,7 @@
     'start': el => startSection(el.dataset.k),
     'review': el => openReview(el.dataset.k),
     'analyse': () => { anaMode = 'wrong'; renderAnalyse(); show('scAnalyse'); },
+    'ai-writing': () => aiWriting(),
     'ana-mode': el => { anaMode = el.dataset.v; renderAnalyse(); },
     'show-report': () => { renderReport(); show('scReport'); },
     'pdf': downloadPDF,

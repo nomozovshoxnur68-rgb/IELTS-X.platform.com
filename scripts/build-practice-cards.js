@@ -23,7 +23,8 @@ const listening = fs.readFileSync(path.join(ROOT, 'part/practice/listening.html'
   return href && t ? { id: base(href), title: t, href, free: true } : null;
 }).filter(Boolean);
 const writing = grab('const writingData = [').map((c) => ({ id: 'w' + c.id, title: c.title, to: '/full-tests/writing/' + slug(c.pack), free: false }));
-const speaking = grab('const topicsData = [').map((c) => ({ id: 's' + c.id, title: c.title, to: '/full-tests/speaking/' + slug(c.pack), free: false }));
+// the speaking topics are real tests now (speaking-src/topics.js); the list keeps their cards so Access can show them
+const speaking = require(path.join(ROOT, 'speaking-src/topics.js')).LIST.filter((c) => c.mode === 'part').map((c, i) => ({ id: 's' + (i + 1), title: c.title, to: '/full-tests/speaking/' + slug(c.pack), free: false }));
 const out = { reading: { title: 'Reading passages', page: '/part/practice/reading', cards: reading },
   listening: { title: 'Listening sections', page: '/part/practice/listening', cards: listening },
   writing: { title: 'Writing tasks', page: '/part/practice/writing', cards: writing },

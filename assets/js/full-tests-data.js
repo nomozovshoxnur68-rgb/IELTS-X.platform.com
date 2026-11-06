@@ -119,16 +119,9 @@
             ] }
         ],
         speaking: [
-            { slug: 'jan-august', title: 'Jan-August', tier: 'Tier 3', plan: 'MAX', premium: true, tests: [
-                { number: 23, source: 'Speaking Parts 1, 2 & 3', tags: ['Health', 'Lifestyle', 'Wellness'], href: '/part/practice/speaking', premium: true },
-                { number: 19, source: 'Speaking Parts 1, 2 & 3', tags: ['Environment Nature', 'Urban Life Places'], href: '/part/practice/speaking', premium: true },
-                { number: 16, source: 'Speaking Parts 1, 2 & 3', tags: ['Education Work', 'Media Entertainment Creativity'], href: '/part/practice/speaking', premium: true }
-            ] },
-            { slug: 'sep-dec', title: 'Sep-Dec', tier: 'Tier 2', plan: 'MAX', premium: true, tests: [
-                { number: 24, source: 'Speaking Parts 1, 2 & 3', tags: ['Technology', 'Communication', 'Relationships'], href: '/part/practice/speaking', premium: true },
-                { number: 22, source: 'Speaking Parts 1, 2 & 3', tags: ['Travel', 'Culture', 'Adventure'], href: '/part/practice/speaking', premium: true },
-                { number: 21, source: 'Speaking Parts 1, 2 & 3', tags: ['Technology', 'Education', 'Daily Life'], href: '/part/practice/speaking', premium: true }
-            ] }
+            /* the tests of these packs are real tests in the admin panel (built in: speaking-src/topics.js) */
+            { slug: 'jan-august', title: 'Jan-August', tier: 'Tier 3', plan: 'MAX', premium: true, tests: [] },
+            { slug: 'sep-dec', title: 'Sep-Dec', tier: 'Tier 2', plan: 'MAX', premium: true, tests: [] }
         ]
     };
 

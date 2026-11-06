@@ -473,7 +473,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     function write(a) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} }
     return {
       all: read,
-      isCompleted: function (key) { return read().indexOf(String(key)) > -1; },
+      isCompleted: function (key) { var k = testKeyOf(key); return read().some(function (x) { return testKeyOf(x) === k; }); },
       markCompleted: function (key) {
         var a = read(); key = String(key);
         if (a.indexOf(key) === -1) { a.push(key); write(a); }
@@ -486,6 +486,13 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
 
   function completionKey(key) {
     return IELTSXProgress.isCompleted(key) ? 'completed' : 'not-completed';
+  }
+  /* the same test under the address of its card and under the key of its saved result */
+  function testKeyOf(href) {
+    var h = String(href == null ? '' : href).trim();
+    var id = /^\/(writing\/|test)\?(?:.*&)?id=([^&#]+)/.exec(h);
+    if (id) return (id[1] === 'test' ? '/test/' : '/writing/') + decodeURIComponent(id[2]);
+    return h.split(/[?#]/)[0].replace(/\.html$/i, '').replace(/\/+$/, '');
   }
   function isFreeItem(item) {
     var s = String(item.status || item.badge || '').trim().toLowerCase();
@@ -557,7 +564,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     return out;
   }
   function filterSpecs(page, packValues) {
-    var packs = (packValues || []).map(function (v) { return opt(v); });
+    /* Pre-test: a pack of Part tests with up to 49 questions. It is always in the list, also while it is still empty. */
+    var packs = ['Pre-test'].concat((packValues || []).filter(function (v) { return !/^pre[\s_-]*test$/i.test(String(v)); })).map(function (v) { return opt(v); });
     var common = {
       status: { mode: 'single', defaultLabel: 'All Status', options: STATUS_OPTIONS },
       plan: { mode: 'single', defaultLabel: 'All Plans', options: PLAN_OPTIONS },
@@ -840,18 +848,18 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     var done = [];
     try { done = JSON.parse(localStorage.getItem('ieltsx_completed') || '[]'); } catch (e) { done = []; }
     var set = {};
-    for (var i = 0; i < done.length; i++) set[done[i]] = true;
-    document.querySelectorAll('#card-grid a[href]').forEach(function (link) {
+    for (var i = 0; i < done.length; i++) set[testKeyOf(done[i])] = true;
+    document.querySelectorAll('#card-grid a[href], #cardsGrid a[href]').forEach(function (link) {
       var card = link.closest('.rounded-xl');
       if (!card) return;
       var pill = card.querySelector('.ix-done');
-      var isDone = !!set[link.getAttribute('href')];
+      var isDone = !!set[testKeyOf(link.getAttribute('href'))];
       if (isDone && !pill) {
-        var host = card.querySelector('.absolute.top-3.left-3') || card;
+        var host = card.querySelector('.relative') || card;   // the picture; card-access.js hides the corner box of the old badge
         var el = document.createElement('span');
         el.className = 'ix-done';
         el.textContent = '\u2713 Completed';
-        el.style.cssText = 'display:inline-block;margin-left:6px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe';
+        el.style.cssText = 'position:absolute;left:12px;bottom:12px;z-index:10;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe';
         host.appendChild(el);
       } else if (!isDone && pill) { pill.remove(); }
     });
@@ -1318,7 +1326,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         return '<div class="h-full" data-ix-admin data-pack="' + esc(m.pack || 'Starter Pack') + '" style="opacity: 1; transform: none;"><div class="rounded-xl bg-card text-card-foreground shadow group overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border h-full flex flex-col">' +
                             '<div class="relative w-full aspect-[4/3] overflow-hidden bg-muted">' + media +
                             '<div class="absolute top-3 left-3 z-10"><span class="inline-flex items-center justify-center rounded-md font-medium border px-2.5 py-0.5 text-xs bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400">' + (m.premium ? 'Premium' : 'Free') + '</span></div>' +
-                            '<div class="absolute top-3 right-3 z-10"><div class="inline-flex items-center rounded-md border px-2.5 py-0.5 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 text-xs font-medium shadow-md">' + esc(m.sectionLabel || 'Section 1') + '</div></div></div>' +
+                            '<div class="absolute top-3 right-3 z-10"><div class="inline-flex items-center rounded-md border px-2.5 py-0.5 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 text-xs font-medium shadow-md">' + (m.pack === 'Pre-test' ? 'Pre-test' : esc(m.sectionLabel || 'Section 1')) + '</div></div></div>' +
                             '<div class="p-4 flex flex-col flex-1 gap-3"><div class="flex flex-col gap-3 flex-1"><h3 class="font-semibold text-base leading-6 break-words text-foreground group-hover:text-primary transition-colors" title="' + esc(m.title) + '">' + esc(m.title) + '</h3>' +
                             '<div class="text-xs text-muted-foreground"><span class="flex items-center gap-1"><span class="truncate">' + esc(m.description || ((m.premium ? 'Premium' : 'Free Practice') + (m.pack ? ' | ' + m.pack : ''))) + '</span></span></div>' +
                             '<div class="flex flex-wrap gap-1">' + chips + '</div></div>' +
@@ -1884,7 +1892,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                     items.forEach(function (m, n) {
                         var c = {
                             id: 1000 + n, title: esc(m.title), status: m.premium ? 'PREMIUM' : 'FREE', types: (m.types || []).map(esc), plan: esc(m.pack || 'Starter Pack'), pack: esc(m.pack || 'Starter Pack'),
-                            passage: esc(m.passageLabel || 'Passage 1'), href: esc(m.href || ('/test?id=' + encodeURIComponent(m.id))), img: esc(m.coverUrl || ''),
+                            passage: m.pack === 'Pre-test' ? 'Pre-test' : esc(m.passageLabel || 'Passage 1'), href: esc(m.href || ('/test?id=' + encodeURIComponent(m.id))), img: esc(m.coverUrl || ''),
                             desc: esc(m.description || (m.premium ? 'Premium' : 'Free Sample') + ' | ' + (m.pack || 'Starter Pack')), badge: m.premium ? 'PREMIUM' : 'FREE', admin: true
                         };
                         c.key = c.href; c.freeCard = !m.premium;
@@ -1912,47 +1920,9 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         // ─── Dark / Light / System: IELTSX.theme ───
         document.addEventListener('ieltsx:themechange', function() { renderCards(); });
 
-        // ─── Data (18 topics) ───
-        const topicsData = [
-            { id: 1, title: "Topic 19 - P3: Environmental protection", part: "Part 3", tier: "Tier 3",
-                pack: "Jan-August", plan: "Plan A", tags: ["Environment Nature", "Urban Life Places"] },
-            { id: 2, title: "Topic 19 - P2: Describe a person who encouraged you to protect the nature",
-                part: "Part 2", tier: "Tier 3", pack: "Jan-August", plan: "Plan A",
-                tags: ["Environment Nature", "Urban Life Places"] },
-            { id: 3, title: "Topic 19 - P1: Museum", part: "Part 1", tier: "Tier 3", pack: "Jan-August",
-                plan: "Plan A", tags: ["Environment Nature", "Urban Life Places"] },
-            { id: 4, title: "Topic 16 - P3: Films", part: "Part 3", tier: "Tier 3", pack: "Jan-August",
-                plan: "Plan B", tags: ["Education Work", "Media Entertainment Creativity"] },
-            { id: 5, title: "Topic 16 - P2: Describe a film you watched and enjoyed", part: "Part 2",
-                tier: "Tier 3", pack: "Jan-August", plan: "Plan B",
-                tags: ["Education Work", "Media Entertainment Creativity"] },
-            { id: 6, title: "Topic 16 - P1: Work/study", part: "Part 1", tier: "Tier 3", pack: "Jan-August",
-                plan: "Plan B", tags: ["Education Work", "Media Entertainment Creativity"] },
-            { id: 7, title: "Topic 21 - P3: Technology in education", part: "Part 3", tier: "Tier 2",
-                pack: "Sep-Dec", plan: "Plan A", tags: ["Technology", "Education"] },
-            { id: 8, title: "Topic 21 - P2: Describe a useful app you use", part: "Part 2", tier: "Tier 2",
-                pack: "Sep-Dec", plan: "Plan A", tags: ["Technology", "Daily Life"] },
-            { id: 9, title: "Topic 21 - P1: Smartphones", part: "Part 1", tier: "Tier 2", pack: "Sep-Dec",
-                plan: "Plan A", tags: ["Technology", "Communication"] },
-            { id: 10, title: "Topic 22 - P3: Travel and tourism", part: "Part 3", tier: "Tier 1",
-                pack: "Sep-Dec", plan: "Plan B", tags: ["Travel", "Culture"] },
-            { id: 11, title: "Topic 22 - P2: Describe a memorable trip", part: "Part 2", tier: "Tier 1",
-                pack: "Sep-Dec", plan: "Plan B", tags: ["Travel", "Adventure"] },
-            { id: 12, title: "Topic 22 - P1: Holidays", part: "Part 1", tier: "Tier 1", pack: "Sep-Dec",
-                plan: "Plan B", tags: ["Travel", "Leisure"] },
-            { id: 13, title: "Topic 23 - P3: Health and fitness", part: "Part 3", tier: "Tier 3",
-                pack: "Jan-August", plan: "Plan A", tags: ["Health", "Lifestyle"] },
-            { id: 14, title: "Topic 23 - P2: Describe a healthy habit", part: "Part 2", tier: "Tier 3",
-                pack: "Jan-August", plan: "Plan A", tags: ["Health", "Wellness"] },
-            { id: 15, title: "Topic 23 - P1: Exercise", part: "Part 1", tier: "Tier 3", pack: "Jan-August",
-                plan: "Plan A", tags: ["Health", "Fitness"] },
-            { id: 16, title: "Topic 24 - P3: Social media", part: "Part 3", tier: "Tier 2", pack: "Sep-Dec",
-                plan: "Plan B", tags: ["Technology", "Communication"] },
-            { id: 17, title: "Topic 24 - P2: Describe a social media platform", part: "Part 2", tier: "Tier 2",
-                pack: "Sep-Dec", plan: "Plan B", tags: ["Technology", "Communication"] },
-            { id: 18, title: "Topic 24 - P1: Online friendships", part: "Part 1", tier: "Tier 2",
-                pack: "Sep-Dec", plan: "Plan B", tags: ["Technology", "Relationships"] }
-        ];
+        // ─── Data: every card is a speaking test of the admin panel (the built-in topics are in speaking-src/topics.js) ───
+        const topicsData = [];
+        let speakingLoading = true;
 
         // ─── Render ───
         let currentPage = 1;
@@ -1963,17 +1933,17 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         function getFilteredData() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             return topicsData.filter(item => {
-                if (!(search === '' || item.title.toLowerCase().includes(search) || item.tags.some(t => t
-                    .toLowerCase().includes(search)))) return false;
+                if (!(search === '' || item.searchText.includes(search))) return false;
                 if (!filterBar) return true;
-                return filterBar.matches('part', [item.part]) &&
-                    filterBar.matches('status', [IELTSX.completionKey('speaking:' + item.id)]) &&
-                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, IELTSX.isFreeItem(item)) : (IELTSX.isFreeItem(item) ? 'demo' : 'max')]) &&
-                    filterBar.matches('pack', [item.pack]);
+                return filterBar.matches('part', item.parts) &&
+                    filterBar.matches('status', [IELTSX.completionKey(item.key)]) &&
+                    filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, !item.premium) : (item.premium ? 'max' : 'demo')]) &&
+                    filterBar.matches('pack', [item.packRaw]);
             });
         }
 
         function renderCards() {
+            if (speakingLoading && !topicsData.length) { document.getElementById('cardsGrid').innerHTML = IELTSX.skeletonCards(6); return; }
             const filtered = getFilteredData();
             const total = filtered.length;
             const totalPages = Math.ceil(total / perPage) || 1;
@@ -1986,19 +1956,21 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                         <div class="h-full">
                             <div class="rounded-xl bg-card text-card-foreground shadow group overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border h-full flex flex-col">
                                 <div class="relative w-full aspect-[4/3] overflow-hidden bg-muted">
-                                    <div class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-rose-500/80 via-pink-500/70 to-red-600/80 dark:from-rose-600/60 dark:via-pink-600/50 dark:to-red-700/60">
+                                    ${item.img ? `<img loading="lazy" decoding="async" src="${item.img}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>` :
+                                    `<div class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-rose-500/80 via-pink-500/70 to-red-600/80 dark:from-rose-600/60 dark:via-pink-600/50 dark:to-red-700/60">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic w-8 h-8 text-white/90">
                                             <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
                                             <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                                             <line x1="12" x2="12" y1="19" y2="22"></line>
                                         </svg>
                                         <span class="mt-2 text-white/90 font-medium text-sm text-center px-4 line-clamp-2">${item.pack}</span>
-                                    </div>
+                                    </div>`}
                                     <div class="absolute top-3 left-3 z-10">
-                                        <span class="inline-flex items-center justify-center rounded-md font-medium border px-2.5 py-0.5 text-xs bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/50">${item.tier}</span>
+                                        <span class="inline-flex items-center justify-center rounded-md font-medium border px-2.5 py-0.5 text-xs bg-green-100 text-green-700 border-green-200">${item.premium ? 'Premium' : 'Free'}</span>
                                     </div>
                                     <div class="absolute top-3 right-3 z-10">
-                                        <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 dark:border-white/30 text-xs font-medium shadow-md hover:bg-black/70 dark:hover:bg-black/90 transition-colors">${item.part}</div>
+                                        <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 bg-black/60 dark:bg-black/80 backdrop-blur-sm text-white border-white/20 dark:border-white/30 text-xs font-medium shadow-md">${item.tag}</div>
                                     </div>
                                 </div>
                                 <div class="p-4 flex flex-col flex-1 gap-3">
@@ -2010,30 +1982,26 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                                                     <path d="M12 7v14"></path>
                                                     <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
                                                 </svg>
-                                                <span class="truncate">${item.pack}</span>
+                                                <span class="truncate">${item.meta}</span>
                                             </span>
                                         </div>
                                         <div class="flex flex-wrap gap-1">
-                                            ${item.tags.map(t => `<div class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 text-xs">${t}</div>`).join('')}
+                                            ${item.tags.map(t => `<div class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground text-xs">${t}</div>`).join('')}
                                         </div>
                                     </div>
                                     <div class="flex gap-2 pt-1">
-                                        <button type="button" data-get-access class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary hover:bg-primary/90 h-8 rounded-md px-3 text-xs bg-gradient-to-r text-white border-0 shadow-lg hover:shadow-xl font-semibold transition-all from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:via-rose-700 hover:to-orange-700 w-full">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crown w-3.5 h-3.5 mr-1">
-                                                <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
-                                                <path d="M5 21h14"></path>
-                                            </svg>Get Access
-                                        </button>
+                                        <a href="${item.href}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap h-8 rounded-md px-3 text-xs font-semibold w-full bg-primary text-primary-foreground shadow hover:bg-primary/90 transition-all" style="text-decoration:none">Start</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    `).join('');
+                    `).join('') || '<div class="col-span-full text-center py-12 text-muted-foreground">' + (topicsData.length ? 'No topics match your filters.' : 'New speaking topics are coming soon.') + '</div>';
 
             document.getElementById('resultCount').textContent = `Showing ${pageItems.length} of ${total} tests`;
             document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages}`;
             document.getElementById('prevPageBtn').disabled = (currentPage === 1);
             document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
+            if (IELTSX.markCompleted) IELTSX.markCompleted();
         }
 
         // ─── Pagination ───
@@ -2048,14 +2016,16 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 renderCards(); }
         });
 
-        // ─── Filters ───
-        (function () {
+        // ─── Filters (the Pack list comes from the tests) ───
+        function makeFilters() {
+            if (filterBar) return;
+            const packs = Array.from(new Set(topicsData.map(function (x) { return x.packRaw; }).filter(Boolean))).sort();
             filterBar = IELTSX.createFilterBar({
-                specs: IELTSX.filterSpecs('speaking', ['Jan-August', 'Sep-Dec']),
+                specs: IELTSX.filterSpecs('speaking', packs),
                 badges: null,
                 onChange: function () { currentPage = 1; renderCards(); }
             });
-        })();
+        }
         document.getElementById('searchInput').addEventListener('input', IELTSX.debounce(function() { currentPage = 1; renderCards(); }, 150));
         document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
 
@@ -2118,8 +2088,31 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         })();
 
         // ─── Init ───
+        window.IELTSX_ADMIN_CARDS_READY = new Promise(function (resolve) {
+                IELTSX.cachedJson('/api/materials?type=speaking&mode=part', function (d, first) {
+                    speakingLoading = false;
+                    var items = d.items || [];
+                    var hrefOf = function (m) { return m.href || ('/test?id=' + encodeURIComponent(m.id)); };
+                    window.IELTSX_ADMIN_CARDS = items.map(function (m) { return { href: hrefOf(m), title: m.title, locked: !!m.locked, premium: !!m.premium, plan: m.plan || 'standard' }; });
+                    // text typed in the admin panel goes into the card HTML: escape it
+                    var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+                    topicsData.length = 0;
+                    items.forEach(function (m) {
+                        var labels = (m.partLabels || []).map(function (t) { return (/part\s*([123])/i.exec(t) || [])[0] || ''; }).filter(Boolean).map(function (t) { return 'Part ' + t.replace(/\D+/g, ''); });
+                        var pack = m.pack || 'Practice', n = Number(m.questionCount) || 0;
+                        topicsData.push({ id: m.id, key: hrefOf(m), title: esc(m.title), href: esc(hrefOf(m)), premium: !!m.premium, img: m.coverUrl ? esc(m.coverUrl) : null,
+                            parts: labels.length ? labels : ['Part 1'], tag: esc(pack === 'Pre-test' ? 'Pre-test' : (labels.join(' + ') || 'Speaking')), pack: esc(pack), packRaw: pack,
+                            meta: esc(pack + (n ? ' · ' + n + (n === 1 ? ' question' : ' questions') : '')), tags: (m.types || []).slice(0, 3).map(esc),
+                            searchText: String(m.title + ' ' + pack + ' ' + (m.types || []).join(' ')).toLowerCase() });
+                    });
+                    makeFilters();
+                    if (first) currentPage = 1;
+                    renderCards();
+                    if (first) resolve(); else if (IELTSX.refreshCardAccess) IELTSX.refreshCardAccess();   // the new copy differs
+                });
+        });
         renderCards();
-    
+
   };
 
   pages['writing'] = function () {
@@ -2161,10 +2154,10 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                 if (!(search === '' || item.title.toLowerCase().includes(search))) return false;
                 if (!filterBar) return true;
                 return filterBar.matches('task', [item.task]) &&
-                    filterBar.matches('status', [IELTSX.completionKey('writing:' + item.id)]) &&
+                    filterBar.matches('status', [IELTSX.completionKey(item.href || 'writing:' + item.id)]) &&
                     filterBar.matches('type', IELTSX.canonicalWritingTypes(item.type)) &&
                     filterBar.matches('plan', [IELTSX.cardPlanKey ? IELTSX.cardPlanKey(item, IELTSX.isFreeItem(item)) : (IELTSX.isFreeItem(item) ? 'demo' : 'max')]) &&
-                    filterBar.matches('pack', [item.pack]);
+                    filterBar.matches('pack', [item.packRaw || item.pack]);
             });
         }
 
@@ -2233,6 +2226,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages}`;
             document.getElementById('prevPageBtn').disabled = (currentPage === 1);
             document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
+            if (IELTSX.markCompleted) IELTSX.markCompleted();
         }
 
         // ─── Pagination ───
@@ -2245,14 +2239,16 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             if (currentPage < totalPages) { currentPage++; renderCards(); }
         });
 
-        // ─── Filters ───
-        (function () {
+        // ─── Filters (the Pack list comes from the tests) ───
+        function makeFilters() {
+            if (filterBar) return;
+            const packs = Array.from(new Set(writingData.map(function (x) { return x.packRaw || x.pack; }).filter(Boolean))).sort();
             filterBar = IELTSX.createFilterBar({
-                specs: IELTSX.filterSpecs('writing', ['09_02-16_02', 'Jan-August', 'Sep-Dec']),
+                specs: IELTSX.filterSpecs('writing', packs),
                 badges: null,
                 onChange: function () { currentPage = 1; renderCards(); }
             });
-        })();
+        }
         document.getElementById('searchInput').addEventListener('input', IELTSX.debounce(function() { currentPage = 1; renderCards(); }, 150));
         document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
 
@@ -2347,9 +2343,10 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
                     // text typed in the admin panel goes into the card HTML: escape it
                     var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
                     var made = items.map(function (m, n) {
-                        return { id: 1000 + n, title: esc(m.title), task: esc(m.taskLabel || 'Task 1'), tier: esc(m.tier || 'Tier 1'), type: esc((m.types || [])[0] || 'Writing task'), pack: esc(m.pack || 'Practice'), plan: 'Plan A', img: m.coverUrl ? esc(m.coverUrl) : null, href: esc(hrefOf(m)), admin: true };
+                        return { id: 1000 + n, title: esc(m.title), task: esc(m.taskLabel || 'Task 1'), tier: esc(m.tier || 'Tier 1'), type: esc((m.types || [])[0] || 'Writing task'), pack: esc(m.pack || 'Practice'), packRaw: m.pack || 'Practice', plan: 'Plan A', img: m.coverUrl ? esc(m.coverUrl) : null, href: esc(hrefOf(m)), admin: true };
                     });
                     Array.prototype.unshift.apply(writingData, made);
+                    makeFilters();
                     if (first) currentPage = 1;
                     renderCards();
                     if (first) resolve(); else if (IELTSX.refreshCardAccess) IELTSX.refreshCardAccess();   // the new copy differs

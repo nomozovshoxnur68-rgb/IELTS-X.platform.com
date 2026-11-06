@@ -1,10 +1,10 @@
 'use strict';
 /* ====
-   ai-provider.js -- the AI service behind the admin panel's AI Test Generator (ai-generator.js).
+   ai-provider.js -- the AI service behind the admin panel's AI Test Generator (ai-generator.js) and the students' AI check of Writing and Speaking (ai-examiner.js).
 
    One small interface, so another provider can be added later without touching the generator:
      configured()                              -> { ok, provider, model, problem }
-     generateJson({ system, parts, schema })   -> the parsed JSON answer (parts: { text } or { file: handle })
+     generateJson({ system, parts, schema })   -> the parsed JSON answer (parts: { text }, { file: handle } or { inline: { mimeType, data: base64 } })
      uploadFile({ data, mimeType, name })      -> handle (an audio / PDF file the model can read)
      deleteFile(handle)                        -> removes it again (temporary files are not kept)
 
@@ -100,7 +100,7 @@ async function generateWith(model, { system, parts, schema, maxOutputTokens }, m
   if (/^gemini-3/i.test(model) && thinkingParamOk) gc.thinkingConfig = { thinkingLevel: THINKING() };
   const body = {
     systemInstruction: { parts: [{ text: system }] },
-    contents: [{ role: 'user', parts: parts.map((p) => (p.file ? { file_data: { mime_type: p.file.mimeType, file_uri: p.file.uri } } : { text: p.text })) }],
+    contents: [{ role: 'user', parts: parts.map((p) => (p.file ? { file_data: { mime_type: p.file.mimeType, file_uri: p.file.uri } } : p.inline ? { inline_data: { mime_type: p.inline.mimeType, data: p.inline.data } } : { text: p.text })) }],
     generationConfig: gc
   };
   const url = `${BASE()}/v1beta/models/${encodeURIComponent(model)}:generateContent`;

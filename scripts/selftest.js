@@ -28,7 +28,7 @@ server.listen(0, async () => {
   try {
     // --- files that must never be downloadable
     for (const p of ['/data/db.json', '/data/.session-secret', '/server.js', '/package.json', '/.env.example', '/ADMIN_ACCESS.md', '/supabase-schema.sql', '/vercel.json', '/scripts/make-admin.js', '/api/../server.js', '/%2e%2e/server.js', '/..%2fserver.js', '/node_modules/x.js',
-      '/ai-provider.js', '/ai-generator.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
+      '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/speaking-src/topics.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
       const r = await call('GET', p); assert.ok([403, 404].includes(r.status), p + ' -> ' + r.status);
     }
     ok('server code, database and docs are not downloadable');
@@ -197,7 +197,7 @@ server.listen(0, async () => {
     assert.equal((await call('POST', '/api/results', { body: res1 })).status, 401);
     assert.equal((await call('POST', '/api/results', { body: { ...res1, scoreCorrect: 11 }, jar: user })).status, 400);
     assert.equal((await call('POST', '/api/results', { body: { ...res1, testKey: 'x' }, jar: user })).status, 400);
-    r = await call('POST', '/api/results', { body: res1, jar: user }); assert.equal(r.status, 201); assert.equal(r.json.result.band, 6.3);
+    r = await call('POST', '/api/results', { body: res1, jar: user }); assert.equal(r.status, 201); assert.equal(r.json.result.band, 6.5, 'the official table: 7 of 10 = 28 of 40');
     assert.equal((await call('POST', '/api/results', { body: res1, jar: user })).json.duplicate, true);
     await call('POST', '/api/results', { body: { ...res1, testKey: '/sections/test-1.html', section: 'Listening', scoreCorrect: 5, scoreTotal: 10 }, jar: user });
     assert.equal((await call('GET', '/api/results', { jar: user })).json.results.length, 2);
@@ -582,7 +582,7 @@ server.listen(0, async () => {
         const tests = cp.tests.map((t, i) => Object.assign({}, t, { _i: i })).sort((a, b) => ((a.number || 0) - (b.number || 0)) || (a._i - b._i));
         const pack = ctx.window.IELTSXAccess.assignKeys(sk.skill, { slug: cp.slug, tests });
         assert.equal(pack.key, pk.key);
-        assert.deepEqual(tests.map((t) => t.key), pk.tests.map((t) => t.key), sk.skill + '/' + pk.slug); checked += tests.length + 1;
+        assert.deepEqual(tests.map((t) => t.key), pk.tests.filter((t) => !t.material).map((t) => t.key), sk.skill + '/' + pk.slug); checked += tests.length + 1;
       }
       assert.ok(checked > 20); ok('browser keys = server keys (' + checked + ' packs and tests)');
     }
@@ -702,7 +702,7 @@ server.listen(0, async () => {
         const tests = cp.tests.map((t, i) => Object.assign({}, t, { _i: i })).sort((a, b) => ((a.number || 0) - (b.number || 0)) || (a._i - b._i));
         const pack = ctx.window.IELTSXAccess.assignKeys(sk.skill, { slug: cp.slug, tests });
         assert.equal(pack.key, pk.key);
-        assert.deepEqual(tests.map((t) => t.key), pk.tests.map((t) => t.key), sk.skill + '/' + pk.slug); checked += tests.length + 1;
+        assert.deepEqual(tests.map((t) => t.key), pk.tests.filter((t) => !t.material).map((t) => t.key), sk.skill + '/' + pk.slug); checked += tests.length + 1;
       }
       assert.ok(checked > 20); ok('browser keys = server keys (' + checked + ' packs and tests)');
     }
@@ -754,6 +754,52 @@ server.listen(0, async () => {
       assert.equal((await call('DELETE', '/api/admin/packs/' + ov.json.pack.id, { jar: boss })).status, 200);
       for (const m of [lp, lf, wf, sf, sp]) await call('DELETE', '/api/admin/materials/' + m.id, { jar: boss });
       ok('Part / Full tests for Reading, Listening, Writing, Speaking + built-in packs managed from the admin panel');
+    }
+    // --- Pre-test: up to 49 questions numbered from 1; one band table and one way of comparing answers everywhere
+    {
+      const vm2 = require('vm');
+      const tf = (n) => Array.from({ length: n }, (_, i) => ({ type: 'tfng', gi: 0, group: 'TFNG', prompt: 'Statement ' + (i + 1), answer: 'TRUE' }));
+      const mkP = (type, pack, questions, extra) => call('POST', '/api/admin/materials', { jar: boss, body: { type, title: type + ' ' + pack, pack, data: { mode: 'part', passage: 'A passage.', audioUrl: 'https://example.com/a.mp3', questions, ...(extra || {}) } } });
+      assert.equal((await mkP('reading', 'Pre-test', tf(50))).status, 400, 'more than 49');
+      const rp = await mkP('reading', 'pre test', tf(49), { passageLabel: 'Passage 2' }); assert.equal(rp.status, 201, rp.text); assert.equal(rp.json.item.pack, 'Pre-test', 'one spelling of the pack');
+      const page = await call('GET', '/exam/reading/' + rp.json.item.id, { jar: boss }); assert.equal(page.status, 200);
+      assert.ok(/const QTOTAL = 49;/.test(page.text) && /const PONLY = 1;/.test(page.text) && /"id": 49,/.test(page.text) && /"id": 1,/.test(page.text), 'numbered 1-49 whatever the passage tag says');
+      const lp = await mkP('listening', 'Pre-test', Array.from({ length: 49 }, (_, i) => ({ type: 'gap', gi: 0, prompt: 'Gap ____', answer: 'w' + i })), { sectionLabel: 'Section 3' });
+      const lpage = await call('GET', '/exam/listening/' + lp.json.item.id, { jar: boss }); assert.ok(/"from":1,"to":49/.test(lpage.text) && /"label":"Pre-test"/.test(lpage.text));
+      assert.equal((await call('PATCH', '/api/admin/materials/' + rp.json.item.id, { jar: boss, body: { data: { mode: 'part', passage: 'A passage.', questions: tf(50) } } })).status, 400);
+      const other = await mkP('reading', 'Starter Pack', tf(50)); assert.equal(other.status, 201, 'other packs keep their limit');
+      assert.equal((await call('PATCH', '/api/admin/materials/' + other.json.item.id, { jar: boss, body: { pack: 'PreTest' } })).status, 400, 'moving a long test into the pack is refused too');
+      // the engines: every question is marked, the official tables, answers compared loosely
+      const engine = (file) => {
+        const src = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+        const grab = (name) => { const i = src.indexOf('function ' + name + '('); assert.ok(i >= 0, file + ': ' + name); let d = 0, j = src.indexOf('{', i); for (let k = j; k < src.length; k++) { if (src[k] === '{') d++; else if (src[k] === '}') { d--; if (!d) return src.slice(i, k + 1); } } return ''; };
+        const box = { QTOTAL: 40 }; vm2.runInNewContext([grab('normAnswer'), grab('answerVariants'), grab('checkAnswerMatch'), grab('bandFor')].join('\n') + ';this.check=checkAnswerMatch;this.band=bandFor;', box);
+        return box;
+      };
+      for (const file of ['reading.js', 'full-mock/js/reading.js', 'listening/js/listening.js', 'listening/js/exam-app.js', 'full-mock/js/listening.js']) {
+        const e = engine(file); const isL = /listening/.test(file);
+        assert.deepEqual([40, 37, 33, 32, 30, 27, 26, 19, 18, 15, 13, 10, 4, 0].map((n) => e.band(n)), isL ? [9, 8.5, 7.5, 7.5, 7, 6.5, 6.5, 5.5, 5.5, 4.5, 4.5, 4, 2.5, 0] : [9, 8.5, 7.5, 7, 7, 6.5, 6, 5.5, 5, 5, 4.5, 4, 2.5, 0], file);
+        for (const [g, c, want] of [[' Colour ', 'colour|color', true], ['color', 'colour | color', true], ['the river', '(the) river', true], ['river', '(the) river', true], ['well known', 'well-known', true], ['O’Brien.', "O'Brien", true], ['rivers', '(the) river', false], ['', 'x', false], ['NOT  GIVEN', 'NOT GIVEN', true]]) assert.equal(e.check(g, c), want, file + ': ' + g + ' / ' + c);
+      }
+      assert.ok(/for \(const i of allIds\)/.test(fs.readFileSync(path.join(__dirname, '../reading.js'), 'utf8')), 'not only the first 40');
+      for (const f of ['reading.js', 'listening/js/listening.js', 'listening/js/exam-app.js']) assert.ok(fs.readFileSync(path.join(__dirname, '..', f), 'utf8').includes('ieltsx:test-finished'), f + ' tells the account');
+      const tc = fs.readFileSync(path.join(__dirname, '../assets/js/test-complete.js'), 'utf8'); assert.ok(/exam\\\/\(reading\|listening\)/.test(tc), 'tests at /exam/... are saved too');
+      // the server: the same table when no band is sent; a missing band is not a band of 0
+      const save = (b) => call('POST', '/api/results', { jar: boss, body: { section: 'Listening', pageLabel: 'x', scoreTotal: 40, ...b } });
+      assert.equal((await save({ testKey: '/x/1', scoreCorrect: 32, band: null })).json.result.band, 7.5);
+      assert.equal((await save({ testKey: '/x/2', scoreCorrect: 26 })).json.result.band, 6.5);
+      assert.equal((await save({ testKey: '/x/3', scoreCorrect: 26, band: 7 })).json.result.band, 7, 'the band of the exam is kept');
+      // answers on the server follow the same rule
+      const g = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Grade rule', data: { mode: 'part', passage: 'A passage.', questions: [{ type: 'short', prompt: 'A', answer: '(the) river|stream' }, { type: 'short', prompt: 'B', answer: 'well-known' }, { type: 'short', prompt: 'C', answer: 'x' }] } } });
+      const gr = await call('POST', '/api/materials/' + g.json.item.id + '/grade', { jar: boss, body: { answers: { q1: 'River', q2: 'well known', q3: 'y' } } }); assert.equal(gr.json.correct, 2, gr.text);
+      for (const m of [rp, lp, other, g]) await call('DELETE', '/api/admin/materials/' + m.json.item.id, { jar: boss });
+      // the built-in speaking topics are real tests: Part cards and Full tests in their packs
+      const sp = (await call('GET', '/api/materials?type=speaking&mode=part')).json.items; const sf = (await call('GET', '/api/materials?type=speaking&mode=full')).json.items;
+      assert.equal(sp.filter((x) => /^Topic \d+ - P[123]:/.test(x.title)).length, 18); assert.equal(sf.filter((x) => /^Topic \d+:/.test(x.title)).length, 6);
+      const free = sp.find((x) => /^Topic 19 - P1/.test(x.title)); assert.ok(!free.locked && free.pack === 'Jan-August' && free.questionCount === 5 && free.types.length);
+      assert.ok(sp.find((x) => /^Topic 24 - P1/.test(x.title)).locked, 'the others need a plan');
+      const steps = require('../ai-examiner').questionsOf((await call('GET', '/api/materials/' + free.id)).json.item); assert.equal(steps.length, 5);
+      ok('Pre-test (49 questions from 1), the official band tables and one answer rule in every engine, built-in speaking topics');
     }
     // --- AI Test Generator, against a local stand-in for the Gemini API (no real AI is called by the self-test)
     {
@@ -885,8 +931,93 @@ server.listen(0, async () => {
         process.env.AI_HOURLY_LIMIT = '1'; fake.mode = 'generate';
         r = await ai(reading({ title: 'limit check' })); assert.equal(r.status, 429);
         ok('AI Test Generator: admins only, key stays on the server, answers checked against the source, cache, one run at a time, clear AI errors, uploaded files only');
+
+        // --- the students' AI check of Writing and Speaking (ai-examiner.js), against the same stand-in
+        const WORDS = Array(60).fill('Many people believe that technology helps students to learn.').join(' ');
+        const crit = (band) => ({ band, comment: 'A comment.', points: ['A point.'] });
+        const writingReply = { summary: 'Good.', strengths: ['Clear.'], criteria: { taskAchievement: crit(6.5), coherenceCohesion: crit(7), lexicalResource: crit(6), grammarAccuracy: crit(6.3) }, grammar: [{ wrong: 'people is', correct: 'people are', why: 'Plural.' }], vocabulary: [{ word: 'good', better: ['beneficial'], why: 'Precise.', example: 'It is beneficial.' }], plan: [{ title: 'Next', text: 'Practise.' }], sampleAnswer: 'A model essay.', overall: 9 };
+        const speakingReply = { summary: 'Fine.', strengths: [], criteria: { fluencyCoherence: crit(6), lexicalResource: crit(6.5), grammarAccuracy: crit(5.5), pronunciation: crit(6) }, grammar: [], vocabulary: [], plan: [], answers: [{ n: 1, comment: 'Well said.', modelAnswer: 'A model answer.' }] };
+        const replyFor = { current: writingReply };
+        const oldEmit = gemini.listeners('request')[0];
+        gemini.removeAllListeners('request');
+        gemini.on('request', (req, res) => {
+          if (fake.mode !== 'examiner') return oldEmit(req, res);
+          let body = ''; req.on('data', (c) => { body += c; }); req.on('end', () => { fake.calls += 1; fake.lastBody = JSON.parse(body || '{}'); reply(res, 200, gen(JSON.stringify(replyFor.current))); });
+        });
+        fake.mode = 'examiner'; process.env.AI_MODEL = 'gemini-test-flash'; delete process.env.AI_HOURLY_LIMIT;
+        const writingTest = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'writing', title: 'AI writing test', data: { tasks: [{ kind: 'task2', prompt: 'Technology in education: agree or disagree?', sample: '' }, { kind: 'task2', prompt: 'Second task', sample: 'The teacher wrote this.' }] } } })).json.item;
+        const speakingTest = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'speaking', title: 'AI speaking test', data: { parts: [{ title: 'Part 1', questions: ['Do you work?', 'Do you like it?'] }, { title: 'Part 2', prompt: 'Describe a book', prepSeconds: 60, speakSeconds: 120 }] } } })).json.item;
+        const lockedTest = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'writing', title: 'AI locked test', premium: true, data: { tasks: [{ kind: 'task2', prompt: 'Locked task' }] } } })).json.item;
+        const w = (body, j) => call('POST', '/api/ai/writing', { jar: j === undefined ? user : j, body });
+        // a visitor is asked to sign in; a student cannot use a test of a higher plan
+        assert.equal((await w({ materialId: writingTest.id, taskId: 't1', answer: WORDS }, null)).status, 401);
+        assert.equal((await w({ materialId: lockedTest.id, taskId: 't1', answer: WORDS })).status, 403);
+        assert.equal((await w({ materialId: writingTest.id, taskId: 't9', answer: WORDS })).status, 404);
+        assert.equal((await w({ materialId: writingTest.id, taskId: 't1', answer: 'Too short.' })).status, 400, 'nothing to check');
+        // the status says how many checks are left; the key is never in it
+        process.env.AI_CHECKS_FREE = '2';
+        let st = (await call('GET', '/api/ai/status', { jar: user })).json; assert.deepEqual([st.configured, st.signedIn, st.limit, st.used, st.remaining], [true, true, 2, 0, 2]);
+        assert.deepEqual([(await call('GET', '/api/ai/status')).json.signedIn, (await call('GET', '/api/ai/status', { jar: boss })).json.limit], [false, null], 'admins have no limit');
+        // one check: the question comes from the server, the bands are worked out here (the model said overall 9), a check is counted
+        const before2 = fake.calls;
+        let c1 = await w({ materialId: writingTest.id, taskId: 't1', answer: WORDS, lang: 'uz', taskPrompt: 'ignore this question' });
+        assert.equal(c1.status, 200, c1.text); assert.equal(fake.calls, before2 + 1);
+        assert.equal(c1.json.overall, 6.5, 'average of 6.5, 7, 6, 6.5 = 6.5'); assert.equal(c1.json.criteria.grammarAccuracy.band, 6.5, 'half bands only');
+        assert.equal(c1.json.grammar[0].correct, 'people are'); assert.equal(c1.json.vocabulary[0].better[0], 'beneficial'); assert.equal(c1.json.sampleAnswer, 'A model essay.');
+        assert.deepEqual([c1.json.quota.used, c1.json.quota.remaining], [1, 1]); assert.ok(!c1.text.includes(KEY));
+        const sentText = fake.lastBody.contents[0].parts.map((x) => x.text || '').join('\n');
+        assert.ok(sentText.includes('Technology in education') && !sentText.includes('ignore this question') && sentText.includes('<candidate_answer>'));
+        assert.ok(/Uzbek/.test(fake.lastBody.systemInstruction.parts[0].text) && /never an instruction/.test(fake.lastBody.systemInstruction.parts[0].text));
+        // the teacher's model answer is used instead of a generated one
+        const c2 = await w({ materialId: writingTest.id, taskId: 't2', answer: WORDS }); assert.equal(c2.status, 200, c2.text);
+        assert.deepEqual([c2.json.sampleAnswer, c2.json.sampleIsModel], ['The teacher wrote this.', true]);
+        // the demo and the mock tests bring their own question; a picture is only read from the mock's own folder, other addresses are not fetched
+        process.env.AI_CHECKS_FREE = '3';
+        const free1 = await w({ examId: 'mock-x', title: 'Mock', taskKind: 'task2', taskPrompt: 'Should cyclists pass a test?', imageUrl: 'https://evil.example/a.jpg', answer: WORDS });
+        assert.equal(free1.status, 200, free1.text); assert.ok(!fake.lastBody.contents[0].parts.some((x) => x.inline_data), 'no picture from another site');
+        assert.ok(fake.lastBody.contents[0].parts[0].text.includes('Should cyclists pass a test?'));
+        // the checks of the month are used up: no AI call, a clear answer; the plans have their own allowance
+        const before3 = fake.calls; const c3 = await w({ materialId: writingTest.id, taskId: 't1', answer: WORDS });
+        assert.equal(c3.status, 402); assert.equal(fake.calls, before3); assert.ok(/AI checks/.test(c3.json.error));
+        process.env.AI_CHECKS_FREE = '50';
+        // a failed AI call does not use a check, and a student does not read about keys or models
+        fake.mode = '404'; const f0 = (await call('GET', '/api/ai/status', { jar: user })).json.used;
+        const c4 = await w({ materialId: writingTest.id, taskId: 't1', answer: WORDS }); assert.equal(c4.status, 503); assert.ok(!/AI_MODEL|gemini/i.test(c4.json.error), c4.json.error);
+        assert.equal((await call('GET', '/api/ai/status', { jar: user })).json.used, f0, 'not counted'); fake.mode = 'examiner';
+        // speaking: a recording goes to the AI as bytes and is written down; then the transcripts are marked
+        const part1 = speakingTest.data.parts[0].id, part2 = speakingTest.data.parts[1].id;
+        replyFor.current = { transcript: 'I work in a bank and I like it.', noSpeech: false, pronunciation: ['Clear vowels.'], fluency: ['Steady.'] };
+        const wav = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4000, 1)]);
+        const up = (q, o) => call('POST', `/api/ai/speaking/transcribe?id=${speakingTest.id}&part=${q}`, { jar: user, raw: o || wav, headers: { 'content-type': 'application/octet-stream', 'x-audio-type': 'audio/wav' } });
+        assert.equal((await up('p9&q=0')).status, 404);
+        assert.equal((await call('POST', `/api/ai/speaking/transcribe?id=${speakingTest.id}&part=${part1}&q=0`, { jar: user, raw: wav, headers: { 'content-type': 'application/octet-stream', 'x-audio-type': 'text/html' } })).status, 415);
+        assert.equal((await up(part1 + '&q=0', Buffer.alloc(10))).status, 400, 'an empty recording');
+        let tr1 = await up(part1 + '&q=0'); assert.equal(tr1.status, 200, tr1.text); assert.equal(tr1.json.transcript, 'I work in a bank and I like it.');
+        const inl = fake.lastBody.contents[0].parts.find((x) => x.inline_data); assert.equal(inl.inline_data.mime_type, 'audio/wav'); assert.equal(Buffer.from(inl.inline_data.data, 'base64').length, wav.length);
+        assert.equal((await call('GET', '/api/ai/status', { jar: user })).json.used, f0, 'writing down a recording is not a check');
+        replyFor.current = speakingReply;
+        const asw = (answers, j) => call('POST', '/api/ai/speaking/assess', { jar: j || user, body: { materialId: speakingTest.id, answers } });
+        assert.equal((await asw([])).status, 400); assert.equal((await asw([{ partId: 'p9', q: 0, transcript: 'x' }])).status, 400, 'a question of another test');
+        let sa = await asw([{ partId: part1, q: 0, transcript: tr1.json.transcript + ' It is a good job with nice people.', durationSec: 12, pronunciation: tr1.json.pronunciation, fluency: tr1.json.fluency }]);
+        assert.equal(sa.status, 200, sa.text); assert.equal(sa.json.overall, 6, 'average of 6, 6.5, 5.5, 6');
+        assert.deepEqual([sa.json.answers[0].question, sa.json.answers[0].modelAnswer, sa.json.typedOnly], ['Do you work?', 'A model answer.', false]);
+        assert.ok(fake.lastBody.contents[0].parts[0].text.includes('Do you work?') && fake.lastBody.contents[0].parts[0].text.includes('Clear vowels.'));
+        // typed answers: pronunciation is not marked and does not count
+        sa = await asw([{ partId: part2, q: 0, transcript: 'I would like to describe a book that I read last year because it was great.', typed: true }]);
+        assert.equal(sa.status, 200, sa.text); assert.deepEqual([sa.json.typedOnly, sa.json.criteria.pronunciation.band, sa.json.overall], [true, null, 6], 'average of 6, 6.5, 5.5');
+        // the history for the Performance page: the criteria, not the texts
+        const hist = (await call('GET', '/api/ai/history', { jar: user })).json;
+        assert.equal(hist.items[0].section, 'Speaking'); assert.equal(hist.items[0].criteria.lexicalResource, 6.5); assert.equal(hist.items[0].criteria.pronunciation, undefined); assert.ok(!JSON.stringify(hist).includes('good job'));
+        assert.equal((await call('GET', '/api/ai/history')).status, 401);
+        // not set up: students read a plain sentence, an admin reads what to do
+        process.env.AI_PROVIDER = 'gemini'; delete process.env.GEMINI_API_KEY;
+        let ns = await w({ materialId: writingTest.id, taskId: 't1', answer: WORDS }); assert.equal(ns.status, 503); assert.ok(!/GEMINI_API_KEY/.test(ns.json.error));
+        ns = await w({ materialId: writingTest.id, taskId: 't1', answer: WORDS }, boss); assert.equal(ns.status, 503); assert.ok(/GEMINI_API_KEY/.test(ns.json.error));
+        assert.deepEqual([(await call('GET', '/api/ai/status', { jar: user })).json.configured, (await call('GET', '/api/ai/status', { jar: user })).json.problem], [false, undefined]);
+        for (const m of [writingTest, speakingTest, lockedTest]) await call('DELETE', '/api/admin/materials/' + m.id, { jar: boss });
+        ok('AI check of Writing and Speaking: four criteria, bands worked out on the server, grammar, vocabulary, model answers, a monthly allowance, recordings as bytes, typed answers, clear errors');
       } finally {
-        for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_PROVIDER', 'AI_HOURLY_LIMIT', 'GOOGLE_API_KEY', 'GEMINI_KEY', 'VERCEL_ENV']) { if (env0[k] === undefined) delete process.env[k]; else process.env[k] = env0[k]; }
+        for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_PROVIDER', 'AI_HOURLY_LIMIT', 'GOOGLE_API_KEY', 'GEMINI_KEY', 'VERCEL_ENV', 'AI_CHECKS_FREE']) { if (env0[k] === undefined) delete process.env[k]; else process.env[k] = env0[k]; }
         gemini.close();
       }
     }

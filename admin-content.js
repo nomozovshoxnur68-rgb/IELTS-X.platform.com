@@ -76,8 +76,8 @@
     const d = m.data || {}; const nq = (d.questions || []).length; const exp = (d.questions || []).filter((q) => String(q.explanation || '').trim()).length;
     const expTxt = nq ? (exp === nq ? ' · 💡 all explained' : exp ? ' · ' + exp + '/' + nq + ' explained' : '') : '';
     const full = modeOf(m) === 'full';
-    if (type === 'reading') return { img: d.coverUrl, tag: full ? 'Full · 3 passages' : d.passageLabel || 'Passage 1', sub: nq + ' questions · ' + (d.durationMin ? d.durationMin + ' min' : 'no timer') + expTxt, href: d.no ? (full ? '/full-tests/reading/test-' : '/pessages/test-') + d.no : '/exam/reading/' + encodeURIComponent(m.id) };
-    if (type === 'listening') return { img: d.coverUrl, tag: full ? 'Full · Parts 1–4' : d.sectionLabel || 'Section 1', sub: nq + ' questions' + (d.audioUrl ? ' · 🔊 audio' : ' · ⚠ no audio') + expTxt, href: !full && d.no ? '/sections/test-' + d.no : '/exam/listening/' + encodeURIComponent(m.id) };
+    if (type === 'reading') return { img: d.coverUrl, tag: full ? 'Full · 3 passages' : m.pack === PRE_TEST ? PRE_TEST : d.passageLabel || 'Passage 1', sub: nq + ' questions · ' + (d.durationMin ? d.durationMin + ' min' : 'no timer') + expTxt, href: d.no ? (full ? '/full-tests/reading/test-' : '/pessages/test-') + d.no : '/exam/reading/' + encodeURIComponent(m.id) };
+    if (type === 'listening') return { img: d.coverUrl, tag: full ? 'Full · Parts 1–4' : m.pack === PRE_TEST ? PRE_TEST : d.sectionLabel || 'Section 1', sub: nq + ' questions' + (d.audioUrl ? ' · 🔊 audio' : ' · ⚠ no audio') + expTxt, href: !full && d.no ? '/sections/test-' + d.no : '/exam/listening/' + encodeURIComponent(m.id) };
     if (type === 'writing') { const ts = d.tasks || []; return { img: d.coverUrl || (ts.find((t) => t.imageUrl) || {}).imageUrl, tag: full ? 'Full · Task 1 + 2' : (ts[0] && ts[0].kind === 'task2' ? 'Task 2' : 'Task 1') + ' · ' + (d.tier || 'Tier 1'), sub: ts.length + ' task(s)' + (ts.some((t) => t.chart) ? ' · chart' : '') + (ts.some((t) => t.sample) ? ' · model answer' : ''), href: '/writing/?id=' + encodeURIComponent(m.id) }; }
     if (type === 'speaking') { const ps = d.parts || []; return { img: (ps.find((t) => t.imageUrl) || {}).imageUrl, tag: full ? 'Full · Parts 1–3' : ps.map((p) => String(p.title || '').split('·')[0].trim()).join(' + ') || 'Part', sub: ps.reduce((n, x) => n + (x.questions || []).length, 0) + ' questions' + (ps.some((x) => x.audioUrl) ? ' · 🔊' : ''), href: '/test?id=' + encodeURIComponent(m.id) }; }
     if (type === 'article') return { img: d.imageUrl || d.coverUrl, tag: d.level || d.passageLabel || 'Passage 1', sub: (d.topic || 'General') + ` · ${(d.vocabulary || []).length} words · ${(d.grammar || []).length} grammar`, href: '/collections/article?id=' + encodeURIComponent(m.id) };
@@ -321,7 +321,7 @@
   function dropAutosave() { clearTimeout(autosave.t); try { localStorage.removeItem(AUTOSAVE); } catch (e) { /* blocked */ } }
   function openBuilder(type, item, mode, opts) {
     opts = opts || {};
-    loadRules().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl && draft) dl.innerHTML = packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join(''); const pk = document.getElementById('cb-pack-picks'); if (pk && draft) pk.outerHTML = packPicks(); });
+    loadRules().then(() => { const dl = document.getElementById('ix-pack-list'); if (dl && draft) dl.innerHTML = (draft.data.mode === 'full' ? packNames(draft.type) : [PRE_TEST]).map((n) => `<option value="${esc(n)}"></option>`).join(''); const pk = document.getElementById('cb-pack-picks'); if (pk && draft) pk.outerHTML = packPicks(); });
     editingId = item ? item.id : null;
     if (impDoc) { impDoc.close(); impDoc = null; }
     draft = item ? JSON.parse(JSON.stringify(item)) : blank(type, mode);
@@ -380,8 +380,9 @@
   }
   /* existing packs as one-click chips under the Pack field (a new name creates a new pack card) */
   function packPicks() {
-    const names = packNames(draft.type); if (!names.length) return '<div id="cb-pack-picks"></div>';
-    return `<div id="cb-pack-picks" class="cb-picks"><span class="muted sm">Packs:</span>${names.map((n) => `<button class="chip${String(draft.pack || '').toLowerCase() === n.toLowerCase() ? ' chip-ok' : ''}" data-cb="pack-pick" data-name="${esc(n)}" type="button">${esc(n)}</button>`).join('')}</div>`;
+    const part = draft.data.mode !== 'full';
+    const names = part ? [PRE_TEST] : packNames(draft.type); if (!names.length) return '<div id="cb-pack-picks"></div>';
+    return `<div id="cb-pack-picks" class="cb-picks"><span class="muted sm">Packs:</span>${part && (draft.type === 'reading' || draft.type === 'listening') ? `<span class="muted sm">${isPreTest() ? 'Up to ' + PRE_TEST_MAX + ' questions, numbered from 1 (press again to take it off).' : 'Pre-test = up to ' + PRE_TEST_MAX + ' questions, numbered from 1.'}</span>` : ''}${names.map((n) => `<button class="chip${String(draft.pack || '').toLowerCase() === n.toLowerCase() ? ' chip-ok' : ''}" data-cb="pack-pick" data-name="${esc(n)}" type="button">${esc(n)}</button>`).join('')}</div>`;
   }
   function readingFormatBlock() {
     const full = draft.data.mode === 'full';
@@ -395,6 +396,8 @@
   }
   /* the card picture + chips of a Listening / Writing / PDF card (the Reading card block is readingFormatBlock) */
   function cardBlock(t, d) {
+    if (t === 'speaking') return `<div class="cb-block"><div class="cb-head"><div><strong>Card on the Speaking practice page</strong><div class="muted sm">The card shows the part, the pack and these chips. The first picture of the parts (if any) is the card image.</div></div></div>
+      <label class="lbl">Topic chips on the card (comma separated)<input class="field" data-p="data.cardTypes" data-csv="1" value="${esc((d.cardTypes || []).join(', '))}" placeholder="Environment, Urban life"></label></div>`;
     if (t !== 'listening' && t !== 'writing' && t !== 'pdf') return '';
     if (d.mode === 'full') return fullBlock(t);   // a full test has no card on the practice page: it is listed in its pack
     const pic = `<div class="cb-head"><div><strong>Card on the ${t === 'pdf' ? 'PDF Library' : t === 'listening' ? 'Listening practice' : 'Writing practice'} page</strong><div class="muted sm">${t === 'writing' ? 'Card picture (leave empty to use the picture of Task 1). ' : 'This picture is the card image. '}png, jpg, webp, avif.</div></div>
@@ -428,6 +431,9 @@
   const SHARED_OPTS = ['matching', 'map', 'box', 'matching-headings', 'matching-info', 'matching-features', 'matching-endings', 'summary-words'];   // option list typed ONCE per group
   const isFullReading = () => !!draft && draft.type === 'reading' && draft.data.mode === 'full';
   const isFullListening = () => !!draft && draft.type === 'listening' && draft.data.mode === 'full';
+  /* Pre-test: a pack of Part tests with up to 49 questions, numbered from 1 (the Passage / Section tag does not move the numbers) */
+  const PRE_TEST = 'Pre-test', PRE_TEST_MAX = 49;
+  const isPreTest = () => !!draft && !!draft.data && draft.data.mode !== 'full' && /^pre[\s_-]*test$/i.test(String(draft.pack || '').trim());
   const isMultiSection = () => isFullReading() || isFullListening();   // groups carry a Passage 1-3 / Part 1-4 and are numbered in that order
   const gLetters = (a) => String(a || '').toUpperCase().split(/[^A-Z]+/).filter(Boolean);
   const ROMANS = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
@@ -633,9 +639,9 @@
   }
   function numbering() {
     const gs = draft.groups || []; const map = {}; let n = 1;
-    if (draft.type === 'listening' && !isFullListening()) { const part = parseInt(String(draft.data.sectionLabel || '').replace(/\D+/g, ''), 10) || 1; n = (part - 1) * 10 + 1; }
+    if (draft.type === 'listening' && !isFullListening() && !isPreTest()) { const part = parseInt(String(draft.data.sectionLabel || '').replace(/\D+/g, ''), 10) || 1; n = (part - 1) * 10 + 1; }
     // a Reading Part test is numbered like its passage in the paper: Passage 2 = Questions 14–26, Passage 3 = 27–40 (reading-exam.js does the same)
-    if (draft.type === 'reading' && !isFullReading()) n = ({ 2: 14, 3: 27 })[parseInt(String(draft.data.passageLabel || '').replace(/\D+/g, ''), 10)] || 1;
+    if (draft.type === 'reading' && !isFullReading() && !isPreTest()) n = ({ 2: 14, 3: 27 })[parseInt(String(draft.data.passageLabel || '').replace(/\D+/g, ''), 10)] || 1;
     // a group added by its numbers ("Questions 14–26" before 1–13 is in) keeps them: the numbers before it stay free
     orderedGroups().forEach((i) => { const g = gs[i]; if (Number(g.start) > n) n = Number(g.start); const from = n;
       g.items.forEach((it) => { n += itemWidth(g, it); });
@@ -714,7 +720,8 @@
     if (!total) err('Add at least one question with its answer.');
     if (isFullReading() && total && total !== 40) warn('A full reading paper normally has 40 questions; this one has ' + total + ' (Passage 1: ' + perPass[1] + ', 2: ' + perPass[2] + ', 3: ' + perPass[3] + ').');
     if (isFullListening() && total && total !== 40) warn('A full listening paper normally has 40 questions (10 in each part); this one has ' + total + ' (Part 1: ' + perPass[1] + ', 2: ' + perPass[2] + ', 3: ' + perPass[3] + ', 4: ' + perPass[4] + ').');
-    if (L && !isFullListening() && total && total !== 10 && total <= 40 && (draft.data.sectionLabel || '').startsWith('Section')) warn('A listening section normally has 10 questions; this one has ' + total + '.');
+    if (isPreTest() && total > PRE_TEST_MAX) err('A Pre-test has at most ' + PRE_TEST_MAX + ' questions; this one has ' + total + '.');
+    if (L && !isFullListening() && !isPreTest() && total && total !== 10 && total <= 40 && (draft.data.sectionLabel || '').startsWith('Section')) warn('A listening section normally has 10 questions; this one has ' + total + '.');
     return out;
   }
   function issuesHtml(list) {
@@ -865,11 +872,13 @@
   const STEPS = [['q', '1 · Questions'], ['a', '2 · Answers'], ['e', '3 · Explanations'], ['all', 'Everything together']];
   /* the first number of this test: a Reading Part of Passage 2 starts at 14, a Listening Part 3 at 21 */
   function firstNo() {
+    if (isPreTest()) return 1;
     if (draft.type === 'listening' && !isFullListening()) return ((parseInt(String(draft.data.sectionLabel || '').replace(/\D+/g, ''), 10) || 1) - 1) * 10 + 1;
     if (draft.type === 'reading' && !isFullReading()) return ({ 2: 14, 3: 27 })[parseInt(String(draft.data.passageLabel || '').replace(/\D+/g, ''), 10)] || 1;
     return 1;
   }
   function lastNo() {
+    if (isPreTest()) return PRE_TEST_MAX;
     if (isFullReading() || isFullListening()) return 40;
     if (draft.type === 'listening') return firstNo() + 9;
     return ({ 1: 13, 14: 26, 27: 40 })[firstNo()] || 13;
@@ -1714,13 +1723,13 @@
         <label class="lbl">Model answer (optional, the student can reveal it)<textarea class="field" rows="4" data-p="data.parts.${i}.sample">${esc(t.sample)}</textarea></label></div>`).join('')}</div>`;
   }
   function renderBuilder() {
-    const t = draft.type, d = draft.data;
+    const t = draft.type, d = draft.data; draft._preShown = isPreTest();
     if (t === 'article') { $('#builder-body').innerHTML = articleForm(); return syncSave(); }
     $('#builder-body').innerHTML = `
       ${draft._ai ? aiBanner() : ''}
       ${t === 'reading' ? readingFormatBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
       ${MODE_TYPES.includes(t) && !draft._ai ? importBlock() : ''}
-      <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(d.mode === 'full' ? 'Pack on the Full Tests page — pick one below, or type a new name for a new pack card' : 'Pack line shown on the card (optional, e.g. Starter Pack)', 'pack', draft.pack, 'list="ix-pack-list" placeholder="' + (d.mode === 'full' ? 'e.g. Pack 5 (empty = Practice)' : 'e.g. Starter Pack') + '" autocomplete="off"')}<datalist id="ix-pack-list">${packNames(draft.type).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>${d.mode === 'full' ? packPicks() : ''}
+      <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(d.mode === 'full' ? 'Pack on the Full Tests page — pick one below, or type a new name for a new pack card' : 'Pack line shown on the card (optional, e.g. Starter Pack)', 'pack', draft.pack, 'list="ix-pack-list" placeholder="' + (d.mode === 'full' ? 'e.g. Pack 5 (empty = Practice)' : 'e.g. Starter Pack') + '" autocomplete="off"')}<datalist id="ix-pack-list">${(d.mode === 'full' ? packNames(draft.type) : [PRE_TEST]).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>${packPicks()}
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
       <div class="cb-grid">${t === 'article' || t === 'speaking' || t === 'pdf' ? '<div></div>' : `<label class="lbl">Time limit, minutes (0 = none)<input class="field" type="number" min="0" data-p="data.durationMin" value="${esc(d.durationMin)}"></label>`}
         <label class="lbl">Who can open it<select class="field" data-p="_access">${ACCESS.map(([v, l]) => `<option value="${v}" ${(draft._access || (draft.premium ? 'standard' : 'free')) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
@@ -1797,6 +1806,7 @@
     const tb = /^groups\.(\d+)\.(?:table|text)$/.exec(p);
     if (tb && e.type === 'change') { syncGaps(draft.groups[Number(tb[1])]); refreshQuestions(); return; }
     if (/\.(answer|explanation)$/.test(p) && e.type === 'change') refreshNums();
+    if (p === 'pack' && e.type === 'change' && draft._preShown !== isPreTest()) { renderBuilder(); return; }
     if (el.dataset.rerender && e.type === 'change') { if (p.startsWith('groups.')) refreshQuestions(); else renderBuilder(); }
     else if (/^groups\.\d+\.options$/.test(p) && e.type === 'change') refreshQuestions();   // the answer menus follow the option list
     if (draft.type === 'article' && /^data\.(body|vocabulary\.\d+\.(word|match)|grammar\.\d+\.(match|sourceContext))$/.test(p)) { clearTimeout(onInput.t); onInput.t = setTimeout(refreshFound, 250); }
@@ -1986,7 +1996,7 @@
         draft.data.body = cur.slice(0, at).replace(/\s*$/, '') + '\n\n![' + cap + '](' + url + ')\n\n' + cur.slice(at).replace(/^\s*/, ''); renderBuilder();
       }
       else if (a === 'p-add') { if (draft.data.parts.length < 3) { const used = draft.data.parts.map(speakNo); draft.data.parts.push(blankPart([1, 2, 3].find((n) => !used.includes(n)) || 3)); renderBuilder(); } }
-      else if (a === 'pack-pick') { draft.pack = t.dataset.name; const f = $('#builder [data-p="pack"]'); if (f) f.value = draft.pack; const pk = $('#cb-pack-picks'); if (pk) pk.outerHTML = packPicks(); autosave(); }
+      else if (a === 'pack-pick') { draft.pack = draft.data.mode !== 'full' && String(draft.pack || '').toLowerCase() === String(t.dataset.name).toLowerCase() ? '' : t.dataset.name; autosave(); renderBuilder(); }
       else if (a === 'p-del') { draft.data.parts.splice(i, 1); renderBuilder(); }
       else if (a === 'p-img') { const url = await pickAndUpload('image/*', $('#pimg-status-' + i)); if (url) { draft.data.parts[i].imageUrl = url; renderBuilder(); } }
       else if (a === 'p-img-del') { draft.data.parts[i].imageUrl = ''; renderBuilder(); }

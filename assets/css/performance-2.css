@@ -1,7 +1,86 @@
+/* IELTSX — the Performance page (performance-dashboard.js). Colours come from the site's tokens (ix-unified.css).
+   --pf-s1 … --pf-s4: the four skills, always in this order, the same in every chart. */
+.pf { --pf-s1: #2a78d6; --pf-s2: #eb6834; --pf-s3: #1baf7a; --pf-s4: #eda100; display: grid; gap: 16px; }
+html.dark-mode .pf { --pf-s1: #3987e5; --pf-s2: #d95926; --pf-s3: #199e70; --pf-s4: #c98500; }
+.pf-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.pf-head h1 { margin: 0 0 4px; font-size: 1.875rem; font-weight: 700; letter-spacing: -0.02em; color: hsl(var(--foreground)); }
+.pf-head p { margin: 0; font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
+.pf-target { display: inline-flex; align-items: center; gap: 8px; font-size: 0.8125rem; color: hsl(var(--muted-foreground)); }
+.pf-target select { height: 32px; padding: 0 8px; border: 1px solid hsl(var(--input)); border-radius: 0.375rem; background: hsl(var(--background)); color: hsl(var(--foreground)); font-size: 0.8125rem; }
+.pf-guest { padding: 12px 16px; border: 1px solid hsl(var(--border)); border-radius: 0.625rem; background: var(--ix-info-bg); color: var(--ix-info-fg); font-size: 0.875rem; }
+.pf-guest a { color: inherit; font-weight: 600; }
 
-                                                                [data-chart=chart-rbp] {
-                                                                    --color-listening: #0ea5e9;
-                                                                    --color-reading: #84cc16;
-                                                                    --color-writing: #a855f7;
-                                                                }
-                                                            
+.pf-card { background: hsl(var(--card)); color: hsl(var(--card-foreground)); border: 1px solid hsl(var(--border)); border-radius: 0.75rem; padding: 18px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); min-width: 0; }
+.pf-card > h2, .pf-section-head h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+.pf-sub { margin: 4px 0 0; }
+.pf-label { font-size: 0.8125rem; color: hsl(var(--muted-foreground)); }
+.pf-big { display: block; margin-top: 6px; font-size: 2rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.pf-note { margin-top: 6px; font-size: 0.8125rem; line-height: 1.45; color: hsl(var(--muted-foreground)); }
+.pf-strong { font-weight: 700; }
+.pf-link { padding: 0; border: 0; background: none; color: hsl(var(--primary)); font-size: 0.8125rem; font-weight: 500; text-decoration: none; cursor: pointer; }
+.pf-link:hover { text-decoration: underline; }
+.pf-empty { padding: 28px 12px; text-align: center; font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
+
+.pf-kpis, .pf-skills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.pf-skill { display: flex; flex-direction: column; }
+.pf-skill-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pf-skill-top h3 { margin: 0; font-size: 0.9375rem; font-weight: 600; }
+.pf-skill-mid { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.pf-skill-foot { display: flex; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 12px; }
+.pf-delta { font-size: 0.75rem; font-weight: 600; color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+.pf-delta.up { color: var(--ix-success-fg); }
+.pf-delta.down { color: var(--ix-danger-fg); }
+.pf-spark polyline { fill: none; stroke: hsl(var(--primary)); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.pf-section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.pf-seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 0.5rem; background: hsl(var(--muted)); }
+.pf-seg button { padding: 4px 10px; border: 0; border-radius: 0.375rem; background: transparent; color: hsl(var(--muted-foreground)); font-size: 0.8125rem; font-weight: 500; cursor: pointer; }
+.pf-seg button[aria-pressed="true"] { background: hsl(var(--background)); color: hsl(var(--foreground)); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+.pf-seg button:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 1px; }
+
+.pf-chart-wrap { position: relative; }
+.pf-chart { display: block; touch-action: pan-y; }
+.pf-grid { stroke: hsl(var(--border)); stroke-width: 1; }
+.pf-axis { fill: hsl(var(--muted-foreground)); font-size: 11px; }
+.pf-goal { stroke: hsl(var(--muted-foreground)); stroke-width: 1; stroke-dasharray: 4 4; }
+.pf-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-dot { stroke: hsl(var(--card)); stroke-width: 2; }
+.pf-cross { stroke: hsl(var(--muted-foreground)); stroke-width: 1; }
+.pf-tip { position: absolute; z-index: 5; display: grid; gap: 2px; max-width: 260px; padding: 8px 10px; border: 1px solid hsl(var(--border)); border-radius: 0.5rem; background: hsl(var(--popover)); color: hsl(var(--popover-foreground)); box-shadow: var(--ix-shadow); font-size: 0.75rem; line-height: 1.4; pointer-events: none; }
+.pf-tip span { color: hsl(var(--muted-foreground)); }
+.pf-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; }
+.pf-key { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: hsl(var(--muted-foreground)); }
+.pf-key i { width: 10px; height: 10px; border-radius: 3px; }
+
+.pf-2col { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.pf-focus { margin: 12px 0 0; padding: 10px 12px; border-radius: 0.5rem; background: hsl(var(--muted)); font-size: 0.875rem; line-height: 1.5; }
+.pf-crit { margin-top: 16px; }
+.pf-crit h3 { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; font-size: 0.875rem; font-weight: 600; }
+.pf-crit h3 small { font-size: 0.75rem; font-weight: 400; color: hsl(var(--muted-foreground)); }
+.pf-crit p { margin: 0; }
+.pf-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(70px, 1fr) 30px; align-items: center; gap: 10px; padding: 4px 0; font-size: 0.8125rem; }
+.pf-bar-name { color: hsl(var(--muted-foreground)); }
+.pf-bar-track { height: 8px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+.pf-bar-track i { display: block; height: 100%; border-radius: 999px; background: hsl(var(--primary)); }
+.pf-bar-val { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.pf-table-wrap { overflow-x: auto; border: 1px solid hsl(var(--border)); border-radius: 0.5rem; }
+.pf-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.pf-table thead { background: hsl(var(--muted) / 0.5); color: hsl(var(--muted-foreground)); }
+.pf-table th, .pf-table td { padding: 10px 12px; text-align: left; font-weight: 400; white-space: nowrap; }
+.pf-table thead th { font-weight: 500; }
+.pf-table tbody tr, .pf-table tbody th { border-top: 1px solid hsl(var(--border)); }
+.pf-table tbody th { font-weight: 500; }
+.pf-table .pf-strong { font-weight: 700; }
+.pf-avg td, .pf-avg thead th:not(:first-child) { text-align: center; font-variant-numeric: tabular-nums; }
+.pf-test { max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.pf-end { text-align: right !important; }
+.pf-tag { margin-left: 4px; padding: 1px 6px; border-radius: 0.25rem; background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); font-size: 0.6875rem; font-weight: 600; }
+.pf-pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 0.8125rem; color: hsl(var(--muted-foreground)); }
+.pf-pager button { height: 32px; padding: 0 12px; border: 1px solid hsl(var(--border)); border-radius: 0.375rem; background: transparent; color: hsl(var(--foreground)); font-size: 0.8125rem; cursor: pointer; }
+.pf-pager button:disabled { opacity: 0.5; cursor: not-allowed; }
+.pf-activity-scroll { overflow-x: auto; padding-bottom: 4px; }
+.pf-activity-scroll svg { display: block; }
+
+@media (max-width: 1100px) { .pf-kpis, .pf-skills { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pf-2col { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .pf-kpis, .pf-skills { gap: 10px; } .pf-big { font-size: 1.625rem; } .pf-head h1 { font-size: 1.5rem; } }

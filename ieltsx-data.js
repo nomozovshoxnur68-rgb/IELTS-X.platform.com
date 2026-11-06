@@ -36,7 +36,8 @@
     const raw = result && typeof result === 'object' ? result : {};
     const total = Number(raw.scoreTotal ?? raw.total ?? raw.questions ?? 0);
     const correct = Number(raw.scoreCorrect ?? raw.correct ?? raw.score ?? 0);
-    const calculatedBand = total > 0 ? Math.max(0, Math.min(9, (correct / total) * 9)) : 0;
+    const calculatedBand = total > 0 ? Math.max(0, Math.min(9, Math.round((correct / total) * 18) / 2)) : 0;
+    const hasBand = raw.band !== null && raw.band !== undefined && raw.band !== '' && Number.isFinite(Number(raw.band));
     const date = new Date(raw.createdAt || raw.date || Date.now());
 
     return {
@@ -48,7 +49,8 @@
       pageLabel: String(raw.pageLabel || raw.testName || raw.title || 'Practice test'),
       scoreCorrect: Number.isFinite(correct) ? correct : 0,
       scoreTotal: Number.isFinite(total) ? total : 0,
-      band: Number.isFinite(Number(raw.band)) ? Number(raw.band) : calculatedBand,
+      band: hasBand ? Number(raw.band) : calculatedBand,
+      durationSec: Number(raw.durationSec) > 0 ? Number(raw.durationSec) : 0,
       createdAt: Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString()
     };
   }
@@ -87,7 +89,13 @@
   }
 
   function formatBand(value) {
-    return Number.isFinite(Number(value)) ? Number(value).toFixed(1) : '—';
+    return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) ? Number(value).toFixed(1) : '—';
+  }
+
+  // the IELTS rule for an average: to the nearest half band, .25 and .75 go up (6.25 -> 6.5, 6.75 -> 7.0)
+  function roundBand(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? Math.min(9, Math.max(0, Math.floor(n * 2 + 0.5) / 2)) : null;
   }
 
   function getActivity(results) {
@@ -123,9 +131,13 @@
   }
 
   function saveResult(result) {
-    const saved = readJson(RESULTS_KEY, []);
     const entry = normalizeResult({ ...result, userEmail: result && result.userEmail || getCurrentUser()?.email || '' });
-    localStorage.setItem(RESULTS_KEY, JSON.stringify([entry, ...(Array.isArray(saved) ? saved : [])]));
+    if (entry.userEmail) {   // a visitor who is not signed in keeps nothing on this device
+      try {
+        const saved = readJson(RESULTS_KEY, []);
+        localStorage.setItem(RESULTS_KEY, JSON.stringify([entry, ...(Array.isArray(saved) ? saved : [])]));
+      } catch (e) { /* storage full or blocked: the server still gets it */ }
+    }
     window.dispatchEvent(new CustomEvent('ieltsx:results-changed', { detail: { result: entry } }));
     pushToServer(entry);
     return entry;
@@ -133,28 +145,41 @@
 
   // ---- account sync: results live on the server, any device sees them ----
   const API = window.fetch ? window.fetch.bind(window) : null;
+  const PENDING_KEY = 'ieltsx_results_pending';
+  function addPending(body) {
+    try { localStorage.setItem(PENDING_KEY, JSON.stringify([...readJson(PENDING_KEY, []), body].slice(-20))); } catch (e) { /* blocked */ }
+  }
+  // a dropped connection must not lose a result: 5xx / network errors are kept and sent again later; the server answers 401 to visitors
+  function postResult(body) {
+    return API('/api/results', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then((r) => { if (r.ok) return r.json(); if (r.status >= 500 || r.status === 429) throw new Error('later'); return null; });
+  }
+  function flushPending() {
+    const list = readJson(PENDING_KEY, []);
+    if (!API || !Array.isArray(list) || !list.length) return Promise.resolve();
+    try { localStorage.removeItem(PENDING_KEY); } catch (e) { return Promise.resolve(); }
+    return list.reduce((chain, body) => chain.then(() => postResult(body)).catch(() => addPending(body)), Promise.resolve());
+  }
   function pushToServer(entry) {
-    if (!API || !entry.testKey || !entry.userEmail) return Promise.resolve(null);
-    return API('/api/results', {
-      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ testKey: entry.testKey, section: entry.section, bucket: entry.bucket, pageLabel: entry.pageLabel, scoreCorrect: entry.scoreCorrect, scoreTotal: entry.scoreTotal, band: entry.band })
-    }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+    if (!API || !entry.testKey) return Promise.resolve(null);
+    const body = { testKey: entry.testKey, section: entry.section, bucket: entry.bucket, pageLabel: entry.pageLabel, scoreCorrect: entry.scoreCorrect, scoreTotal: entry.scoreTotal, band: entry.band, durationSec: entry.durationSec };
+    return postResult(body).then((d) => {
       if (!d || !d.result) return null;
-      // keep one copy: the server's row replaces the local one
-      const list = readJson(RESULTS_KEY, []).map((x) => (x.id === entry.id ? { ...x, id: d.result.id } : x));
-      localStorage.setItem(RESULTS_KEY, JSON.stringify(list));
       try {
+        // keep one copy: the server's row replaces the local one
+        const list = readJson(RESULTS_KEY, []).map((x) => (x.id === entry.id ? { ...x, id: d.result.id } : x));
+        localStorage.setItem(RESULTS_KEY, JSON.stringify(list));
         const done = new Set(readJson('ieltsx_completed', []));
         done.add(entry.testKey);
         localStorage.setItem('ieltsx_completed', JSON.stringify([...done]));
       } catch (e) { /* ignore */ }
       return d.result;
-    }).catch(() => null);
+    }).catch(() => { addPending(body); return null; });
   }
 
   function syncFromServer() {
     if (!API) return Promise.resolve(false);
-    return API('/api/results', { credentials: 'same-origin', cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+    return flushPending().then(() => API('/api/results', { credentials: 'same-origin', cache: 'no-store' })).then((r) => (r.ok ? r.json() : null)).then((d) => {
       if (!d || !Array.isArray(d.results)) return false;
       const user = getCurrentUser();
       const email = String((user && user.email) || '').toLowerCase();
@@ -181,6 +206,7 @@
     getResults,
     getSectionResults,
     getSummary,
+    roundBand,
     saveResult,
     syncFromServer,
     titleCase

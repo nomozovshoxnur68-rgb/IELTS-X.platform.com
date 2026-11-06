@@ -3434,32 +3434,47 @@ function zoomText(step) {
 // RESULTS COMPUTATION
 // ====================================================================
 
+/* One way of comparing answers, the same in every exam and on the server: capitals, extra spaces, curly quotes,
+   hyphens and a full stop at the end do not matter. "a|b" = either is right; "(the) river" = "river" and "the river". */
+function normAnswer(v) {
+  return String(v == null ? '' : v).normalize('NFKC').toLowerCase()
+    .replace(/[\u2018\u2019\u02bc`]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[\u2010-\u2015-]+/g, ' ')
+    .replace(/^[\s.,;:!?"']+|[\s.,;:!?"']+$/g, '').replace(/\s+/g, ' ').trim();
+}
+function answerVariants(correct) {
+  const out = [];
+  String(correct == null ? '' : correct).split('|').forEach(function (a) {
+    out.push(normAnswer(a.replace(/[()]/g, ' ')));
+    if (a.indexOf('(') !== -1) out.push(normAnswer(a.replace(/\([^)]*\)/g, ' ')));
+  });
+  return out.filter(Boolean);
+}
 function checkAnswerMatch(given, correct) {
-  if (!given) return false;
-  const givenStr = given.toString().trim().toLowerCase();
-  const correctArr = correct.toString().toLowerCase().split('|');
-  return correctArr.includes(givenStr);
+  const g = normAnswer(given);
+  return !!g && answerVariants(correct).indexOf(g) !== -1;
 }
 
 function bandFor(score) {
   /* One passage is marked on its own, so the raw mark is first scaled onto the
      40-question table. */
   score = Math.round(score / QTOTAL * 40);
-  /* The conversion table supplied for these papers, 40 questions. */
-  if (score >= 40) return 9.0;
-  if (score >= 38) return 8.5;
+  /* The official IELTS Academic Reading table (40 questions). */
+  if (score >= 39) return 9.0;
+  if (score >= 37) return 8.5;
   if (score >= 35) return 8.0;
   if (score >= 33) return 7.5;
   if (score >= 30) return 7.0;
   if (score >= 27) return 6.5;
   if (score >= 23) return 6.0;
-  if (score >= 20) return 5.5;
-  if (score >= 16) return 5.0;
-  if (score >= 14) return 4.5;
-  if (score >= 12) return 4.0;
-  if (score >= 10) return 3.5;
-  if (score >= 8)  return 3.0;
-  if (score >   0) return 2.5;
+  if (score >= 19) return 5.5;
+  if (score >= 15) return 5.0;
+  if (score >= 13) return 4.5;
+  if (score >= 10) return 4.0;
+  if (score >= 8) return 3.5;
+  if (score >= 6) return 3.0;
+  if (score >= 4) return 2.5;
+  if (score >= 2) return 2.0;
+  if (score >= 1) return 1.0;
   return 0;
 }
 
@@ -3527,12 +3542,7 @@ function gradeReading() {
     const correct = map[i];
     if (correct === undefined) continue;
     const given = (state.readingAnswers[i] || '').toString().trim();
-    let isCorrect = false;
-    if (typeof correct === 'string' && correct.length > 2 && !/^(TRUE|FALSE|YES|NO|NOT GIVEN)$/i.test(correct) && !correct.includes('|')) {
-      isCorrect = given.toUpperCase() === correct.toUpperCase();
-    } else {
-      isCorrect = checkAnswerMatch(given, correct);
-    }
+    const isCorrect = checkAnswerMatch(given, correct);
     if (isCorrect) score++;
 
     let status = 'skipped';

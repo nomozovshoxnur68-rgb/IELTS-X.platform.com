@@ -172,6 +172,20 @@ body[data-theme="dark"] .score-card { background: linear-gradient(135deg, #1b233
 .sample p { font-size: 0.9em; line-height: 1.7; margin: 0 0 8px; }
 .card ol { padding-left: 22px; margin: 0; }
 .card ol li { margin-bottom: 10px; line-height: 1.6; }
+.crit-comment { margin: 0 0 10px; font-size: 0.9em; line-height: 1.65; }
+.ai-rows { display: grid; gap: 12px; }
+.ai-row { padding-bottom: 12px; border-bottom: 1px solid var(--card-line); }
+.ai-row:last-child { padding-bottom: 0; border-bottom: 0; }
+.ai-row p { margin: 4px 0 0; font-size: 0.86em; line-height: 1.6; color: var(--muted); }
+.ai-row .ai-eg { font-style: italic; }
+.ai-fix { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; font-size: 0.92em; line-height: 1.5; }
+.ai-fix s { color: #dc2626; text-decoration-thickness: 1px; }
+.ai-fix b { color: #16a34a; font-weight: 600; }
+.ai-note { margin: 0 0 18px; text-align: center; font-size: 0.8em; color: var(--muted); }
+.start-ai { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin: 14px 0 0; font-size: 0.9rem; color: #bdbdbd; }
+.start-ai label { display: inline-flex; align-items: center; gap: 8px; }
+.start-ai select { padding: 5px 8px; border-radius: 6px; border: 1px solid #55585c; background: #26282b; color: #ececec; font: inherit; }
+.start-ai a { color: #fff; }
 .res-actions { display: flex; justify-content: center; gap: 14px; border-top: 1px solid var(--card-line); padding-top: 20px; margin-top: 10px; }
 .btn-outline, .btn-dark { border-radius: 6px; font-size: 0.85em; font-weight: 600; padding: 9px 22px; border: 1px solid var(--card-line); }
 .btn-outline { background: var(--card); color: var(--fg); }
