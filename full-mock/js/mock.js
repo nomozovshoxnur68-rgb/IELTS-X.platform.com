@@ -409,6 +409,7 @@
     S.finishedAt = Date.now(); running = null; inSession = false; save();
     paintGuard(); closeFrame();
     renderReport(); show('scReport');
+    aiWriting();   // the Writing is checked by itself when the test ends; reopening an old attempt does not use a check
     sendResults();
     saveToAccount();
   }
@@ -553,6 +554,7 @@
     paintSendStatus();
   }
   /* ------------------------------------- the AI check of the Writing section */
+  let aiBusy = '';   // the task being checked right now
   const aiCrit = [['taskAchievement', 'Task Response / Achievement'], ['coherenceCohesion', 'Coherence & Cohesion'], ['lexicalResource', 'Lexical Resource'], ['grammarAccuracy', 'Grammatical Range & Accuracy']];
   function aiTaskHtml(name, r) {
     const rows = (list, render) => list.map(render).join('');
@@ -569,38 +571,49 @@
       return `<h2>AI feedback on your Writing</h2><p class="rx-hint">This band is an estimate from AI to help you practise, not an official IELTS score. Task 2 counts twice as much as Task 1.</p>
         ${S.aiW.tasks.map((t) => aiTaskHtml(t.name, t.result)).join('')}`;
     }
+    if (aiBusy) return aiCheckingHtml(aiBusy);
+    const pick = aiLang();
     return `<h2>AI feedback on your Writing</h2><p class="rx-hint">Get a band on the four criteria, grammar corrections, vocabulary upgrades and a model answer. Each task uses one AI check.</p>
       ${note ? `<p class="ai-err">${note}</p>` : ''}
-      <div class="ai-go"><label>Feedback in <select id="mockAiLang"><option value="en">English</option><option value="uz">O&#699;zbekcha</option><option value="ru">Русский</option></select></label>
+      <div class="ai-go"><label>Feedback in <select id="mockAiLang">${[['en', 'English'], ['uz', 'O&#699;zbekcha'], ['ru', 'Русский']].map(([v, t]) => `<option value="${v}"${v === pick ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
       <button class="rx-btn dark" type="button" data-action="ai-writing">Get AI feedback</button></div>`;
   }
+  const aiCheckingHtml = (name) => `<h2>AI feedback on your Writing</h2><p class="rx-hint">Checking ${name}… This usually takes less than a minute.</p>`;
+  /* the language chosen for the feedback, the same one as on the Writing and Speaking pages */
+  function aiLang() { try { return localStorage.getItem('ieltsx:pref:ai-lang') || 'en'; } catch (e) { return 'en'; } }
   /* one task after the other; what was checked is kept with the attempt, so it is not asked (and counted) twice */
   async function aiWriting() {
-    const box = $('mockAi'); const w = entryOf('writing', S.pick && S.pick.writing).writing;
-    const lang = ($('mockAiLang') || {}).value || 'en';
-    const list = [['Task 1', 'task1', S.w.t1, w.task1, 150], ['Task 2', 'task2', S.w.t2, w.task2, 250]].filter((x) => words(x[2]) >= 20);
-    if (!list.length) { box.innerHTML = aiWritingHtml('Your answers are too short to check.'); return; }
-    S.aiPart = S.aiPart || {};
+    if (aiBusy) return;
+    const att = S, paint = (html) => { const box = $('mockAi'); if (box && att === S) box.innerHTML = html; };
+    const w = entryOf('writing', att.pick && att.pick.writing).writing;
+    const lang = ($('mockAiLang') || {}).value || aiLang();
+    try { localStorage.setItem('ieltsx:pref:ai-lang', lang); } catch (e) { /* blocked */ }
+    const list = [['Task 1', 'task1', att.w.t1, w.task1, 150], ['Task 2', 'task2', att.w.t2, w.task2, 250]].filter((x) => words(x[2]) >= 20);
+    if (!list.length) { paint(aiWritingHtml('Your answers are too short to check.')); return; }
+    att.aiPart = att.aiPart || {};
     try {
       for (const [name, kind, answer, task, minWords] of list) {
-        if (S.aiPart[kind]) continue;
-        box.innerHTML = `<h2>AI feedback on your Writing</h2><p class="rx-hint">Checking ${name}… This usually takes less than a minute.</p>`;
+        if (att.aiPart[kind]) continue;
+        aiBusy = name; paint(aiCheckingHtml(name));
         const r = await fetch('/api/ai/writing', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ examId: 'mock-' + S.testId, title: (CONFIG.title || 'Full mock') + ' · ' + name, taskKind: kind, taskPrompt: [].concat(task.lines || []).concat(task.alt ? ['(The picture: ' + task.alt + ')'] : []).join('\n'), imageUrl: task.img ? '/full-mock/' + task.img : '', minWords, answer, lang }) });
+          body: JSON.stringify({ examId: 'mock-' + att.testId, title: (CONFIG.title || 'Full mock') + ' · ' + name, taskKind: kind, taskPrompt: [].concat(task.lines || []).concat(task.alt ? ['(The picture: ' + task.alt + ')'] : []).join('\n'), imageUrl: task.img ? '/full-mock/' + task.img : '', minWords, answer, lang }) });
         const d = await r.json().catch(() => ({}));
         if (!r.ok) { const e = new Error(d.error || 'The AI check failed. Please try again.'); e.status = r.status; throw e; }
-        S.aiPart[kind] = { name, result: d }; save();
+        att.aiPart[kind] = { name, result: d };
+        if (att === S) save();
       }
-      const tasks = ['task1', 'task2'].map((k) => S.aiPart[k]).filter(Boolean);
+      const tasks = ['task1', 'task2'].map((k) => att.aiPart[k]).filter(Boolean);
       // Task 2 counts twice; a task left empty counts as Band 0, as in the exam
-      const sum = (S.aiPart.task1 ? S.aiPart.task1.result.overall : 0) + 2 * (S.aiPart.task2 ? S.aiPart.task2.result.overall : 0);
-      S.aiW = { overall: Math.min(9, Math.floor((sum / 3) * 2 + 0.5) / 2), tasks }; save();
+      const sum = (att.aiPart.task1 ? att.aiPart.task1.result.overall : 0) + 2 * (att.aiPart.task2 ? att.aiPart.task2.result.overall : 0);
+      att.aiW = { overall: Math.min(9, Math.floor((sum / 3) * 2 + 0.5) / 2), tasks };
+      aiBusy = '';
       fetch('/api/results', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ testKey: '/full-mock/' + S.testId + '/writing', section: 'Writing', bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · Writing', scoreCorrect: tasks.length, scoreTotal: 2, band: S.aiW.overall }) }).catch(() => { /* still on screen */ });
-      renderReport();
+        body: JSON.stringify({ testKey: '/full-mock/' + att.testId + '/writing', section: 'Writing', bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · Writing', scoreCorrect: tasks.length, scoreTotal: 2, band: att.aiW.overall }) }).catch(() => { /* still on screen */ });
+      if (att === S) { save(); renderReport(); }
     } catch (e) {
+      aiBusy = '';
       const next = encodeURIComponent(location.pathname + location.search);
-      box.innerHTML = aiWritingHtml(esc(e.message) + (e.status === 401 ? ` <a href="/login?next=${next}">Sign in</a>` : e.status === 402 ? ' <a href="/Price">See plans</a>' : ''));
+      paint(aiWritingHtml(esc(e.message) + (e.status === 401 ? ` <a href="/login?next=${next}">Sign in</a>` : e.status === 402 ? ' <a href="/Price">See plans</a>' : '')));
     }
   }
   function finishAll() {

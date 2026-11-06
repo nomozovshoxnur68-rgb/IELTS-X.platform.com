@@ -8,6 +8,7 @@ process.env.PAYMENT_WEBHOOK_SECRET = 'hook-secret';
 const mails = []; const realLog = console.log;
 console.log = (...a) => { const t = a.join(' '); if (t.includes('[mail not configured]')) mails.push(t); else realLog(...a); };
 const handler = require('../server');
+for (const k of ['OPENAI_API_KEY', 'GEMINI_API_KEY', 'GOOGLE_API_KEY', 'AI_PROVIDER', 'AI_MODEL', 'AI_AUDIO_MODEL', 'AI_TRANSCRIBE_MODEL']) delete process.env[k];   // server.js has read .env: a real key is never used by the tests
 const crypto = require('crypto');
 
 const server = http.createServer(handler);
@@ -1019,6 +1020,168 @@ server.listen(0, async () => {
       } finally {
         for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_PROVIDER', 'AI_HOURLY_LIMIT', 'GOOGLE_API_KEY', 'GEMINI_KEY', 'VERCEL_ENV', 'AI_CHECKS_FREE']) { if (env0[k] === undefined) delete process.env[k]; else process.env[k] = env0[k]; }
         gemini.close();
+      }
+
+      // --- the same AI features with OpenAI, against a local stand-in for its API (no real AI call)
+      const OKEY = 'sk-test-openai-key-123456';
+      const oa = { mode: 'ok', reply: {}, requests: [], audioFails: false, deleted: 0 };
+      const oaReply = (res, status, obj) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(obj)); };
+      const oaError = (res, status, code, message) => oaReply(res, status, { error: { message, type: code, code } });
+      const responseOf = (obj) => ({ status: 'completed', output: [{ type: 'reasoning', summary: [] }, { type: 'message', content: [{ type: 'output_text', text: JSON.stringify(obj) }] }], usage: { total_tokens: 10 } });
+      const openai = http.createServer((req, res) => {
+        const chunks = []; req.on('data', (c) => chunks.push(c)); req.on('end', () => {
+          const raw = Buffer.concat(chunks); const isJson = /json/.test(req.headers['content-type'] || '');
+          const body = isJson ? JSON.parse(raw.toString() || '{}') : raw.toString('latin1');
+          oa.requests.push({ url: req.url, body, auth: req.headers.authorization, type: req.headers['content-type'] });
+          if (req.headers.authorization !== 'Bearer ' + OKEY) return oaError(res, 401, 'invalid_api_key', 'Incorrect API key provided: sk-wrong***key. You can find your API key at https://platform.openai.com.');
+          if (oa.mode === 'no-credit') return oaError(res, 429, 'insufficient_quota', 'You exceeded your current quota, please check your plan and billing details.');
+          if (oa.mode === 'rate-limit') return oaError(res, 429, 'rate_limit_exceeded', 'Rate limit reached for requests.');
+          if (req.url === '/v1/audio/transcriptions') {
+            if (oa.mode === 'no-whisper' && /whisper-1/.test(body)) return oaError(res, 404, 'model_not_found', 'The model whisper-1 does not exist.');
+            if (/verbose_json/.test(body)) return oaReply(res, 200, { text: 'Good morning. I live on Mill Street.', segments: [{ start: 3.2, end: 5, text: ' Good morning.' }, { start: 9, end: 11, text: ' I live on Mill Street.' }] });
+            return oaReply(res, 200, { text: oa.mode === 'silence' ? '' : 'Er, I work in a bank and I like it, you know.' });
+          }
+          if (req.url === '/v1/chat/completions') {
+            if (oa.audioFails) return oaError(res, 404, 'model_not_found', 'The model gpt-audio-1.5 does not exist.');
+            return oaReply(res, 200, { choices: [{ message: { content: JSON.stringify({ transcript: 'I work in a bank and I like it.', noSpeech: false, pronunciation: ['Clear vowels in "bank".'], fluency: ['Steady pace.'] }) } }] });
+          }
+          if (req.url === '/v1/responses') {
+            if (oa.mode === 'fallback' && body.model === 'gpt-6-luna') return oaError(res, 404, 'model_not_found', 'The model gpt-6-luna does not exist or you do not have access to it.');
+            if (oa.mode === 'no-reasoning' && body.reasoning) return oaError(res, 400, 'invalid_request_error', "Unsupported parameter: 'reasoning.effort' is not supported with this model.");
+            if (oa.mode === 'cut-off') return oaReply(res, 200, { status: 'incomplete', incomplete_details: { reason: 'max_output_tokens' }, output: [] });
+            if (oa.mode === 'refusal') return oaReply(res, 200, { status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal', refusal: 'I cannot help with that.' }] }] });
+            if (oa.mode === 'malformed') return oaReply(res, 200, { status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: 'Sure! Here you are.' }] }] });
+            return oaReply(res, 200, responseOf(oa.reply));
+          }
+          return oaError(res, 404, 'not_found', 'Unknown URL ' + req.url);
+        });
+      });
+      await new Promise((done) => openai.listen(0, done));
+      const env1 = { ...process.env };
+      const last = (url) => oa.requests.filter((x) => x.url === url).pop();
+      try {
+        for (const k of ['GEMINI_API_KEY', 'GEMINI_API_BASE', 'AI_PROVIDER', 'AI_MODEL']) delete process.env[k];
+        Object.assign(process.env, { AI_TIMEOUT_MS: '5000', AI_HOURLY_LIMIT: '1000', AI_CHECKS_FREE: '100', OPENAI_API_BASE: `http://127.0.0.1:${openai.address().port}` });
+        // not set up: OpenAI is the default; the admin reads what to set and which look-alike NAME was found, never its value
+        Object.assign(process.env, { OPENAI_KEY: 'value-must-not-show-456' });
+        let s = await call('GET', '/api/admin/ai/status', { jar: boss });
+        assert.deepEqual([s.json.configured, s.json.provider, s.json.model], [false, 'openai', 'gpt-6-luna']); assert.ok(/OPENAI_API_KEY/.test(s.json.problem) && /OPENAI_KEY/.test(s.json.problem)); assert.ok(!s.text.includes('value-must-not-show-456'));
+        delete process.env.OPENAI_KEY;
+        // an old AI_PROVIDER=gemini or a Gemini name in AI_MODEL does not stop an OpenAI key from working; AI_PROVIDER=gemini with a Gemini key stays Gemini
+        Object.assign(process.env, { OPENAI_API_KEY: OKEY, AI_PROVIDER: 'gemini', AI_MODEL: 'gemini-3.8-flash' });
+        s = await call('GET', '/api/admin/ai/status', { jar: boss }); assert.deepEqual([s.json.configured, s.json.provider, s.json.model], [true, 'openai', 'gpt-6-luna']); assert.ok(!s.text.includes(OKEY));
+        process.env.GEMINI_API_KEY = 'x'; assert.equal((await call('GET', '/api/admin/ai/status', { jar: boss })).json.provider, 'gemini');
+        delete process.env.GEMINI_API_KEY; delete process.env.AI_PROVIDER; delete process.env.AI_MODEL;
+        assert.equal((await call('GET', '/api/ai/status', { jar: user })).json.configured, true);
+
+        const owriting = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'writing', title: 'OpenAI writing test', data: { tasks: [{ kind: 'task2', prompt: 'Technology in education: agree or disagree?', sample: '' }] } } })).json.item;
+        const ospeaking = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'speaking', title: 'OpenAI speaking test', data: { parts: [{ title: 'Part 1', questions: ['Do you work?', 'Do you like it?'] }] } } })).json.item;
+        const OWORDS = Array(60).fill('Many people believe that technology helps students to learn.').join(' ');
+        const ocrit = (band) => ({ band, comment: 'A comment.', points: ['A point.'] });
+        const owritingReply = { summary: 'Good.', strengths: ['Clear.'], criteria: { taskAchievement: ocrit(6.5), coherenceCohesion: ocrit(7), lexicalResource: ocrit(6), grammarAccuracy: ocrit(6.5) }, grammar: [{ wrong: 'people is', correct: 'people are', why: 'Plural.' }], vocabulary: [], plan: [{ title: 'Next', text: 'Practise.' }], sampleAnswer: 'A model essay.' };
+        const check = (body, j) => call('POST', '/api/ai/writing', { jar: j === undefined ? user : j, body: { materialId: owriting.id, taskId: 't1', answer: OWORDS, ...(body || {}) } });
+
+        // writing: the key goes in the header and never comes back; JSON in a strict schema; nothing is stored at OpenAI; the bands are worked out here
+        oa.reply = owritingReply;
+        const w1 = await check({ lang: 'uz' }); assert.equal(w1.status, 200, w1.text);
+        const rq = last('/v1/responses');
+        assert.equal(rq.auth, 'Bearer ' + OKEY); assert.equal(rq.body.model, 'gpt-6-luna'); assert.equal(rq.body.store, false); assert.deepEqual(rq.body.reasoning, { effort: 'low' });
+        assert.equal(rq.body.max_output_tokens, 12000); assert.equal(rq.body.temperature, undefined);
+        assert.ok(/Uzbek/.test(rq.body.instructions)); assert.ok(rq.body.input[0].content.map((x) => x.text).join('\n').includes('<candidate_answer>'));
+        const fmt = rq.body.text.format; assert.deepEqual([fmt.type, fmt.strict], ['json_schema', true]);
+        const closed = (o) => { if (o.properties) { assert.equal(o.additionalProperties, false); assert.deepEqual([...o.required].sort(), Object.keys(o.properties).sort()); Object.values(o.properties).forEach(closed); } if (o.items) closed(o.items); };
+        closed(fmt.schema);
+        assert.equal(w1.json.overall, 6.5); assert.equal(w1.json.grammar[0].correct, 'people are'); assert.equal(w1.json.sampleAnswer, 'A model essay.'); assert.ok(!w1.text.includes(OKEY));
+
+        // speaking: the words come from the speech-to-text model, the notes from the model that hears it; no temperature, no schema for the audio model
+        const owav = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4000, 1)]);
+        const opart = ospeaking.data.parts[0].id;
+        const say = (type) => call('POST', `/api/ai/speaking/transcribe?id=${ospeaking.id}&part=${opart}&q=0`, { jar: user, raw: owav, headers: { 'content-type': 'application/octet-stream', 'x-audio-type': type || 'audio/wav' } });
+        let t1 = await say(); assert.equal(t1.status, 200, t1.text);
+        assert.deepEqual([t1.json.transcript, t1.json.noSpeech, t1.json.pronunciation, t1.json.fluency], ['Er, I work in a bank and I like it, you know.', false, ['Clear vowels in "bank".'], ['Steady pace.']]);
+        const chat = last('/v1/chat/completions').body;
+        assert.deepEqual([chat.model, chat.store, chat.modalities, chat.response_format], ['gpt-audio-1.5', false, ['text'], undefined]);
+        const aud = chat.messages[1].content.find((x) => x.type === 'input_audio'); assert.equal(aud.input_audio.format, 'wav'); assert.equal(Buffer.from(aud.input_audio.data, 'base64').length, owav.length);
+        assert.ok(/JSON/.test(chat.messages[0].content) && /"transcript"/.test(chat.messages[0].content));
+        const stt = last('/v1/audio/transcriptions');
+        assert.ok(/name="model"\r\n\r\ngpt-transcribe/.test(stt.body) && /name="languages\[\]"\r\n\r\nen/.test(stt.body) && /filename="recording\.wav"/.test(stt.body) && /name="prompt"/.test(stt.body)); assert.ok(!/name="language"/.test(stt.body));
+        // a format the audio model does not take (a browser that could not make a WAV): still written down, no notes
+        const hearCalls = oa.requests.filter((x) => x.url === '/v1/chat/completions').length;
+        t1 = await say('audio/webm'); assert.equal(t1.status, 200, t1.text); assert.deepEqual([t1.json.transcript, t1.json.pronunciation], ['Er, I work in a bank and I like it, you know.', []]);
+        assert.equal(oa.requests.filter((x) => x.url === '/v1/chat/completions').length, hearCalls); assert.ok(/filename="recording\.webm"/.test(last('/v1/audio/transcriptions').body));
+        // silence: nothing to mark
+        oa.mode = 'silence'; oa.audioFails = true; t1 = await say(); assert.equal(t1.status, 200, t1.text); assert.equal(t1.json.noSpeech, true); oa.mode = 'ok';
+        // the audio model is not available: the transcript still works, and pronunciation is not marked rather than guessed
+        t1 = await say(); assert.equal(t1.status, 200, t1.text); assert.deepEqual([t1.json.transcript, t1.json.pronunciation, t1.json.noSpeech], ['Er, I work in a bank and I like it, you know.', [], false]);
+        oa.audioFails = false;
+        oa.reply = { summary: 'Fine.', strengths: [], criteria: { fluencyCoherence: ocrit(6), lexicalResource: ocrit(6.5), grammarAccuracy: ocrit(5.5), pronunciation: ocrit(8) }, grammar: [], vocabulary: [], plan: [], answers: [{ n: 1, comment: 'Well said.', modelAnswer: 'A model answer.' }] };
+        const assess = (extra) => call('POST', '/api/ai/speaking/assess', { jar: user, body: { materialId: ospeaking.id, answers: [{ partId: opart, q: 0, transcript: 'Er, I work in a bank and I like it, you know, it is a good job.', durationSec: 12, ...(extra || {}) }] } });
+        let sp = await assess(); assert.equal(sp.status, 200, sp.text);
+        assert.deepEqual([sp.json.criteria.pronunciation.band, sp.json.overall, sp.json.typedOnly, sp.json.pronunciationUnheard], [null, 6, false, true], 'average of 6, 6.5, 5.5 without pronunciation');
+        assert.ok(/no notes from the recordings/.test(last('/v1/responses').body.instructions));
+        sp = await assess({ pronunciation: ['Clear vowels.'], fluency: ['Steady.'] }); assert.equal(sp.status, 200, sp.text);
+        assert.deepEqual([sp.json.criteria.pronunciation.band, sp.json.pronunciationUnheard, sp.json.overall], [8, false, 6.5], 'average of 6, 6.5, 5.5, 8');
+
+        // the Test Generator: a key that may be left out becomes nullable, and a null answer is the same as no key
+        const OPASSAGE = 'The first glass was made in Mesopotamia around 3500 BC. In 1959 Alastair Pilkington introduced the float process, which produces flat glass.';
+        oa.reply = { groups: [{ type: 'tfng', section: 1, instruction: 'Do the statements agree?', options: null, questions: [{ prompt: 'Glass was first made in Mesopotamia.', options: null, answer: 'TRUE', explanation: 'Sentence 1.', evidence: 'The first glass was made in Mesopotamia', origin: 'ai', time: null }] }], warnings: null };
+        const oread = (title) => ({ skill: 'reading', mode: 'part', title, count: 1, types: ['tfng'], passages: [{ title: 'Glass', text: OPASSAGE }] });
+        let g = await call('POST', '/api/admin/ai/generate', { jar: boss, body: oread('openai generate') }); assert.equal(g.status, 200, g.text);
+        assert.equal(g.json.groups[0].items[0].answer, 'TRUE'); assert.equal(g.json.groups[0].items[0].verified, true); assert.equal(g.json.model, 'gpt-6-luna');
+        const gs = last('/v1/responses').body.text.format.schema.properties.groups.items; closed(gs);
+        assert.deepEqual(gs.properties.options.type, ['array', 'null']); assert.deepEqual(gs.properties.questions.items.properties.time.type, ['number', 'null']); assert.equal(gs.properties.type.type, 'string');
+        // no access to the first model: the next one, and it is remembered
+        oa.mode = 'fallback'; g = await call('POST', '/api/admin/ai/generate', { jar: boss, body: oread('openai fallback') }); assert.equal(g.status, 200, g.text); assert.equal(g.json.model, 'gpt-5.6-luna'); oa.mode = 'ok';
+        assert.equal((await call('GET', '/api/admin/ai/status', { jar: boss })).json.model, 'gpt-5.6-luna');
+        // a model set in AI_MODEL is used alone; one that does not reason is asked again without that setting
+        process.env.AI_MODEL = 'gpt-test-model'; oa.mode = 'no-reasoning'; const n0 = oa.requests.length;
+        g = await call('POST', '/api/admin/ai/generate', { jar: boss, body: oread('openai no reasoning') }); assert.equal(g.status, 200, g.text); assert.equal(oa.requests.length, n0 + 2); assert.equal(last('/v1/responses').body.reasoning, undefined); assert.equal(g.json.model, 'gpt-test-model');
+        delete process.env.AI_MODEL; oa.mode = 'ok';
+
+        // a Listening recording is written down with times first; the model works from those words; nothing has to be deleted at OpenAI
+        const obd = 'OAIBOUNDARY';
+        const omp = (name, bytes) => Buffer.concat([Buffer.from(`--${obd}\r\nContent-Disposition: form-data; name="type"\r\n\r\naudio\r\n--${obd}\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: audio/mpeg\r\n\r\n`), bytes, Buffer.from(`\r\n--${obd}--\r\n`)]);
+        const upO = await call('POST', '/api/admin/uploads', { jar: boss, raw: omp('oa-part1.mp3', Buffer.from('ID3fake-openai-audio')), headers: { 'content-type': 'multipart/form-data; boundary=' + obd } }); assert.equal(upO.status, 201, upO.text);
+        oa.reply = { segments: [{ start: 3, part: 1, speaker: 'MAN', text: 'Good morning.' }, { start: 9, part: 1, speaker: 'WOMAN', text: 'I live on Mill Street.' }] };
+        g = await call('POST', '/api/admin/ai/transcribe', { jar: boss, body: { audioUrl: upO.json.url } }); assert.equal(g.status, 200, g.text); assert.equal(g.json.segments[1].start, 9);
+        const timed = last('/v1/audio/transcriptions').body; assert.ok(/name="model"\r\n\r\nwhisper-1/.test(timed) && /verbose_json/.test(timed) && /name="timestamp_granularities\[\]"\r\n\r\nsegment/.test(timed) && /name="language"\r\n\r\nen/.test(timed) && /filename="recording\.mp3"/.test(timed));
+        const fromText = last('/v1/responses').body.input[0].content.map((x) => x.text).join('\n'); assert.ok(fromText.includes('[9] I live on Mill Street.') && fromText.includes('Transcribe this IELTS Listening')); assert.ok(!oa.requests.some((x) => /\/v1\/files/.test(x.url)));
+        // whisper-1 gone (it shuts down in Feb 2027): the transcript still comes, without times
+        const opr = require('../ai-provider');
+        oa.mode = 'no-whisper';
+        const noTimes = await opr.generateJson({ system: 'S', schema: { type: 'object', properties: { segments: { type: 'array', items: { type: 'string' } } }, required: ['segments'] }, parts: [{ file: await opr.uploadFile({ data: Buffer.from('ID3x'), mimeType: 'audio/mp3', name: 'x.mp3' }) }, { text: 'Transcribe' }] });
+        assert.ok(noTimes.json); assert.ok(/use 0 for every start/.test(last('/v1/responses').body.input[0].content[0].text)); oa.mode = 'ok';
+        // too large or a format OpenAI cannot read: a clear message and no call
+        const nBig = oa.requests.length;
+        await assert.rejects(opr.generateJson({ system: 'S', schema: { type: 'object' }, parts: [{ file: { mimeType: 'audio/mp3', data: Buffer.alloc(25 * 1024 * 1024 + 1) } }] }), /up to 25 MB/);
+        await assert.rejects(opr.generateJson({ system: 'S', schema: { type: 'object' }, parts: [{ file: { mimeType: 'audio/aac', data: Buffer.from('x') } }] }), /MP3 or WAV/);
+        assert.equal(oa.requests.length, nBig);
+        assert.equal((await call('GET', '/api/admin/ai/status', { jar: boss })).json.limits.maxAudioMb, 25);
+        // a scanned PDF and a picture go inside the request
+        oa.reply = { ok: true };
+        const pdfH = await opr.uploadFile({ data: Buffer.from('%PDF-1.4 fake'), mimeType: 'application/pdf', name: 'scan.pdf' });
+        await opr.generateJson({ system: 'S', schema: { type: 'object', properties: { ok: { type: 'boolean' } } }, parts: [{ file: pdfH }, { inline: { mimeType: 'image/png', data: 'QUJD' } }, { text: 'Read it' }] }); await opr.deleteFile(pdfH);
+        const pc = last('/v1/responses').body.input[0].content;
+        assert.deepEqual(pc[0], { type: 'input_file', filename: 'scan.pdf', file_data: 'data:application/pdf;base64,' + Buffer.from('%PDF-1.4 fake').toString('base64') });
+        assert.deepEqual(pc[1], { type: 'input_image', image_url: 'data:image/png;base64,QUJD' }); assert.deepEqual(pc[2], { type: 'input_text', text: 'Read it' });
+
+        // errors: an admin reads what to do, a student a plain sentence; a failed check is not counted; no key in any message
+        oa.reply = owritingReply;
+        const u0 = (await call('GET', '/api/ai/status', { jar: user })).json.used;
+        for (const [mode, status, admin, student] of [['no-credit', 503, /no credit left.*ChatGPT subscription/, /not available right now/], ['rate-limit', 429, /rate limit/, /very busy/], ['cut-off', 422, /too long/, /cut off/], ['refusal', 422, /declined/, /could not check this text/], ['malformed', 502, /not valid JSON/, /could not be read/]]) {
+          oa.mode = mode;
+          const a = await check({ answer: OWORDS + ' admin ' + mode }, boss); assert.equal(a.status, status, mode + ' ' + a.text); assert.ok(admin.test(a.json.error), mode + ': ' + a.json.error);
+          const b = await check({ answer: OWORDS + ' student ' + mode }); assert.equal(b.status, status, mode + ' ' + b.text); assert.ok(student.test(b.json.error), mode + ': ' + b.json.error); assert.ok(!/OPENAI_API_KEY|billing|gpt-/i.test(b.json.error), b.json.error);
+        }
+        oa.mode = 'ok'; assert.equal((await call('GET', '/api/ai/status', { jar: user })).json.used, u0, 'not counted');
+        process.env.OPENAI_API_KEY = 'sk-wrong-key-000';
+        const bad = await check({}, boss); assert.equal(bad.status, 503); assert.ok(/refused the API key/.test(bad.json.error)); assert.ok(!bad.text.includes('sk-wrong'));
+        process.env.OPENAI_API_KEY = OKEY;
+        for (const m of [owriting, ospeaking]) await call('DELETE', '/api/admin/materials/' + m.id, { jar: boss });
+        ok('OpenAI: strict JSON answers, speech written down and heard, pronunciation never guessed, recordings with times, PDFs and pictures, model fallback, clear errors, the key stays on the server');
+      } finally {
+        for (const k of ['OPENAI_API_KEY', 'OPENAI_API_BASE', 'OPENAI_KEY', 'GEMINI_API_KEY', 'AI_PROVIDER', 'AI_MODEL', 'AI_TIMEOUT_MS', 'AI_HOURLY_LIMIT', 'AI_CHECKS_FREE']) { if (env1[k] === undefined) delete process.env[k]; else process.env[k] = env1[k]; }
+        openai.close();
       }
     }
     // --- rate limit

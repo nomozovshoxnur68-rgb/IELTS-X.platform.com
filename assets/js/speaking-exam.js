@@ -1,9 +1,10 @@
 /* IELTSX — the Speaking test (opened by test-player.js at /test?id=<id>).
    Part 1 and Part 3 are answered question by question, Part 2 is a cue card with its preparation and speaking time.
-   The student records each answer (or types it when there is no microphone). "Get AI feedback" sends the answers to the
-   server: every recording is written down one at a time (so a long test fits the request size of the host and a failed
-   answer is simply sent again), then the transcripts are marked on the four band criteria (ai-examiner.js).
-   Recordings stay in this tab until that button is pressed, and the server does not keep them. */
+   The student records each answer (or types it when there is no microphone). When every question is answered the AI check
+   starts by itself after a few seconds (which can be stopped, to record an answer again); "Get AI feedback" starts it earlier.
+   It sends the answers to the server: every recording is written down one at a time (so a long test fits the request size of
+   the host and a failed answer is simply sent again), then the transcripts are marked on the four band criteria (ai-examiner.js).
+   Recordings stay in this tab until the check starts, and the server does not keep them. */
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -28,6 +29,7 @@
     ['grammarAccuracy', 'Grammatical Range & Accuracy'], ['pronunciation', 'Pronunciation']
   ];
   const MAX_SECONDS = 130;      // one answer fits one request of the host (16 kHz mono WAV)
+  const AUTO_SECONDS = 5;       // the moment to change one's mind before the check starts by itself
   const partNo = (p) => { const m = /part\s*([123])/i.exec(String((p && p.title) || '')); return m ? Number(m[1]) : 0; };
 
   /* the same steps as questionsOf() in ai-examiner.js */
@@ -47,7 +49,7 @@
     const lastKey = 'ix-speaking:' + id;
     const answers = {};       // step key -> { blob, url, mime, durationSec, typed, transcript, pronunciation, fluency, noSpeech }
     let cur = 0, status = null, lang = 'en', typing = false, notes = '', checking = false, finished = false;
-    let rec = null, stream = null, chunks = [], recStart = 0, tick = null, cdTimer = null, prepLeft = 0, meter = null, audioCtx = null;
+    let rec = null, stream = null, chunks = [], recStart = 0, tick = null, cdTimer = null, prepLeft = 0, meter = null, audioCtx = null, autoTimer = null, autoLeft = 0;
     try { lang = localStorage.getItem('ieltsx:pref:ai-lang') || 'en'; } catch (e) { /* blocked */ }
 
     const done = (s) => { const a = answers[s.key]; return !!(a && (a.blob || (a.typed && a.typed.trim()))); };
@@ -108,6 +110,7 @@
     }
     function go(i) {
       if (i < 0 || i >= steps.length) return;
+      cancelAuto();
       const leave = () => { stopPrep(); typing = false; cur = i; if (window.speechSynthesis) window.speechSynthesis.cancel(); paint(); window.scrollTo({ top: 0 }); };
       if (rec && rec.state === 'recording') { pendingAfterStop = leave; stopRecording(); return; }
       leave();
@@ -138,20 +141,20 @@
           <div class="sx-actions"><button type="button" class="sx-btn" id="sx-typed-ok">${icon(I.check, 16)} Save answer</button><button type="button" class="sx-btn ghost" id="sx-typed-no">Record instead</button></div>`;
         const t = $('#sx-typed');
         t.oninput = () => { answers[s.key] = { ...(answers[s.key] || {}), typed: t.value, transcript: '' }; };
-        $('#sx-typed-ok').onclick = () => { typing = false; paint(); };
+        $('#sx-typed-ok').onclick = () => { typing = false; paint(); autoCheck(); };
         $('#sx-typed-no').onclick = () => { typing = false; paintRecorder(); }; return;
       }
       if (a && a.blob) {
         box.innerHTML = `<div class="sx-rec-head"><span class="sx-live is-done">${icon(I.check, 15)}Answer recorded</span><span class="sx-time">${clock(a.durationSec)}</span></div>
           <audio class="sx-audio" controls src="${esc(a.url)}"></audio>
           <div class="sx-actions"><button type="button" class="sx-btn ghost" id="sx-again">${icon(I.redo, 16)} Record again</button>${cur < steps.length - 1 ? `<button type="button" class="sx-btn" id="sx-go-next">Next question ${icon(I.right, 16)}</button>` : ''}</div>`;
-        $('#sx-again').onclick = () => { URL.revokeObjectURL(a.url); delete answers[s.key]; paint(); };
+        $('#sx-again').onclick = () => { cancelAuto(); URL.revokeObjectURL(a.url); delete answers[s.key]; paint(); };
         const n = $('#sx-go-next'); if (n) n.onclick = () => go(cur + 1); return;
       }
       if (a && a.typed && a.typed.trim()) {
         box.innerHTML = `<div class="sx-rec-head"><span class="sx-live is-done">${icon(I.check, 15)}Answer typed</span></div><p class="sx-typed-show">${para(a.typed)}</p>
           <div class="sx-actions"><button type="button" class="sx-btn ghost" id="sx-edit">Edit</button>${cur < steps.length - 1 ? `<button type="button" class="sx-btn" id="sx-go-next">Next question ${icon(I.right, 16)}</button>` : ''}</div>`;
-        $('#sx-edit').onclick = () => { typing = true; paintRecorder(); };
+        $('#sx-edit').onclick = () => { cancelAuto(); typing = true; paint(); };
         const n = $('#sx-go-next'); if (n) n.onclick = () => go(cur + 1); return;
       }
       box.innerHTML = `<div class="sx-rec-head"><span class="sx-live is-idle">Your answer</span><span class="sx-time">up to ${clock(s.limit)}</span></div>
@@ -180,6 +183,7 @@
       if (!navigator.mediaDevices || !window.MediaRecorder) { paintRecorder('Recording does not work in this browser. Press "Type instead", or open the test in Chrome, Edge, Safari or Firefox.'); return; }
       try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
       catch (e) { paintRecorder(e && e.name === 'NotFoundError' ? 'No microphone was found. Connect one, or press "Type instead".' : 'The microphone is blocked. Allow it in the address bar of the browser and press the microphone again.'); return; }
+      cancelAuto();
       const s = steps[cur]; const mime = pickMime();
       chunks = [];
       rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : undefined);
@@ -194,6 +198,7 @@
         if (pendingAfterStop) { const f = pendingAfterStop; pendingAfterStop = null; f(); return; }
         paint();
         if (!chunks.length) paintRecorder('Nothing was recorded. Check your microphone and try again.');
+        else autoCheck();
       };
       rec.start(1000); recStart = Date.now();
       startMeter(stream);
@@ -237,9 +242,28 @@
       if (status && !status.configured) { box.innerHTML = `<span class="sx-note">The AI check is not available yet.</span>${status.problem ? `<span class="sx-warn sx-admin">${esc(status.problem)}</span>` : ''}`; return; }
       if (status && !status.signedIn) { box.innerHTML = `<a class="sx-btn" href="/login?next=${next}">Sign in to get AI feedback</a>`; return; }
       if (status && status.limit !== null && status.limit !== undefined && status.remaining <= 0) { box.innerHTML = `<span class="sx-note">No AI checks left this month.</span><a class="sx-btn" href="/Price">See plans</a>`; return; }
+      if (autoLeft > 0) {
+        box.innerHTML = `<span class="sx-note" role="status">All answered. AI feedback starts in <b id="sx-auto-left">${autoLeft}</b> s</span><button type="button" class="sx-btn ghost" id="sx-auto-stop">Wait</button><button type="button" class="sx-btn primary" id="sx-check">${icon(I.spark, 16)} Start now</button>`;
+        $('#sx-auto-stop').onclick = () => { cancelAuto(); paintCta(); };
+        $('#sx-check').onclick = () => runCheck();
+        return;
+      }
       const left = status && status.limit ? `<span class="sx-note">${status.remaining} of ${status.limit} checks left</span>` : '';
       box.innerHTML = `${left}<button type="button" class="sx-btn primary" id="sx-check" ${n ? '' : 'disabled'}>${icon(I.spark, 16)} Get AI feedback</button>`;
       $('#sx-check').onclick = () => runCheck();
+    }
+    function cancelAuto() { clearInterval(autoTimer); autoTimer = null; autoLeft = 0; }
+    /* every answer is in: the check starts by itself, unless the student may not use it (the button or the sign-in link stays then) */
+    function autoCheck() {
+      cancelAuto();
+      const allowed = status && status.configured && status.signedIn && (status.limit === null || status.limit === undefined || status.remaining > 0);
+      if (!allowed || checking || finished || doneCount() !== steps.length) return;
+      autoLeft = AUTO_SECONDS; paintCta();
+      autoTimer = setInterval(() => {
+        autoLeft -= 1;
+        if (autoLeft <= 0) { runCheck(); return; }
+        const el = $('#sx-auto-left'); if (el) el.textContent = autoLeft;
+      }, 1000);
     }
 
     /* the recording as 16 kHz mono WAV: every browser records another format, and speech needs no more than this */
@@ -287,6 +311,7 @@
         <p class="sx-hint">Please keep this page open. It usually takes about a minute.</p></section></div>`;
     }
     async function runCheck() {
+      cancelAuto();
       if (checking) return;
       const list = steps.filter(done); if (!list.length) return;
       checking = true;
@@ -338,7 +363,7 @@
       const q = r.quota;
       main.innerHTML = `<div class="sx sx-result">
         <section class="sx-card sx-hero">${ring(Number(r.overall) || 0)}<div><span class="sx-chip">${esc(item.title)}</span><h2>Band ${Number(r.overall || 0).toFixed(1)} · ${esc(bandWord(Number(r.overall) || 0))} speaker</h2><p>${esc(r.summary)}</p>
-          ${r.missed ? `<p class="sx-warn">${r.missed} recording${r.missed === 1 ? ' had' : 's had'} no clear speech and ${r.missed === 1 ? 'was' : 'were'} left out.</p>` : ''}${r.typedOnly ? '<p class="sx-warn">These answers were typed, so pronunciation was not marked.</p>' : ''}</div></section>
+          ${r.missed ? `<p class="sx-warn">${r.missed} recording${r.missed === 1 ? ' had' : 's had'} no clear speech and ${r.missed === 1 ? 'was' : 'were'} left out.</p>` : ''}${r.typedOnly ? '<p class="sx-warn">These answers were typed, so pronunciation was not marked.</p>' : r.pronunciationUnheard ? '<p class="sx-warn">Pronunciation could not be assessed this time, so it was not marked and does not count.</p>' : ''}</div></section>
         <div class="sx-crits">${crit}</div>
         ${(r.strengths || []).length ? `<section class="sx-card"><h3>What you did well</h3>${list(r.strengths)}</section>` : ''}
         ${(r.grammar || []).length ? `<section class="sx-card"><h3>Grammar corrections</h3>${fix(r.grammar, (g) => `<div class="sx-fix"><div><s>${esc(g.wrong)}</s><span aria-hidden="true">→</span><b>${esc(g.correct)}</b></div>${g.why ? `<p>${esc(g.why)}</p>` : ''}</div>`)}</section>` : ''}

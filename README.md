@@ -284,13 +284,14 @@ Students get, for every Writing task and Speaking attempt: a band on each of the
 (their words, the fix, the rule), **vocabulary upgrades**, feedback, next steps and a **model answer** (the teacher's one when the test has it). The
 feedback comes in English, O'zbekcha or Русский, as the student chooses. The band is an estimate and the pages say so.
 
-* **To switch it on**: set `GEMINI_API_KEY` on the server (the same key as the AI Test Generator; on Vercel: Settings -> Environment Variables, then redeploy). The key never reaches a browser. Without it the pages say the check is not available yet, and admins read what to set.
+* **To switch it on**: set `OPENAI_API_KEY` on the server (the same key as the AI Test Generator; locally in `.env`, on Vercel: Settings -> Environment Variables, then redeploy) and add credit to the OpenAI account (a ChatGPT subscription does not include the API). The key never reaches a browser. Without it the pages say the check is not available yet, and admins read what to set.
+* **It runs by itself**: a Writing test is checked when it is submitted; a Speaking test is checked a few seconds after the last answer (**Wait** stops it, to record an answer again; **Get AI feedback** starts it earlier, with some questions unanswered); the Writing of a Full Mock is checked when the test ends. A visitor who is not signed in, or who has no checks left, is told so and nothing is sent.
 * **Files**: `ai-examiner.js` (routes, prompts, schemas, the allowance; server only), `ai-provider.js` (the AI service), `writing/js/script.js` and `assets/js/speaking-exam.js` (the pages).
 * **Routes**: `GET /api/ai/status`, `POST /api/ai/writing`, `POST /api/ai/speaking/transcribe` (one recording, raw bytes), `POST /api/ai/speaking/assess`, `GET /api/ai/history`. All but the status need a signed-in student who may open the test.
-* **Speaking**: one recording per question (a cue card is one recording), converted in the browser to 16 kHz mono WAV so one answer fits a Vercel request (2 minutes 10 seconds at most). Each is written down with notes on pronunciation and fluency, then the transcripts are marked. Recordings are not stored. A student without a microphone can type: pronunciation is then not marked and does not count.
+* **Speaking**: one recording per question (a cue card is one recording), converted in the browser to 16 kHz mono WAV so one answer fits a Vercel request (2 minutes 10 seconds at most). Each is written down (`gpt-transcribe`) and heard for notes on pronunciation and fluency (`gpt-audio-1.5`), then the transcripts are marked. Recordings are not stored. A student without a microphone can type: pronunciation is then not marked and does not count. The same happens when the audio model gives no notes: pronunciation is never guessed from a transcript.
 * **Bands**: the model gives the four criteria; the overall band is worked out on the server with the IELTS rule for averages (6.25 -> 6.5, 6.75 -> 7.0). In a full Writing test Task 2 counts twice.
 * **Allowance per month** (a failed check is not counted, admins have no limit): `AI_CHECKS_FREE` 3, `AI_CHECKS_STANDARD` 30, `AI_CHECKS_MAX` 60, `AI_CHECKS_ULTRA` 200. One Writing task or one Speaking attempt is one check. Usage is kept in the setting `ai-usage:<user id>` with the bands of the last 40 checks (for the Performance page), no texts.
-* **Full Mock**: the results page has **Get AI feedback** for the Writing section (each task is one check; Task 2 counts twice); the feedback stays with the attempt, so it is not asked for twice, and the band goes to the Mock group of the Performance page.
+* **Full Mock**: the Writing section is checked when the test ends (each task is one check; Task 2 counts twice); if that fails, or for an older attempt, the results page has **Get AI feedback**. The feedback stays with the attempt, so it is not asked for twice, and the band goes to the Mock group of the Performance page.
 * **Trying it without a key**: `AI_PROVIDER=mock` answers with placeholder text marked [Test mode].
 
 ## Speaking
@@ -312,11 +313,11 @@ feedback comes in English, O'zbekcha or Русский, as the student chooses. 
 
 ## AI Test Generator (`/admin#ai`)
 
-Makes a Reading or Listening test from a PDF, a pasted passage or a recording with an AI (Gemini), and opens it in the normal
+Makes a Reading or Listening test from a PDF, a pasted passage or a recording with an AI (OpenAI), and opens it in the normal
 test form as a **Draft**. The admin reads it, fixes it and presses **Save draft** or **Publish** (asks for confirmation).
 Nothing is saved or published by the generator itself; the manual forms are unchanged.
 
-* **Files**: `ai-provider.js` (the AI service: Gemini over REST, or `mock`; one small interface so another provider can be
+* **Files**: `ai-provider.js` (the AI service: OpenAI or Gemini over REST, or `mock`; one small interface so another provider can be
   added), `ai-generator.js` (routes, prompts, the JSON schema the model must answer in, the checks, cache), `admin-ai.js`
   (the page), hooks in `admin-content.js` (`window.IXAdmin`: the PDF reader, open-in-form, Save draft / Publish).
 * **Routes** (inside `/api/admin/`, so `requireAdmin()`, the cross-site check, the admin rate limit and the audit log apply):
@@ -325,29 +326,35 @@ Nothing is saved or published by the generator itself; the manual forms are unch
   source has questions they are kept word for word (`origin: "source"`) and the AI answers / explains them and checks the answer
   key (a disagreement is a warning, the key's answer stays). Without questions the AI writes them (`origin: "ai"`) with the chosen
   difficulty, number and types. A scanned PDF (no text) is uploaded to storage and read by the AI (marked so).
-* **Listening**: the recording is uploaded to the site's storage (kept for playback), sent to Gemini's Files API by the server,
-  transcribed with times (`[m:ss] SPEAKER: text`, editable), and the copy at Gemini is deleted. Questions are checked against the
+* **Listening**: the recording is uploaded to the site's storage (kept for playback), sent to the AI service by the server (OpenAI:
+  written down with `whisper-1`, up to 25 MB; Gemini: its Files API, and the copy there is deleted), and transcribed with times
+  (`[m:ss] SPEAKER: text`, editable). `whisper-1` is the only OpenAI model with times and shuts down on 26 Feb 2027; after that
+  the transcript comes from `gpt-transcribe` without times. Questions are checked against the
   transcript (never "against the audio"); the second an answer is heard is saved as `at` and used by the review screen.
 * **Checks**: every answer must come with the exact words of the source (`evidence`), looked up in the passage / transcript; an
   answer not found, an option letter that does not exist, a word limit broken, or a question the source does not decide is
   listed as a warning, and the question is tagged **check** in the form. Types the skill does not have are left out.
-* **Cost / safety**: the key is read only on the server (`GEMINI_API_KEY`, sent to Google in the `x-goog-api-key` header), never
+* **Cost / safety**: the key is read only on the server (`OPENAI_API_KEY`, sent to OpenAI in the `Authorization` header), never
   in the page. One generation at a time per admin, `AI_HOURLY_LIMIT` per hour (default 30), the same request within an hour comes
   from the cache (no new AI call). Only files uploaded in this panel are sent (no other websites), audio up to `AI_MAX_AUDIO_MB`
-  (default 60), PDFs up to 30 MB. Clear messages for a missing / wrong key, an unknown model, rate limits, timeouts, blocked or
-  cut-off answers and answers that are not valid JSON (nothing is changed then).
-* **Settings** (see `.env.example`): `GEMINI_API_KEY` (required, https://aistudio.google.com/apikey), `AI_MODEL` (empty =
-  `gemini-3.8-flash`, Google's recommended Flash model in Oct 2026; if the key may not use it, `gemini-flash-latest` and
-  `gemini-3.6-flash` are tried and the one that answers is kept), `AI_THINKING` (Gemini 3 thinking level, default `low`),
-  `AI_PROVIDER` (`gemini`, or `mock` to try the page without a key), `AI_HOURLY_LIMIT`, `AI_MAX_AUDIO_MB`, `AI_TIMEOUT_MS`.
+  (default 60; OpenAI takes 25 at most), PDFs up to 30 MB. Clear messages for a missing / wrong key, an account without credit, an
+  unknown model, rate limits, timeouts, blocked or cut-off answers and answers that are not valid JSON (nothing is changed then).
+* **Settings** (see `.env.example`): `OPENAI_API_KEY` (required, https://platform.openai.com/api-keys), `AI_MODEL` (empty =
+  `gpt-6-luna`, OpenAI's efficient model in Nov 2026; if the key may not use it, `gpt-5.6-luna` is tried and the one that answers
+  is kept), `AI_AUDIO_MODEL` (default `gpt-audio-1.5`), `AI_TRANSCRIBE_MODEL` (default `gpt-transcribe`), `AI_THINKING` (default `low`),
+  `AI_PROVIDER` (`openai`, `gemini` with `GEMINI_API_KEY`, or `mock` to try the page without a key), `AI_HOURLY_LIMIT`, `AI_MAX_AUDIO_MB`, `AI_TIMEOUT_MS`.
   On Vercel the function may run 60 s (`vercel.json`); a long recording should be one part at a time
   (“starts at / ends at”), and recordings / scanned PDFs need Supabase Storage.
+* **OpenAI API**: plain REST with no SDK. `/v1/responses` with `text.format` (strict JSON schema: `strictSchema()` closes every object and
+  makes a key that may be left out nullable) for answers, pictures and PDFs; `/v1/chat/completions` with `input_audio` for hearing a
+  spoken answer (the Responses API takes no audio); `/v1/audio/transcriptions` for writing speech down. Nothing is kept at OpenAI: `store: false`, and
+  files go inside the request.
 * **Gemini API**: plain REST, as in https://ai.google.dev/api/generate-content (v1beta `generateContent`, JSON mode with
   `responseSchema` in OpenAPI form, the resumable Files API for audio / scanned PDFs, `x-goog-api-key` header). No SDK is needed
   (the official JS SDK is `@google/genai`; the project has no npm packages). "Thought" parts of the answer are skipped.
 * **Private files on Vercel**: `middleware.js` answers 404 for `server.js`, the AI modules, `scripts/`, `data/`, `*.md` …,
   which Vercel would otherwise serve as static files (the Node server refuses them in `isBlocked()`).
-* **Self-test**: `npm test` runs the generator against a local stand-in for the Gemini API (no real AI call).
+* **Self-test**: `npm test` runs the generator and the checks against local stand-ins for the OpenAI and Gemini APIs (no real AI call; a real key in `.env` is not used).
 
 ## Built-in Reading Part tests, Volume 9 start screen (October 2026)
 

@@ -33,8 +33,8 @@ const TYPES = {
 };
 const DIFFICULTY = { 'band-5': 'IELTS band 5–5.5 (easier)', 'band-6': 'IELTS band 6–6.5', 'band-7': 'IELTS band 7–7.5', 'band-8': 'IELTS band 8–9 (hardest)' };
 const SHARED = ['matching', 'box', 'map'];
-const AUDIO_MIME = { '.mp3': 'audio/mp3', '.wav': 'audio/wav', '.m4a': 'audio/m4a', '.aac': 'audio/aac', '.ogg': 'audio/ogg' };   // the audio types of https://ai.google.dev/gemini-api/docs/audio
-const MAX_AUDIO = () => Math.max(1, Number(process.env.AI_MAX_AUDIO_MB) || 60) * 1024 * 1024;
+const AUDIO_MIME = { '.mp3': 'audio/mp3', '.wav': 'audio/wav', '.m4a': 'audio/m4a', '.aac': 'audio/aac', '.ogg': 'audio/ogg' };
+const MAX_AUDIO = () => { const mb = Math.max(1, Number(process.env.AI_MAX_AUDIO_MB) || 60); return (provider.configured().provider === 'openai' ? Math.min(mb, 25) : mb) * 1024 * 1024; };   // OpenAI takes 25 MB at most
 const MAX_PDF = 30 * 1024 * 1024;
 
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
@@ -43,7 +43,7 @@ const norm = (s) => String(s || '').toLowerCase().replace(/[‘’ʼ`]/g, "'").r
 const letters = (a) => String(a || '').toUpperCase().split(/[^A-Z]+/).filter(Boolean);
 const ROMAN = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
 
-/* ───────── what the model must answer (Gemini responseSchema) ───────── */
+/* ───────── what the model must answer (the provider passes this schema on to the AI service) ───────── */
 const Q_ITEM = { type: 'object', properties: {
   prompt: { type: 'string', description: 'the question / statement / item; ____ marks the gap of a completion question' },
   options: { type: 'array', items: { type: 'string' }, description: 'multiple choice only: the options, each starting with its letter, e.g. "A. the price"' },
@@ -279,7 +279,7 @@ const MOCK = {
       qs.push(inp.skill === 'listening' ? { prompt: w.slice(0, k).join(' ') + ' ____', answer: w.slice(k).join(' ').replace(/[^\p{L}\p{N}' -]/gu, '').split(' ').slice(0, 2).join(' '), explanation: 'Placeholder (mock AI).', evidence: s.slice(0, 120), origin: 'ai' }
         : { prompt: s, answer: 'TRUE', explanation: 'Placeholder (mock AI): the passage says this.', evidence: s.slice(0, 160), origin: 'ai' }); }
     return { groups: qs.length ? [{ type: inp.skill === 'listening' ? 'gap' : 'tfng', section: 1, instruction: inp.skill === 'listening' ? 'Complete the notes below. Write NO MORE THAN TWO WORDS for each answer.' : 'Do the following statements agree with the information given in the passage?', questions: qs }] : [],
-      warnings: ['Mock AI provider: these are placeholder questions, not real AI output. Set AI_PROVIDER=gemini and GEMINI_API_KEY for real generation.'] };
+      warnings: ['Mock AI provider: these are placeholder questions, not real AI output. Set AI_PROVIDER=openai and OPENAI_API_KEY for real generation.'] };
   },
   complete: (inp, ids) => () => ({ answers: inp.groups.flatMap((g, gi) => g.items.map((it, ii) => ({ id: ids[gi][ii], answer: it.answer || '', explanation: it.answer ? 'Placeholder (mock AI): the answer key says so.' : 'Placeholder (mock AI): not decided.', evidence: '' }))),
     warnings: ['Mock AI provider: answers were not checked by an AI.'] }),

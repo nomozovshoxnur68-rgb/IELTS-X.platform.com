@@ -2,7 +2,7 @@
 /* ====
    ai-examiner.js -- the AI check of Writing and Speaking for students: four band criteria, grammar corrections,
    vocabulary upgrades, feedback and a model answer. It uses the same AI service as the Test Generator (ai-provider.js),
-   so the key is one setting on the server (GEMINI_API_KEY) and never reaches a browser.
+   so the key is one setting on the server (OPENAI_API_KEY) and never reaches a browser.
 
      GET  /api/ai/status                 is the AI set up, how many checks are left this month
      POST /api/ai/writing                one task + the student's text            -> the examiner's report (1 check)
@@ -262,6 +262,8 @@ async function assessSpeaking(req, res, ctx, u) {
   await needCheck(ctx, u);
   ctx.rateLimit('ai-check:' + u.id, 30, 3600000);
   const typedOnly = given.every((a) => a.typed);
+  // pronunciation is marked only from notes on a recording: without any (typed answers, or the audio model did not answer) it is not marked and does not count
+  const unheard = given.every((a) => a.typed || !a.pronunciation.length);
   const lines = given.map((a, i) => {
     const wpm = !a.typed && a.durationSec >= 5 ? Math.round(countWords(a.transcript) / (a.durationSec / 60)) : 0;
     return `ANSWER ${i + 1} — ${a.part}\nQUESTION: ${a.text}\n<candidate_answer>\n${a.transcript}\n</candidate_answer>` +
@@ -274,7 +276,7 @@ Mark against the four public IELTS band descriptors:
 - Fluency and Coherence (criteria.fluencyCoherence): length of the answers, pace, hesitation, linking of ideas. A one-sentence answer to a question that needs more scores low.
 - Lexical Resource (criteria.lexicalResource): range, paraphrase, idiomatic and precise words.
 - Grammatical Range and Accuracy (criteria.grammarAccuracy): variety of structures and how many are free of errors. Remember this is speech, so judge what was said and do not mark punctuation.
-- Pronunciation (criteria.pronunciation): ${typedOnly ? 'these answers were typed, so give band 0 and say in the comment that pronunciation could not be assessed.' : 'use the notes from the recordings.'}${SHARED_RULES(lang)}
+- Pronunciation (criteria.pronunciation): ${unheard ? `${typedOnly ? 'these answers were typed' : 'there are no notes from the recordings'}, so give band 0 and say in the comment that pronunciation could not be assessed.` : 'use the notes from the recordings.'}${SHARED_RULES(lang)}
 - "strengths": up to 3 things done well.
 - "plan": 3 or 4 concrete things to practise next, most useful first.
 - "answers": one item for every answer above; "n" is its number, "comment" is one sentence of feedback on that answer, "modelAnswer" is a natural Band 8-9 spoken answer to the same question in simple, clear English (Part 1: 2-4 sentences; a Part 2 cue card: 170-220 words; Part 3: 4-6 sentences).`,
@@ -282,10 +284,11 @@ Mark against the four public IELTS band descriptors:
     mock: () => mockSpeaking(given)
   });
   const r = report(out.json, SPEAKING_CRITERIA);
-  const scored = typedOnly ? SPEAKING_CRITERIA.filter((k) => k !== 'pronunciation') : SPEAKING_CRITERIA;
-  if (typedOnly) r.criteria.pronunciation.band = null;
+  const scored = unheard ? SPEAKING_CRITERIA.filter((k) => k !== 'pronunciation') : SPEAKING_CRITERIA;
+  if (unheard) r.criteria.pronunciation.band = null;
   r.overall = roundAvg(scored.map((k) => r.criteria[k].band));
   r.typedOnly = typedOnly;
+  r.pronunciationUnheard = unheard && !typedOnly;
   r.answers = given.map((a, i) => {
     const x = (Array.isArray(out.json.answers) ? out.json.answers : []).find((y) => Number(y && y.n) === i + 1) || {};
     return { partId: a.partId, q: a.q, part: a.part, question: a.text, transcript: a.transcript, typed: a.typed, comment: str(x.comment, 500), modelAnswer: str(x.modelAnswer, 3000), teacherAudio: '' };
@@ -333,9 +336,9 @@ async function route(req, res, p, method, url, ctx) {
   } catch (e) {
     if (!(e instanceof AiError)) throw e;
     const u = await ctx.currentUser(req).catch(() => null);
-    if (['config', 'key', 'model'].includes(e.code)) console.error('AI examiner:', e.code, e.message);
-    // a wrong key or model is for the admins; a student reads a plain sentence (the check was not counted)
-    const plain = { config: 'The AI check is not available yet. Please try again later.', key: 'The AI check is not available right now. Please try again later.', model: 'The AI check is not available right now. Please try again later.',
+    if (['config', 'key', 'model', 'billing'].includes(e.code)) console.error('AI examiner:', e.code, e.message);
+    // a wrong key or model, or an account without credit, is for the admins; a student reads a plain sentence (the check was not counted)
+    const plain = { config: 'The AI check is not available yet. Please try again later.', key: 'The AI check is not available right now. Please try again later.', model: 'The AI check is not available right now. Please try again later.', billing: 'The AI check is not available right now. Please try again later.',
       quota: 'The AI is very busy right now. Please try again in a minute.', 'too-long': 'The AI answer was cut off. Please press Try again.', blocked: 'The AI could not check this text. Please make sure it is your answer to the task.', recitation: 'The AI could not finish this check. Please press Try again.', malformed: 'The AI sent an answer that could not be read. Please press Try again.' };
     throw new ctx.HttpError(e.status, u && ctx.isAdmin(u) ? e.message : (plain[e.code] || e.message));
   }
