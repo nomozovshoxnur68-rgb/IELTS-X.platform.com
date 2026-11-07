@@ -59,7 +59,8 @@ const ADMIN_EMAILS = new Set(
 // pages that need an active Premium plan (lower-case paths); extend with PREMIUM_PATHS=/a.html,/b.html
 // (a * matches anything; put premium-only audio / files under /premium-audio/ to protect them too)
 // (the full test pages /full-tests/<skill>/test-N.html are decided by the Access rules below: admin panel -> Access)
-const PREMIUM_PATHS = ['/mock tests.html', '/premium-tests.html', '/premium-audio/*']
+// (the Mock Tests page lists every mock with its own plan; the mocks and their papers are guarded in mock-tests.js)
+const PREMIUM_PATHS = ['/premium-tests.html', '/premium-audio/*']
   .concat(String(process.env.PREMIUM_PATHS || '').split(',').map((p) => p.trim().toLowerCase()).filter(Boolean))
   .map((p) => new RegExp('^' + p.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'));
 const isPremiumPath = (p) => PREMIUM_PATHS.some((re) => re.test(p));
@@ -156,7 +157,7 @@ function memoGet(key, load) {
   return p;
 }
 const memoClear = (prefix) => { for (const k of [...memo.keys()]) if (k.startsWith(prefix)) memo.delete(k); };
-const MEMO_SETTINGS = new Set(['branding', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules']);
+const MEMO_SETTINGS = new Set(['branding', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests']);
 
 const store = {
   async listUsers() { return USE_SUPABASE ? ((await sb('ieltsx_users?select=*&order=createdAt.desc')) || []) : loadDb().users; },
@@ -579,6 +580,10 @@ function redirect(res, location) { res.writeHead(302, { Location: location, 'Cac
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 /* the store of AI checks (ai-store.js): every Writing / Speaking check with its feedback, per account */
 let aiStoreInst = null;
+/* Full Mock Tests (mock-tests.js): the catalog, attempts drawn and marked on the server, guarded paper files */
+let mockCtxInst = null;
+const mockCtx = (extra) => Object.assign(mockCtxInst || (mockCtxInst = { store, currentUser, isAdmin, userLevel, allowsLevel, levelName, send, readJson, rateLimit, HttpError, purposeToken, readPurposeToken,
+  sign: (body) => crypto.createHmac('sha256', SESSION_SECRET).update(body).digest(), cookies, isHttps, bandFor, newId, audit, cleanUrl, SECURITY_HEADERS }), extra || {});
 const aiStore = () => aiStoreInst || (aiStoreInst = require('./ai-store').createAiStore({ USE_SUPABASE, sb, eq, DATA_DIR, HttpError }));
 
 function readBody(req, limit = 100 * 1024) {
@@ -1393,6 +1398,10 @@ async function api(req, res, url) {
     // to the query, so only a value that starts with "/" can be the page.
     let want = String(url.searchParams.get('page') || url.searchParams.getAll('path').find((v) => String(v).startsWith('/')) || ''); try { want = decodeURIComponent(want); } catch (e) { /* keep */ }
     // Mock tests and /premium-audio/ (PREMIUM_PATHS) need a paid plan too; middleware.js asks this before Vercel sends the file
+    if (/^\/full-mock\//i.test(want)) {   // a mock paper: only inside the student's own attempt (mock-tests.js)
+      const g = await require('./mock-tests').gateFile(mockCtx(), req, want);
+      return send(res, 200, { allowed: !g || g.ok, locked: !!g, authenticated: !!u, price: !g || g.ok ? null : (u ? '/Mock%20tests' : '/login?next=' + encodeURIComponent('/Mock tests')) }, { 'Cache-Control': 'no-store, private' });
+    }
     const gate = await gateForPath(hrefPath(want) + '.html') || (isPremiumPath(hrefPath(want) + '.html') || isPremiumPath(hrefPath(want)) ? { locked: true, plan: 'standard' } : { locked: false, plan: 'standard' });
     let allowed = allowsLevel(gate, level); let limited = false;
     if (allowed && gate.locked && await quotaBlocks(u, gate, hrefPath(want) + '.html')) { allowed = false; limited = true; }
@@ -1458,8 +1467,12 @@ async function api(req, res, url) {
     throw new HttpError(405, 'Method not allowed.');
   }
 
+  /* ---- Full Mock Tests (mock-tests.js): the cards, starting / resuming / finishing an attempt ---- */
+  if (p === '/api/mocks' || p.startsWith('/api/mocks/') || p.startsWith('/api/mock/')) return require('./mock-tests').route(req, res, p, method, url, mockCtx());
+
   /* ---- the AI check of Writing and Speaking (ai-examiner.js): any signed-in student, within the checks of the plan ---- */
-  if (p.startsWith('/api/ai/')) return require('./ai-examiner').route(req, res, p, method, url, { store, currentUser, isAdmin, userLevel, materialRule, accessRules, allowsLevel, send, readJson, readBody, rateLimit, HttpError, UPLOAD_DIR, aiStore: aiStore() });
+  if (p.startsWith('/api/ai/')) return require('./ai-examiner').route(req, res, p, method, url, { store, currentUser, isAdmin, userLevel, materialRule, accessRules, allowsLevel, send, readJson, readBody, rateLimit, HttpError, UPLOAD_DIR, aiStore: aiStore(),
+    mockWritingTask: (u, token, which) => require('./mock-tests').writingTask(mockCtx(), u, token, which) });
 
   /* ---- admin ---- */
   if (p.startsWith('/api/admin/')) {
@@ -1467,6 +1480,7 @@ async function api(req, res, url) {
     rateLimit('admin:' + admin.id, 600, 60000);
     // AI Test Generator (ai-generator.js): admins only, like everything here; it never saves or publishes anything itself
     if (p.startsWith('/api/admin/ai/')) return require('./ai-generator').route(req, res, p, method, { admin, send, readJson, audit, rateLimit, HttpError, UPLOAD_DIR, SUPABASE_URL, MEDIA_BUCKET, IS_VERCEL, USE_SUPABASE, AUDIO_EXT, PDF_EXT });
+    if (p === '/api/admin/mocks' || p.startsWith('/api/admin/mocks/')) return require('./mock-tests').adminRoute(req, res, p, method, url, mockCtx({ admin }));
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {
@@ -1567,8 +1581,11 @@ async function api(req, res, url) {
       const u = await store.findUserById(decodeURIComponent(dm[1])); if (!u) throw new HttpError(404, 'User not found.');
       const results = await store.listResults(u.id, 1000);
       // the AI checks: only the bands and criteria (the student's own texts and the feedback stay with the student)
-      const [orders, aiReports] = await Promise.all([store.listOrders({ userId: u.id, limit: 50 }), aiStore().list(u.id, { limit: 20 }).catch(() => [])]);
-      return send(res, 200, { user: adminUser(u, resultStats(results).get(u.id)), results: results.slice(0, 100), orders, aiReports: aiReports.map(({ id, section, title, band, criteria, words, createdAt }) => ({ id, section, title, band, criteria, words, createdAt })) });
+      const [orders, aiReports, mocks] = await Promise.all([store.listOrders({ userId: u.id, limit: 50 }), aiStore().list(u.id, { limit: 20 }).catch(() => []),
+        require('./mock-tests').readAttempts(mockCtx(), u).catch(() => ({ items: [] }))]);
+      // the mock attempts: the bands, the integrity log count and the marking flags (never which papers they had)
+      const mockAttempts = mocks.items.slice(0, 20).map(({ id, title, mode, startedAt, finishedAt, L, R, overall, viol, flags }) => ({ id, title, mode, startedAt, finishedAt, L, R, overall, viol, flags }));
+      return send(res, 200, { user: adminUser(u, resultStats(results).get(u.id)), results: results.slice(0, 100), orders, mockAttempts, aiReports: aiReports.map(({ id, section, title, band, criteria, words, createdAt }) => ({ id, section, title, band, criteria, words, createdAt })) });
     }
     dm = p.match(/^\/api\/admin\/users\/([^/]+)\/(block|note|logout-all)$/);
     if (dm && method === 'POST') {
@@ -1756,7 +1773,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
@@ -1914,6 +1931,15 @@ async function staticFile(req, res, pathname) {
     return serveFile(req, res, f, { 'Content-Security-Policy': 'sandbox allow-scripts allow-forms allow-popups' });
   }
 
+  let guarded = false;
+  if (lower.startsWith('/full-mock/')) {   // the papers of a mock test (with their answers) only inside the student's own attempt
+    const g = await require('./mock-tests').gateFile(mockCtx(), req, decoded);
+    if (g && !g.ok) {
+      if (/text\/html/.test(String(req.headers.accept || '')) && g.status !== 404) return redirect(res, g.status === 401 ? '/login?next=' + encodeURIComponent('/Mock tests') : '/Mock%20tests');
+      return g.status === 404 ? notFound(req, res) : send(res, g.status, { error: g.status === 401 ? 'Please sign in.' : 'This file opens only inside your mock test.' });
+    }
+    guarded = !!(g && g.ok);   // never kept by the browser: the next attempt must ask again
+  }
   let target = aliasMap.get(lower) || decoded;
   if (target === '/') target = '/index.html';
   if (!path.extname(target) && !target.endsWith('/')) {          // /Price -> /Price.html (clean URLs)
@@ -1958,7 +1984,7 @@ async function staticFile(req, res, pathname) {
     if (gateLocked && await quotaBlocks(u, gate, tl)) return redirect(res, '/Price?premium=limit&next=' + encodeURIComponent(pathname));
   }
   const extra = needsAdmin ? { 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY', 'X-Robots-Tag': 'noindex, nofollow', 'Content-Security-Policy': ADMIN_CSP }
-    : needsPremium ? { 'Cache-Control': 'no-store' } : {};
+    : needsPremium || guarded ? { 'Cache-Control': 'no-store, private' } : {};
   return serveFile(req, res, file, extra);
 }
 
@@ -2006,6 +2032,8 @@ const requestHandler = async (req, res) => {
     }
     if (await require('./listening-router').route(req, res, url, { root: ROOT, store, currentUser, isAdmin, materialRule, accessRules, allowsLevel, userLevel, send })) return;   // Listening tests made in the admin panel (new listening engine)
     if (await require('./reading-router').route(req, res, url, { root: ROOT, store, currentUser, isAdmin, materialRule, accessRules, allowsLevel, userLevel, send })) return;   // Reading tests made in the admin panel (Part = 1 passage, Full = 3 passages)
+    const mp = /^\/full-mock\/paper\/(reading|listening)\/([0-9a-f-]{36})\/?$/i.exec(url.pathname);
+    if (mp && (req.method === 'GET' || req.method === 'HEAD')) return await require('./mock-tests').servePaper(req, res, mockCtx(), mp[1].toLowerCase(), mp[2].toLowerCase());
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed');
     if (/\.html$/i.test(url.pathname) && !url.pathname.toLowerCase().startsWith('/uploads/')) {

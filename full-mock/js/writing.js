@@ -34,14 +34,25 @@
     setTimeout(() => $('wText1').focus(), 50);
   }
   /* the two tasks come from the mock this candidate was given (js/tests.js) */
+  /* the two tasks of this attempt come from the server (mock-tests.js): built-in papers have a picture, a Writing test
+     made in the admin panel may give the figures of a line graph instead (shown as a table) */
+  const safeImg = (u) => (/^(\/(full-mock|uploads|assets|api\/media)\/[^"'<>\s]+|https:\/\/[^"'<>\s]+)$/i.test(String(u || '')) ? String(u) : '');
+  function chartTable(c) {
+    if (!c || !Array.isArray(c.years) || !Array.isArray(c.series) || !c.series.length) return '';
+    return '<div class="tbox" style="overflow:auto"><table style="border-collapse:collapse;font-size:14px;min-width:60%">'
+      + '<tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid #999">' + esc(c.unit || '') + '</th>' + c.years.map(y => '<th style="padding:4px 8px;border-bottom:1px solid #999">' + esc(y) + '</th>').join('') + '</tr>'
+      + c.series.map(s => '<tr><th style="text-align:left;padding:4px 8px">' + esc(s.name) + '</th>' + c.years.map((y, i) => '<td style="padding:4px 8px;text-align:center">' + esc((s.values || [])[i] ?? '') + '</td>').join('') + '</tr>').join('')
+      + '</table></div>';
+  }
   function renderPrompts() {
-    const w = Mock.test.writing, lines = a => a.map(l => '<p>' + esc(l) + '</p>').join('');
+    const w = Mock.test.writing, lines = a => (a || []).map(l => '<p>' + esc(l) + '</p>').join('');
+    const min1 = Number(w.task1.minWords) || 150, min2 = Number(w.task2.minWords) || 250, img = safeImg(w.task1.img);
     $('wPrompt1').innerHTML = '<h3>WRITING TASK 1</h3><p>You should spend about <b>20 minutes</b> on this task.</p>'
-      + '<div class="tbox">' + lines(w.task1.lines) + '</div><p><b>Write at least 150 words.</b></p>'
-      + (w.task1.img ? '<figure><img alt="' + esc(w.task1.alt || '') + '" src="' + esc(w.task1.img) + '"></figure>' : '');
+      + '<div class="tbox">' + lines(w.task1.lines) + '</div><p><b>Write at least ' + min1 + ' words.</b></p>'
+      + (img ? '<figure><img alt="' + esc(w.task1.alt || '') + '" src="' + esc(img) + '"></figure>' : chartTable(w.task1.chart));
     $('wPrompt2').innerHTML = '<h3>WRITING TASK 2</h3><p>You should spend about <b>40 minutes</b> on this task.</p><p>Write about the following topic:</p>'
       + '<div class="tbox">' + lines(w.task2.lines) + '</div>'
-      + '<p>Give reasons for your answer and include any relevant examples from your own knowledge or experience.</p><p><b>Write at least 250 words.</b></p>';
+      + '<p>Give reasons for your answer and include any relevant examples from your own knowledge or experience.</p><p><b>Write at least ' + min2 + ' words.</b></p>';
   }
   function applyMode() {
     const real = state().mode === 'real';

@@ -180,7 +180,12 @@ async function checkWriting(req, res, ctx, u) {
   const answer = str(b.answer, 12000); const words = countWords(answer); const lang = langOf(b.lang);
   if (words < MIN_WRITING_WORDS) throw new ctx.HttpError(400, `Write at least ${MIN_WRITING_WORDS} words so there is something to check.`);
   let task; let title; let teacherSample = ''; let testKey;
-  if (b.materialId) {   // a test of the admin panel: the question comes from the server, not from the browser
+  if (b.mockToken && ctx.mockWritingTask) {   // the Writing of a Full Mock (mock-tests.js): the task comes from the student's own attempt
+    const mt = await ctx.mockWritingTask(u, String(b.mockToken), b.mockTask === 'task2' ? 'task2' : 'task1');
+    if (!mt) throw new ctx.HttpError(403, 'This mock attempt could not be confirmed. Please open your result again.');
+    task = { kind: mt.kind, prompt: mt.prompt, chart: chartOf(mt.chart), imageUrl: mt.imageUrl, minWords: mt.minWords };
+    title = mt.title; teacherSample = str(mt.teacherSample, 8000); testKey = mt.testKey;
+  } else if (b.materialId) {   // a test of the admin panel: the question comes from the server, not from the browser
     const m = await materialFor(ctx, u, b.materialId, 'writing');
     const t = ((m.data && m.data.tasks) || []).find((x) => x.id === b.taskId);
     if (!t) throw new ctx.HttpError(404, 'This task was not found.');

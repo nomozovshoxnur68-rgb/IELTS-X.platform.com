@@ -518,6 +518,10 @@
       "destination": "/api"
     },
     {
+      "source": "/full-mock/paper/:kind(reading|listening)/:id",
+      "destination": "/api"
+    },
+    {
       "source": "/api/:path*",
       "destination": "/api"
     }
@@ -593,7 +597,7 @@
   ],
   "functions": {
     "api/index.js": {
-      "includeFiles": "{server.js,*.html,data/**,supabase-schema.sql,assets/**,reading-src/part/**,listening-src/part/**,speaking-src/**}",
+      "includeFiles": "{server.js,*.html,data/**,supabase-schema.sql,assets/**,reading-src/part/**,listening-src/part/**,speaking-src/**,full-mock/*.html,full-tests/reading/test-1.html,full-mock/js/tests.js,full-mock/js/listening.js}",
       "maxDuration": 60
     }
   }

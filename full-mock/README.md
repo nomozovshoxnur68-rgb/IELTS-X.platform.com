@@ -62,3 +62,11 @@ js/bridge.js (iframe ko'prigi) | assets/
   `assets/img/m1610-task1.jpg`.
 - Fix: the tutorial video's Play button could cover the Close button when a video failed to play.
 - Adding a paper: see the comment at the top of `js/tests.js`.
+
+---
+
+## Update (November 2026): the server runs the mocks
+
+Mocks are made in **Admin → Mock tests** and opened as `/full-mock/?mock=<id>`. The papers are drawn and the answers are marked on the
+server (`mock-tests.js` in the project root); `js/tests.js` is read by the server only and never sent to a browser, so the `?test=` /
+`allowTestParam` switch and the browser-side draw are gone. To add a built-in paper, still add it to `js/tests.js` (see its top comment).

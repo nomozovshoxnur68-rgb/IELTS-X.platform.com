@@ -4,12 +4,15 @@
    (iframes) · results · analyse mistakes · PDF · sending the results.
    Writing lives in js/writing.js; the papers in js/reading.js and js/listening.js.
 
-   SECURITY NOTE
-   Everything here runs in the candidate's browser, so it is a deterrent, not a
-   vault: it blocks the context menu and the usual shortcuts, keeps the page in
-   full screen, logs every attempt to leave, locks Real Exam Mode (no submit,
-   no restart) and signs the saved state so hand-edits are noticed. Scores that
-   must be trusted should be re-checked on the server that receives the result.
+   SECURITY
+   The papers are drawn on the server (mock-tests.js): POST /api/mocks/<id>/start
+   gives this attempt its three papers and a signed token (also an HttpOnly
+   cookie), and a paper page is sent only inside that attempt. When the test
+   ends, POST /api/mock/finish marks the answers again on the server: the bands
+   shown and saved are the server's. In the browser the shell still blocks the
+   context menu and the usual shortcuts, keeps the page in full screen, logs
+   every attempt to leave, locks Real Exam Mode (no submit, no restart) and
+   signs the saved state so hand-edits are noticed.
    ============================================================ */
 (function () {
   'use strict';
@@ -17,10 +20,10 @@
   /* ---------------------------------------------------------------- config */
   const CONFIG = {
     title: 'Full Mock Test',
-    storeKey: 'rcdi_fullmock_v3',
+    storeKey: 'ieltsx_fullmock_v4',          // v4: the attempt comes from the server (an older saved state is not resumed)
     outboxKey: 'rcdi_fullmock_outbox',
-    seenKey: 'rcdi_fullmock_bags_v2',       // per-paper shuffled bags (Listening / Reading / Writing rotate on their own)
-    allowTestParam: false,                   // true: index.html?l=m15&r=m9&w=m1610 (or ?test=m15 for all three) forces papers (for you, not for candidates)
+    /* which mock: /full-mock/?mock=<id> (the cards of the Mock Tests page); without it the built-in one with random papers */
+    mockId: (function () { const v = new URLSearchParams(location.search).get('mock') || 'random'; return /^[\w-]{1,40}$/.test(v) ? v : 'random'; })(),
     /* Where the finished result is POSTed as JSON (name, phone, email, scores,
        answers, writing). Leave '' to keep results on this device only. */
     resultsEndpoint: '',
@@ -62,82 +65,30 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3600);
   }
 
-  /* --------------------------------------------------------- hidden random papers */
-  /* Listening, Reading and Writing are drawn SEPARATELY (js/tests.js -> MOCK_POOL), so a
-     candidate can get, for example, Listening A + Reading C + Writing B. Each paper has its
-     own shuffled bag: everything in it is handed out once before anything repeats, and the
-     paper that was just used never comes straight back. Nothing shows which paper it is. */
+  /* ------------------------------------------------- the attempt, from the server */
+  /* The papers are drawn by the server (mock-tests.js), separately for Listening, Reading and Writing: each
+     student gets every paper once before any repeats, and nothing on the page shows which paper it is. */
   const KINDS = ['listening', 'reading', 'writing'];
-  const POOL = (function () {
-    const p = window.MOCK_POOL || {};
-    /* old tests.js (one entry = one whole mock) still works */
-    if (!p.listening && Array.isArray(window.MOCK_TESTS)) {
-      const T = window.MOCK_TESTS;
-      return {
-        listening: T.map(t => ({ id: t.id, file: t.listening })),
-        reading: T.map(t => ({ id: t.id, file: t.reading })),
-        writing: T.map(t => ({ id: t.id, writing: t.writing }))
-      };
-    }
-    return { listening: p.listening || [], reading: p.reading || [], writing: p.writing || [] };
-  })();
-  const entryOf = (k, id) => POOL[k].find(e => e.id === id) || POOL[k][0] || {};
-  const rand = n => {
-    if (window.crypto && crypto.getRandomValues) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
-    return Math.floor(Math.random() * n);
-  };
-  function shuffle(a) {
-    a = a.slice();
-    for (let i = a.length - 1; i > 0; i--) { const j = rand(i + 1); const t = a[i]; a[i] = a[j]; a[j] = t; }
-    return a;
+  async function postJson(url, body) {
+    let r;
+    try { r = await fetch(url, { method: 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: stringify(body || {}) }); }
+    catch (e) { const x = new Error('The server could not be reached. Check your connection and try again.'); x.status = 0; throw x; }
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) { const x = new Error(d.error || 'Something went wrong (' + r.status + ').'); x.status = r.status; throw x; }
+    return d;
   }
-  function loadBags() {
-    try { const b = JSON.parse(localStorage.getItem(CONFIG.seenKey) || '{}'); return b && typeof b === 'object' ? b : {}; } catch (e) { return {}; }
-  }
-  function saveBags(b) { try { localStorage.setItem(CONFIG.seenKey, JSON.stringify(b)); } catch (e) { /* ignore */ } }
-  /* next paper of one kind: take from the bag; when the bag runs dry, refill it
-     (shuffled, and never starting with the paper that was handed out last) */
-  function drawPaper(k, bags) {
-    const all = POOL[k].map(e => e.id);
-    if (!all.length) return '';
-    let bag = (bags[k] && Array.isArray(bags[k].bag) ? bags[k].bag : []).filter(id => all.indexOf(id) > -1);
-    const last = bags[k] ? bags[k].last : '';
-    if (!bag.length) {
-      bag = shuffle(all);
-      if (all.length > 1 && bag[0] === last) { const j = 1 + rand(bag.length - 1); const t = bag[0]; bag[0] = bag[j]; bag[j] = t; }
-    }
-    const id = bag.shift();
-    bags[k] = { bag, last: id };
-    return id;
-  }
-  function pickPapers() {
-    const pick = {};
-    if (CONFIG.allowTestParam) {
-      const q = new URLSearchParams(location.search), all = q.get('test');
-      KINDS.forEach(k => {
-        const v = q.get(k[0]) || all;
-        if (v && POOL[k].some(e => e.id === v)) pick[k] = v;
-      });
-    }
-    const bags = loadBags();
-    KINDS.forEach(k => { if (!pick[k]) pick[k] = drawPaper(k, bags); });
-    saveBags(bags);
-    return pick;
-  }
-  const pickLabel = pick => KINDS.map(k => k[0].toUpperCase() + ':' + (pick[k] || '')).join(' ');
-  /* a state saved before papers were drawn separately: reuse its one test id for all three */
-  function ensurePick(st) {
-    const have = st.pick && KINDS.every(k => POOL[k].some(e => e.id === st.pick[k]));
-    if (have) return;
-    const pick = {};
-    KINDS.forEach(k => { pick[k] = POOL[k].some(e => e.id === st.testId) ? st.testId : (POOL[k][0] || {}).id || ''; });
-    st.pick = pick; st.testId = pickLabel(pick);
+  /* the attempt the server handed out -> the state of this page */
+  function useAttempt(st, a) {
+    st.attemptId = a.id; st.token = a.token; st.mockId = a.mockId || CONFIG.mockId; st.mode = a.mode === 'practice' ? 'practice' : 'real';
+    st.papers = a.papers || {}; if (a.title) st.title = a.title;
+    st.testId = a.id;
   }
 
   /* ----------------------------------------------------------------- state */
   const fresh = () => ({
     name: '', phone: '', email: '', mode: 'real',
-    testId: '', pick: {}, done: {}, watched: {}, res: {}, w: { t1: '', t2: '' },
+    testId: '', mockId: '', attemptId: '', token: '', title: '', papers: {}, marked: false,
+    done: {}, watched: {}, res: {}, w: { t1: '', t2: '' },
     wEndsAt: null, startedAt: null, finishedAt: null,
     viol: [], sent: false
   });
@@ -221,8 +172,10 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return ['lgEmail', 'Please enter a valid email address.'];
     return null;
   }
-  function doLogin(e) {
+  let starting = false;
+  async function doLogin(e) {
     e.preventDefault();
+    if (starting) return;
     const name = $('lgName').value.trim().replace(/\s+/g, ' ');
     const phone = $('lgPhone').value.trim();
     const email = $('lgEmail').value.trim().toLowerCase();
@@ -232,20 +185,64 @@
     $('lgErr').textContent = '';
     goFull();                                              // this click is the user gesture
     const old = loadSaved();
-    /* Same candidate and a paper still in progress: carry on where they were (the mode they started with stays).
-       A finished Real Exam is final (the results show again). A finished Practice, or a Real Exam re-entered in
-       Practice, starts a NEW attempt and hands out the next mock at random. */
-    const resume = old && old.email === email && (!old.finishedAt || (old.mode === 'real' && mode === 'real'));
-    if (resume) {
-      S = old; S.name = name; S.phone = phone; ensurePick(S);
-    } else {
-      S = fresh(); S.name = name; S.phone = phone; S.email = email; S.mode = mode; S.startedAt = Date.now();
-      S.pick = pickPapers(); S.testId = pickLabel(S.pick);
-    }
+    /* Same candidate, same mock and a paper still in progress: carry on where they were (the mode they started with
+       stays). A finished Real Exam is final (the results show again). A finished Practice, or a Real Exam re-entered in
+       Practice, starts a NEW attempt: the server hands out new papers. */
+    const resume = old && old.token && old.mockId === CONFIG.mockId && old.email === email && (!old.finishedAt || (old.mode === 'real' && mode === 'real'));
+    const btn = $('loginForm').querySelector('.lg-btn'); starting = true; if (btn) btn.disabled = true;
+    try {
+      let again = !resume;
+      if (resume) {
+        S = old; S.name = name; S.phone = phone;
+        // the paper pages need the attempt cookie again (a finished attempt may have ended: its results still show;
+        // an unfinished one that ended (8 hours) starts again with new papers)
+        try { useAttempt(S, (await postJson('/api/mock/resume', { token: S.token })).attempt); }
+        catch (x) { if (S.finishedAt) { /* the results stay */ } else if (x.status === 410) again = true; else throw x; }
+      }
+      if (again) {
+        const d = await postJson('/api/mocks/' + encodeURIComponent(CONFIG.mockId) + '/start', { mode });
+        S = fresh(); S.name = name; S.phone = phone; S.email = email; S.startedAt = Date.now();
+        useAttempt(S, d.attempt);
+      }
+    } catch (x) {
+      leaveFull();
+      const nextUrl = encodeURIComponent(location.pathname + location.search);
+      $('lgErr').innerHTML = esc(x.message) + (x.status === 401 ? ` <a href="/login?next=${nextUrl}">Sign in</a>` : x.status === 403 ? ' <a href="/Price">See plans</a>' : '');
+      return;
+    } finally { starting = false; if (btn) btn.disabled = false; }
+    if (S.title) CONFIG.title = S.title;
     save(); paintIdentity();
     if (S.finishedAt) { inSession = false; renderReport(); show('scReport'); return; }
     inSession = true; paintGuard();
     renderChecks(); show('scChecks');
+  }
+  /* before the form: who is signed in, and may they take this mock? (the server checks again on Start) */
+  async function boot() {
+    let me = null, mock = null;
+    try {
+      const [a, b] = await Promise.all([
+        fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' }).then((r) => (r.ok ? r.json() : {})),
+        fetch('/api/mocks', { credentials: 'same-origin', cache: 'no-store' }).then((r) => (r.ok ? r.json() : {}))
+      ]);
+      me = a.user || null; mock = (b.mocks || []).find((m) => m.id === CONFIG.mockId) || null;
+    } catch (e) { /* offline: Start says why */ }
+    if (mock) {
+      CONFIG.title = mock.title;
+      const h = $('loginForm').querySelector('h1'); if (h) h.textContent = mock.title;
+      if (mock.modes === 'real' || mock.modes === 'practice') {   // the admin allowed one mode only
+        document.querySelectorAll('input[name="mode"]').forEach((r) => { const keep = r.value === mock.modes; r.checked = keep; r.closest('.mode').classList.toggle('hidden', !keep); });
+      }
+    }
+    const nextUrl = encodeURIComponent(location.pathname + location.search);
+    const note = (html) => { $('lgErr').innerHTML = html; };
+    if (!me) note(`Please <a href="/login?next=${nextUrl}">sign in</a> to take this mock test. Your bands are saved to your account.`);
+    else {
+      if (!$('lgName').value) $('lgName').value = me.name || '';
+      $('lgEmail').value = me.email || ''; $('lgEmail').readOnly = true;   // the result goes to this account
+      if (mock && mock.locked) note(`This mock test is for ${esc(({ standard: 'Standard', max: 'Max', ultra: 'Ultra' })[mock.plan] || 'paid')} members. <a href="/Price">See plans</a>`);
+      else if (!mock) note('This mock test was not found. <a href="/Mock%20tests">See all mock tests</a>');
+    }
+    (me ? ($('lgName').value ? $('lgPhone') : $('lgName')) : $('lgName')).focus();
   }
 
   /* ----------------------------------------------------------- pre-test checks */
@@ -347,7 +344,7 @@
 
   /* ------------------------------------------------- Listening / Reading pages */
   let activeFrame = null;                       // { fr, k, mode, ready }
-  const frameUrl = k => entryOf(k, S.pick && S.pick[k]).file + '?embed=1';
+  const frameUrl = k => ((S.papers && S.papers[k] && S.papers[k].file) || '') + '?embed=1';
   function startSection(k) {
     goFull();
     if (k === 'writing') { Mock.writing.start(); return; }
@@ -409,18 +406,28 @@
     S.finishedAt = Date.now(); running = null; inSession = false; save();
     paintGuard(); closeFrame();
     renderReport(); show('scReport');
-    aiWriting();   // the Writing is checked by itself when the test ends; reopening an old attempt does not use a check
+    markOnServer();   // the server marks Listening and Reading again and saves them to the account (Performance page)
+    aiWriting();      // the Writing is checked by itself when the test ends; reopening an old attempt does not use a check
     sendResults();
-    saveToAccount();
   }
-  /* Listening and Reading of a finished mock on the student's account (Performance page). A visitor who is not signed in gets a 401 and nothing is kept. */
-  function saveToAccount() {
-    ['listening', 'reading'].forEach((k) => {
-      const R = S.res[k]; if (!R) return;
-      const name = CONFIG.names[k];
-      fetch('/api/results', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ testKey: '/full-mock/' + S.testId + '/' + k, section: name, bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · ' + name, scoreCorrect: R.correct, scoreTotal: R.total, band: Number(R.band) }) }).catch(() => { /* the report is still on screen */ });
-    });
+  /* The bands that count are the server's: it marks the answers again against its own answer key (mock-tests.js).
+     Asked again when the results are opened, until it has answered (an offline end of the test is not lost). */
+  let marking = false;
+  async function markOnServer() {
+    if (marking || S.marked || !S.token || !S.finishedAt) return;
+    marking = true; const att = S;
+    const part = (k) => { const R = att.res[k]; return R ? { answers: answerMap(R.rows), correct: R.correct } : null; };
+    try {
+      const d = await postJson('/api/mock/finish', { token: att.token, listening: part('listening'), reading: part('reading'), viol: att.viol.length });
+      [['listening', d.listening], ['reading', d.reading]].forEach(([k, X]) => {
+        if (!X || !att.res[k]) return;
+        att.res[k].correct = X.correct; att.res[k].total = X.total; att.res[k].band = Number(X.band).toFixed(1);
+      });
+      att.marked = true; att.flagged = !!d.flagged;
+      if (att === S) { save(); if (!$('scReport').classList.contains('hidden')) renderReport(); }
+    } catch (e) {
+      att.markError = e.message; if (att === S && !$('scReport').classList.contains('hidden')) paintSendStatus();
+    } finally { marking = false; }
   }
   function overallLR() {
     const L = S.res.listening, R = S.res.reading;
@@ -432,7 +439,7 @@
   function payload(extra) {
     const L = S.res.listening || null, R = S.res.reading || null;
     return Object.assign({
-      event: 'result', test: CONFIG.title, testId: S.testId, papers: S.pick, mode: S.mode,
+      event: 'result', test: CONFIG.title, testId: S.testId, mockId: S.mockId, mode: S.mode,
       candidate: { name: S.name, phone: S.phone, email: S.email },
       startedAt: S.startedAt, finishedAt: S.finishedAt,
       listening: L, reading: R, overallLR: overallLR(),
@@ -467,9 +474,10 @@
   }
   function paintSendStatus() {
     const el = $('sendStatus'); if (!el) return;
-    if (!CONFIG.resultsEndpoint) el.textContent = 'Your result is saved on this device.';
-    else el.textContent = S.sent ? 'Your result was sent to ' + S.email + '.' : 'Sending your result… it will retry automatically.';
-    el.className = 'rx-status' + (S.sent ? ' ok' : '');
+    if (S.marked) el.textContent = 'Marked on our server and saved to your account (Performance page → Mock).';
+    else if (S.markError) el.innerHTML = esc('Your result is not confirmed yet: ' + S.markError) + ' <button class="rx-btn" type="button" data-action="mark-again">Try again</button>';
+    else el.textContent = 'Checking your answers on our server…';
+    el.className = 'rx-status' + (S.marked ? ' ok' : '');
   }
   window.addEventListener('online', () => { if (S.finishedAt) flushOutbox().then(ok => { S.sent = ok; save(); paintSendStatus(); }); });
 
@@ -526,7 +534,7 @@
     const viol = S.viol.length;
     $('repBody').innerHTML = `
       <h1>Exam Results</h1>
-      <div class="rx-pill">FULL MOCK TEST</div>
+      <div class="rx-pill">${esc(CONFIG.title || 'Full Mock Test').toUpperCase()}</div>
       <p class="rx-who">${esc(S.name)} &middot; ${esc(S.email)}</p>
       <div class="rx-score main"><div class="rx-score-t">Your Overall Band Score <small>(Listening + Reading)</small></div>
         <div class="rx-big">${ov}</div><div class="rx-out">out of 9</div>
@@ -552,6 +560,7 @@
         <button class="rx-btn dark" data-action="finish">Finish</button>
       </div>`;
     paintSendStatus();
+    if (!S.marked) markOnServer();   // asked again until the server has marked this attempt
   }
   /* ------------------------------------- the AI check of the Writing section */
   let aiBusy = '';   // the task being checked right now
@@ -585,18 +594,18 @@
   async function aiWriting() {
     if (aiBusy) return;
     const att = S, paint = (html) => { const box = $('mockAi'); if (box && att === S) box.innerHTML = html; };
-    const w = entryOf('writing', att.pick && att.pick.writing).writing;
     const lang = ($('mockAiLang') || {}).value || aiLang();
     try { localStorage.setItem('ieltsx:pref:ai-lang', lang); } catch (e) { /* blocked */ }
-    const list = [['Task 1', 'task1', att.w.t1, w.task1, 150], ['Task 2', 'task2', att.w.t2, w.task2, 250]].filter((x) => words(x[2]) >= 20);
+    const list = [['Task 1', 'task1', att.w.t1], ['Task 2', 'task2', att.w.t2]].filter((x) => words(x[2]) >= 20);
     if (!list.length) { paint(aiWritingHtml('Your answers are too short to check.')); return; }
     att.aiPart = att.aiPart || {};
     try {
-      for (const [name, kind, answer, task, minWords] of list) {
+      for (const [name, kind, answer] of list) {
         if (att.aiPart[kind]) continue;
         aiBusy = name; paint(aiCheckingHtml(name));
+        // the task itself comes from the attempt on the server (mock-tests.js), never from this page
         const r = await fetch('/api/ai/writing', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ examId: 'mock-' + att.testId, title: (CONFIG.title || 'Full mock') + ' · ' + name, taskKind: kind, taskPrompt: [].concat(task.lines || []).concat(task.alt ? ['(The picture: ' + task.alt + ')'] : []).join('\n'), imageUrl: task.img ? '/full-mock/' + task.img : '', minWords, answer, lang }) });
+          body: JSON.stringify({ mockToken: att.token, mockTask: kind, answer, lang }) });
         const d = await r.json().catch(() => ({}));
         if (!r.ok) { const e = new Error(d.error || 'The AI check failed. Please try again.'); e.status = r.status; throw e; }
         att.aiPart[kind] = { name, result: d };
@@ -608,7 +617,7 @@
       att.aiW = { overall: Math.min(9, Math.floor((sum / 3) * 2 + 0.5) / 2), tasks };
       aiBusy = '';
       fetch('/api/results', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ testKey: '/full-mock/' + att.testId + '/writing', section: 'Writing', bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · Writing', scoreCorrect: tasks.length, scoreTotal: 2, band: att.aiW.overall }) }).catch(() => { /* still on screen */ });
+        body: JSON.stringify({ testKey: '/mock/' + (att.mockId || 'random') + '/' + att.attemptId + '/writing', section: 'Writing', bucket: 'Mock', pageLabel: (CONFIG.title || 'Full mock') + ' · Writing', scoreCorrect: tasks.length, scoreTotal: 2, band: att.aiW.overall }) }).catch(() => { /* still on screen */ });
       if (att === S) { save(); renderReport(); }
     } catch (e) {
       aiBusy = '';
@@ -749,7 +758,8 @@
     'issue-send': sendIssue,
     'issue-close': () => $('issueDlg').classList.add('hidden'),
     'finish': finishAll,
-    'new-attempt': newAttempt
+    'new-attempt': newAttempt,
+    'mark-again': () => { S.markError = ''; paintSendStatus(); markOnServer(); }
   };
   document.addEventListener('click', e => {
     const el = e.target.closest('[data-action]');
@@ -770,7 +780,7 @@
   const Mock = {
     $, qsa, esc, words, show, goFull, save, ask, toast, logViolation,
     get S() { return S; },
-    get test() { return { id: S.testId, writing: entryOf('writing', S.pick && S.pick.writing).writing }; },
+    get test() { return { id: S.testId, writing: (S.papers && S.papers.writing) || { task1: { lines: [] }, task2: { lines: [] } } }; },
     get running() { return running; }, set running(v) { running = v; paintGuard(); },
     attach(name, api) { writingApi[name] = api; },
     get writing() { return writingApi.writing; },
@@ -779,5 +789,5 @@
   };
   Object.freeze(Mock);
   window.Mock = Mock;
-  $('lgName').focus();
+  boot();
 })();

@@ -2050,7 +2050,8 @@ function injectHeadingSlots(paraMap) {
   });
 }
 
-const HDR_TITLE_PREFIX = '[Demo]';
+// a page may set READING_TEST.TITLE_PREFIX (the papers of a Full Mock use none)
+const HDR_TITLE_PREFIX = (window.READING_TEST && typeof window.READING_TEST.TITLE_PREFIX === 'string') ? window.READING_TEST.TITLE_PREFIX : '[Demo]';
 function switchPassage(n) {
   state.currentPassage = n;
   // V3 — do NOT pre-charge this passage's first question. The old code set
@@ -2070,7 +2071,7 @@ function switchPassage(n) {
   const p = PASSAGES[String(n)];
   // header title: "[Demo] Test 8 - P3: <passage title>"  (change HDR_TITLE_PREFIX to rename "[Demo]")
   const hdrTitle = document.getElementById('hdr-title');
-  if (hdrTitle) hdrTitle.innerHTML = HDR_TITLE_PREFIX + ' ' + p.title + ' - P' + n;
+  if (hdrTitle) hdrTitle.innerHTML = (HDR_TITLE_PREFIX ? HDR_TITLE_PREFIX + ' ' : '') + p.title + ' - P' + n;
   // .sectionStimulus carries margin:16px 0 inside a pane padded 0 16px, so the
   // passage column is 688px wide starting at x=16 and its title's top edge
   // lands at y=192 — level with the first question in the right-hand pane.
@@ -3441,6 +3442,9 @@ function finishExam() {
   saveState();
   document.body.classList.remove('no-select');
   exitFullscreen();
+  // FULL MOCK: inside the mock shell (a paper made in the admin panel, /full-mock/paper/reading/<id>) the graded paper
+  // goes to the shell (full-mock/js/bridge.js); the shell and the server do the rest. Everywhere else nothing changes.
+  if (window.MockBridge && MockBridge.embedded) { MockBridge.done('reading', gradeReading()); return; }
   // The reference paper has no interstitial: submitting shows the report.
   openResultsModal();
 }
@@ -5517,6 +5521,35 @@ function fpStart() {
   if (fpTimer) return;
   fpTimer = setInterval(fpPaintPassage, 600);
 }
+
+/* =====
+   FULL MOCK BRIDGE (only used inside the mock iframe, ?embed=1, with full-mock/js/bridge.js on the page):
+   the shell starts the paper, or reopens it in review mode with the student's answers. The same as in
+   full-mock/js/reading.js, so a paper made in the admin panel runs in a mock with this (newer) engine.
+   ===== */
+window.__mockStart = function (n) {
+  state.student.name = (n || 'Candidate');
+  validateStart();
+};
+window.__mockReview = function (n, ans) {
+  state.student.name = (n || 'Candidate');
+  validateStart();
+  var tries = 0;
+  var t = setInterval(function () {
+    tries++;
+    if (state.stage === 'reading' && document.querySelector('#questions-pane .q-card')) {
+      clearInterval(t);
+      setTimeout(function () {
+        try { pauseTimer(); } catch (err) {}
+        try { Object.keys(ans || {}).forEach(function (k) { if (ans[k] != null && ans[k] !== '') state.readingAnswers[k] = ans[k]; }); } catch (err) {}
+        try { switchPassage(state.currentPassage || 1); } catch (err) {}
+        try { openResultsModal(); } catch (err) {}
+        try { pauseTimer(); } catch (err) {}
+        try { MockBridge.exitButton(); } catch (err) {}
+      }, 450);
+    } else if (tries > 400) { clearInterval(t); try { MockBridge.exitButton(); } catch (err) {} }
+  }, 60);
+};
 
 // =====
 // PUBLIC API

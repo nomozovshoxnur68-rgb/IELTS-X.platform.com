@@ -5,7 +5,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
-  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', sitecheck: 'Website check' };
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', mocks: 'Mock tests',listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', sitecheck: 'Website check' };
 
   /* A test, article, pack or lock saved here makes the copies of the card lists kept by the student pages old
      (IELTSX.cachedJson in assets/js/app.js), so the change shows on the next page they open. */
@@ -15,7 +15,7 @@
     window.fetch = function (url, opt) {
       const p = orig.apply(this, arguments);
       const method = String((opt && opt.method) || 'GET').toUpperCase();
-      if (method !== 'GET' && /\/api\/admin\/(materials|access|packs|ai)/.test(String(url && url.url ? url.url : url))) {
+      if (method !== 'GET' && /\/api\/admin\/(materials|access|packs|ai|mocks)/.test(String(url && url.url ? url.url : url))) {
         p.then((r) => { if (r.ok) { try { localStorage.setItem('ix-materials-changed', String(Date.now())); } catch (e) { /* blocked */ } } }, () => {});
       }
       return p;
@@ -258,6 +258,7 @@
         `<div class="box"><h4>Private note (only admins see it)</h4><textarea class="field" id="user-note" maxlength="500" placeholder="e.g. paid in cash on 12 Oct, Telegram @name">${esc(u.note)}</textarea><div class="btn-row" style="margin-top:8px"><button class="btn btn-sm" data-save-note="${esc(u.id)}" type="button">Save note</button></div></div>` +
         `<div class="box"><h4>Test history</h4>${testTable(d.results)}</div>` +
         `<div class="box"><h4>AI checks (Writing / Speaking)</h4>${aiTable(d.aiReports || [])}</div>` +
+        `<div class="box"><h4>Mock tests</h4>${mockTable(d.mockAttempts || [])}</div>` +
         `<div class="box"><h4>Orders</h4>${orderTable(d.orders)}</div>` +
         (self ? '' : `<div class="box danger"><h4>Account control</h4><div class="btn-row">` +
           (u.isAdmin ? `<button class="btn btn-sm" data-role="user" data-id="${esc(u.id)}" type="button">Remove admin</button>` :
@@ -270,6 +271,15 @@
   const testTable = (list) => list.length
     ? `<div class="table-wrap"><table class="table"><thead><tr><th>Test</th><th>Section</th><th class="right">Score</th><th>Band</th><th>Time</th><th>When</th></tr></thead><tbody>${list.slice(0, 30).map((r) => `<tr><td>${esc(r.pageLabel)}</td><td>${esc(r.section)}</td><td class="right nowrap">${r.scoreCorrect}/${r.scoreTotal}</td><td><strong>${esc(r.band)}</strong></td><td>${duration(r.durationSec)}</td><td class="nowrap">${esc(fmtDate(r.createdAt))}</td></tr>`).join('')}</tbody></table></div>${list.length > 30 ? `<div class="muted sm" style="margin-top:6px">Latest 30 of ${list.length} shown.</div>` : ''}`
     : '<div class="muted">No finished tests yet.</div>';
+  /* the mock attempts of a student: bands marked on the server, how often they left the exam screen, and a mark when the
+     page claimed another score than the server found (mock-tests.js) */
+  const mockTable = (list) => list.length
+    ? `<div class="table-wrap"><table class="table"><thead><tr><th>Mock</th><th>Mode</th><th>L</th><th>R</th><th>Overall</th><th>Integrity</th><th>When</th></tr></thead><tbody>${list.map((a) => `<tr><td>${esc(a.title || 'Mock test')}</td><td>${a.mode === 'practice' ? 'Practice' : 'Real'}</td>`
+      + `<td>${a.L ? esc(Number(a.L.band).toFixed(1)) + ` <span class="muted sm">${a.L.correct}/${a.L.total}</span>` : '—'}</td><td>${a.R ? esc(Number(a.R.band).toFixed(1)) + ` <span class="muted sm">${a.R.correct}/${a.R.total}</span>` : '—'}</td>`
+      + `<td><strong>${a.finishedAt ? (a.overall == null ? '—' : esc(Number(a.overall).toFixed(1))) : '<span class="muted">in progress</span>'}</strong></td>`
+      + `<td>${(a.flags || []).length ? `<span class="badge badge-rejected" title="${esc(a.flags.join('\n'))}">⚠ check</span> ` : ''}${a.viol ? esc(a.viol) + ' left screen' : a.finishedAt ? '<span class="muted sm">clean</span>' : ''}</td>`
+      + `<td class="nowrap">${esc(fmtDate(a.finishedAt || a.startedAt))}</td></tr>`).join('')}</tbody></table></div>`
+    : '<div class="muted">No mock test taken yet.</div>';
   const AI_SHORT = { taskAchievement: 'TA', coherenceCohesion: 'CC', lexicalResource: 'LR', grammarAccuracy: 'GRA', fluencyCoherence: 'FC', pronunciation: 'P' };
   const aiTable = (list) => list.length
     ? `<div class="table-wrap"><table class="table"><thead><tr><th>Test</th><th>Section</th><th>Band</th><th>Criteria</th><th>When</th></tr></thead><tbody>${list.map((r) => `<tr><td>${esc(r.title)}</td><td>${esc(r.section)}</td><td><strong>${esc(Number(r.band).toFixed(1))}</strong></td><td class="nowrap">${Object.entries(r.criteria || {}).map(([k, v]) => `${esc(AI_SHORT[k] || k)} ${v === null ? '—' : esc(Number(v).toFixed(1))}`).join(' · ')}</td><td class="nowrap">${esc(fmtDate(r.createdAt))}</td></tr>`).join('')}</tbody></table></div><div class="muted sm" style="margin-top:6px">Latest ${list.length}. The texts and the feedback are visible only to the student.</div>`

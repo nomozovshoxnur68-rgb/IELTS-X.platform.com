@@ -29,7 +29,7 @@ server.listen(0, async () => {
   try {
     // --- files that must never be downloadable
     for (const p of ['/data/db.json', '/data/.session-secret', '/server.js', '/package.json', '/.env.example', '/ADMIN_ACCESS.md', '/supabase-schema.sql', '/vercel.json', '/scripts/make-admin.js', '/api/../server.js', '/%2e%2e/server.js', '/..%2fserver.js', '/node_modules/x.js',
-      '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/ai-store.js', '/data/ai-reports/x.json', '/speaking-src/topics.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
+      '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/ai-store.js', '/mock-tests.js', '/full-mock/js/tests.js', '/data/ai-reports/x.json', '/speaking-src/topics.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
       const r = await call('GET', p); assert.ok([403, 404].includes(r.status), p + ' -> ' + r.status);
     }
     ok('server code, database and docs are not downloadable');
@@ -63,8 +63,11 @@ server.listen(0, async () => {
 
     // --- premium
     assert.equal((await call('GET', '/api/premium/status', { jar: user })).json.premium, false);
-    let m = await call('GET', '/Mock%20tests.html'); assert.equal(m.status, 302); assert.ok(m.headers.get('location').startsWith('/login?next='));
-    m = await call('GET', '/Mock%20tests.html', { jar: user }); assert.equal(m.status, 302); assert.ok(m.headers.get('location').startsWith('/Price?premium=required'));
+    // the Mock Tests page lists every mock for everybody; taking one needs its plan (the built-in one: any paid plan)
+    let m = await call('GET', '/Mock%20tests.html'); assert.equal(m.status, 200);
+    const startMock = (j) => call('POST', '/api/mocks/random/start', { jar: j ? { get: j.get, set: () => {} } : undefined, body: { mode: 'practice' } });   // the attempt cookie is not kept in these one-cookie jars
+    assert.equal((await startMock()).status, 401); assert.equal((await startMock(user)).status, 403);
+    assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/premium-audio/x.mp3'), { jar: user })).json.allowed, false);
     // --- vocabulary collections: Free / Premium unlock enforced by the server
     {
       const adm = boss;
@@ -84,10 +87,10 @@ server.listen(0, async () => {
     }
     r = await call('POST', `/api/admin/users/${aliceId}/premium`, { body: { plan: 'Premium', days: 30 }, jar: boss }); assert.equal(r.json.user.premiumActive, true);
     assert.equal((await call('GET', '/api/premium/status', { jar: user })).json.premium, true);
-    assert.equal((await call('GET', '/Mock%20tests.html', { jar: user })).status, 200);
-    assert.equal((await call('GET', '/Mock%20tests.html', { jar: boss })).status, 200);
+    assert.equal((await startMock(user)).status, 200);
+    assert.equal((await startMock(boss)).status, 200);
     await call('DELETE', `/api/admin/users/${aliceId}/premium`, { jar: boss });
-    assert.equal((await call('GET', '/Mock%20tests.html', { jar: user })).status, 302); ok('premium: grant, page unlocked, revoke, page locked again');
+    assert.equal((await startMock(user)).status, 403); ok('premium: grant, mock unlocked, revoke, mock locked again');
     // expired premium
     const dbf = path.join(tmp, 'db.json'); const db = JSON.parse(fs.readFileSync(dbf)); db.users.find((u) => u.email === 'alice@example.com').premiumActive = true; db.users.find((u) => u.email === 'alice@example.com').premiumExpiresAt = new Date(Date.now() - 1000).toISOString(); fs.writeFileSync(dbf, JSON.stringify(db));
     assert.equal((await call('GET', '/api/premium/status', { jar: user })).json.premium, false); ok('expired premium counts as free');
@@ -515,7 +518,7 @@ server.listen(0, async () => {
       // ?page= (what access-gate.js and middleware.js send), and the query Vercel builds: its rewrite adds path=access/check first
       assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
       assert.equal((await call('GET', '/api/access/check?path=access%2Fcheck&path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
-      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/Mock tests'))).json.allowed, false, 'Mock tests need a plan');
+      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/premium-audio/a.mp3'))).json.allowed, false, 'premium audio needs a plan');
       ok('one test can be made Max-only (Standard -> Price page, Max still opens it)');
 
       // a whole pack: Free for everybody, then Max, then back to default; a test setting wins over its pack
@@ -635,7 +638,7 @@ server.listen(0, async () => {
       // ?page= (what access-gate.js and middleware.js send), and the query Vercel builds: its rewrite adds path=access/check first
       assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
       assert.equal((await call('GET', '/api/access/check?path=access%2Fcheck&path=' + encodeURIComponent('/full-tests/reading/test-5'), { jar: stdU.j })).json.allowed, false);
-      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/Mock tests'))).json.allowed, false, 'Mock tests need a plan');
+      assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/premium-audio/a.mp3'))).json.allowed, false, 'premium audio needs a plan');
       ok('one test can be made Max-only (Standard -> Price page, Max still opens it)');
 
       // a whole pack: Free for everybody, then Max, then back to default; a test setting wins over its pack
@@ -1260,6 +1263,122 @@ server.listen(0, async () => {
       assert.equal((await call('GET', '/exam/reading/not-a-real-id')).status === 500, false);
       assert.equal((await call('POST', '/api/orders/' + encodeURIComponent('x),userId.eq.(y') + '/cancel', { jar: boss })).status, 404);
       ok('packs: Cyrillic / symbol names get their own address, Vercel rewrites point at clean URLs, the browser uses the same rule, bad ids are a 404');
+    }
+
+    // --- Full Mock Tests (mock-tests.js): made in the admin panel, papers drawn and marked on the server, papers only inside an attempt
+    {
+      const env3 = { AI_PROVIDER: process.env.AI_PROVIDER }; process.env.AI_PROVIDER = 'mock';
+      const MT = require('../mock-tests.js')._test;
+      try {
+        // jars that keep several cookies (the session and the mock attempt), and fixed sets of cookies
+        const mjar = () => { const c = {}; return { get: () => Object.entries(c).map(([k, v]) => k + '=' + v).join('; '), set: (v) => { const i = v.indexOf('='); c[v.slice(0, i)] = v.slice(i + 1); } }; };
+        const fixedJar = (...cs) => ({ get: () => cs.filter(Boolean).join('; '), set: () => {} });
+        const cookieOf = (j, name) => j.get().split('; ').find((x) => x.startsWith(name + '=')) || '';
+        const erin = mjar(), finn = mjar();
+        for (const [name, email, j] of [['Erin', 'erin@example.com', erin], ['Finn', 'finn@example.com', finn]]) {
+          const hp = handler.hashPassword('Tr1cky-pass-77');
+          await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hp.hash, passwordSalt: hp.salt, emailVerified: true, createdAt: new Date().toISOString() });
+          assert.equal((await call('POST', '/api/auth/login', { jar: j, body: { email, password: 'Tr1cky-pass-77' } })).status, 200);
+        }
+        // admin panel: only admins; the papers are checked
+        assert.equal((await call('GET', '/api/admin/mocks', { jar: erin })).status, 403);
+        const opts = (await call('GET', '/api/admin/mocks', { jar: boss })).json;
+        assert.ok(opts.mocks.some((x) => x.id === 'random' && x.builtin) && opts.options.builtin.reading.length >= 10 && opts.options.builtin.listening.length >= 10);
+        assert.equal((await call('POST', '/api/admin/mocks', { jar: boss, body: { title: 'Bad', papers: { reading: { src: 'builtin', id: 'nope' } } } })).status, 400);
+        const partR = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Part only', data: { passage: 'Text.', questions: [{ type: 'short', prompt: 'q', answer: 'a' }] } } })).json.item;
+        assert.equal((await call('POST', '/api/admin/mocks', { jar: boss, body: { title: 'Bad', papers: { reading: { src: 'material', id: partR.id } } } })).status, 400, 'a Part test is not a whole paper');
+        const fixed = (await call('POST', '/api/admin/mocks', { jar: boss, body: { title: 'Fixed mock', access: 'free', modes: 'real', papers: { listening: { src: 'builtin', id: 'm16' }, reading: { src: 'builtin', id: 'm15' }, writing: { src: 'builtin', id: 'm14' } } } })).json.mock;
+        assert.ok(fixed && fixed.id && fixed.papers.reading.id === 'm15');
+        // an admin-made paper (a Draft: used only in mocks) for Reading, Listening and Writing
+        const rq = []; for (let i = 0; i < 40; i++) rq.push({ type: i < 13 ? 'short' : i < 26 ? 'tfng' : 'short', passage: i < 13 ? 1 : i < 26 ? 2 : 3, prompt: 'Q' + (i + 1), answer: i >= 13 && i < 26 ? 'TRUE' : 'ans' + i });
+        const fr = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Mock reading', published: false, data: { mode: 'full', passages: [{ title: 'A', passage: 'One.' }, { title: 'B', passage: 'Two.' }, { title: 'C', passage: 'Three.' }], questions: rq } } })).json.item;
+        const lq = []; for (let i = 0; i < 40; i++) lq.push({ type: 'gap', passage: Math.floor(i / 10) + 1, prompt: 'Gap ____', answer: 'w' + i });
+        const fl = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'Mock listening', published: false, data: { mode: 'full', audioUrl: 'https://cdn.example.com/a.mp3', questions: lq } } })).json.item;
+        const fw = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'writing', title: 'Mock writing', published: false, data: { mode: 'full', tasks: [{ kind: 'task1', prompt: 'Describe the chart.', minWords: 150 }, { kind: 'task2', prompt: 'Discuss cars in cities.', minWords: 250 }] } } })).json.item;
+        const made = await call('POST', '/api/admin/mocks', { jar: boss, body: { title: 'Teacher mock', access: 'max', papers: { listening: { src: 'material', id: fl.id }, reading: { src: 'material', id: fr.id }, writing: { src: 'material', id: fw.id } } } });
+        assert.equal(made.status, 201, made.text); const tm = made.json.mock;
+        // the cards: everybody sees them, no paper is named, the plan of each card
+        const pub = await call('GET', '/api/mocks'); const pubText = pub.text;
+        assert.equal(pub.status, 200); assert.ok(pub.json.mocks.length >= 3 && !pub.json.signedIn);
+        for (const secret of ['m16', 'm15', 'm14', fr.id, fl.id, fw.id, '"papers"']) assert.ok(!pubText.includes(secret), 'the cards never name a paper: ' + secret);
+        const card = (j, id) => call('GET', '/api/mocks', { jar: j }).then((r) => r.json.mocks.find((x) => x.id === id));
+        assert.equal((await card(erin, tm.id)).locked, true); assert.equal((await card(erin, fixed.id)).locked, false);
+        // starting: sign-in and plan; the mode the admin allows
+        assert.equal((await call('POST', '/api/mocks/' + tm.id + '/start', { body: {} })).status, 401);
+        assert.equal((await call('POST', '/api/mocks/' + tm.id + '/start', { jar: erin, body: {} })).status, 403);
+        assert.equal((await call('POST', '/api/mocks/nope/start', { jar: erin, body: {} })).status, 404);
+        const st = await call('POST', '/api/mocks/' + fixed.id + '/start', { jar: erin, body: { mode: 'practice' } });
+        assert.equal(st.status, 200); const att = st.json.attempt;
+        assert.equal(att.mode, 'real', 'this mock is Real exam only'); assert.ok(/ieltsx_mock=/.test(st.headers.get('set-cookie')) && /HttpOnly/.test(st.headers.get('set-cookie')));
+        assert.equal(att.papers.reading.file, '/full-mock/reading-m15.html'); assert.equal(att.papers.writing.task1.img, '/full-mock/assets/img/m14-task1.png');
+        const erinSess = cookieOf(erin, 'ieltsx_session'), finnSess = cookieOf(finn, 'ieltsx_session'); assert.ok(erinSess && finnSess);
+        const mock1 = st.headers.get('set-cookie').split(';')[0];
+        const erinM = fixedJar(erinSess, mock1), erinS = fixedJar(erinSess);
+        // the paper files: only inside the attempt, only its own papers; tests.js never
+        assert.equal((await call('GET', '/full-mock/reading-m15.html', { jar: erinM })).status, 200);
+        assert.equal((await call('GET', '/full-mock/reading-m9', { jar: erinM })).status, 403);
+        assert.equal((await call('GET', '/full-mock/reading-m15', { jar: erinS })).status, 403, 'no attempt cookie');
+        assert.equal((await call('GET', '/full-mock/reading-m15')).status, 401);
+        assert.equal((await call('GET', '/full-mock/js/tests.js', { jar: boss })).status, 404);
+        assert.equal((await call('GET', '/full-mock/js/listening.js', { jar: erinS })).status, 403);
+        assert.equal((await call('GET', '/full-mock/js/listening.js', { jar: erinM })).status, 200);
+        assert.equal((await call('GET', '/full-mock/index.html')).status, 200, 'the shell itself is open: it asks the server');
+        assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/full-mock/reading-m15'), { jar: erinM })).json.allowed, true, 'the question middleware.js asks on Vercel');
+        assert.equal((await call('GET', '/api/access/check?page=' + encodeURIComponent('/full-mock/reading-m9'), { jar: erinM })).json.allowed, false);
+        const finnM = fixedJar(finnSess, mock1);
+        assert.equal((await call('GET', '/full-mock/reading-m15', { jar: finnM })).status, 403, 'another account cannot use the cookie');
+        // finishing: marked again on the server (the page's claim is not trusted), once, by the owner only
+        const rk = MT.builtinReadingKey('m15'), lk = MT.builtinListeningKey('m16'); assert.equal(Object.keys(rk).length, 40); assert.equal(Object.keys(lk).length, 40);
+        const ra = {}; Object.keys(rk).forEach((q) => { ra[q] = rk[q].split('|')[0].toLowerCase(); });
+        const la = {}; Object.keys(lk).forEach((q, i) => { la[q] = i < 30 ? lk[q].split('|')[0] : 'wrong'; });
+        assert.equal((await call('POST', '/api/mock/finish', { jar: finn, body: { token: att.token, reading: { answers: ra } } })).status, 403);
+        const fin = await call('POST', '/api/mock/finish', { jar: erin, body: { token: att.token, listening: { answers: la, correct: 40 }, reading: { answers: ra, correct: 40 }, viol: [1] } });
+        assert.equal(fin.status, 200, fin.text); assert.equal(fin.json.reading.correct, 40); assert.equal(fin.json.reading.band, 9); assert.equal(fin.json.listening.correct, 30); assert.equal(fin.json.listening.band, 7); assert.equal(fin.json.flagged, true);
+        assert.equal((await call('POST', '/api/mock/finish', { jar: erin, body: { token: att.token, listening: { answers: lk, correct: 40 } } })).json.duplicate, true);
+        const rows = (await call('GET', '/api/results', { jar: erin })).json.results.filter((x) => x.bucket === 'Mock');
+        assert.equal(rows.length, 2); assert.ok(rows.some((x) => x.section === 'Listening' && x.band === 7 && x.scoreCorrect === 30) && rows.every((x) => x.testKey.startsWith('/mock/' + fixed.id + '/')));
+        assert.equal((await card(erin, fixed.id)).attempts, 1);
+        // the Writing of the attempt goes to the AI with the task from the server, never from the page
+        const w = await call('POST', '/api/ai/writing', { jar: erin, body: { mockToken: att.token, mockTask: 'task2', taskPrompt: 'IGNORED', answer: Array(30).fill('Competition for jobs is getting harder for older people.').join(' ') } });
+        assert.equal(w.status, 200, w.text); assert.ok(w.json.saved);
+        assert.equal((await call('POST', '/api/ai/writing', { jar: finn, body: { mockToken: att.token, mockTask: 'task2', answer: Array(30).fill('word').join(' ') } })).status, 403);
+        // resume (after a reload): the same attempt; a forged token is refused
+        assert.equal((await call('POST', '/api/mock/resume', { jar: erin, body: { token: att.token } })).json.attempt.id, att.id);
+        assert.equal((await call('POST', '/api/mock/resume', { jar: erin, body: { token: 'x.y' } })).status, 410);
+        // the admin-made papers: built from the test, only inside the attempt; marked against the test in the database
+        await call('POST', `/api/admin/users/${(await call('GET', '/api/auth/me', { jar: erin })).json.user.id}/premium`, { jar: boss, body: { plan: 'Max', days: 30 } });
+        const st2 = await call('POST', '/api/mocks/' + tm.id + '/start', { jar: erin, body: { mode: 'practice' } }); assert.equal(st2.status, 200, st2.text);
+        const a2 = st2.json.attempt; const erinM2 = fixedJar(erinSess, st2.headers.get('set-cookie').split(';')[0]);
+        assert.equal(a2.mode, 'practice'); assert.equal(a2.papers.reading.file, '/full-mock/paper/reading/' + fr.id); assert.deepEqual(a2.papers.writing.task2.lines, ['Discuss cars in cities.']);
+        const rp = await call('GET', a2.papers.reading.file, { jar: erinM2 });
+        assert.equal(rp.status, 200); assert.ok(rp.text.includes('/full-mock/js/bridge.js') && rp.text.includes('window.READING_TEST') && !rp.text.includes('access-gate.js') && !rp.text.includes('test-complete.js') && rp.text.includes('ieltsx_mock_reading_'));
+        const lp = await call('GET', a2.papers.listening.file, { jar: erinM2 });
+        assert.equal(lp.status, 200); assert.ok(lp.text.includes('/full-mock/js/bridge.js') && !lp.text.includes('access-gate.js'));
+        assert.equal((await call('GET', a2.papers.reading.file, { jar: erinM })).status, 403, 'the first attempt does not have this paper');
+        assert.equal((await call('GET', a2.papers.reading.file, { jar: erinS })).status, 403);
+        const ra2 = {}; rq.forEach((q, i) => { ra2[i + 1] = i < 20 ? q.answer : 'x'; });
+        const fin2 = await call('POST', '/api/mock/finish', { jar: erin, body: { token: a2.token, reading: { answers: ra2, correct: 20 } } });
+        assert.equal(fin2.json.reading.correct, 20); assert.equal(fin2.json.flagged, false); assert.equal(fin2.json.listening, null);
+        // the mock attempts of a student in the admin panel (no paper names)
+        const erinId = (await call('GET', '/api/auth/me', { jar: erin })).json.user.id;
+        const adm = await call('GET', '/api/admin/mocks/attempts/' + erinId, { jar: boss });
+        assert.equal(adm.json.items.length, 2); assert.ok(!adm.text.includes('"pp"'));
+        const drawer = await call('GET', '/api/admin/users/' + erinId, { jar: boss });
+        assert.equal(drawer.json.mockAttempts.length, 2); assert.ok(!drawer.text.includes('m15') && drawer.json.mockAttempts.some((a) => a.flags && a.flags.length && a.viol === 1));
+        // admin: hide, edit, delete; the built-in mock is reset, never lost
+        assert.equal((await call('PATCH', '/api/admin/mocks/' + fixed.id, { jar: boss, body: { published: false } })).status, 200);
+        assert.ok(!(await call('GET', '/api/mocks', { jar: erin })).json.mocks.some((x) => x.id === fixed.id));
+        assert.equal((await call('POST', '/api/mocks/' + fixed.id + '/start', { jar: erin, body: {} })).status, 404);
+        assert.equal((await call('PATCH', '/api/admin/mocks/random', { jar: boss, body: { title: 'Renamed', access: 'ultra' } })).json.mock.title, 'Renamed');
+        assert.equal((await call('DELETE', '/api/admin/mocks/random', { jar: boss })).status, 200);
+        const back = (await call('GET', '/api/admin/mocks', { jar: boss })).json.mocks.find((x) => x.id === 'random'); assert.equal(back.title, 'Full Mock Test'); assert.equal(back.access, 'standard');
+        for (const id of [fixed.id, tm.id]) assert.equal((await call('DELETE', '/api/admin/mocks/' + id, { jar: boss })).status, 200);
+        for (const m2 of [partR, fr, fl, fw]) await call('DELETE', '/api/admin/materials/' + m2.id, { jar: boss });
+        // the marking rule is the one of the exam pages
+        assert.ok(MT.matches(' The  River. ', '(the) river') && MT.matches('ten thousand', 'ten thousand|10,000') && !MT.matches('', 'x') && MT.matches('‘s', "'s"));
+        assert.deepEqual(MT.cleanAnswers({ '21-22': 'B, D', 3: 'x', bad: 'y' }), { 21: 'B', 22: 'D', 3: 'x' });
+        ok('Full Mock Tests: admin-made mocks and papers, cards never name a paper, plan + mode, papers only inside the attempt, marked again on the server, once, Writing task from the server, resume, hide / reset');
+      } finally { if (env3.AI_PROVIDER === undefined) delete process.env.AI_PROVIDER; else process.env.AI_PROVIDER = env3.AI_PROVIDER; }
     }
 
     // --- rate limit

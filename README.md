@@ -5,7 +5,7 @@ No npm packages (Node 18+).
 
 ```bash
 npm start            # http://localhost:3000
-npm test             # 51 checks: accounts, premium, orders, results, admin tests + articles, file protection ...
+npm test             # 52 checks: accounts, premium, orders, results, admin tests + articles, file protection ...
 ```
 
 ## Test links (always `test-1`, `test-2`, ... in listing order)
@@ -538,3 +538,42 @@ database's own words stay in the server log; an order is found by its id or its 
 inside one `or=(…)` filter, which also made finding an order by its code fail on Supabase); `Cross-Origin-Opener-Policy:
 same-origin-allow-popups` and a stricter `Permissions-Policy` (microphone for this site only, no sensors / ad topics) on the Node server
 and in `vercel.json`. `npm test`: 51 checks.
+
+## Full Mock Tests: admin panel, new page, safer mocks (November 2026)
+
+**Mock Tests page** (`/Mock tests`, `Mock tests.html` + `assets/js/mock-page.js` + `assets/css/mock-page.css`): the old copy of a
+Reading page is replaced by the real catalog: a hero with the three papers and the student's own mock results, how a mock works,
+filters (All / Available to me / Not taken / Completed) and one card per mock (picture or a coloured cover, plan badge, the three
+papers, time, "new papers every attempt", status In progress / Done with the best band, Start / Continue / Take again / Get Access).
+The page is public now; what a card needs is decided per mock. Light / dark / phone.
+
+**Admin → Mock tests** (`#mocks`, `admin-mocks.js`): + New mock test → name, label, description, card picture (upload or link), and
+for each paper **Random built-in** (a new one for every attempt), **one built-in paper**, or **a Full test made in the panel** (Reading /
+Listening: a Full test; Writing: a test with a Task 1 and a Task 2). A test saved as **Draft** works in mocks only, so a teacher can
+keep papers that appear nowhere else. Who can take it (Free / Standard / Max / Ultra), exam mode (student chooses / Real only /
+Practice only), position, Visible. Hide / Show, Open, Delete; the built-in "Full Mock Test" (random papers, any paid plan) can be
+changed and **Reset**. The user drawer lists the student's mock attempts: bands, how often they left the exam screen, and a ⚠ when the
+page claimed another score than the server found. Mocks are kept in the settings (`mock-tests`): no SQL to run.
+
+**How a mock runs now** (`mock-tests.js`, server only): the shell `/full-mock/?mock=<id>` asks `POST /api/mocks/<id>/start`; the server
+checks the plan, **draws the papers** (each student gets every built-in paper once before any repeats) and returns a **signed attempt**
+(HMAC with `SESSION_SECRET`, 8 hours, also the HttpOnly cookie `ieltsx_mock`). `POST /api/mock/resume` after a reload,
+`POST /api/mock/finish` at the end. Admin-made papers open at `/full-mock/paper/<reading|listening>/<id>` (the site's own engines and
+templates plus the bridge to the shell; `reading.js` got the same two mock hooks as `full-mock/js/reading.js`).
+
+**Mock security**
+* A paper page (it carries its answers) is sent **only inside the student's own attempt and only its own papers**; another paper,
+  another account or no attempt gets 403 / the Mock page. The Listening answer packs (`full-mock/js/listening.js`) and recordings need
+  an attempt too. `full-mock/js/tests.js` (every paper and every Writing task) is **never sent**: the server reads it. On Vercel
+  `middleware.js` asks `/api/access/check` with the session and attempt cookies before it sends any of these files (and refuses when
+  the API cannot be asked).
+* **Marked again on the server**: the answers are compared with the server's own key (built-in Reading: the paper's data; built-in
+  Listening: `full-mock/js/listening.js`; admin papers: the test in the database), with the same rule as the exam pages; the band comes
+  from the official table on the server. A score the page claims is never trusted; a difference is kept as a flag. An attempt is
+  finished once; the Listening / Reading results (Mock group of the Performance page) are written by the server.
+* The Writing task for the AI check comes from the attempt on the server (`mockToken`), never from the page; the check is kept in the
+  AI feedback archive.
+* The cards and the shell never name a paper; random papers are drawn on the server, not in the browser (the old `?test=` switch is gone).
+* In the browser the shell still keeps full screen, blocks shortcuts and logs leaving the screen (the count goes to the server).
+
+`npm test`: 52 checks.
