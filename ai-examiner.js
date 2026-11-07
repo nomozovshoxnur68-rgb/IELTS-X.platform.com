@@ -9,6 +9,10 @@
      POST /api/ai/speaking/transcribe    one recorded answer (raw audio body)     -> transcript + notes on the delivery (free)
      POST /api/ai/speaking/assess        the transcripts of one attempt           -> the examiner's report (1 check)
      GET  /api/ai/history                the criteria of the last checks (Performance page)
+     GET  /api/ai/reports[/<id>]         the saved checks of the student (ai-store.js): list, one whole check; DELETE removes one
+
+   Every finished check is kept in the store of AI checks (ai-store.js) with its feedback and the student's text or
+   transcripts, so it can be opened again on any device (Performance page -> AI feedback archive).
 
    Checks per month (a check that fails does not count; admins have no limit):
      AI_CHECKS_FREE (default 3), AI_CHECKS_STANDARD (30), AI_CHECKS_MAX (60), AI_CHECKS_ULTRA (200)
@@ -92,6 +96,15 @@ async function countCheck(ctx, u, item) {
   rec.items = [{ at: new Date().toISOString(), ...item }].concat(rec.items).slice(0, 40);
   try { await ctx.store.setSetting(usageKey(u), rec); } catch (e) { console.error('AI usage could not be saved:', e.message); }
   return allowance(ctx, u, rec);
+}
+/* a finished check: counted, and kept in the store of AI checks (ai-store.js) at the same time, so the student waits
+   for one round trip, not two. A check that could not be kept still reaches the student (reportId null). */
+async function finishCheck(ctx, u, item, stored) {
+  const [quota, reportId] = await Promise.all([
+    countCheck(ctx, u, item),
+    ctx.aiStore ? ctx.aiStore.save(u.id, stored).catch(() => null) : Promise.resolve(null)
+  ]);
+  return { quota, reportId };
 }
 
 /* ───────── a material the student may open ───────── */
@@ -198,7 +211,12 @@ async function checkWriting(req, res, ctx, u) {
   r.sampleAnswer = teacherSample || str(out.json.sampleAnswer, 6000);
   r.sampleIsModel = !!teacherSample;
   r.meta = { source: 'ai', words };
-  r.quota = await countCheck(ctx, u, { section: 'Writing', title: str(title, 120), band: r.overall, testKey, criteria: Object.fromEntries(WRITING_CRITERIA.map((k) => [k, r.criteria[k].band])) });
+  const bands = Object.fromEntries(WRITING_CRITERIA.map((k) => [k, r.criteria[k].band]));
+  const done = await finishCheck(ctx, u, { section: 'Writing', title: str(title, 120), band: r.overall, testKey, criteria: bands }, {
+    section: 'Writing', kind: task.kind, testKey, materialId: b.materialId || '', title, band: r.overall, criteria: bands, words, lang, model: out.model || '',
+    report: { ...r, task: { kind: task.kind, prompt: str(task.prompt, 2500), minWords: task.minWords, imageUrl: str(task.imageUrl, 400), chart: task.chart || null, taskId: str(b.taskId, 40) }, answer }
+  });
+  r.quota = done.quota; r.reportId = done.reportId; r.saved = !!done.reportId;
   return ctx.send(res, 200, r);
 }
 
@@ -294,7 +312,15 @@ Mark against the four public IELTS band descriptors:
     return { partId: a.partId, q: a.q, part: a.part, question: a.text, transcript: a.transcript, typed: a.typed, comment: str(x.comment, 500), modelAnswer: str(x.modelAnswer, 3000), teacherAudio: '' };
   });
   r.meta = { source: 'ai' };
-  r.quota = await countCheck(ctx, u, { section: 'Speaking', title: str(m.title, 120), band: r.overall, testKey: '/test/' + m.id, criteria: Object.fromEntries(scored.map((k) => [k, r.criteria[k].band])) });
+  r.pronunciationNotes = [...new Set(given.flatMap((a) => a.pronunciation))].slice(0, 6);
+  r.fluencyNotes = [...new Set(given.flatMap((a) => a.fluency))].slice(0, 4);
+  const bands = Object.fromEntries(scored.map((k) => [k, r.criteria[k].band]));
+  const words = given.reduce((n, a) => n + countWords(a.transcript), 0);
+  const done = await finishCheck(ctx, u, { section: 'Speaking', title: str(m.title, 120), band: r.overall, testKey: '/test/' + m.id, criteria: bands }, {
+    section: 'Speaking', kind: typedOnly ? 'typed' : 'spoken', testKey: '/test/' + m.id, materialId: m.id, title: m.title, band: r.overall, criteria: bands, words, lang, model: out.model || '',
+    report: { ...r, durationSec: given.reduce((n, a) => n + a.durationSec, 0), questions: steps.length }
+  });
+  r.quota = done.quota; r.reportId = done.reportId; r.saved = !!done.reportId;
   return ctx.send(res, 200, r);
 }
 
@@ -308,6 +334,38 @@ function mockWriting(words, task) {
 }
 function mockSpeaking(given) {
   return { summary: `[Test mode: AI_PROVIDER=mock, no AI was asked] ${given.length} answer(s) were received.`, criteria: { fluencyCoherence: mockCrit(6, 'Fluency'), lexicalResource: mockCrit(6.5, 'Vocabulary'), grammarAccuracy: mockCrit(5.5, 'Grammar'), pronunciation: mockCrit(6, 'Pronunciation') }, ...mockShared(), answers: given.map((a, i) => ({ n: i + 1, comment: '[Test mode] Feedback on this answer.', modelAnswer: '[Test mode] A model answer to this question appears here.' })) };
+}
+
+/* ───────── the saved checks of one student ─────────
+     GET    /api/ai/reports?section=Writing|Speaking&testKey=/writing/<id>&limit=20&before=<date>   -> { items, next }
+     GET    /api/ai/reports/<id>                                                                     -> { report }
+     DELETE /api/ai/reports/<id>                                                                     -> { ok } */
+async function reportsRoute(req, res, p, method, url, ctx, u) {
+  const S = ctx.aiStore;
+  if (!S) throw new ctx.HttpError(404, 'Not found.');
+  const noStore = { 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex' };
+  if (p === '/api/ai/reports') {
+    if (method !== 'GET') throw new ctx.HttpError(405, 'Method not allowed.');
+    ctx.rateLimit('ai-reports:' + u.id, 600, 3600000);
+    const limit = Math.max(1, Math.min(50, Math.floor(Number(url.searchParams.get('limit'))) || 20));
+    const items = await S.list(u.id, { section: url.searchParams.get('section') || '', testKey: url.searchParams.get('testKey') || '', before: url.searchParams.get('before') || '', limit });
+    return ctx.send(res, 200, { items, next: items.length === limit ? items[items.length - 1].createdAt : null }, noStore);
+  }
+  const id = decodeURIComponent(p.slice('/api/ai/reports/'.length));
+  if (!S.isUuid(id)) throw new ctx.HttpError(404, 'This feedback was not found.');
+  if (method === 'GET') {
+    ctx.rateLimit('ai-reports:' + u.id, 600, 3600000);
+    const row = await S.get(u.id, id);
+    if (!row) throw new ctx.HttpError(404, 'This feedback was not found.');
+    const { userId, ...report } = row;   // the account id is not repeated back
+    return ctx.send(res, 200, { report }, noStore);
+  }
+  if (method === 'DELETE') {
+    ctx.rateLimit('ai-reports-del:' + u.id, 120, 3600000);
+    if (!(await S.remove(u.id, id))) throw new ctx.HttpError(404, 'This feedback was not found.');
+    return ctx.send(res, 200, { ok: true }, noStore);
+  }
+  throw new ctx.HttpError(405, 'Method not allowed.');
 }
 
 /* ───────── routes ───────── */
@@ -326,6 +384,8 @@ async function route(req, res, p, method, url, ctx) {
       const rec = await readUsage(ctx, u);
       return ctx.send(res, 200, { ...allowance(ctx, u, rec), configured: provider.configured().ok, items: rec.items }, { 'Cache-Control': 'no-store, private' });
     }
+    /* the store of AI checks (ai-store.js): only the student's own checks, light rows in a list, the whole check by id */
+    if (p === '/api/ai/reports' || p.startsWith('/api/ai/reports/')) return await reportsRoute(req, res, p, method, url, ctx, u);
     if (method !== 'POST') throw new ctx.HttpError(405, 'Method not allowed.');
     const c = provider.configured();
     if (!c.ok) throw new ctx.HttpError(503, ctx.isAdmin(u) ? c.problem : 'The AI check is not available yet. Please try again later.');

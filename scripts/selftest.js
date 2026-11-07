@@ -29,7 +29,7 @@ server.listen(0, async () => {
   try {
     // --- files that must never be downloadable
     for (const p of ['/data/db.json', '/data/.session-secret', '/server.js', '/package.json', '/.env.example', '/ADMIN_ACCESS.md', '/supabase-schema.sql', '/vercel.json', '/scripts/make-admin.js', '/api/../server.js', '/%2e%2e/server.js', '/..%2fserver.js', '/node_modules/x.js',
-      '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/speaking-src/topics.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
+      '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/ai-store.js', '/data/ai-reports/x.json', '/speaking-src/topics.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js']) {
       const r = await call('GET', p); assert.ok([403, 404].includes(r.status), p + ' -> ' + r.status);
     }
     ok('server code, database and docs are not downloadable');
@@ -1184,6 +1184,84 @@ server.listen(0, async () => {
         openai.close();
       }
     }
+    // --- the store of AI checks (ai-store.js): every check kept on the account, only its owner reads it
+    {
+      const env2 = { AI_PROVIDER: process.env.AI_PROVIDER };
+      process.env.AI_PROVIDER = 'mock';
+      try {
+        const carol = jar(), dave = jar();
+        // made in the store directly: the sign-up of this test run already reached its rate limit
+        for (const [name, email, j] of [['Carol', 'carol@example.com', carol], ['Dave', 'dave@example.com', dave]]) {
+          const hp = handler.hashPassword('Tr1cky-pass-77');
+          await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hp.hash, passwordSalt: hp.salt, emailVerified: true, createdAt: new Date().toISOString() });
+          assert.equal((await call('POST', '/api/auth/login', { jar: j, body: { email, password: 'Tr1cky-pass-77' } })).status, 200);
+        }
+        const essay = Array(40).fill('People is very good at learning new things when they practise every day.').join(' ');
+        const w = await call('POST', '/api/ai/writing', { jar: carol, body: { examId: 'demo', title: 'Car ownership', taskKind: 'task2', taskPrompt: 'Some people think cars are bad. Discuss.', minWords: 250, answer: essay, lang: 'uz' } });
+        assert.equal(w.status, 200, w.text); assert.equal(w.json.saved, true); assert.ok(/^[0-9a-f-]{36}$/.test(w.json.reportId));
+        const sp = (await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'speaking', title: 'Store speaking', data: { parts: [{ title: 'Part 1', questions: ['Do you work?'] }] } } })).json.item;
+        const s = await call('POST', '/api/ai/speaking/assess', { jar: carol, body: { materialId: sp.id, lang: 'en', answers: [{ partId: sp.data.parts[0].id, q: 0, transcript: 'Yes, I work in a bank and I like my job because people are friendly there.', typed: true }] } });
+        assert.equal(s.status, 200, s.text); assert.equal(s.json.saved, true);
+        // the list: newest first, light rows only (no feedback texts, no account id)
+        let l = await call('GET', '/api/ai/reports', { jar: carol });
+        assert.equal(l.status, 200); assert.equal(l.json.items.length, 2); assert.equal(l.json.items[0].section, 'Speaking'); assert.equal(l.json.items[1].band, w.json.overall);
+        assert.ok(!('report' in l.json.items[0]) && !('userId' in l.json.items[0]), 'the list is light');
+        assert.equal(l.json.items[1].criteria.grammarAccuracy, w.json.criteria.grammarAccuracy.band);
+        assert.equal((await call('GET', '/api/ai/reports?section=Writing', { jar: carol })).json.items.length, 1);
+        assert.equal((await call('GET', '/api/ai/reports?testKey=/writing/demo', { jar: carol })).json.items.length, 1);
+        l = await call('GET', '/api/ai/reports?limit=1', { jar: carol }); assert.ok(l.json.next);
+        const page2 = await call('GET', '/api/ai/reports?limit=1&before=' + encodeURIComponent(l.json.next), { jar: carol }); assert.equal(page2.json.items[0].section, 'Writing');
+        // one whole check: the feedback, the task and the student's own text
+        const one = await call('GET', '/api/ai/reports/' + w.json.reportId, { jar: carol });
+        assert.equal(one.status, 200); assert.equal(one.json.report.report.answer, essay); assert.equal(one.json.report.report.task.kind, 'task2');
+        assert.ok(one.json.report.report.grammar.length && one.json.report.report.sampleAnswer); assert.ok(!('userId' in one.json.report));
+        // only the owner: another student, a visitor, made-up ids
+        assert.equal((await call('GET', '/api/ai/reports/' + w.json.reportId, { jar: dave })).status, 404);
+        assert.equal((await call('DELETE', '/api/ai/reports/' + w.json.reportId, { jar: dave })).status, 404);
+        assert.equal((await call('GET', '/api/ai/reports/' + w.json.reportId)).status, 401);
+        assert.equal((await call('GET', '/api/ai/reports')).status, 401);
+        assert.equal((await call('GET', '/api/ai/reports', { jar: dave })).json.items.length, 0);
+        for (const bad of ['abc', '..%2F..%2Fdb', "1'or'1'='1", '00000000-0000-0000-0000-000000000000']) assert.equal((await call('GET', '/api/ai/reports/' + bad, { jar: carol })).status, 404, bad);
+        assert.equal((await call('GET', '/api/ai/reports?section=<x>&before=nonsense&limit=9999', { jar: carol })).status, 200);
+        // admins see the bands only, never the texts
+        const carolId = (await call('GET', '/api/auth/me', { jar: carol })).json.user.id;
+        const drawer = await call('GET', '/api/admin/users/' + carolId, { jar: boss });
+        assert.equal(drawer.json.aiReports.length, 2); assert.ok(!JSON.stringify(drawer.json.aiReports).includes('People is very good'));
+        // the student deletes one; deleting the account deletes the rest (local mode: one file per account, not in db.json)
+        assert.ok(!fs.readFileSync(path.join(tmp, 'db.json'), 'utf8').includes('People is very good'), 'the checks are not in db.json');
+        assert.equal((await call('DELETE', '/api/ai/reports/' + w.json.reportId, { jar: carol })).status, 200);
+        assert.equal((await call('GET', '/api/ai/reports/' + w.json.reportId, { jar: carol })).status, 404);
+        assert.equal((await call('DELETE', '/api/admin/users/' + carolId, { jar: boss })).status, 200);
+        assert.ok(!fs.existsSync(path.join(tmp, 'ai-reports', carolId + '.json')));
+        await call('DELETE', '/api/admin/materials/' + sp.id, { jar: boss });
+        ok('AI feedback archive: every check kept with its feedback, light list with paging, only the owner reads or deletes it, admins see bands only, deleted with the account');
+      } finally { if (env2.AI_PROVIDER === undefined) delete process.env.AI_PROVIDER; else process.env.AI_PROVIDER = env2.AI_PROVIDER; }
+    }
+
+    // --- packs: a Cyrillic or symbol name gets its own address; made-up ids never reach the database
+    {
+      const a = await call('POST', '/api/admin/packs', { jar: boss, body: { skill: 'reading', title: 'Пакет 7' } });
+      const b = await call('POST', '/api/admin/packs', { jar: boss, body: { skill: 'reading', title: 'Пакет 8' } });
+      const c = await call('POST', '/api/admin/packs', { jar: boss, body: { skill: 'reading', title: '★★★' } });
+      assert.equal(a.status, 201); assert.equal(b.status, 201); assert.equal(c.status, 201);
+      assert.equal(a.json.pack.slug, 'paket-7'); assert.equal(b.json.pack.slug, 'paket-8'); assert.ok(/^p[0-9a-z]+$/.test(c.json.pack.slug));
+      assert.equal((await call('GET', '/full-tests/reading/paket-7')).status, 200);
+      const vj = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
+      const rw = vj.rewrites.find((x) => x.source.startsWith('/full-tests/:skill'));
+      assert.equal(rw.destination, '/full-tests/pack', 'with cleanUrls a rewrite to "….html" is a 404 on Vercel');
+      assert.ok(!vj.rewrites.some((x) => /\.html$/.test(x.destination)), 'no rewrite points at a .html file');
+      // the browser files use the same rule (assets/js/access.js, full-tests.js)
+      for (const f of ['assets/js/access.js', 'assets/js/full-tests.js']) {
+        const src = fs.readFileSync(path.join(__dirname, '..', f), 'utf8'); const fn = src.match(/var CYR = [^\n]+\n\s+function slugify\(s\) \{[\s\S]+?\n\s{4}\}/)[0];
+        const slugify = new Function(fn + '; return slugify;')();
+        assert.equal(slugify('Пакет 7'), 'paket-7', f); assert.equal(slugify('★★★'), c.json.pack.slug, f); assert.equal(slugify('Pack 6'), 'pack-6', f);
+      }
+      for (const x of [a, b, c]) await call('DELETE', '/api/admin/packs/' + x.json.pack.id, { jar: boss });
+      assert.equal((await call('GET', '/exam/reading/not-a-real-id')).status === 500, false);
+      assert.equal((await call('POST', '/api/orders/' + encodeURIComponent('x),userId.eq.(y') + '/cancel', { jar: boss })).status, 404);
+      ok('packs: Cyrillic / symbol names get their own address, Vercel rewrites point at clean URLs, the browser uses the same rule, bad ids are a 404');
+    }
+
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');

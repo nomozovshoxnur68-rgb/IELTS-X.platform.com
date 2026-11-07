@@ -3,6 +3,7 @@
 Vercelda disk faqat o'qish uchun, shuning uchun foydalanuvchilar Supabase'da saqlanadi.
 
 1. https://supabase.com da loyiha oching. SQL Editor'da `supabase-schema.sql` ni bir marta to'liq ishga tushiring.
+   Baza oldin yaratilgan bo'lsa, faqat oxirgi **v9** qismini ishga tushiring (AI feedback arxivi jadvali `ieltsx_ai_reports` va jadvallar huquqlarini yopish). Qayta ishga tushirish xavfsiz.
 2. Vercel -> Project -> Settings -> Environment Variables:
    - `SUPABASE_URL` (https://xxxx.supabase.co)
    - `SUPABASE_SERVICE_ROLE_KEY` (Supabase -> Settings -> API -> **service_role**, anon emas)

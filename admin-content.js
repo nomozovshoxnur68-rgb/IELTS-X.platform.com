@@ -2065,7 +2065,7 @@
           <label class="lbl">Position (1 = first, empty = default order)<input class="field" id="pk-order" type="number" min="0" max="999" value="${esc(f.order || '')}"></label></div>
         <label class="lbl">Short description (optional)<input class="field" id="pk-desc" maxlength="200" value="${esc(f.description)}" placeholder="Practice tests to improve your skills"></label>
         <div class="cb-checks">${f.builtIn ? '' : `<label><input type="checkbox" id="pk-premium" ${f.premium ? 'checked' : ''}> Locked (paid plan) by default</label>`}<label><input type="checkbox" id="pk-published" ${f.published !== false ? 'checked' : ''}> Visible to students</label></div>
-        <div class="btn-row"><button class="btn btn-primary" data-pk="save" type="button">${packEdit ? 'Save changes' : 'Create pack'}</button>${packEdit ? '<button class="btn" data-pk="cancel" type="button">Cancel</button>' : ''}</div></div>`;
+        <div class="btn-row"><button class="btn btn-primary" data-pk="save" type="button">${packEdit && (packEdit.id || packEdit.slug) ? 'Save changes' : 'Create pack'}</button>${packEdit ? '<button class="btn" data-pk="cancel" type="button">Cancel</button>' : ''}</div></div>`;
   }
   function packRow(p) {
     const open = openPacks.has(p.key) || !!packQuery;
@@ -2126,9 +2126,11 @@
         const body = { skill: packEdit && packEdit.slug ? packEdit.skill : $('#pk-skill').value, title: $('#pk-title').value, tier: $('#pk-tier').value, plan: $('#pk-plan').value, group: $('#pk-group').value, description: $('#pk-desc').value, order: $('#pk-order').value, published: $('#pk-published').checked };
         if ($('#pk-premium')) body.premium = $('#pk-premium').checked; else body.premium = !!packEdit.premium;
         if (!body.title.trim()) return toast('Please enter the pack name.', true);
-        if (packEdit && packEdit.id) await api('/api/admin/packs/' + encodeURIComponent(packEdit.id), { method: 'PATCH', body: JSON.stringify(body) });
-        else await api('/api/admin/packs', { method: 'POST', body: JSON.stringify(packEdit && packEdit.slug ? { ...body, slug: packEdit.slug } : body) });
-        toast(packEdit && (packEdit.id || packEdit.slug) ? 'Pack saved' : 'Pack created'); packSkill = body.skill; packEdit = null; await loadPackList();
+        const out = packEdit && packEdit.id ? await api('/api/admin/packs/' + encodeURIComponent(packEdit.id), { method: 'PATCH', body: JSON.stringify(body) })
+          : await api('/api/admin/packs', { method: 'POST', body: JSON.stringify(packEdit && packEdit.slug ? { ...body, slug: packEdit.slug } : body) });
+        toast(packEdit && (packEdit.id || packEdit.slug) ? 'Pack saved' : 'Pack created'); packSkill = body.skill; packEdit = null;
+        if (out && out.pack && out.pack.slug) openPacks.add('pack:' + out.pack.skill + '/' + out.pack.slug);   // the new pack is shown open, with its “+ Test”
+        await loadPackList();
       }
     } catch (err) { fail(err); }
   }

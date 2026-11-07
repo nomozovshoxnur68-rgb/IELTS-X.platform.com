@@ -132,11 +132,17 @@ async function sb(pathname, options = {}) {
     if (/column .* does not exist|could not find the .* column/i.test(msg)) throw new HttpError(503, 'The database is out of date (a column is missing). Run the whole supabase-schema.sql again in the Supabase SQL editor.');
     if (/relation .* does not exist|could not find the table|schema cache/i.test(msg)) throw new HttpError(503, 'The database tables are missing. Run supabase-schema.sql once in the Supabase SQL editor.');
     if (/violates check constraint/i.test(msg)) throw new HttpError(503, 'The database does not accept this kind of content yet. Run supabase-schema.sql again in the Supabase SQL editor (its last part allows Writing, Speaking, Articles and PDF).');
-    throw new HttpError(500, 'Database error: ' + String(msg).slice(0, 160));
+    if (/invalid input syntax for type uuid/i.test(msg)) throw new HttpError(404, 'Not found.');   // a made-up id in an address
+    // the database's own words stay in the server log: they name tables, columns and values, which a visitor must not see
+    throw new HttpError(500, 'Database error' + (data && /^[A-Z0-9]{5}$/.test(String(data.code || '')) ? ' (' + data.code + ')' : '') + '. Please try again.');
   }
   return data;
 }
 const eq = (v) => encodeURIComponent(String(v));
+/* every id of the database is a UUID: anything else is refused before it reaches Supabase (no query, no database error) */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isUuid = (v) => UUID_RE.test(String(v || ''));
+const ORDER_REF_RE = /^IX-[A-F0-9]{4,12}$/i;
 const jsonHeaders = { 'Content-Type': 'application/json' };
 /* Supabase: the reads every page makes (logo, prices, packs, the lists of tests) are kept for a few seconds, so one page
    does not wait for the database again and again. A change made on this server clears them at once; another server
@@ -160,7 +166,7 @@ const store = {
   },
   async findUserById(id) {
     if (!id) return null;
-    if (USE_SUPABASE) return ((await sb(`ieltsx_users?id=eq.${eq(id)}&limit=1`)) || [])[0] || null;
+    if (USE_SUPABASE) { if (!isUuid(id)) return null; return ((await sb(`ieltsx_users?id=eq.${eq(id)}&limit=1`)) || [])[0] || null; }
     return loadDb().users.find((u) => u.id === id) || null;
   },
   async insertUser(u) {
@@ -168,12 +174,13 @@ const store = {
     const db = loadDb(); db.users.push(u); saveDb(db); return u;
   },
   async updateUser(id, patch) {
+    if (USE_SUPABASE && !isUuid(id)) return null;
     if (USE_SUPABASE) return ((await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0] || store.findUserById(id);
     const db = loadDb(); const u = db.users.find((x) => x.id === id);
     if (!u) return null; Object.assign(u, patch); saveDb(db); return u;
   },
   async deleteUser(id) {
-    if (USE_SUPABASE) { await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'DELETE' }); return true; }
+    if (USE_SUPABASE) { if (!isUuid(id)) return false; await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'DELETE' }); return true; }
     const db = loadDb(); const n = db.users.length; db.users = db.users.filter((u) => u.id !== id); saveDb(db); return db.users.length < n;
   },
   async listMaterials(type) {
@@ -186,7 +193,7 @@ const store = {
   },
   async getMaterial(id) {
     await seedBuiltinTests();
-    if (USE_SUPABASE) return ((await sb(`ieltsx_materials?select=*&id=eq.${eq(id)}&limit=1`)) || [])[0] || null;
+    if (USE_SUPABASE) { if (!isUuid(id)) return null; return ((await sb(`ieltsx_materials?select=*&id=eq.${eq(id)}&limit=1`)) || [])[0] || null; }
     return loadDb().materials.find((m) => m.id === id) || null;
   },
   async insertMaterial(m) {
@@ -196,12 +203,13 @@ const store = {
   },
   async updateMaterial(id, patch) {
     memoClear('mat:');
+    if (USE_SUPABASE && !isUuid(id)) return null;
     if (USE_SUPABASE) { const row = ((await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0] || null; memoClear('mat:'); return row; }
     const db = loadDb(); const m = db.materials.find((x) => x.id === id); if (!m) return null; Object.assign(m, patch); saveDb(db); return m;
   },
   async deleteMaterial(id) {
     memoClear('mat:');
-    if (USE_SUPABASE) { await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'DELETE' }); memoClear('mat:'); return true; }
+    if (USE_SUPABASE) { if (!isUuid(id)) return false; await sb(`ieltsx_materials?id=eq.${eq(id)}`, { method: 'DELETE' }); memoClear('mat:'); return true; }
     const db = loadDb(); const n = db.materials.length; db.materials = db.materials.filter((m) => m.id !== id); saveDb(db); return db.materials.length < n;
   },
   /* test results (one row per finished test) */
@@ -214,11 +222,11 @@ const store = {
     return loadDb().results.slice(0, limit);
   },
   async deleteResultsByUser(userId) {
-    if (USE_SUPABASE) { await sb(`ieltsx_results?userId=eq.${eq(userId)}`, { method: 'DELETE' }); return true; }
+    if (USE_SUPABASE) { if (isUuid(userId)) await sb(`ieltsx_results?userId=eq.${eq(userId)}`, { method: 'DELETE' }); return true; }
     const db = loadDb(); db.results = db.results.filter((r) => r.userId !== userId); saveDb(db); return true;
   },
   async listResults(userId, limit = 500) {
-    if (USE_SUPABASE) return (await sb(`ieltsx_results?userId=eq.${eq(userId)}&order=createdAt.desc&limit=${limit}`)) || [];
+    if (USE_SUPABASE) return isUuid(userId) ? (await sb(`ieltsx_results?userId=eq.${eq(userId)}&order=createdAt.desc&limit=${limit}`)) || [] : [];
     return loadDb().results.filter((r) => r.userId === userId).slice(0, limit);
   },
   /* orders */
@@ -231,10 +239,19 @@ const store = {
     return loadDb().orders.filter((o) => (!userId || o.userId === userId) && (!status || o.status === status)).slice(0, limit);
   },
   async findOrder(key) {
-    if (USE_SUPABASE) return ((await sb(`ieltsx_orders?or=(id.eq.${eq(key)},ref.eq.${eq(key)})&limit=1`)) || [])[0] || null;
+    // an order is found by its id (UUID) or its code (IX-4F2A91); anything else never reaches the database. Before, both
+    // were put in one or=(…) filter: a code made Postgres compare it with the UUID column and fail, and the value went
+    // inside the filter's own syntax.
+    key = String(key || '').trim();
+    if (USE_SUPABASE) {
+      if (isUuid(key)) return ((await sb(`ieltsx_orders?id=eq.${eq(key)}&limit=1`)) || [])[0] || null;
+      if (ORDER_REF_RE.test(key)) return ((await sb(`ieltsx_orders?ref=eq.${eq(key.toUpperCase())}&limit=1`)) || [])[0] || null;
+      return null;
+    }
     return loadDb().orders.find((o) => o.id === key || o.ref === key) || null;
   },
   async updateOrder(id, patch) {
+    if (USE_SUPABASE && !isUuid(id)) return null;
     if (USE_SUPABASE) return ((await sb(`ieltsx_orders?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0] || null;
     const db = loadDb(); const o = db.orders.find((x) => x.id === id); if (!o) return null; Object.assign(o, patch); saveDb(db); return o;
   },
@@ -248,10 +265,14 @@ const store = {
     return loadDb().audit.slice(0, limit);
   },
   /* small key/value settings (the lock / plan rules of the packs and tests) */
-  async getSetting(key) {
+  /* fresh = read the database itself, not the copy kept for a few seconds: every admin change reads, changes and saves the
+     whole value, so it must start from what is really stored (on Vercel another instance may have just changed it) */
+  async getSetting(key, opts) {
     if (USE_SUPABASE) {
       const read = async () => { const row = ((await sb(`ieltsx_settings?select=value&key=eq.${eq(key)}&limit=1`)) || [])[0]; return row ? row.value : null; };
-      return MEMO_SETTINGS.has(key) ? memoGet('set:' + key, read) : read();
+      if (!MEMO_SETTINGS.has(key)) return read();
+      if (opts && opts.fresh) { memoClear('set:' + key); return memoGet('set:' + key, read); }
+      return memoGet('set:' + key, read);
     }
     const v = loadDb().settings[key]; return v === undefined ? null : v;
   },
@@ -536,8 +557,11 @@ const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), geolocation=(), payment=(), usb=()',
+  // the microphone only for this site's own pages (Speaking); no camera, location, payment, USB, sensors or ad topics
+  'Permissions-Policy': 'camera=(), geolocation=(), payment=(), usb=(), microphone=(self), magnetometer=(), gyroscope=(), accelerometer=(), browsing-topics=()',
   'X-Permitted-Cross-Domain-Policies': 'none',
+  // a page opened from another site cannot reach this window (Google sign-in still works: it is a popup this page opens)
+  'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
   'Content-Security-Policy': "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
 };
 // admin pages may only load their own scripts/styles and talk to this server
@@ -553,6 +577,9 @@ function send(res, status, data, headers = {}) {
 }
 function redirect(res, location) { res.writeHead(302, { Location: location, 'Cache-Control': 'no-store', ...SECURITY_HEADERS }); res.end(); }
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
+/* the store of AI checks (ai-store.js): every Writing / Speaking check with its feedback, per account */
+let aiStoreInst = null;
+const aiStore = () => aiStoreInst || (aiStoreInst = require('./ai-store').createAiStore({ USE_SUPABASE, sb, eq, DATA_DIR, HttpError }));
 
 function readBody(req, limit = 100 * 1024) {
   // Vercel's Node runtime reads JSON bodies before the handler runs (req.body); the stream is then already finished.
@@ -940,7 +967,17 @@ const vm = require('vm');
 const PLAN_ORDER = { standard: 1, max: 2, ultra: 3 };
 const SKILL_LIST = ['reading', 'listening', 'writing', 'speaking', 'article'];
 const planOf = (v) => { const s = String(v || '').toLowerCase(); return s.includes('ultra') ? 'ultra' : s.includes('max') ? 'max' : (s.includes('standard') ? 'standard' : ''); };
-const slugOf = (s) => String(s || '').toLowerCase().trim().replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, '');
+/* The address of a pack: Latin letters and digits. Cyrillic names (Russian, Uzbek) are written in Latin letters first, and a
+   name with no letter at all gets a short fixed code, so a pack named "Пакет 7" or "★" still has its own address (before,
+   both became "" and the second one was refused as "already exists"). assets/js/access.js and full-tests.js do the same. */
+const CYR = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'yo', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya', ў: 'o', қ: 'q', ғ: 'g', ҳ: 'h' };
+const slugOf = (s) => {
+  const raw = String(s || '').toLowerCase().trim();
+  const out = raw.replace(/[а-яёўқғҳ]/g, (c) => CYR[c] || '').replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, '');
+  if (out || !raw) return out;
+  let h = 5381; for (let i = 0; i < raw.length; i++) h = ((h * 33) ^ raw.charCodeAt(i)) >>> 0;
+  return 'p' + h.toString(36);
+};
 const hrefPath = (h) => String(h || '').split(/[?#]/)[0].replace(/\/+$/, '').replace(/\.html$/i, '').toLowerCase();
 function userLevel(u) {
   if (!u) return 0;
@@ -1004,7 +1041,7 @@ let rulesCache = { t: 0, v: {} };
 async function accessRules(force) {
   if (!force && Date.now() - rulesCache.t < 3000) return rulesCache.v;
   let v = rulesCache.v;
-  try { const s = await store.getSetting('access-rules'); v = s && typeof s === 'object' && s.rules && typeof s.rules === 'object' ? s.rules : {}; }
+  try { const s = await store.getSetting('access-rules', { fresh: !!force }); v = s && typeof s === 'object' && s.rules && typeof s.rules === 'object' ? s.rules : {}; }
   catch (e) { console.warn('Access rules unavailable (defaults are used):', e.message); }
   rulesCache = { t: Date.now(), v };
   return v;
@@ -1047,8 +1084,14 @@ const priceUrl = (plan, next) => `/Price?premium=required&plan=${plan || 'standa
 
 /* ---- packs made in the admin panel (cards of the Full Tests pages), kept in settings ---- */
 const PACK_SKILLS = ['reading', 'listening', 'writing', 'speaking'];
-async function getAdminPacks() {
-  try { const v = await store.getSetting('admin-packs'); return Array.isArray(v && v.packs) ? v.packs : []; } catch (e) { return []; }
+async function getAdminPacks(fresh) {
+  let v;
+  try { v = await store.getSetting('admin-packs', { fresh: !!fresh }); }
+  catch (e) {
+    if (fresh) throw e;   // an admin change must not start from an empty list (it would delete every pack when saved)
+    return [];
+  }
+  return Array.isArray(v && v.packs) ? v.packs : [];
 }
 const savePacks = (packs) => store.setSetting('admin-packs', { packs, updatedAt: new Date().toISOString() });
 function cleanPack(b, cur) {
@@ -1070,7 +1113,7 @@ async function adminAccessView() {
     packs: sk.packs.map((pk) => ({ key: pk.key, slug: pk.slug, title: pk.title, tier: pk.tier, plan: pk.plan || '', group: pk.group || '', description: pk.description || '', builtIn: !pk.practice, practice: !!pk.practice, rule: view(rules[pk.key], null, pk.def), def: pk.def,
       tests: pk.tests.map((t) => ({ key: t.key, id: t.id, title: t.title, source: t.source, href: t.href, rule: view(rules[t.key], rules[pk.key], t.def), def: t.def })) }))
   }));
-  for (const ap of await getAdminPacks()) {
+  for (const ap of await getAdminPacks(true).catch(() => getAdminPacks())) {
     const sk = skills.find((x) => x.skill === ap.skill); if (!sk) continue;
     let pk = sk.packs.find((p) => !p.practice && (p.slug === ap.slug || slugOf(p.title) === ap.slug));
     if (!pk) { pk = { key: `pack:${ap.skill}/${ap.slug}`, slug: ap.slug, title: ap.title, tier: ap.tier, extra: true, def: { locked: !!ap.premium, plan: 'standard' }, tests: [] }; pk.rule = view(rules[pk.key], null, pk.def); sk.packs.push(pk); }
@@ -1416,7 +1459,7 @@ async function api(req, res, url) {
   }
 
   /* ---- the AI check of Writing and Speaking (ai-examiner.js): any signed-in student, within the checks of the plan ---- */
-  if (p.startsWith('/api/ai/')) return require('./ai-examiner').route(req, res, p, method, url, { store, currentUser, isAdmin, userLevel, materialRule, accessRules, allowsLevel, send, readJson, readBody, rateLimit, HttpError, UPLOAD_DIR });
+  if (p.startsWith('/api/ai/')) return require('./ai-examiner').route(req, res, p, method, url, { store, currentUser, isAdmin, userLevel, materialRule, accessRules, allowsLevel, send, readJson, readBody, rateLimit, HttpError, UPLOAD_DIR, aiStore: aiStore() });
 
   /* ---- admin ---- */
   if (p.startsWith('/api/admin/')) {
@@ -1463,11 +1506,12 @@ async function api(req, res, url) {
       const want = String(process.env.WEB_CONCURRENCY || process.env.WORKERS || '').trim().toLowerCase();
       let ai = false; try { ai = !!require('./ai-provider').configured().ok; } catch (e) { ai = false; }
       let promoColumns = true; if (USE_SUPABASE) { try { await sb('ieltsx_orders?select=promoCode,discount,fullAmount&limit=1'); } catch (e) { promoColumns = false; } }
+      const aiReports = await aiStore().ready();
       const report = await require('./site-check').run({
         root: ROOT, uploadDir: UPLOAD_DIR, aliasMap, store, isPremium, isAdmin, publicPages: publicUrls(),
         config: { storage: USE_SUPABASE ? 'supabase' : 'file', vercel: IS_VERCEL, dbSize, sessionSecretFromEnv: !!process.env.SESSION_SECRET,
           production: IS_VERCEL || process.env.NODE_ENV === 'production' || /^https:\/\//.test(PUBLIC_URL), adminEmails: ADMIN_EMAILS.size, mail: MAIL_READY,
-          publicUrl: PUBLIC_URL, google: !!GOOGLE_CLIENT_ID, ai, paymentWebhook: !!PAYMENT_WEBHOOK_SECRET, promoColumns, pricing: await getPricing(),
+          publicUrl: PUBLIC_URL, google: !!GOOGLE_CLIENT_ID, ai, paymentWebhook: !!PAYMENT_WEBHOOK_SECRET, promoColumns, aiReports, pricing: await getPricing(),
           workers: USE_SUPABASE ? (want === 'auto' ? require('os').cpus().length : Math.max(1, parseInt(want, 10) || 1)) : 1 }
       }, { fresh: url.searchParams.get('fresh') === '1' });
       return send(res, 200, report, { 'Cache-Control': 'no-store' });
@@ -1522,7 +1566,9 @@ async function api(req, res, url) {
     if (dm && method === 'GET') {
       const u = await store.findUserById(decodeURIComponent(dm[1])); if (!u) throw new HttpError(404, 'User not found.');
       const results = await store.listResults(u.id, 1000);
-      return send(res, 200, { user: adminUser(u, resultStats(results).get(u.id)), results: results.slice(0, 100), orders: await store.listOrders({ userId: u.id, limit: 50 }) });
+      // the AI checks: only the bands and criteria (the student's own texts and the feedback stay with the student)
+      const [orders, aiReports] = await Promise.all([store.listOrders({ userId: u.id, limit: 50 }), aiStore().list(u.id, { limit: 20 }).catch(() => [])]);
+      return send(res, 200, { user: adminUser(u, resultStats(results).get(u.id)), results: results.slice(0, 100), orders, aiReports: aiReports.map(({ id, section, title, band, criteria, words, createdAt }) => ({ id, section, title, band, criteria, words, createdAt })) });
     }
     dm = p.match(/^\/api\/admin\/users\/([^/]+)\/(block|note|logout-all)$/);
     if (dm && method === 'POST') {
@@ -1581,20 +1627,21 @@ async function api(req, res, url) {
       const u = await store.findUserById(decodeURIComponent(m[1])); if (!u) throw new HttpError(404, 'User not found.');
       if (u.id === admin.id) throw new HttpError(400, 'You cannot delete your own account here.');
       await store.deleteResultsByUser(u.id);
+      await aiStore().removeByUser(u.id).catch(() => null);   // the saved AI checks go with the account
       await store.deleteUser(u.id);
       await audit(admin, 'user.delete', u.email);
       return send(res, 200, { ok: true });
     }
-    if (method === 'GET' && p === '/api/admin/packs') return send(res, 200, { packs: await getAdminPacks() }, { 'Cache-Control': 'no-store' });
+    if (method === 'GET' && p === '/api/admin/packs') return send(res, 200, { packs: await getAdminPacks(true) }, { 'Cache-Control': 'no-store' });
     if (method === 'POST' && p === '/api/admin/packs') {
-      const all = await getAdminPacks(); const pk = cleanPack(await readJson(req, 64 * 1024));
+      const all = await getAdminPacks(true); const pk = cleanPack(await readJson(req, 64 * 1024));
       if (all.some((x) => x.skill === pk.skill && x.slug === pk.slug)) throw new HttpError(409, 'A pack with this name already exists.');
       all.push(pk); await savePacks(all); await audit(admin, 'pack.add', pk.title, { skill: pk.skill });
       return send(res, 201, { pack: pk });
     }
     m = p.match(/^\/api\/admin\/packs\/([^/]+)$/);
     if (m && (method === 'PATCH' || method === 'DELETE')) {
-      const all = await getAdminPacks(); const id = decodeURIComponent(m[1]); const idx = all.findIndex((x) => x.id === id); if (idx < 0) throw new HttpError(404, 'Pack not found.');
+      const all = await getAdminPacks(true); const id = decodeURIComponent(m[1]); const idx = all.findIndex((x) => x.id === id); if (idx < 0) throw new HttpError(404, 'Pack not found.');
       if (method === 'DELETE') { const [gone] = all.splice(idx, 1); await savePacks(all); await audit(admin, 'pack.delete', gone.title); return send(res, 200, { ok: true }); }
       const pk = cleanPack(await readJson(req, 64 * 1024), all[idx]);
       if (all.some((x, i) => i !== idx && x.skill === pk.skill && x.slug === pk.slug)) throw new HttpError(409, 'A pack with this name already exists.');
@@ -1709,7 +1756,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;

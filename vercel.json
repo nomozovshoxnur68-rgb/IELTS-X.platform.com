@@ -499,11 +499,11 @@
     },
     {
       "source": "/full-tests/:skill(listening|reading|writing|speaking)/:pack((?!test-|index)[a-z0-9][a-z0-9_-]*|pack-[A-Za-z0-9_-]+|volume-[A-Za-z0-9_-]+|jan-august|sep-dec|09_02-16_02)",
-      "destination": "/full-tests/pack.html"
+      "destination": "/full-tests/pack"
     },
     {
       "source": "/test/:id",
-      "destination": "/test.html"
+      "destination": "/test"
     },
     {
       "source": "/favicon.ico",
@@ -540,7 +540,7 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), geolocation=(), payment=(), usb=()"
+          "value": "camera=(), geolocation=(), payment=(), usb=(), microphone=(self), magnetometer=(), gyroscope=(), accelerometer=(), browsing-topics=()"
         },
         {
           "key": "X-Permitted-Cross-Domain-Policies",
@@ -553,6 +553,10 @@
         {
           "key": "Content-Security-Policy",
           "value": "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
         }
       ]
     },

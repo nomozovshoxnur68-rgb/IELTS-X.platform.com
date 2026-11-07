@@ -19,7 +19,15 @@
     var LABEL = { standard: 'Standard', max: 'Max', ultra: 'Ultra' };
     var state = null, pending = null;
 
-    function slugify(s) { return String(s || '').toLowerCase().trim().replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, ''); }
+    /* the same rule as slugOf() in server.js: Cyrillic in Latin letters, a name without letters gets a short fixed code */
+    var CYR = { 'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya', 'ў': 'o', 'қ': 'q', 'ғ': 'g', 'ҳ': 'h' };
+    function slugify(s) {
+        var raw = String(s || '').toLowerCase().trim();
+        var out = raw.replace(/[а-яёўқғҳ]/g, function (c) { return CYR[c] || ''; }).replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, '');
+        if (out || !raw) return out;
+        var h = 5381; for (var i = 0; i < raw.length; i++) h = ((h * 33) ^ raw.charCodeAt(i)) >>> 0;
+        return 'p' + h.toString(36);
+    }
     function planOf(v) { var s = String(v || '').toLowerCase(); return s.indexOf('ultra') !== -1 ? 'ultra' : s.indexOf('max') !== -1 ? 'max' : (s.indexOf('standard') !== -1 ? 'standard' : ''); }
     function planKey(r) { return r && r.locked ? (ORDER[r.plan] ? r.plan : 'standard') : 'demo'; }
 

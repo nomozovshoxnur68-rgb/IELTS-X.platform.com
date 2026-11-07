@@ -1,0 +1,73 @@
+/* IELTSX — AI feedback archive (assets/js/ai-archive.js, Performance page). Site tokens only (ix-unified.css), light + dark. */
+.ixa-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ixa-head h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+.ixa-list { display: grid; gap: 8px; }
+.ixa-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid hsl(var(--border)); border-radius: 0.625rem; background: hsl(var(--background)); }
+.ixa-row:hover { border-color: hsl(var(--primary) / 0.45); }
+.ixa-band { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 0.625rem; background: hsl(var(--muted)); font-size: 1.0625rem; font-weight: 700; font-variant-numeric: tabular-nums; color: hsl(var(--foreground)); }
+.ixa-band.good { background: var(--ix-success-bg, #dcfce7); color: var(--ix-success-fg, #166534); }
+.ixa-band.low { background: var(--ix-danger-bg, #fee2e2); color: var(--ix-danger-fg, #991b1b); }
+.ixa-main { min-width: 0; }
+.ixa-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 0.9375rem; font-weight: 600; color: hsl(var(--foreground)); }
+.ixa-title span.t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.ixa-chip { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+.ixa-chip.w { background: hsl(var(--primary) / 0.12); color: hsl(var(--primary)); }
+.ixa-chip.s { background: rgba(27, 175, 122, 0.14); color: #138a60; }
+html.dark-mode .ixa-chip.s { color: #4ad3a0; }
+.ixa-meta { margin-top: 3px; font-size: 0.75rem; color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+.ixa-crits { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 4px; font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
+.ixa-crits b { color: hsl(var(--foreground)); font-weight: 600; }
+.ixa-actions { display: flex; gap: 6px; }
+.ixa-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid hsl(var(--border)); border-radius: 0.5rem; background: hsl(var(--background)); color: hsl(var(--foreground)); font-size: 0.8125rem; font-weight: 500; text-decoration: none; cursor: pointer; }
+.ixa-btn:hover { background: hsl(var(--muted)); }
+.ixa-btn:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 1px; }
+.ixa-btn.primary { border-color: hsl(var(--primary)); background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.ixa-btn.primary:hover { filter: brightness(1.05); }
+.ixa-btn.danger { color: hsl(var(--destructive)); }
+.ixa-btn[disabled] { opacity: 0.55; cursor: default; }
+.ixa-more { display: flex; justify-content: center; margin-top: 12px; }
+.ixa-empty { padding: 26px 12px; text-align: center; font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
+.ixa-empty a { color: hsl(var(--primary)); font-weight: 500; }
+.ixa-skel { height: 66px; border-radius: 0.625rem; background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--background)) 50%, hsl(var(--muted)) 100%); background-size: 200% 100%; animation: ixa-shine 1.2s linear infinite; }
+@keyframes ixa-shine { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .ixa-skel { animation: none; } }
+
+/* one check, opened */
+.ixa-dialog { width: min(880px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid hsl(var(--border)); border-radius: 0.875rem; background: hsl(var(--card)); color: hsl(var(--card-foreground)); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25); }
+.ixa-dialog::backdrop { background: rgba(15, 23, 42, 0.55); }
+.ixa-dhead { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; border-bottom: 1px solid hsl(var(--border)); background: hsl(var(--card)); }
+.ixa-dhead h3 { margin: 0; font-size: 1rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ixa-dbody { display: grid; gap: 14px; padding: 18px; }
+.ixa-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.ixa-hero .ixa-band { width: 72px; height: 72px; font-size: 1.75rem; border-radius: 0.875rem; }
+.ixa-hero p { margin: 4px 0 0; font-size: 0.875rem; line-height: 1.55; color: hsl(var(--foreground)); }
+.ixa-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ixa-box { padding: 12px 14px; border: 1px solid hsl(var(--border)); border-radius: 0.625rem; background: hsl(var(--background)); min-width: 0; }
+.ixa-box h4 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 6px; font-size: 0.875rem; font-weight: 600; }
+.ixa-box h4 span { font-variant-numeric: tabular-nums; }
+.ixa-box p, .ixa-box li { font-size: 0.8125rem; line-height: 1.55; color: hsl(var(--foreground)); }
+.ixa-box p { margin: 0 0 6px; }
+.ixa-box ul, .ixa-box ol { margin: 0; padding-left: 18px; }
+.ixa-fix { padding: 8px 0; border-top: 1px dashed hsl(var(--border)); }
+.ixa-fix:first-of-type { border-top: 0; padding-top: 0; }
+.ixa-fix div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 0.8125rem; }
+.ixa-fix s { color: var(--ix-danger-fg, #b91c1c); }
+.ixa-fix b { color: var(--ix-success-fg, #15803d); }
+.ixa-fix p { margin: 3px 0 0; color: hsl(var(--muted-foreground)); }
+.ixa-eg { font-style: italic; }
+.ixa-text { white-space: pre-wrap; font-size: 0.8125rem; line-height: 1.6; max-height: 340px; overflow: auto; }
+.ixa-answer { border: 1px solid hsl(var(--border)); border-radius: 0.5rem; padding: 8px 10px; margin-top: 6px; }
+.ixa-answer summary { cursor: pointer; font-size: 0.8125rem; font-weight: 600; }
+.ixa-answer h5 { margin: 8px 0 2px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: hsl(var(--muted-foreground)); }
+.ixa-note { font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
+.ixa-warn { color: var(--ix-danger-fg, #b91c1c); font-size: 0.8125rem; }
+@media (max-width: 640px) {
+  .ixa-row { grid-template-columns: auto minmax(0, 1fr); }
+  .ixa-actions { grid-column: 1 / -1; justify-content: flex-end; }
+  .ixa-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media print {   /* "Print / PDF" prints only the opened check */
+  body.ixa-print > *:not(.ixa-dialog) { display: none !important; }
+  body.ixa-print .ixa-dialog { position: static; width: auto; max-height: none; border: 0; box-shadow: none; }
+  body.ixa-print .ixa-dhead .ixa-actions { display: none; }
+}

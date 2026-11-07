@@ -425,6 +425,7 @@
       sampleIsModel: !!raw.sampleIsModel,
       plan: (Array.isArray(raw.plan) ? raw.plan : []).map((p) => ({ title: String(p.title || ''), text: String(p.text || '') })),
       quota: raw.quota || null,
+      reportId: /^[0-9a-f-]{36}$/i.test(String(raw.reportId || '')) ? String(raw.reportId) : null,
       meta: { source: (raw.meta && raw.meta.source) || 'ai' },
     };
   }
@@ -546,6 +547,9 @@
     });
     const q = results.map((r) => r.quota).filter(Boolean).pop();
     html += `<p class="ai-note">This band is an estimate from AI to help you practise, not an official IELTS score.${q && q.limit !== null ? ` AI checks left this month: ${q.remaining} of ${q.limit}.` : ''}</p>`;
+    // every check is kept on the account (ai-store.js on the server): it opens again from the Performance page on any device
+    const saved = results.map((r, i) => ({ id: r.reportId, i })).filter((x) => x.id);
+    if (saved.length) html += `<p class="ai-note">Saved to your account. Open it again any time in the AI feedback archive: ${saved.map((x) => `<a href="/study/Tools/Performance#ai-report=${encodeURIComponent(x.id)}">${saved.length > 1 ? 'Part ' + (x.i + 1) : 'open the feedback'}</a>`).join(' · ')}.</p>`;
     html += `<div class="res-actions">
       <button class="btn-outline" id="reportIssueBtn">Report Issue</button>
       <button class="btn-outline" id="reviewBtn">Review Mistakes</button>

@@ -6,10 +6,10 @@
    It also keeps the server's own files private: Vercel would otherwise send server.js, the AI modules, scripts/ … as
    static files (the Node server refuses them itself, see isBlocked() in server.js). */
 export const config = { matcher: ['/full-tests/:path*', '/pessages/:path*', '/sections/:path*', '/premium-audio/:path*', '/Mock(.*)', '/mock(.*)',
-  '/server.js', '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js',
+  '/server.js', '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/ai-store.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js',
   '/supabase-schema.sql', '/vercel.json', '/package.json', '/README.md', '/GOOGLE_SETUP.md', '/VERCEL_SETUP.md', '/scripts/:path*', '/data/:path*', '/reading-src/:path*', '/listening-src/:path*', '/speaking-src/:path*', '/full-mock/README.md'] };
 
-const PRIVATE = /^\/(?:server|ai-provider|ai-generator|ai-examiner|reading-router|listening-router|reading-exam|listening-exam|middleware|site-check)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src|listening-src|speaking-src)\//i;
+const PRIVATE = /^\/(?:server|ai-provider|ai-generator|ai-examiner|ai-store|reading-router|listening-router|reading-exam|listening-exam|middleware|site-check)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src|listening-src|speaking-src)\//i;
 
 const GATED = [
   /^\/full-tests\/(reading|listening|writing|speaking)\/test-[^/]+?(\.html)?\/?$/i,

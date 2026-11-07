@@ -5,7 +5,7 @@ No npm packages (Node 18+).
 
 ```bash
 npm start            # http://localhost:3000
-npm test             # 26 checks: accounts, premium, orders, results, admin tests + articles, file protection ...
+npm test             # 51 checks: accounts, premium, orders, results, admin tests + articles, file protection ...
 ```
 
 ## Test links (always `test-1`, `test-2`, ... in listing order)
@@ -287,10 +287,10 @@ feedback comes in English, O'zbekcha or Русский, as the student chooses. 
 * **To switch it on**: set `OPENAI_API_KEY` on the server (the same key as the AI Test Generator; locally in `.env`, on Vercel: Settings -> Environment Variables, then redeploy) and add credit to the OpenAI account (a ChatGPT subscription does not include the API). The key never reaches a browser. Without it the pages say the check is not available yet, and admins read what to set.
 * **It runs by itself**: a Writing test is checked when it is submitted; a Speaking test is checked a few seconds after the last answer (**Wait** stops it, to record an answer again; **Get AI feedback** starts it earlier, with some questions unanswered); the Writing of a Full Mock is checked when the test ends. A visitor who is not signed in, or who has no checks left, is told so and nothing is sent.
 * **Files**: `ai-examiner.js` (routes, prompts, schemas, the allowance; server only), `ai-provider.js` (the AI service), `writing/js/script.js` and `assets/js/speaking-exam.js` (the pages).
-* **Routes**: `GET /api/ai/status`, `POST /api/ai/writing`, `POST /api/ai/speaking/transcribe` (one recording, raw bytes), `POST /api/ai/speaking/assess`, `GET /api/ai/history`. All but the status need a signed-in student who may open the test.
+* **Routes**: `GET /api/ai/status`, `POST /api/ai/writing`, `POST /api/ai/speaking/transcribe` (one recording, raw bytes), `POST /api/ai/speaking/assess`, `GET /api/ai/history`, `GET /api/ai/reports` (+ `/<id>`, `DELETE /<id>`, see **AI feedback archive**). All but the status need a signed-in student who may open the test.
 * **Speaking**: one recording per question (a cue card is one recording), converted in the browser to 16 kHz mono WAV so one answer fits a Vercel request (2 minutes 10 seconds at most). Each is written down (`gpt-transcribe`) and heard for notes on pronunciation and fluency (`gpt-audio-1.5`), then the transcripts are marked. Recordings are not stored. A student without a microphone can type: pronunciation is then not marked and does not count. The same happens when the audio model gives no notes: pronunciation is never guessed from a transcript.
 * **Bands**: the model gives the four criteria; the overall band is worked out on the server with the IELTS rule for averages (6.25 -> 6.5, 6.75 -> 7.0). In a full Writing test Task 2 counts twice.
-* **Allowance per month** (a failed check is not counted, admins have no limit): `AI_CHECKS_FREE` 3, `AI_CHECKS_STANDARD` 30, `AI_CHECKS_MAX` 60, `AI_CHECKS_ULTRA` 200. One Writing task or one Speaking attempt is one check. Usage is kept in the setting `ai-usage:<user id>` with the bands of the last 40 checks (for the Performance page), no texts.
+* **Allowance per month** (a failed check is not counted, admins have no limit): `AI_CHECKS_FREE` 3, `AI_CHECKS_STANDARD` 30, `AI_CHECKS_MAX` 60, `AI_CHECKS_ULTRA` 200. One Writing task or one Speaking attempt is one check. Usage is kept in the setting `ai-usage:<user id>` with the bands of the last 40 checks (for the Performance page); the checks themselves are kept in the AI feedback archive (below).
 * **Full Mock**: the Writing section is checked when the test ends (each task is one check; Task 2 counts twice); if that fails, or for an older attempt, the results page has **Get AI feedback**. The feedback stays with the attempt, so it is not asked for twice, and the band goes to the Mock group of the Performance page.
 * **Trying it without a key**: `AI_PROVIDER=mock` answers with placeholder text marked [Test mode].
 
@@ -504,3 +504,37 @@ The strip of numbers 1–40 shows what each number still needs. **Everything tog
   `loading.js`). Clicking the code copies it.
 * **Supabase**: run the **v8 part** of `supabase-schema.sql` once (three columns on `ieltsx_orders`). Until then an order with
   a code still gets the lower price and the code is written in the activity log; the Website check reminds you.
+
+## AI feedback archive, pack pages on Vercel, more safety (November 2026)
+
+**AI feedback archive (the store of AI checks).** Every Writing task and Speaking attempt the AI examiner marks is kept on the
+student's account: the band, the four criteria with their comments, grammar corrections, vocabulary upgrades, strengths, next steps,
+the model answer(s), the task, and the student's own text or the transcripts of the answers (recordings are still never stored).
+
+* **Where**: Performance page → **AI feedback archive** (`assets/js/ai-archive.js`, `assets/css/ai-archive.css`): All / Writing / Speaking,
+  10 at a time with **Load more**, **Open** shows the whole check (Print / PDF), **✕** deletes it. The Writing and Speaking results
+  link straight to the check they just saved (`/study/Tools/Performance#ai-report=<id>`). The admin user drawer lists the bands and
+  criteria of a student's checks, never the texts.
+* **Server**: `ai-store.js` (server only, refused as a file by `server.js` and `middleware.js`). `ai-examiner.js` saves a check at the
+  same time as it counts it (one round trip). Routes: `GET /api/ai/reports?section=&testKey=&limit=&before=` → `{ items, next }` (light
+  rows: band, criteria, title, date — no texts), `GET /api/ai/reports/<id>` → `{ report }`, `DELETE /api/ai/reports/<id>`. Only the owner;
+  any other id is a 404. A check that could not be saved still reaches the student (`saved: false`).
+* **Fast**: Supabase table `ieltsx_ai_reports` with indexes on (`userId`, `createdAt` desc) and (`userId`, `testKey`, `createdAt` desc);
+  a list reads only the small columns, the feedback (`report`) is read when one check is opened; paging by date, not offset. Local
+  file mode: one file per account in `data/ai-reports/<userId>.json` (last 300 checks), kept in memory, so `data/db.json` does not grow.
+* **Supabase**: run the **v9 part** of `supabase-schema.sql` once (the table, its indexes, RLS, and table rights taken from the
+  public `anon` / `authenticated` roles on every IELTSX table). Until then the Website check shows a warning and checks are not kept.
+
+**Packs on Vercel.** A pack made in **Admin → Packs** opened a 404 page on Vercel: `vercel.json` rewrote `/full-tests/<skill>/<pack>` to
+`/full-tests/pack.html`, and with `cleanUrls: true` Vercel serves that file only as `/full-tests/pack`. The rewrites now point at
+`/full-tests/pack` and `/test` (the old `/test/<id>` links were a 404 for the same reason). The built-in packs worked because they
+have their own files. Also: a pack named in Cyrillic (`Пакет 7`) or with no letters got an empty address, so the second one was
+refused as "already exists" — the name is now written in Latin letters (`paket-7`), the same rule in `server.js`, `assets/js/access.js`
+and `full-tests.js`. Admin changes to packs and Access rules read the database itself (not the copy kept for 5 s), and a pack change
+stops with an error instead of starting from an empty list when the database cannot be read (that would have deleted every pack).
+
+**Safety.** Ids are checked before they reach Supabase (a made-up id is a 404, not a 500 that printed the database's own error); the
+database's own words stay in the server log; an order is found by its id or its code with two separate filters (before, a code went
+inside one `or=(…)` filter, which also made finding an order by its code fail on Supabase); `Cross-Origin-Opener-Policy:
+same-origin-allow-popups` and a stricter `Permissions-Policy` (microphone for this site only, no sensors / ad topics) on the Node server
+and in `vercel.json`. `npm test`: 51 checks.

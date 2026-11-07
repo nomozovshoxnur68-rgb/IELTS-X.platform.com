@@ -257,6 +257,7 @@
           (u.premiumActive ? `<button class="btn btn-sm btn-danger" data-revoke="${esc(u.id)}" type="button">Take Premium away</button>` : '') + '</div></div>') +
         `<div class="box"><h4>Private note (only admins see it)</h4><textarea class="field" id="user-note" maxlength="500" placeholder="e.g. paid in cash on 12 Oct, Telegram @name">${esc(u.note)}</textarea><div class="btn-row" style="margin-top:8px"><button class="btn btn-sm" data-save-note="${esc(u.id)}" type="button">Save note</button></div></div>` +
         `<div class="box"><h4>Test history</h4>${testTable(d.results)}</div>` +
+        `<div class="box"><h4>AI checks (Writing / Speaking)</h4>${aiTable(d.aiReports || [])}</div>` +
         `<div class="box"><h4>Orders</h4>${orderTable(d.orders)}</div>` +
         (self ? '' : `<div class="box danger"><h4>Account control</h4><div class="btn-row">` +
           (u.isAdmin ? `<button class="btn btn-sm" data-role="user" data-id="${esc(u.id)}" type="button">Remove admin</button>` :
@@ -269,6 +270,10 @@
   const testTable = (list) => list.length
     ? `<div class="table-wrap"><table class="table"><thead><tr><th>Test</th><th>Section</th><th class="right">Score</th><th>Band</th><th>Time</th><th>When</th></tr></thead><tbody>${list.slice(0, 30).map((r) => `<tr><td>${esc(r.pageLabel)}</td><td>${esc(r.section)}</td><td class="right nowrap">${r.scoreCorrect}/${r.scoreTotal}</td><td><strong>${esc(r.band)}</strong></td><td>${duration(r.durationSec)}</td><td class="nowrap">${esc(fmtDate(r.createdAt))}</td></tr>`).join('')}</tbody></table></div>${list.length > 30 ? `<div class="muted sm" style="margin-top:6px">Latest 30 of ${list.length} shown.</div>` : ''}`
     : '<div class="muted">No finished tests yet.</div>';
+  const AI_SHORT = { taskAchievement: 'TA', coherenceCohesion: 'CC', lexicalResource: 'LR', grammarAccuracy: 'GRA', fluencyCoherence: 'FC', pronunciation: 'P' };
+  const aiTable = (list) => list.length
+    ? `<div class="table-wrap"><table class="table"><thead><tr><th>Test</th><th>Section</th><th>Band</th><th>Criteria</th><th>When</th></tr></thead><tbody>${list.map((r) => `<tr><td>${esc(r.title)}</td><td>${esc(r.section)}</td><td><strong>${esc(Number(r.band).toFixed(1))}</strong></td><td class="nowrap">${Object.entries(r.criteria || {}).map(([k, v]) => `${esc(AI_SHORT[k] || k)} ${v === null ? '—' : esc(Number(v).toFixed(1))}`).join(' · ')}</td><td class="nowrap">${esc(fmtDate(r.createdAt))}</td></tr>`).join('')}</tbody></table></div><div class="muted sm" style="margin-top:6px">Latest ${list.length}. The texts and the feedback are visible only to the student.</div>`
+    : '<div class="muted">No AI checks kept yet.</div>';
   const orderTable = (list) => list.length
     ? `<div class="table-wrap"><table class="table"><thead><tr><th>Code</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>${list.map((o) => `<tr><td>${esc(o.ref)}</td><td>${esc(o.planName)} · ${o.months} mo</td><td class="nowrap">${money(o.amount, o.currency)}</td><td><span class="badge badge-${esc(o.status)}">${esc(o.status)}</span></td><td class="nowrap">${esc(fmtDate(o.createdAt))}</td></tr>`).join('')}</tbody></table></div>`
     : '<div class="muted">No orders.</div>';
