@@ -3,13 +3,17 @@
    quiz-game.js -- live quiz games for every subject (server only, never sent to a browser as a file).
 
    An admin makes a quiz in the panel (Admin -> Games): a name, a subject (Huquq, Matematika, IELTS, ...) and questions
-   with 2-4 answers, a time limit and points. "Host live" starts a game with a 6-digit PIN. The host screen (/game-host)
-   is shown on the classroom screen; the students open /game on their phones, type the PIN and a nickname and answer
-   on four coloured tiles. A right answer gives up to 1000 points (x2 on a double-points question): the faster, the more.
+   with 2-4 answers, a time limit and points. "Host" starts a game with a 6-digit PIN in one of two game types:
+     classic   the question and the answers are on the host screen only (the classroom screen); the phones show the
+               four coloured shapes ▲ ◆ ● ■
+     phone     the question and the answers are on every phone as well (students can play from anywhere)
+   The host screen (/game-host) runs the game; the students open /game, type the PIN and a nickname and answer. A right
+   answer gives up to 1000 points (x2 on a double-points question): the faster, the more. With "auto" on, the game moves
+   on by itself: everybody answered (or time is up) -> the right answer -> the ranking -> the next question.
 
-     POST /api/game/pin      {pin}           -> the game's name and subject (and the signed-in student's name)
+     POST /api/game/pin      {pin}           -> the game's name, subject and type (and the signed-in student's name)
      POST /api/game/join     {pin, name}     -> a signed player token (the page sends it back in X-Game-Token)
-     GET  /api/game/state                    -> what the player's screen shows now (asked about once a second)
+     GET  /api/game/state                    -> what the player's screen shows now
      POST /api/game/answer   {q, c}          -> the answer to question q (tile c); the points are worked out here
      POST /api/game/leave
      /api/admin/games...                     the quizzes, the host screen and the reports (admins only)
@@ -20,15 +24,18 @@
      game-qs:<PIN>            the questions, copied when the game is made (never changed afterwards)
      game-p:<PIN>:<player>    one player (name, score, answers)                       -- written for that player only
    so players who answer at the same moment never overwrite each other. The clock is part of the state (openAt /
-   endsAt): "time is up" is worked out from the time, nothing has to run in the background. Locally ("npm start"
+   endsAt): "time is up" is worked out from the time, nothing has to run in the background. A player's poll is one
+   small read (the state + the player's own row); the questions are kept in memory by game id. Locally ("npm start"
    without Supabase) the live rows are kept in memory. The quizzes (game-quiz:<id>) and the reports of finished games
    (game-report:<id>) are kept in the settings in both modes.
 
    Security
    - Only admins make quizzes and run the host screen. A player row is changed only with the player's signed token
      (HMAC with SESSION_SECRET; it names the game and the player), so nobody can answer for somebody else.
-   - The right answer is never sent to a player before the question is closed. The points are worked out on the
-     server with the server's own clock (an answer after the time is refused) and an answer counts once.
+   - The right answer is never sent to a player before the question is closed; in a classic game the question and the
+     answers are not sent to the phones at all. The points are worked out on the server with the server's own clock
+     (an answer after the time is refused) and an answer counts once. While the clock runs a player's score is the
+     one before the question (a jump would tell right or wrong).
    - Wrong PINs are rate limited per address (a PIN cannot be found by trying), nicknames are unique in a game, a game
      holds at most MAX_PLAYERS players, and the host can lock the game or remove a player.
    ==== */
@@ -37,7 +44,9 @@ const crypto = require('crypto');
 const K = { quiz: 'game-quiz:', live: 'game-live:', qs: 'game-qs:', player: 'game-p:', report: 'game-report:' };
 const MAX_QUESTIONS = 100, MAX_PLAYERS = 300, MAX_QUIZZES = 500, MAX_REPORTS = 300;
 const TIMES = [5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240];
-const LEAD_MS = 5000;              // the question is read for 5 seconds before the answers open
+const MODES = ['classic', 'phone'];
+const LEAD_MS = { classic: 3000, phone: 1500 };   // the question is shown this long before the answers open
+const REVEAL_MS = 3500, BOARD_MS = 4500;          // auto: the right answer, then the ranking, then the next question
 const GRACE_MS = 1500;             // an answer sent just before the end may arrive a moment after it
 const IDLE_MS = 6 * 3600 * 1000;   // a game nobody moved on for 6 hours is removed
 const TOKEN_MS = 12 * 3600 * 1000;
@@ -47,14 +56,13 @@ const SID_RE = /^[a-f0-9]{16}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SUBJECTS = ['IELTS', 'Ingliz tili', 'Huquq', 'Matematika', 'Ona tili va adabiyot', 'Tarix', 'Fizika', 'Kimyo', 'Biologiya', 'Geografiya', 'Informatika', 'Iqtisodiyot'];
 const QUIZ_FIELDS = ['id', 'title', 'subject', 'description', 'coverUrl', 'count', 'totalTime', 'createdAt', 'updatedAt', 'createdBy', 'plays', 'lastPlayedAt'];
-const REPORT_FIELDS = ['sid', 'quizId', 'title', 'subject', 'pin', 'host', 'startedAt', 'endedAt', 'asked', 'total', 'count', 'winner', 'avgRight'];
+const REPORT_FIELDS = ['sid', 'quizId', 'title', 'subject', 'mode', 'pin', 'host', 'startedAt', 'endedAt', 'asked', 'total', 'count', 'winner', 'avgRight'];
 
 const line = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 const text = (v, n) => String(v == null ? '' : v).replace(/\r\n?/g, '\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f\u200b-\u200f\u2028-\u202e\ufeff]/g, ' ')
   .replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim().slice(0, n);
 const clone = (v) => (v == null ? v : JSON.parse(JSON.stringify(v)));
 const iso = () => new Date().toISOString();
-const pick = (o, fields) => { const out = {}; fields.forEach((f) => { out[f] = o && o[f] !== undefined ? o[f] : null; }); return out; };
 
 /* ───────── storage ───────── */
 /* the live rows: in the database on Vercel / with Supabase, in memory for "npm start" on a file database */
@@ -66,15 +74,15 @@ const memKv = {
   async del(key) { mem.delete(key); },
   async delPrefix(prefix) { for (const k of [...mem.keys()]) if (k.startsWith(prefix)) mem.delete(k); }
 };
-const dbKv = (store) => ({
+const dbKv = (store, minimal) => ({
   async get(keys) { const m = await store.getSettings(keys); for (const [k, v] of m) m.set(k, clone(v)); return m; },
   list: (prefix, fields) => store.listSettings(prefix, { fields }),
-  set: (key, value) => store.setSetting(key, value),
+  set: (key, value) => store.setSetting(key, value, minimal ? { minimal: true } : undefined),   // the live rows: no copy sent back
   del: (key) => store.deleteSetting(key),
   delPrefix: (prefix) => store.deleteSettings(prefix)
 });
-const liveKv = (ctx) => (ctx.USE_SUPABASE ? dbKv(ctx.store) : memKv);
-const keepKv = (ctx) => dbKv(ctx.store);
+const liveKv = (ctx) => (ctx.USE_SUPABASE ? dbKv(ctx.store, true) : memKv);
+const keepKv = (ctx) => dbKv(ctx.store, false);
 
 /* the questions of a game never change while it runs: kept here by game id, so a poll reads only the small rows */
 const qsCache = new Map();
@@ -90,6 +98,7 @@ async function liveOf(ctx, pin) {
   return (await liveKv(ctx).get([K.live + pin])).get(K.live + pin) || null;
 }
 async function playersOf(ctx, pin) {
+  if (!PIN_RE.test(String(pin || ''))) return [];
   return (await liveKv(ctx).list(K.player + pin + ':')).map((r) => r.value).filter((p) => p && PID_RE.test(String(p.pid || '')));
 }
 async function dropGame(ctx, pin) {
@@ -108,13 +117,15 @@ async function sweep(ctx) {
 }
 
 /* ───────── the game ───────── */
-/* ready = the question is read (no answers yet), answer = the clock runs, reveal = time is up: the right answer is shown */
+/* ready = the question is shown (no answers yet), answer = the clock runs, reveal = time is up: the right answer is shown */
 function phaseOf(s, now) {
   if (s.phase !== 'question') return s.phase;
   if (now < s.openAt) return 'ready';
   if (now < s.endsAt) return 'answer';
   return 'reveal';
 }
+/* when the phase began (the reveal begins when the clock stops) */
+function phaseStart(s, ph) { return ph === 'ready' ? s.phaseAt : ph === 'answer' ? s.openAt : ph === 'reveal' ? s.endsAt : s.phaseAt; }
 /* a right answer: 1000 points at once, 500 at the last moment (x2 for double points, 0 for a question without points) */
 function pointsFor(q, ms) {
   if (!q.points) return 0;
@@ -123,14 +134,14 @@ function pointsFor(q, ms) {
 }
 const ranked = (players) => players.slice().sort((a, b) => (b.score || 0) - (a.score || 0) || String(a.joinedAt).localeCompare(String(b.joinedAt)));
 function standings(s, players) {
-  const list = ranked(players); const ranks = {};
-  list.forEach((p, i) => { ranks[p.pid] = i + 1; });
+  const list = ranked(players); const ranks = {}; const behind = {};
+  list.forEach((p, i) => { ranks[p.pid] = i + 1; if (i) behind[p.pid] = [(list[i - 1].score || 0) - (p.score || 0), list[i - 1].name]; });   // how far behind the player above
   const top = list.slice(0, 5).map((p) => ({ pid: p.pid, name: p.name, score: p.score || 0, gain: (p.a && p.a[s.q] && p.a[s.q].pts) || 0, streak: p.streak || 0 }));
-  return { ranks, top, count: list.length, ranksAt: s.q };
+  return { prevRanks: s.ranks || {}, ranks, behind, top, count: list.length, ranksAt: s.q };
 }
 function goQuestion(s, i, qs, now) {
-  s.phase = 'question'; s.q = i; s.early = false;
-  s.openAt = now + LEAD_MS; s.endsAt = s.openAt + qs[i].time * 1000;
+  s.phase = 'question'; s.q = i; s.early = false; s.phaseAt = now;
+  s.openAt = now + (LEAD_MS[s.mode] || LEAD_MS.classic); s.endsAt = s.openAt + qs[i].time * 1000;
 }
 function questionStats(q, k, players) {
   const counts = q.answers.map(() => 0); let right = 0, answered = 0;
@@ -141,13 +152,16 @@ async function saveReport(ctx, s, qs, players) {
   if (s.q < 0) return null;
   const list = ranked(players); const asked = Math.min(qs.length, s.q + 1);
   const rows = list.map((p, i) => {
-    let right = 0, answered = 0;
-    for (let k = 0; k < asked; k++) { const a = p.a && p.a[k]; if (a) { answered++; if (a.ok) right++; } }
-    return { rank: i + 1, name: p.name, userId: p.userId || null, score: p.score || 0, right, answered };
+    let right = 0, answered = 0; const a = [];
+    for (let k = 0; k < asked; k++) {
+      const x = p.a && p.a[k];
+      if (x) { answered++; if (x.ok) right++; a.push([x.c, x.ok ? 1 : 0, x.pts || 0, x.ms || 0]); } else a.push(null);
+    }
+    return { rank: i + 1, name: p.name, userId: p.userId || null, score: p.score || 0, right, answered, a };   // a: [tile, right, points, ms] per question
   });
-  const questions = qs.slice(0, asked).map((q, k) => ({ text: q.text, answers: q.answers, correct: q.correct, ...questionStats(q, k, players) }));
+  const questions = qs.slice(0, asked).map((q, k) => ({ text: q.text, answers: q.answers, correct: q.correct, time: q.time, ...questionStats(q, k, players) }));
   const rep = {
-    sid: s.sid, quizId: s.quizId, title: s.title, subject: s.subject, pin: s.pin, host: s.host,
+    sid: s.sid, quizId: s.quizId, title: s.title, subject: s.subject, mode: s.mode, pin: s.pin, host: s.host,
     startedAt: s.startedAt || s.createdAt, endedAt: iso(), asked, total: qs.length, count: rows.length,
     winner: rows[0] ? { name: rows[0].name, score: rows[0].score } : null,
     avgRight: rows.length && asked ? Math.round(rows.reduce((t, r) => t + r.right, 0) / rows.length / asked * 100) : 0,
@@ -177,6 +191,7 @@ function cleanQuestion(ctx, q, i) {
   (Array.isArray(q.answers) ? q.answers : []).slice(0, 4).forEach((a, k) => { const v = line(a, 160); if (v) kept.push({ v, ok: marks.has(k) }); });
   if (type === 'tf' && kept.length !== 2) throw new ctx.HttpError(400, where + 'a True / False question has exactly two answers.');
   if (kept.length < 2) throw new ctx.HttpError(400, where + 'give at least two answers.');
+  if (new Set(kept.map((x) => x.v.toLowerCase())).size !== kept.length) throw new ctx.HttpError(400, where + 'two answers are the same.');
   const correct = kept.map((x, k) => (x.ok ? k : -1)).filter((k) => k >= 0);
   if (!correct.length) throw new ctx.HttpError(400, where + 'mark the right answer.');
   return {
@@ -206,7 +221,7 @@ async function getQuiz(ctx, id) {
   const q = (await keepKv(ctx).get([K.quiz + id])).get(K.quiz + id);
   return q && Array.isArray(q.questions) ? q : null;
 }
-const lightLive = (s, now) => ({ pin: s.pin, sid: s.sid, quizId: s.quizId, title: s.title, subject: s.subject, phase: phaseOf(s, now), q: s.q, n: s.n, count: s.count || 0, host: s.host, createdAt: s.createdAt, startedAt: s.startedAt || null });
+const lightLive = (s, now) => ({ pin: s.pin, sid: s.sid, quizId: s.quizId, title: s.title, subject: s.subject, mode: s.mode || 'classic', phase: phaseOf(s, now), q: s.q, n: s.n, count: s.count || 0, host: s.host, createdAt: s.createdAt, startedAt: s.startedAt || null });
 
 /* ───────── wrong PINs: at most 25 in 10 minutes from one address (a classroom shares one address: right PINs never count) ───────── */
 const misses = new Map();
@@ -228,6 +243,29 @@ async function playerOf(ctx, req) {
   if (!s || s.sid !== t.sid) return { t, s: null, p: null, pkey };
   return { t, s, p: m.get(pkey) || null, pkey };
 }
+const timing = (s) => ({ auto: s.auto !== false, revealMs: REVEAL_MS, boardMs: BOARD_MS });
+
+/* what a player's screen shows now */
+function playerView(s, me, qs, now) {
+  const ph = phaseOf(s, now); const mode = s.mode || 'classic';
+  const q = s.q >= 0 ? qs[s.q] : null; const mine = q && me.a ? me.a[s.q] || null : null;
+  const open = ph === 'ready' || ph === 'answer';   // while the clock runs the score and streak are the ones before this question
+  const out = {
+    now, phase: ph, mode, title: s.title, subject: s.subject, q: s.q, n: s.n, openAt: s.openAt, endsAt: s.endsAt, phaseAt: phaseStart(s, ph), ...timing(s),
+    you: { name: me.name, score: (me.score || 0) - (open && mine ? mine.pts || 0 : 0), streak: open ? null : me.streak || 0,
+      rank: s.ranksAt === s.q || ph === 'final' ? (s.ranks || {})[me.pid] || null : null, players: s.count || null }
+  };
+  const bh = (s.ranksAt === s.q || ph === 'final') && s.behind ? s.behind[me.pid] : null;
+  if (bh && (ph === 'scoreboard' || ph === 'final')) out.you.behind = { points: bh[0], name: bh[1] };
+  if (q && (open || ph === 'reveal')) {
+    out.question = { type: q.type, count: q.answers.length, time: q.time, points: q.points };
+    if (mode === 'phone' || ph === 'reveal') Object.assign(out.question, { text: q.text, image: q.image, answers: q.answers });   // classic: only the shapes on the phones
+  }
+  if (q && open) out.answered = mine ? { c: mine.c } : null;
+  if (q && (ph === 'reveal' || ph === 'scoreboard' || ph === 'final')) out.result = { answered: !!mine, c: mine ? mine.c : null, ok: !!(mine && mine.ok), pts: mine ? mine.pts : 0, correct: q.correct, correctText: q.correct.map((i) => q.answers[i]), chosenText: mine ? q.answers[mine.c] || '' : '' };
+  if (ph === 'final') out.top = (s.top || []).slice(0, 3).map((x) => ({ name: x.name, score: x.score }));
+  return out;
+}
 
 /* ───────── students: /api/game/* ───────── */
 async function route(req, res, p, method, url, ctx) {
@@ -242,7 +280,7 @@ async function route(req, res, p, method, url, ctx) {
     if (s.phase === 'final') throw new HttpError(410, 'This game has ended.');
     if (s.locked) throw new HttpError(423, 'The host has locked this game.');
     const u = await ctx.currentUser(req).catch(() => null);
-    return send(res, 200, { pin, title: s.title, subject: s.subject, started: s.phase !== 'lobby', name: u ? line(u.name, 20) : '' });
+    return send(res, 200, { pin, title: s.title, subject: s.subject, mode: s.mode || 'classic', started: s.phase !== 'lobby', name: u ? line(u.name, 20) : '' });
   }
 
   if (p === '/api/game/join' && method === 'POST') {
@@ -251,18 +289,16 @@ async function route(req, res, p, method, url, ctx) {
     const b = await readJson(req, 2048); const pin = String(b.pin || '').replace(/\D/g, '');
     const name = line(b.name, 20);
     if (!name) throw new HttpError(400, 'Please enter a nickname.');
-    const s = await liveOf(ctx, pin);
+    const [s, players, u] = await Promise.all([liveOf(ctx, pin), playersOf(ctx, pin), ctx.currentUser(req).catch(() => null)]);
     if (!s) { pinGuard(ctx, req, true); throw new HttpError(404, 'No game with this PIN. Check the number on the screen.'); }
     if (s.phase === 'final') throw new HttpError(410, 'This game has ended.');
     if (s.locked) throw new HttpError(423, 'The host has locked this game.');
-    const players = await playersOf(ctx, pin);
     if (players.length >= MAX_PLAYERS) throw new HttpError(409, 'This game is full.');
     if (players.some((x) => String(x.name).toLowerCase() === name.toLowerCase())) throw new HttpError(409, 'Somebody already uses this nickname in this game. Try another one.');
-    const u = await ctx.currentUser(req).catch(() => null);
     const pid = crypto.randomBytes(6).toString('hex');
     await liveKv(ctx).set(K.player + pin + ':' + pid, { pid, name, userId: u ? u.id : null, joinedAt: iso(), score: 0, streak: 0, a: {} });
     const token = ctx.purposeToken('game', { pin, sid: s.sid, pid }, TOKEN_MS);
-    return send(res, 200, { token, pid, name, pin, title: s.title, subject: s.subject });
+    return send(res, 200, { token, pid, name, pin, title: s.title, subject: s.subject, mode: s.mode || 'classic' });
   }
 
   if (p === '/api/game/state' && method === 'GET') {
@@ -270,20 +306,8 @@ async function route(req, res, p, method, url, ctx) {
     ctx.rateLimit('gamestate:' + t.pid, 400, 60000);
     if (!s) return send(res, 200, { phase: 'gone', now: Date.now() });
     if (!me) return send(res, 200, { phase: 'kicked', now: Date.now(), title: s.title });
-    const now = Date.now(); const ph = phaseOf(s, now);
     const qs = s.q >= 0 ? await questionsOf(ctx, s) : [];
-    const q = s.q >= 0 ? qs[s.q] : null; const mine = q && me.a ? me.a[s.q] || null : null;
-    const fresh = s.ranksAt === s.q;
-    const open = ph === 'ready' || ph === 'answer';   // while the clock runs the score and streak are the ones before this question (they would tell right or wrong)
-    const out = {
-      now, phase: ph, title: s.title, subject: s.subject, q: s.q, n: s.n, openAt: s.openAt, endsAt: s.endsAt,
-      you: { name: me.name, score: (me.score || 0) - (open && mine ? mine.pts || 0 : 0), streak: open ? null : me.streak || 0, rank: fresh || ph === 'final' ? (s.ranks || {})[me.pid] || null : null, players: s.count || null }
-    };
-    if (q && (ph === 'ready' || ph === 'answer' || ph === 'reveal')) out.question = { type: q.type, text: q.text, image: q.image, answers: q.answers, time: q.time, points: q.points };
-    if (q && (ph === 'answer' || ph === 'ready')) out.answered = mine ? { c: mine.c } : null;
-    if (q && (ph === 'reveal' || ph === 'scoreboard' || ph === 'final')) out.result = { answered: !!mine, c: mine ? mine.c : null, ok: !!(mine && mine.ok), pts: mine ? mine.pts : 0, correct: q.correct, correctText: q.correct.map((i) => q.answers[i]) };
-    if (ph === 'final') out.top = (s.top || []).slice(0, 3).map((x) => ({ name: x.name, score: x.score }));
-    return send(res, 200, out);
+    return send(res, 200, playerView(s, me, qs, Date.now()));
   }
 
   if (p === '/api/game/answer' && method === 'POST') {
@@ -319,19 +343,23 @@ async function route(req, res, p, method, url, ctx) {
 }
 
 /* ───────── admins: /api/admin/games* ───────── */
-async function hostState(ctx, s) {
+function hostState(s, qs, players) {
   const now = Date.now(); const ph = phaseOf(s, now);
-  const qs = await questionsOf(ctx, s);
-  const players = ranked(await playersOf(ctx, s.pin));
+  players = ranked(players);
   const q = s.q >= 0 ? qs[s.q] : null;
   const shown = ph === 'reveal' || ph === 'scoreboard' || ph === 'final';
   const st = q ? questionStats(q, s.q, players) : { counts: [], right: 0, answered: 0 };
+  const fresh = s.ranksAt === s.q;
   return {
-    now, pin: s.pin, sid: s.sid, quizId: s.quizId, title: s.title, subject: s.subject, host: s.host, phase: ph, q: s.q, n: s.n || qs.length,
-    openAt: s.openAt, endsAt: s.endsAt, locked: !!s.locked, last: s.q >= qs.length - 1,
+    now, pin: s.pin, sid: s.sid, quizId: s.quizId, title: s.title, subject: s.subject, mode: s.mode || 'classic', host: s.host, phase: ph, q: s.q, n: s.n || qs.length,
+    openAt: s.openAt, endsAt: s.endsAt, phaseAt: phaseStart(s, ph), ...timing(s), locked: !!s.locked, last: s.q >= qs.length - 1,
     question: q ? { type: q.type, text: q.text, image: q.image, answers: q.answers, time: q.time, points: q.points, correct: shown ? q.correct : undefined } : null,
     answered: st.answered, dist: shown ? st.counts : null, right: shown ? st.right : null,
-    players: players.map((x, i) => { const a = q && x.a ? x.a[s.q] : null; return { pid: x.pid, name: x.name, score: (x.score || 0) - (!shown && a ? a.pts || 0 : 0), rank: i + 1, answered: !!a, ok: shown ? !!(a && a.ok) : undefined, gain: shown && a ? a.pts : 0, streak: shown ? x.streak || 0 : null }; }),
+    players: players.map((x, i) => {
+      const a = q && x.a ? x.a[s.q] : null; const was = fresh ? (s.prevRanks || {})[x.pid] : null;
+      return { pid: x.pid, name: x.name, score: (x.score || 0) - (!shown && a ? a.pts || 0 : 0), rank: i + 1, answered: !!a, ok: shown ? !!(a && a.ok) : undefined,
+        c: shown && a ? a.c : undefined, ms: shown && a ? a.ms : undefined, gain: shown && a ? a.pts : 0, streak: shown ? x.streak || 0 : null, move: was ? was - (i + 1) : 0 };
+    }),
     top: s.top || []
   };
 }
@@ -350,7 +378,7 @@ async function adminRoute(req, res, p, method, url, ctx) {
     quizzes.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
     reports.sort((a, b) => String(b.endedAt).localeCompare(String(a.endedAt)));
     const subjects = [...new Set(SUBJECTS.concat(quizzes.map((q) => q.subject).filter(Boolean)))];
-    return send(res, 200, { quizzes, live, reports, subjects, limits: { questions: MAX_QUESTIONS, players: MAX_PLAYERS, times: TIMES } });
+    return send(res, 200, { quizzes, live, reports, subjects, modes: MODES, limits: { questions: MAX_QUESTIONS, players: MAX_PLAYERS, times: TIMES } });
   }
   if (p === '/api/admin/games' && method === 'POST') {
     const b = await readJson(req, 400 * 1024);
@@ -363,13 +391,15 @@ async function adminRoute(req, res, p, method, url, ctx) {
 
   let m = p.match(/^\/api\/admin\/games\/live\/(\d{6})$/);
   if (m) {
-    const pin = m[1]; const s = await liveOf(ctx, pin);
+    const pin = m[1];
     if (method === 'GET') {
+      const [s, players] = await Promise.all([liveOf(ctx, pin), playersOf(ctx, pin)]);   // one round trip
       if (!s) throw new HttpError(404, 'This game is over or was closed.');
-      return send(res, 200, await hostState(ctx, s));
+      return send(res, 200, hostState(s, await questionsOf(ctx, s), players));
     }
     if (method !== 'POST') throw new HttpError(405, 'Method not allowed.');
     const b = await readJson(req, 4096);
+    let [s, players] = await Promise.all([liveOf(ctx, pin), playersOf(ctx, pin)]);
     if (!s) { if (b.action === 'close') return send(res, 200, { closed: true }); throw new HttpError(404, 'This game is over or was closed.'); }
     const kv = liveKv(ctx); const now = Date.now(); const ph = phaseOf(s, now);
     const conflict = () => { throw new HttpError(409, 'The game has already moved on.'); };
@@ -377,41 +407,37 @@ async function adminRoute(req, res, p, method, url, ctx) {
     const qs = await questionsOf(ctx, s);
     if (!qs.length) throw new HttpError(500, 'The questions of this game could not be read. Close it and start it again.');
     switch (b.action) {
-      case 'start': {
+      case 'start':
         if (s.phase !== 'lobby') conflict();
-        const players = await playersOf(ctx, pin);
         if (!players.length) throw new HttpError(400, 'Wait until at least one player has joined.');
         s.startedAt = iso(); s.count = players.length; goQuestion(s, 0, qs, now);
         try { const quiz = await getQuiz(ctx, s.quizId); if (quiz) await keep.set(K.quiz + quiz.id, { ...quiz, plays: (quiz.plays || 0) + 1, lastPlayedAt: iso() }); } catch (e) { /* only the counter */ }
         break;
-      }
       case 'reveal':   // everybody answered, or the host skips the rest of the time
         if (ph !== 'ready' && ph !== 'answer') conflict();
         s.endsAt = now; s.openAt = Math.min(s.openAt, now); s.early = true;
         break;
-      case 'next':
+      case 'next':     // the right answer -> the ranking -> the next question (or the podium after the last one)
         if (ph === 'reveal') {
-          const players = await playersOf(ctx, pin);
-          Object.assign(s, standings(s, players));
-          if (s.q + 1 >= qs.length) { s.phase = 'final'; await saveReport(ctx, s, qs, players); }
-          else s.phase = 'scoreboard';
+          Object.assign(s, standings(s, players)); s.phaseAt = now;
+          if (s.q + 1 >= qs.length) { s.phase = 'final'; await saveReport(ctx, s, qs, players); } else s.phase = 'scoreboard';
         } else if (ph === 'scoreboard') goQuestion(s, s.q + 1, qs, now);
         else conflict();
         break;
-      case 'end': {
+      case 'end':
         if (ph === 'final') conflict();
         if (s.q < 0) { await dropGame(ctx, pin); await ctx.audit(admin, 'game.close', s.title, { pin }); return send(res, 200, { closed: true }); }
-        const players = await playersOf(ctx, pin);
         if (s.phase === 'question') { s.endsAt = Math.min(s.endsAt, now); s.openAt = Math.min(s.openAt, s.endsAt); s.early = true; }
-        Object.assign(s, standings(s, players)); s.phase = 'final';
+        Object.assign(s, standings(s, players)); s.phase = 'final'; s.phaseAt = now;
         await saveReport(ctx, s, qs, players);
         break;
-      }
+      case 'auto': s.auto = !!b.auto; break;
       case 'lock': s.locked = !!b.locked; break;
       case 'kick':
         if (!PID_RE.test(String(b.pid || ''))) throw new HttpError(400, 'Unknown player.');
         await kv.del(K.player + pin + ':' + b.pid);
-        return send(res, 200, { ok: true });
+        players = players.filter((x) => x.pid !== b.pid);
+        return send(res, 200, hostState(s, qs, players));
       case 'close':
         await dropGame(ctx, pin);
         await ctx.audit(admin, 'game.close', s.title, { pin });
@@ -420,7 +446,7 @@ async function adminRoute(req, res, p, method, url, ctx) {
     }
     s.t = iso();
     await kv.set(K.live + pin, s);
-    return send(res, 200, { ok: true, phase: phaseOf(s, Date.now()), q: s.q });
+    return send(res, 200, hostState(s, qs, players));   // the screen draws the new state at once (no second request)
   }
 
   m = p.match(/^\/api\/admin\/games\/reports\/([a-f0-9]{16})$/);
@@ -456,6 +482,8 @@ async function adminRoute(req, res, p, method, url, ctx) {
     }
     if (m[2] === 'host' && method === 'POST') {
       ctx.rateLimit('gamehost:' + admin.id, 30, 10 * 60000);
+      const b = await readJson(req, 1024);
+      const mode = MODES.includes(b.mode) ? b.mode : 'classic';
       const live = await sweep(ctx); const kv = liveKv(ctx);
       let pin = '';
       for (let i = 0; i < 30 && !pin; i++) { const c = String(crypto.randomInt(100000, 1000000)); if (!live.some((s) => s.pin === c) && !(await liveOf(ctx, c))) pin = c; }
@@ -463,15 +491,15 @@ async function adminRoute(req, res, p, method, url, ctx) {
       const sid = crypto.randomBytes(8).toString('hex'); const now = iso();
       await kv.delPrefix(K.player + pin + ':');
       await kv.set(K.qs + pin, { sid, qs: cur.questions });
-      const s = { sid, pin, quizId: cur.id, title: cur.title, subject: cur.subject, host: { id: admin.id, name: line(admin.name || admin.email, 60) }, n: cur.questions.length,
-        phase: 'lobby', q: -1, openAt: 0, endsAt: 0, early: false, locked: false, ranks: {}, top: [], count: 0, ranksAt: -1, createdAt: now, startedAt: null, t: now };
+      const s = { sid, pin, quizId: cur.id, title: cur.title, subject: cur.subject, mode, auto: b.auto !== false, host: { id: admin.id, name: line(admin.name || admin.email, 60) }, n: cur.questions.length,
+        phase: 'lobby', q: -1, openAt: 0, endsAt: 0, phaseAt: Date.now(), early: false, locked: false, ranks: {}, prevRanks: {}, top: [], count: 0, ranksAt: -1, createdAt: now, startedAt: null, t: now };
       await kv.set(K.live + pin, s);
-      await ctx.audit(admin, 'game.host', cur.title, { pin });
-      return send(res, 201, { pin, sid });
+      await ctx.audit(admin, 'game.host', cur.title, { pin, mode });
+      return send(res, 201, { pin, sid, mode });
     }
     throw new HttpError(405, 'Method not allowed.');
   }
   throw new HttpError(404, 'Not found.');
 }
 
-module.exports = { route, adminRoute, _test: { pointsFor, phaseOf, standings, cleanQuiz, LEAD_MS, mem } };
+module.exports = { route, adminRoute, _test: { pointsFor, phaseOf, standings, cleanQuiz, playerView, LEAD_MS, REVEAL_MS, BOARD_MS, mem } };

@@ -1,6 +1,6 @@
 /*
  * IELTSX Game -- the words of the player page (/game) and the host screen (/game-host) in Uzbek, English and Russian.
- * The language button (top right) switches them; the choice is kept in this browser.
+ * The language button (top right) switches them; the choice is kept in this browser. Uzbek first.
  */
 (function () {
   'use strict';
@@ -11,9 +11,10 @@
       nickLabel: 'Ismingiz', nickPh: 'Ismingizni yozing', go: 'Boshladik!', nickBad: 'Ismingizni yozing', nickTaken: 'Bu ism band. Boshqa ism tanlang.',
       lockedJoin: 'Boshlovchi oʻyinga kirishni yopib qoʻydi.', full: 'Oʻyin toʻldi.',
       youreIn: 'Siz oʻyindasiz!', seeName: 'Ismingizni ekranda koʻryapsizmi?', waitStart: 'Boshlovchi oʻyinni boshlashini kuting…', leave: 'Chiqish',
-      qOf: '{n}-savol · jami {m}', getReady: 'Tayyorlaning…', sent: 'Javob yuborildi!', waitOthers: 'Boshqalarni kutyapmiz…',
-      correct: 'Toʻgʻri!', wrong: 'Notoʻgʻri', timeUp: 'Vaqt tugadi', rightWas: 'Toʻgʻri javob:', streak: 'Ketma-ket {n} ta toʻgʻri 🔥',
-      score: 'Ball', yourPlace: 'oʻrningiz', ofPlayers: '{n} oʻyinchidan', finalScore: 'Yakuniy ball', playAgain: 'Yana oʻynash', backSite: 'IELTSX ga qaytish',
+      qOf: '{n}-savol · jami {m}', getReady: 'Tayyorlaning…', lookScreen: 'Savolni ekrandan oʻqing!', sent: 'Javob yuborildi!', waitOthers: 'Boshqalarni kutyapmiz…',
+      correct: 'Toʻgʻri!', wrong: 'Notoʻgʻri', timeUp: 'Vaqt tugadi', rightWas: 'Toʻgʻri javob:', youChose: 'Siz tanladingiz:', streak: 'Ketma-ket {n} ta toʻgʻri 🔥',
+      score: 'Ball', yourPlace: 'oʻrningiz', ofPlayers: '{n} oʻyinchidan', behind: '{name} dan {n} ball orqadasiz', leader: 'Siz birinchisiz! 👑',
+      finalScore: 'Yakuniy ball', playAgain: 'Yana oʻynash', backSite: 'IELTSX ga qaytish',
       gone: 'Bu oʻyin tugadi.', kicked: 'Boshlovchi sizni oʻyindan chiqardi.', offline: 'Aloqa uzildi. Qayta ulanmoqda…',
       double: 'Ikki barobar ball!', noPoints: 'Ballsiz savol', answersN: 'javob', joinAt: 'Telefoningizda oching:', gamePin: 'Oʻyin PIN kodi:',
       playersN: 'oʻyinchi', start: 'Boshlash', next: 'Keyingi', skip: 'Oʻtkazib yuborish', scoreboard: 'Reyting', endGame: 'Oʻyinni tugatish',
@@ -23,6 +24,8 @@
       toAdmin: 'Admin panelga qaytish', csv: 'Natijalarni yuklab olish (CSV)', allResults: 'Barcha natijalar', points: 'ball',
       answeredOf: '{a} / {p} javob berdi', rightOf: '{p} tadan {a} tasi toʻgʻri javob berdi', removeQ: '{name} oʻyindan chiqarilsinmi?', endQ: 'Oʻyin hozir tugatilsinmi? Natijalar saqlanadi.', closeQ: 'Oʻyin yopilsinmi? Oʻyinchilar oʻyindan chiqadi.',
       needPlayer: 'Kamida bitta oʻyinchi qoʻshilishini kuting.', rank: '#', player: 'Oʻyinchi', right: 'Toʻgʻri', sec: 's',
+      modeClassic: 'Klassik: savol faqat ekranda', modePhone: 'Telefonda: savol har bir telefonda', auto: 'Avto', autoOnHint: 'Oʻyin oʻzi davom etadi', autoOffHint: 'Keyingi bosqich tugma bilan',
+      fastest: 'Eng tez', nextIn: 'Keyingisi: {n} s', nextQuestion: 'Keyingi savol', results: 'Natijalar',
       title: 'IELTSX Game', tagline: 'Sinf bilan jonli viktorina'
     },
     en: {
@@ -31,9 +34,10 @@
       nickLabel: 'Nickname', nickPh: 'Your name', go: 'OK, go!', nickBad: 'Enter a nickname', nickTaken: 'This nickname is taken. Try another one.',
       lockedJoin: 'The host has locked this game.', full: 'This game is full.',
       youreIn: "You're in!", seeName: 'See your nickname on screen?', waitStart: 'Waiting for the host to start…', leave: 'Leave',
-      qOf: 'Question {n} of {m}', getReady: 'Get ready…', sent: 'Answer sent!', waitOthers: 'Waiting for the others…',
-      correct: 'Correct!', wrong: 'Incorrect', timeUp: "Time's up", rightWas: 'Right answer:', streak: 'Answer streak {n} 🔥',
-      score: 'Score', yourPlace: 'your place', ofPlayers: 'of {n} players', finalScore: 'Final score', playAgain: 'Play again', backSite: 'Back to IELTSX',
+      qOf: 'Question {n} of {m}', getReady: 'Get ready…', lookScreen: 'Read the question on the screen!', sent: 'Answer sent!', waitOthers: 'Waiting for the others…',
+      correct: 'Correct!', wrong: 'Incorrect', timeUp: "Time's up", rightWas: 'Right answer:', youChose: 'You chose:', streak: 'Answer streak {n} 🔥',
+      score: 'Score', yourPlace: 'your place', ofPlayers: 'of {n} players', behind: '{n} points behind {name}', leader: "You're in the lead! 👑",
+      finalScore: 'Final score', playAgain: 'Play again', backSite: 'Back to IELTSX',
       gone: 'This game has ended.', kicked: 'The host removed you from this game.', offline: 'Connection lost. Reconnecting…',
       double: 'Double points!', noPoints: 'No points', answersN: 'answers', joinAt: 'Join on your phone at', gamePin: 'Game PIN:',
       playersN: 'players', start: 'Start', next: 'Next', skip: 'Skip', scoreboard: 'Scoreboard', endGame: 'End game',
@@ -43,6 +47,8 @@
       toAdmin: 'Back to the admin panel', csv: 'Download results (CSV)', allResults: 'All results', points: 'points',
       answeredOf: '{a} of {p} answered', rightOf: '{a} of {p} got it right', removeQ: 'Remove {name} from the game?', endQ: 'End the game now? The results are kept.', closeQ: 'Close the game? The players leave it.',
       needPlayer: 'Wait until at least one player has joined.', rank: '#', player: 'Player', right: 'Right', sec: 's',
+      modeClassic: 'Classic: the question only on the screen', modePhone: 'On every phone: the question on the phones too', auto: 'Auto', autoOnHint: 'The game moves on by itself', autoOffHint: 'Each step with the button',
+      fastest: 'Fastest', nextIn: 'Next in {n} s', nextQuestion: 'Next question', results: 'Results',
       title: 'IELTSX Game', tagline: 'Live quiz with your class'
     },
     ru: {
@@ -51,9 +57,10 @@
       nickLabel: 'Никнейм', nickPh: 'Ваше имя', go: 'Поехали!', nickBad: 'Введите никнейм', nickTaken: 'Это имя уже занято. Выберите другое.',
       lockedJoin: 'Ведущий закрыл вход в игру.', full: 'Игра заполнена.',
       youreIn: 'Вы в игре!', seeName: 'Видите своё имя на экране?', waitStart: 'Ждём, когда ведущий начнёт…', leave: 'Выйти',
-      qOf: 'Вопрос {n} из {m}', getReady: 'Приготовьтесь…', sent: 'Ответ отправлен!', waitOthers: 'Ждём остальных…',
-      correct: 'Верно!', wrong: 'Неверно', timeUp: 'Время вышло', rightWas: 'Правильный ответ:', streak: 'Серия верных ответов: {n} 🔥',
-      score: 'Очки', yourPlace: 'ваше место', ofPlayers: 'из {n} игроков', finalScore: 'Итоговый счёт', playAgain: 'Играть снова', backSite: 'Назад в IELTSX',
+      qOf: 'Вопрос {n} из {m}', getReady: 'Приготовьтесь…', lookScreen: 'Читайте вопрос на экране!', sent: 'Ответ отправлен!', waitOthers: 'Ждём остальных…',
+      correct: 'Верно!', wrong: 'Неверно', timeUp: 'Время вышло', rightWas: 'Правильный ответ:', youChose: 'Ваш ответ:', streak: 'Серия верных ответов: {n} 🔥',
+      score: 'Очки', yourPlace: 'ваше место', ofPlayers: 'из {n} игроков', behind: 'на {n} очков позади {name}', leader: 'Вы лидируете! 👑',
+      finalScore: 'Итоговый счёт', playAgain: 'Играть снова', backSite: 'Назад в IELTSX',
       gone: 'Эта игра завершена.', kicked: 'Ведущий удалил вас из игры.', offline: 'Нет связи. Переподключаемся…',
       double: 'Двойные очки!', noPoints: 'Без очков', answersN: 'ответов', joinAt: 'Откройте на телефоне', gamePin: 'PIN-код игры:',
       playersN: 'игроков', start: 'Начать', next: 'Далее', skip: 'Пропустить', scoreboard: 'Таблица лидеров', endGame: 'Завершить игру',
@@ -63,12 +70,14 @@
       toAdmin: 'Назад в админ-панель', csv: 'Скачать результаты (CSV)', allResults: 'Все результаты', points: 'очков',
       answeredOf: 'ответили {a} из {p}', rightOf: 'верно ответили {a} из {p}', removeQ: 'Удалить {name} из игры?', endQ: 'Завершить игру сейчас? Результаты сохранятся.', closeQ: 'Закрыть игру? Игроки выйдут из неё.',
       needPlayer: 'Дождитесь хотя бы одного игрока.', rank: '#', player: 'Игрок', right: 'Верно', sec: 'с',
+      modeClassic: 'Классика: вопрос только на экране', modePhone: 'На телефонах: вопрос на каждом телефоне', auto: 'Авто', autoOnHint: 'Игра идёт сама', autoOffHint: 'Каждый шаг кнопкой',
+      fastest: 'Быстрее всех', nextIn: 'Далее через {n} с', nextQuestion: 'Следующий вопрос', results: 'Результаты',
       title: 'IELTSX Game', tagline: 'Живая викторина с классом'
     }
   };
   var LANGS = ['uz', 'en', 'ru'];
   var lang = 'uz';
-  try { var saved = localStorage.getItem('ix-game-lang'); if (LANGS.indexOf(saved) >= 0) lang = saved;   /* Uzbek first; the button switches */ } catch (e) { /* storage blocked */ }
+  try { var saved = localStorage.getItem('ix-game-lang'); if (LANGS.indexOf(saved) >= 0) lang = saved; } catch (e) { /* storage blocked */ }
 
   function t(key, vars) {
     var s = (T[lang] && T[lang][key]) || T.en[key] || key;

@@ -507,7 +507,27 @@
     },
     {
       "source": "/favicon.ico",
-      "destination": "/assets/ieltsx-mark.png"
+      "destination": "/api"
+    },
+    {
+      "source": "/favicon.png",
+      "destination": "/api"
+    },
+    {
+      "source": "/icon.png",
+      "destination": "/api"
+    },
+    {
+      "source": "/apple-touch-icon.png",
+      "destination": "/api"
+    },
+    {
+      "source": "/apple-touch-icon-precomposed.png",
+      "destination": "/api"
+    },
+    {
+      "source": "/logo.png",
+      "destination": "/api"
     },
     {
       "source": "/sitemap.xml",

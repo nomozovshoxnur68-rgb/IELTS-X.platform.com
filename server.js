@@ -279,10 +279,10 @@ const store = {
     }
     const v = loadDb().settings[key]; return v === undefined ? null : v;
   },
-  async setSetting(key, value) {
+  async setSetting(key, value, opts) {   // opts.minimal: the database does not send the row back (the live game rows, written often)
     memoClear('set:' + key);
     if (USE_SUPABASE) {
-      await sb('ieltsx_settings?on_conflict=key', { method: 'POST', headers: { ...jsonHeaders, Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ key, value, updatedAt: new Date().toISOString() }) });
+      await sb('ieltsx_settings?on_conflict=key', { method: 'POST', headers: { ...jsonHeaders, Prefer: 'resolution=merge-duplicates,return=' + (opts && opts.minimal ? 'minimal' : 'representation') }, body: JSON.stringify({ key, value, updatedAt: new Date().toISOString() }) });
       memoClear('set:' + key);   // a read made while it was being saved kept the old value
       return value;
     }
@@ -304,9 +304,9 @@ const store = {
     if (!SETTING_KEY_RE.test(prefix)) return [];
     const f = Array.isArray(fields) ? fields.filter((x) => /^[a-zA-Z]{1,30}$/.test(x)) : null;
     if (USE_SUPABASE) {
-      const sel = f ? 'key,' + f.map((x) => `${x}:value->${x}`).join(',') : 'key,value';
+      const sel = f ? 'key,' + f.map((x) => `v_${x}:value->${x}`).join(',') : 'key,value';   // v_ in front: a field called "count" is never read as the count() function
       const rows = (await sb(`ieltsx_settings?select=${sel}&key=like.${eq(prefix)}*&order=updatedAt.desc&limit=${Math.min(5000, limit)}`)) || [];
-      return f ? rows.map((r) => { const v = {}; f.forEach((x) => { v[x] = r[x] === undefined ? null : r[x]; }); return { key: r.key, value: v }; }) : rows;
+      return f ? rows.map((r) => { const v = {}; f.forEach((x) => { v[x] = r['v_' + x] === undefined ? null : r['v_' + x]; }); return { key: r.key, value: v }; }) : rows;
     }
     const s = loadDb().settings;
     return Object.keys(s).filter((k) => k.startsWith(prefix)).slice(0, limit).map((k) => {
@@ -2035,6 +2035,52 @@ async function staticFile(req, res, pathname) {
   return serveFile(req, res, file, extra);
 }
 
+/* ───────────────────────── the site logo at fixed addresses ─────────────────────────
+   /favicon.ico, /favicon.png, /icon.png, /apple-touch-icon.png -> the square icon chosen in Admin -> Logo (or the logo);
+   /logo.png -> the wide logo. Browsers, Google (the icon next to the site in the search results), link previews and
+   the structured data of the home page ask for these fixed addresses, so a new logo reaches them without changing any
+   page; nothing chosen = the built-in files. On Vercel these addresses are sent here (vercel.json). */
+const BRAND_FILES = { icon: 'assets/ieltsx-mark.png', logo: 'assets/ieltsx-logo-transparent.png' };
+const brandCache = new Map();
+async function brandBytes(src) {
+  const hit = brandCache.get(src);
+  if (hit && Date.now() - hit.t < 10 * 60000) return hit;
+  let out = null;
+  const media = /^\/api\/media\/([A-Za-z0-9_-]{8,40})$/.exec(src);
+  if (media) {
+    const rec = await store.getSetting('media:' + media[1]).catch(() => null);
+    if (rec && rec.b64 && /^image\//.test(rec.mime || '')) out = { type: rec.mime, buf: Buffer.from(rec.b64, 'base64') };
+  } else if (/^\/(uploads|assets)\//.test(src) && !src.includes('..')) {
+    const base = src.startsWith('/uploads/') ? UPLOAD_DIR : ROOT;
+    const f = path.resolve(base, '.' + decodeURIComponent(src.replace(/^\/uploads/, '')));
+    const type = MIME[path.extname(f).toLowerCase()];
+    if (f.startsWith(path.resolve(base) + path.sep) && /^image\//.test(type || '') && fs.existsSync(f) && fs.statSync(f).isFile()) out = { type, buf: fs.readFileSync(f) };
+  } else if (SUPABASE_URL && src.startsWith(SUPABASE_URL + '/storage/v1/object/public/')) {   // an upload kept in Supabase Storage
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 5000);
+    try {
+      const r = await fetch(src, { signal: ctl.signal });
+      const type = String(r.headers.get('content-type') || '').split(';')[0];
+      if (r.ok && /^image\//.test(type)) { const buf = Buffer.from(await r.arrayBuffer()); if (buf.length <= 5 * 1024 * 1024) out = { type, buf }; }
+    } finally { clearTimeout(tm); }
+  } else if (/^https:\/\//i.test(src)) out = { redirect: src };   // a picture on another site: the browser is sent there
+  if (out) { out.t = Date.now(); if (brandCache.size > 20) brandCache.clear(); brandCache.set(src, out); }
+  return out;
+}
+async function brandImage(req, res, kind) {
+  const b = await getBranding();
+  const src = kind === 'logo' ? b.logoUrl || b.iconUrl : b.iconUrl || b.logoUrl;
+  const headers = { 'Cache-Control': 'public, max-age=3600, s-maxage=600, stale-while-revalidate=86400', 'X-Content-Type-Options': 'nosniff',
+    'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox", 'Access-Control-Allow-Origin': '*' };
+  let img = null;
+  try { img = src ? await brandBytes(src) : null; } catch (e) { img = null; }
+  if (img && img.redirect) { res.writeHead(302, { Location: img.redirect, 'Cache-Control': 'public, max-age=600' }); return res.end(); }
+  if (!img) return serveFile(req, res, path.join(ROOT, BRAND_FILES[kind]), headers);
+  const etag = '"' + crypto.createHash('sha1').update(img.buf).digest('hex').slice(0, 20) + '"';
+  if (req.headers['if-none-match'] === etag) { res.writeHead(304, { ETag: etag, ...headers }); return res.end(); }
+  res.writeHead(200, { 'Content-Type': img.type, 'Content-Length': img.buf.length, ETag: etag, ...headers });
+  return res.end(req.method === 'HEAD' ? undefined : img.buf);
+}
+
 /* ───────────────────────── sitemap (public pages only) ───────────────────────── */
 function sitemap(origin) {
   const body = publicUrls().map((u) => {
@@ -2070,6 +2116,8 @@ const requestHandler = async (req, res) => {
     if (url.pathname === '/robots.txt' || url.pathname === '/api/robots') {
       return send(res, 200, `User-agent: *\nDisallow: /admin\nDisallow: /api/\nDisallow: /account.html\nDisallow: /login.html\nDisallow: /uploads/\nAllow: /\n\nSitemap: ${siteUrl(req)}/sitemap.xml\n`, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     }
+    const bi = /^\/(favicon\.ico|favicon\.png|icon\.png|apple-touch-icon(?:-precomposed)?\.png|logo\.png)$/i.exec(url.pathname);
+    if (bi && (req.method === 'GET' || req.method === 'HEAD')) return await brandImage(req, res, /^logo/i.test(bi[1]) ? 'logo' : 'icon');   // the logo of the admin panel at a fixed address (favicon, Google, link previews)
     if (url.pathname === '/sitemap.xml' || url.pathname === '/api/sitemap') {
       return send(res, 200, sitemap(siteUrl(req)), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     }
