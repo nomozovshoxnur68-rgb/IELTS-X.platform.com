@@ -144,6 +144,8 @@ const eq = (v) => encodeURIComponent(String(v));
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isUuid = (v) => UUID_RE.test(String(v || ''));
 const ORDER_REF_RE = /^IX-[A-F0-9]{4,12}$/i;
+/* the keys of the settings the server makes itself (store.getSettings / listSettings / deleteSettings): no LIKE wildcard (% _) */
+const SETTING_KEY_RE = /^[a-z][a-z0-9:-]{2,120}$/i;
 const jsonHeaders = { 'Content-Type': 'application/json' };
 /* Supabase: the reads every page makes (logo, prices, packs, the lists of tests) are kept for a few seconds, so one page
    does not wait for the database again and again. A change made on this server clears them at once; another server
@@ -285,6 +287,44 @@ const store = {
       return value;
     }
     const db = loadDb(); db.settings[key] = value; saveDb(db); return value;
+  },
+  /* several settings in one read, every setting whose key starts with a prefix, and removing them (the quiz games,
+     quiz-game.js). The keys and prefixes are made by the server only ([a-z0-9:-]); "fields" reads only those parts of
+     each value (a list of games without all their questions). */
+  async getSettings(keys) {
+    keys = [...new Set((keys || []).filter((k) => SETTING_KEY_RE.test(k)))];
+    if (!keys.length) return new Map();
+    if (USE_SUPABASE) {
+      const rows = (await sb(`ieltsx_settings?select=key,value&key=in.(${keys.map((k) => eq('"' + k + '"')).join(',')})`)) || [];
+      return new Map(rows.map((r) => [r.key, r.value]));
+    }
+    const s = loadDb().settings; return new Map(keys.filter((k) => s[k] !== undefined).map((k) => [k, s[k]]));
+  },
+  async listSettings(prefix, { fields, limit = 1000 } = {}) {
+    if (!SETTING_KEY_RE.test(prefix)) return [];
+    const f = Array.isArray(fields) ? fields.filter((x) => /^[a-zA-Z]{1,30}$/.test(x)) : null;
+    if (USE_SUPABASE) {
+      const sel = f ? 'key,' + f.map((x) => `${x}:value->${x}`).join(',') : 'key,value';
+      const rows = (await sb(`ieltsx_settings?select=${sel}&key=like.${eq(prefix)}*&order=updatedAt.desc&limit=${Math.min(5000, limit)}`)) || [];
+      return f ? rows.map((r) => { const v = {}; f.forEach((x) => { v[x] = r[x] === undefined ? null : r[x]; }); return { key: r.key, value: v }; }) : rows;
+    }
+    const s = loadDb().settings;
+    return Object.keys(s).filter((k) => k.startsWith(prefix)).slice(0, limit).map((k) => {
+      if (!f) return { key: k, value: s[k] };
+      const v = {}; f.forEach((x) => { v[x] = s[k] && s[k][x] !== undefined ? s[k][x] : null; }); return { key: k, value: v };
+    });
+  },
+  async deleteSetting(key) {
+    if (!SETTING_KEY_RE.test(key)) return false;
+    memoClear('set:' + key);
+    if (USE_SUPABASE) { await sb(`ieltsx_settings?key=eq.${eq(key)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); return true; }
+    const db = loadDb(); if (db.settings[key] === undefined) return false; delete db.settings[key]; saveDb(db); return true;
+  },
+  async deleteSettings(prefix) {
+    if (!SETTING_KEY_RE.test(prefix) || prefix.length < 6) return false;   // never a short prefix that could match other settings
+    if (USE_SUPABASE) { await sb(`ieltsx_settings?key=like.${eq(prefix)}*`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); return true; }
+    const db = loadDb(); const keys = Object.keys(db.settings).filter((k) => k.startsWith(prefix));
+    if (!keys.length) return false; keys.forEach((k) => { delete db.settings[k]; }); saveDb(db); return true;
   }
 };
 
@@ -584,6 +624,9 @@ let aiStoreInst = null;
 let mockCtxInst = null;
 const mockCtx = (extra) => Object.assign(mockCtxInst || (mockCtxInst = { store, currentUser, isAdmin, userLevel, allowsLevel, levelName, send, readJson, rateLimit, HttpError, purposeToken, readPurposeToken,
   sign: (body) => crypto.createHmac('sha256', SESSION_SECRET).update(body).digest(), cookies, isHttps, bandFor, newId, audit, cleanUrl, SECURITY_HEADERS }), extra || {});
+/* live quiz games (quiz-game.js): the quizzes of the admin panel, the host screen, the players */
+let gameCtxInst = null;
+const gameCtx = (extra) => ({ ...(gameCtxInst || (gameCtxInst = { store, currentUser, isAdmin, send, readJson, rateLimit, HttpError, purposeToken, readPurposeToken, audit, cleanUrl, clientIp, USE_SUPABASE })), ...(extra || {}) });
 const aiStore = () => aiStoreInst || (aiStoreInst = require('./ai-store').createAiStore({ USE_SUPABASE, sb, eq, DATA_DIR, HttpError }));
 
 function readBody(req, limit = 100 * 1024) {
@@ -1470,6 +1513,9 @@ async function api(req, res, url) {
   /* ---- Full Mock Tests (mock-tests.js): the cards, starting / resuming / finishing an attempt ---- */
   if (p === '/api/mocks' || p.startsWith('/api/mocks/') || p.startsWith('/api/mock/')) return require('./mock-tests').route(req, res, p, method, url, mockCtx());
 
+  /* ---- live quiz games (quiz-game.js): joining with a PIN, the player's screen, answers (no account needed) ---- */
+  if (p.startsWith('/api/game/')) return require('./quiz-game').route(req, res, p, method, url, gameCtx());
+
   /* ---- the AI check of Writing and Speaking (ai-examiner.js): any signed-in student, within the checks of the plan ---- */
   if (p.startsWith('/api/ai/')) return require('./ai-examiner').route(req, res, p, method, url, { store, currentUser, isAdmin, userLevel, materialRule, accessRules, allowsLevel, send, readJson, readBody, rateLimit, HttpError, UPLOAD_DIR, aiStore: aiStore(),
     mockWritingTask: (u, token, which) => require('./mock-tests').writingTask(mockCtx(), u, token, which) });
@@ -1481,6 +1527,7 @@ async function api(req, res, url) {
     // AI Test Generator (ai-generator.js): admins only, like everything here; it never saves or publishes anything itself
     if (p.startsWith('/api/admin/ai/')) return require('./ai-generator').route(req, res, p, method, { admin, send, readJson, audit, rateLimit, HttpError, UPLOAD_DIR, SUPABASE_URL, MEDIA_BUCKET, IS_VERCEL, USE_SUPABASE, AUDIO_EXT, PDF_EXT });
     if (p === '/api/admin/mocks' || p.startsWith('/api/admin/mocks/')) return require('./mock-tests').adminRoute(req, res, p, method, url, mockCtx({ admin }));
+    if (p === '/api/admin/games' || p.startsWith('/api/admin/games/')) return require('./quiz-game').adminRoute(req, res, p, method, url, gameCtx({ admin }));
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {
@@ -1773,7 +1820,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
@@ -2001,7 +2048,7 @@ function sitemap(origin) {
 /* the public pages: the sitemap, and the search-engine check of the admin Website check (site-check.js) */
 function publicUrls() {
   const urls = new Set(['/', '/Price', '/Predictions', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
-    '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/privacy-policy', '/terms-of-service']);
+    '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/game', '/privacy-policy', '/terms-of-service']);
   for (const dir of ['pessages', 'sections']) {
     try {
       for (const f of fs.readdirSync(path.join(ROOT, dir))) {

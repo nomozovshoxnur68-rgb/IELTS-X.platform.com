@@ -577,3 +577,45 @@ templates plus the bridge to the shell; `reading.js` got the same two mock hooks
 * In the browser the shell still keeps full screen, blocks shortcuts and logs leaving the screen (the count goes to the server).
 
 `npm test`: 52 checks.
+
+## Game: live quiz for every subject (November 2026)
+
+A live classroom quiz with a PIN, for any subject (Huquq, Matematika, IELTS, Tarix …). The teacher shows the host screen on the
+classroom screen, the students play on their phones.
+
+**Admin → Games (live quiz)** (`#games`, `admin-games.js`): **+ New game** → name, subject (pick one or type any other), description,
+card picture, and the questions: **Quiz** (2–4 answers, one or more marked right with ✓) or **True / False**, a time limit
+(5 s – 4 min), points (standard / double / none) and an optional picture. Questions can be moved, copied and deleted, and many can be
+pasted at once with **Import from text** (`1. Question` / `A) …` / `*B) right answer` or a line `Javob: B`, an empty line between
+questions). The games are grouped by subject (tabs), with Duplicate and Delete. **▶ Host live** gives the game a 6-digit **PIN** and
+opens the host screen; **Live now** lists running games (open the host screen again, or close). **Past games** keeps a report of
+every finished game: the ranking, right answers per player and per question, CSV download.
+
+**Host screen** (`/game-host?pin=…`, `game-host.html` + `assets/js/game-host.js`): the join address and the PIN in large type, the
+players appearing (click a name to remove a player, 🔓 lock the game), **Start** → each question is read for 5 s, then the clock and
+the number of answers; when everybody has answered the question closes at once (or **Skip**). Then the right answer with how many chose
+each tile → **Scoreboard** (top 5) → … → the **podium** with all results and the CSV. Space / Enter / → press the big button.
+Full screen button; Uzbek / English / Russian.
+
+**Player page** (`/game`, also **Game** in the site menu under Mock Tests — added for every page by `assets/js/sidebar-links.js`):
+PIN → nickname (the signed-in name is offered) → "You're in" → the four coloured tiles ▲ ◆ ● ■ → right / wrong with the points and the
+streak → the place → the final place and the podium. No account is needed. `/game?pin=123456` fills the PIN. A reload or a locked
+phone comes back to the same game. Uzbek / English / Russian (`assets/js/game-i18n.js`).
+
+**Points**: a right answer gives 1000 at once and 500 at the last moment (x2 for double points, 0 for "no points").
+
+**How it runs** (`quiz-game.js`, server only): no open connection, the pages ask the server about once a second, so it works on Vercel.
+A live game is kept in the settings table in small rows that each have one writer: `game-live:<PIN>` (the state and the clock — the
+host only), `game-qs:<PIN>` (the questions, copied at the start) and `game-p:<PIN>:<player>` (one row per player — only that player),
+so players answering at the same moment never overwrite each other. "Time is up" is worked out from the times in the state; nothing
+runs in the background. Games are kept as `game-quiz:<id>`, reports as `game-report:<id>` (the newest 300). Locally without Supabase the
+live rows stay in memory. Games nobody moved on for 6 hours are removed. **No SQL to run.**
+
+**Safety**: only admins make games and run the host screen; a player is a signed token (HMAC with `SESSION_SECRET`) that names the game
+and the player, so nobody can answer for somebody else; the right answer is never sent to a player before the question closes; the
+points come from the server's own clock, an answer after the time is refused and counts once; the score shown during a question is the
+one before it (it would tell right or wrong). Wrong PINs are limited per address (25 in 10 minutes; right PINs never count, so a
+classroom on one Wi-Fi is fine), nicknames are unique per game, at most 300 players and 100 questions per game. `quiz-game.js` is
+never sent as a file (server + `middleware.js`).
+
+`npm test`: 53 checks.

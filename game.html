@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>IELTSX Game — enter the PIN</title>
+<meta name="description" content="Join a live IELTSX quiz game: type the game PIN from the screen and answer on your phone.">
+<meta property="og:title" content="IELTSX Game">
+<meta property="og:description" content="Join a live quiz game: type the game PIN from the screen and answer on your phone.">
+<meta name="theme-color" content="#2b0a45">
+<link rel="icon" href="/assets/ieltsx-mark.png">
+<link rel="stylesheet" href="/assets/css/game.css">
+</head>
+<body class="gp">
+<div class="g-bg" aria-hidden="true"><span></span><span></span></div>
+
+<header class="g-top" id="top">
+  <a class="g-brand" href="/"><img src="/assets/ieltsx-mark.png" alt="">IELTSX</a>
+  <button class="g-lang" id="lang-btn" type="button" aria-label="Language / Til / Язык"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> UZ</button>
+</header>
+<div class="g-qbar" id="qbar" hidden><span id="qbar-n"></span><span class="g-timer" id="qbar-t" aria-live="off"></span><span id="qbar-x"></span></div>
+
+<main class="g-main">
+  <!-- 1. the PIN -->
+  <section class="g-screen" id="s-pin">
+    <div class="g-logo">IELTSX Game<small data-t="tagline">Live quiz with your class</small></div>
+    <form class="g-card" id="f-pin" novalidate autocomplete="off">
+      <label for="pin" data-t="pinLabel">Game PIN</label>
+      <input class="g-input" id="pin" name="pin" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" data-t-ph="pinPh" placeholder="Enter PIN" aria-describedby="pin-err">
+      <button class="g-btn" type="submit" data-t="enter">Enter</button>
+      <div class="g-err" id="pin-err" role="alert"></div>
+    </form>
+    <div class="g-foot-links"><a href="/" data-t="backSite">Back to IELTSX</a></div>
+  </section>
+
+  <!-- 2. the nickname -->
+  <section class="g-screen" id="s-name" hidden>
+    <span class="g-subject" id="name-subject"></span>
+    <div class="g-big" id="name-title"></div>
+    <form class="g-card" id="f-name" novalidate autocomplete="off">
+      <label for="nick" data-t="nickLabel">Nickname</label>
+      <input class="g-input" id="nick" name="nick" maxlength="20" data-t-ph="nickPh" placeholder="Your name" aria-describedby="nick-err" autocapitalize="words" spellcheck="false">
+      <button class="g-btn" type="submit" data-t="go">OK, go!</button>
+      <div class="g-err" id="nick-err" role="alert"></div>
+    </form>
+    <button class="g-btn ghost" id="name-back" type="button">←</button>
+  </section>
+
+  <!-- 3. waiting for the start -->
+  <section class="g-screen" id="s-lobby" hidden>
+    <div class="g-big" data-t="youreIn">You're in!</div>
+    <div class="g-sub" data-t="seeName">See your nickname on screen?</div>
+    <div class="g-chip" id="lobby-name"></div>
+    <div class="g-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="g-sub" data-t="waitStart">Waiting for the host to start…</div>
+    <div class="g-game-name"><span class="g-subject" id="lobby-subject"></span> <span id="lobby-title"></span></div>
+    <button class="g-btn ghost" id="lobby-leave" type="button" data-t="leave">Leave</button>
+  </section>
+
+  <!-- 4. the question is read -->
+  <section class="g-screen" id="s-ready" hidden>
+    <div class="g-sub" id="ready-n"></div>
+    <div id="ready-tag"></div>
+    <div class="g-qtext" id="ready-q"></div>
+    <div class="g-progress" aria-hidden="true"><i id="ready-bar"></i></div>
+    <div class="g-sub" data-t="getReady">Get ready…</div>
+  </section>
+
+  <!-- 5. the answer tiles -->
+  <section class="g-screen" id="s-answer" hidden>
+    <div class="g-qtext" id="ans-q"></div>
+    <img class="g-qimg" id="ans-img" alt="" hidden>
+    <div class="g-tiles" id="ans-tiles"></div>
+  </section>
+
+  <!-- 6. answer sent -->
+  <section class="g-screen" id="s-sent" hidden>
+    <div id="sent-shape"></div>
+    <div class="g-big" id="sent-title" data-t="sent">Answer sent!</div>
+    <div class="g-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="g-sub" data-t="waitOthers">Waiting for the others…</div>
+  </section>
+
+  <!-- 7. right or wrong -->
+  <section class="g-screen" id="s-result" hidden>
+    <div class="g-big" id="res-title"></div>
+    <div class="g-mark" id="res-mark" aria-hidden="true"></div>
+    <div class="g-gain" id="res-gain" hidden></div>
+    <div class="g-sub" id="res-streak" hidden></div>
+    <div class="g-sub" id="res-right" hidden></div>
+  </section>
+
+  <!-- 8. the place after a question -->
+  <section class="g-screen" id="s-board" hidden>
+    <div class="g-place" id="board-place"></div>
+    <div class="g-sub" id="board-of"></div>
+    <div class="g-gain" id="board-score"></div>
+  </section>
+
+  <!-- 9. the end -->
+  <section class="g-screen" id="s-final" hidden>
+    <div class="g-sub" id="final-title"></div>
+    <div class="g-place" id="final-place"></div>
+    <div class="g-sub" id="final-of"></div>
+    <div><div class="g-sub" data-t="finalScore">Final score</div><div class="g-gain" id="final-score"></div></div>
+    <div class="g-podium-mini" id="final-top"></div>
+    <div class="g-row"><button class="g-btn light" id="final-again" type="button" data-t="playAgain">Play again</button><a class="g-btn ghost" href="/" style="display:inline-grid;place-items:center;text-decoration:none" data-t="backSite">Back to IELTSX</a></div>
+  </section>
+
+  <!-- 10. the game is gone / removed -->
+  <section class="g-screen" id="s-gone" hidden>
+    <div class="g-mark" aria-hidden="true">!</div>
+    <div class="g-big" id="gone-text"></div>
+    <button class="g-btn light" id="gone-again" type="button" data-t="playAgain">Play again</button>
+  </section>
+</main>
+
+<footer class="g-foot" id="foot" hidden><b id="foot-name"></b><span class="g-score" id="foot-score">0</span></footer>
+<div class="g-offline" id="offline" role="status" hidden data-t="offline">Connection lost. Reconnecting…</div>
+<div class="g-toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/assets/js/game-i18n.js"></script>
+<script src="/assets/js/game-play.js"></script>
+</body>
+</html>
