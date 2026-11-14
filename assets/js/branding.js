@@ -65,14 +65,32 @@
                 mk.style.display = 'none';
             } else { if (own) own.remove(); mk.style.display = ''; }
         }
-        var link = document.querySelector('link[rel~="icon"]');
-        if (mark) {
-            if (!link) { link = document.createElement('link'); link.rel = 'icon'; link.setAttribute('data-ix-added', ''); document.head.appendChild(link); }
+        // the tab icon: /favicon.ico already sends the chosen icon (server.js), so it only gets "?v=" for a new one (the
+        // address Google reads stays /favicon.ico); a page with another icon address gets the chosen picture
+        var links = document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]');
+        if (!links.length && mark) { var nl = document.createElement('link'); nl.rel = 'icon'; nl.setAttribute('data-ix-added', ''); document.head.appendChild(nl); links = [nl]; }
+        for (var l = 0; l < links.length; l++) {
+            var link = links[l];
             if (!link.hasAttribute('data-ix-orig')) link.setAttribute('data-ix-orig', link.getAttribute('href') || '');
-            if (link.getAttribute('href') !== mark) link.setAttribute('href', mark);
-        } else if (link && link.hasAttribute('data-ix-orig')) {
-            if (link.hasAttribute('data-ix-added')) link.remove(); else link.setAttribute('href', link.getAttribute('data-ix-orig'));
+            var orig = link.getAttribute('data-ix-orig');
+            var fixed = /^\/(favicon\.ico|favicon\.png|icon\.png|apple-touch-icon\.png)$/.test(orig);
+            var want = fixed ? orig + (b && b.updatedAt ? '?v=' + encodeURIComponent(b.updatedAt) : '') : mark || orig;
+            if (link.hasAttribute('data-ix-added') && !mark) { link.remove(); continue; }
+            if (want && link.getAttribute('href') !== want) link.setAttribute('href', want);
         }
+        homeData();
+    }
+    /* the home page tells search engines the site's name and logo (Google shows them in the results); it points at
+       the fixed logo address, so a logo changed in the admin panel is what Google finds next time */
+    function homeData() {
+        if (!/^\/(index(\.html)?)?$/.test(location.pathname) || document.getElementById('ix-site-data')) return;
+        var o = location.origin, s = document.createElement('script');
+        s.type = 'application/ld+json'; s.id = 'ix-site-data';
+        s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': [
+            { '@type': 'Organization', '@id': o + '/#organization', name: 'IELTSX', url: o + '/', logo: o + '/icon.png' },
+            { '@type': 'WebSite', '@id': o + '/#website', name: 'IELTSX', url: o + '/', publisher: { '@id': o + '/#organization' } }
+        ] });
+        document.head.appendChild(s);
     }
     var cached = null;
     try { cached = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { /* blocked or broken */ }
@@ -85,7 +103,7 @@
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (d) {
                 if (!d) return;
-                var b = { logoUrl: d.logoUrl || '', iconUrl: d.iconUrl || '' };
+                var b = { logoUrl: d.logoUrl || '', iconUrl: d.iconUrl || '', updatedAt: d.updatedAt || '' };
                 try { if (b.logoUrl || b.iconUrl) localStorage.setItem(KEY, JSON.stringify(b)); else localStorage.removeItem(KEY); } catch (e) { /* blocked */ }
                 cached = b; run(b);
                 setTimeout(function () { run(b); }, 1500);     // pictures drawn later by the page scripts (sidebars, results)

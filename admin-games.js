@@ -16,6 +16,12 @@
   const POINTS = [[1, 'Standard points'], [2, 'Double points'], [0, 'No points']];
   const COVERS = [['#820241', '#c2185b'], ['#1e3a8a', '#3b82f6'], ['#065f46', '#10b981'], ['#7c2d12', '#f97316'], ['#4c1d95', '#8b5cf6'], ['#0f766e', '#22d3ee'], ['#9f1239', '#fb7185'], ['#334155', '#64748b']];
   let data = null, edit = null, busy = false, loading = false, subject = 'all', search = '', importOpen = false, report = null;
+  /* the two game types: classic = the question only on the host screen (the phones show the coloured shapes), phone = on every phone too */
+  const MODES = {
+    classic: { name: 'Classic', uz: 'Klassik', icon: '🖥️', text: 'The question and the answers are only on the host screen (the classroom screen). Phones show the four coloured shapes ▲ ◆ ● ■ — students look up and tap a colour.', best: 'Best in the classroom with a projector.' },
+    phone: { name: 'On every phone', uz: 'Telefonda', icon: '📱', text: 'The question and the answers are on every phone as well (the host screen shows them too). Students can read and answer without looking up.', best: 'Best for big rooms, weak projectors or playing from home.' }
+  };
+  let mode = (() => { try { const m = localStorage.getItem('ix-game-mode'); return MODES[m] ? m : 'classic'; } catch (e) { return 'classic'; } })();
 
   async function api(url, opt = {}) {
     const r = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...opt, headers: { ...(opt.body ? { 'Content-Type': 'application/json' } : {}), ...(opt.headers || {}) } });
@@ -40,7 +46,7 @@
   function livePill() { const p = $('#games-live'); if (!p || !data) return; const n = (data.live || []).filter((g) => g.phase !== 'final').length; p.textContent = n; p.hidden = !n; }
 
   /* ───────── a new question ───────── */
-  const blankQ = (type) => (type === 'tf' ? { type: 'tf', text: '', image: '', answers: ['True', 'False'], correct: [0], time: 10, points: 1 } : { type: 'quiz', text: '', image: '', answers: ['', '', '', ''], correct: [], time: 20, points: 1 });
+  const blankQ = (type) => (type === 'tf' ? { type: 'tf', text: '', image: '', answers: ['Toʻgʻri', 'Notoʻgʻri'], correct: [], time: 10, points: 1 } : { type: 'quiz', text: '', image: '', answers: ['', '', '', ''], correct: [], time: 20, points: 1 });
   const fourAnswers = (q) => { const a = (q.answers || []).slice(0, 4); while (q.type !== 'tf' && a.length < 4) a.push(''); return a; };
 
   /* ───────── questions pasted as text ─────────
@@ -90,7 +96,7 @@
         <strong class="gm-title">${esc(g.title)}</strong>
         ${g.description ? `<p class="muted sm gm-desc">${esc(g.description)}</p>` : ''}
         <div class="muted sm">${g.count || 0} question${g.count === 1 ? '' : 's'} · about ${mins((g.totalTime || 0) + (g.count || 0) * 12)} · ${g.plays ? 'played ' + g.plays + (g.plays === 1 ? ' time' : ' times') : 'not played yet'}</div>
-        <div class="btn-row"><button class="btn btn-sm btn-primary" data-gm="host" data-id="${esc(g.id)}" type="button" ${busy ? 'disabled' : ''}>▶ Host live</button>
+        <div class="btn-row"><button class="btn btn-sm btn-primary" data-gm="host" data-id="${esc(g.id)}" type="button" ${busy ? 'disabled' : ''}>▶ Host · ${esc(MODES[mode].uz)}</button>
           <button class="btn btn-sm" data-gm="edit" data-id="${esc(g.id)}" type="button">Edit</button>
           <button class="btn btn-sm" data-gm="copy" data-id="${esc(g.id)}" type="button">Duplicate</button>
           <button class="btn btn-sm btn-danger" data-gm="del" data-id="${esc(g.id)}" type="button">Delete</button></div>
@@ -102,7 +108,7 @@
     return `<div class="gm-live"><div class="section-title" style="font-size:14px">● Live now</div>${live.map((g) => `<div class="gm-live-row">
         <span class="gm-pin">${esc(g.pin.slice(0, 3) + ' ' + g.pin.slice(3))}</span>
         <div class="grow"><strong>${esc(g.title)}</strong><div class="muted sm">${esc(g.subject)} · ${esc(PHASE[g.phase] || g.phase)}${g.q >= 0 ? ' · question ' + (g.q + 1) + ' of ' + g.n : ''} · by ${esc((g.host && g.host.name) || '—')} · ${fmtWhen(g.createdAt)}</div></div>
-        <a class="btn btn-sm btn-primary" href="/game-host?pin=${esc(g.pin)}" target="_blank" rel="noopener">Open host screen ↗</a>
+        <span class="badge">${esc((MODES[g.mode] || MODES.classic).icon + ' ' + (MODES[g.mode] || MODES.classic).uz)}</span><a class="btn btn-sm btn-primary" href="/game-host?pin=${esc(g.pin)}" target="_blank" rel="noopener">Open host screen ↗</a>
         <button class="btn btn-sm btn-danger" data-gm="close" data-pin="${esc(g.pin)}" type="button">Close</button></div>`).join('')}</div>`;
   }
   function reportsBlock() {
@@ -170,9 +176,10 @@
     const q = search.trim().toLowerCase();
     const list = all.filter((g) => (subject === 'all' || g.subject === subject) && (!q || (g.title + ' ' + g.subject + ' ' + (g.description || '')).toLowerCase().includes(q)));
     mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">Games · live quiz for every subject</div>
-        <div class="muted sm">Make a game for any subject (Huquq, Matematika, IELTS …). Press <b>▶ Host live</b>: the game gets a PIN and the host screen opens for the classroom screen. Students open <b>${esc(location.host)}/game</b> (or “Game” in the site menu), type the PIN and their name, and answer on their phones. Faster right answers get more points.</div></div>
+        <div class="muted sm">Make a game for any subject (Huquq, Matematika, IELTS …). Choose the game type below and press <b>▶ Host</b> on a game: it gets a PIN and the host screen opens for the classroom screen. With <b>Auto</b> on, the game moves on by itself (everybody answered → the right answer → the ranking → the next question). Students open <b>${esc(location.host)}/game</b> (or “Game” in the site menu), type the PIN and their name, and answer on their phones. Faster right answers get more points.</div></div>
         ${edit ? '' : '<div class="btn-row"><a class="btn" href="/game" target="_blank" rel="noopener">Join page ↗</a><button class="btn btn-primary" data-gm="new" type="button">+ New game</button></div>'}</div>
       ${liveBlock()}
+      ${edit ? '' : modeCards()}
       ${edit ? form() : ''}
       ${edit ? '' : `<div class="tabs gm-tabs"><button class="tab${subject === 'all' ? ' active' : ''}" data-gm="subject" data-s="all" type="button">All<span class="n">${all.length}</span></button>${subjects.map((s) => `<button class="tab${subject === s ? ' active' : ''}" data-gm="subject" data-s="${esc(s)}" type="button">${esc(s)}<span class="n">${counts[s]}</span></button>`).join('')}</div>
       ${all.length > 6 ? `<div class="toolbar"><input class="field grow" id="gm-search" type="search" placeholder="Search games" value="${esc(search)}" autocomplete="off"></div>` : ''}
@@ -181,17 +188,25 @@
       ${report ? reportModal() : ''}`;
   }
 
+  function modeCards() {
+    const pic = (m) => `<div class="gm-phone" aria-hidden="true">${m === 'phone' ? '<i class="gm-ph-q"></i>' : '<i class="gm-ph-n">3 / 10</i>'}<div class="gm-ph-tiles">${SHAPES.map((sh, k) => `<b class="gm-a${k}">${sh}${m === 'phone' ? '<i></i>' : ''}</b>`).join('')}</div></div>`;
+    return `<div class="gm-modes"><div class="gm-modes-head"><strong>Game type</strong><span class="muted sm">Choose how the game looks on the phones, then press ▶ Host on a game. Every game can be played in both ways.</span></div><div class="gm-mode-grid">${Object.keys(MODES).map((m) => `<button class="gm-mode${mode === m ? ' is-on' : ''}" data-gm="mode" data-m="${m}" type="button" aria-pressed="${mode === m}">
+        ${pic(m)}<span class="gm-mode-body"><span class="gm-mode-title">${MODES[m].icon} ${esc(MODES[m].uz)} <span class="muted sm">· ${esc(MODES[m].name)}</span>${mode === m ? '<span class="chip chip-ok">Selected ✓</span>' : ''}</span>
+        <span class="sm">${esc(MODES[m].text)}</span><span class="muted sm">${esc(MODES[m].best)}</span></span></button>`).join('')}</div></div>`;
+  }
+
   /* ───────── a report ───────── */
   function reportModal() {
     const r = report;
     return `<div class="modal-backdrop open gm-modal" data-gm="closerep"><div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="Game report">
       <div class="cb-top"><h3>${esc(r.title)} <span class="muted sm">· ${esc(r.subject)} · ${fmtWhen(r.endedAt)}</span></h3><button class="btn btn-sm" data-gm="closerep" type="button" aria-label="Close">✕</button></div>
       <div class="cb-body">
-        <div class="kv"><div><small>Players</small><b>${r.count}</b></div><div><small>Questions played</small><b>${r.asked} of ${r.total}</b></div><div><small>Right answers (average)</small><b>${r.avgRight}%</b></div><div><small>Host</small><b>${esc((r.host && r.host.name) || '—')}</b></div></div>
+        <div class="kv"><div><small>Players</small><b>${r.count}</b></div><div><small>Questions played</small><b>${r.asked} of ${r.total}</b></div><div><small>Right answers (average)</small><b>${r.avgRight}%</b></div><div><small>Host · type</small><b>${esc((r.host && r.host.name) || '—')} · ${esc((MODES[r.mode] || MODES.classic).uz)}</b></div></div>
         <div class="section-title" style="font-size:14px">Ranking</div>
         <div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Player</th><th class="right">Points</th><th class="right">Right</th><th class="right">Answered</th></tr></thead><tbody>
           ${(r.players || []).map((p) => `<tr><td>${p.rank <= 3 ? ['🥇', '🥈', '🥉'][p.rank - 1] : p.rank}</td><td>${esc(p.name)}${p.userId ? ' <span class="badge badge-info">account</span>' : ''}</td><td class="right">${p.score}</td><td class="right">${p.right} / ${r.asked}</td><td class="right">${p.answered}</td></tr>`).join('') || '<tr><td colspan="5" class="empty">Nobody played.</td></tr>'}
         </tbody></table></div>
+        ${answersTable(r)}
         <div class="section-title" style="font-size:14px">Questions</div>
         ${(r.questions || []).map((q, i) => { const pct = q.answered ? Math.round(q.right / Math.max(1, r.count) * 100) : 0; return `<div class="gm-rq"><div class="gm-rq-head"><span class="cb-qn">${i + 1}</span><span class="grow">${esc(q.text)}</span><span class="badge ${pct >= 70 ? 'badge-ok' : pct >= 40 ? 'badge-warn' : 'badge-bad'}">${pct}% right</span></div>
           <div class="gm-rq-bars">${q.answers.map((a, k) => { const n = q.counts[k] || 0; const w = r.count ? Math.round(n / r.count * 100) : 0; return `<div class="gm-rq-bar gm-a${k}${q.correct.includes(k) ? ' is-right' : ''}"><span class="gm-shape">${SHAPES[k]}</span><span class="grow">${esc(a)}${q.correct.includes(k) ? ' ✓' : ''}</span><span class="gm-rq-fill" style="width:${w}%"></span><b>${n}</b></div>`; }).join('')}</div>
@@ -199,10 +214,18 @@
       </div>
       <div class="modal-actions"><button class="btn" data-gm="csv" data-sid="${esc(r.sid)}" type="button">⬇ Download CSV</button><button class="btn btn-primary" data-gm="closerep" type="button">Close</button></div></div></div>`;
   }
+  /* every player x every question: the tile chosen (✓ right / ✗ wrong / – no answer) and the points */
+  function answersTable(r) {
+    const ps = r.players || []; if (!ps.length || !ps[0].a) return '';
+    const cell = (x, q) => { if (!x) return '<td class="gm-cell none" title="No answer">–</td>'; const [c, ok, pts, ms] = x; return `<td class="gm-cell ${ok ? 'ok' : 'bad'}" title="${esc((q && q.answers[c]) || '')} · ${(ms / 1000).toFixed(1)} s"><span class="gm-mini gm-a${c}">${SHAPES[c] || '?'}</span>${ok ? '✓ ' + pts : '✗'}</td>`; };
+    return `<div class="section-title" style="font-size:14px">Answers of every player</div><div class="table-wrap gm-matrix"><table class="table"><thead><tr><th>#</th><th>Player</th>${(r.questions || []).map((q, i) => `<th class="right" title="${esc(q.text)}">Q${i + 1}</th>`).join('')}<th class="right">Points</th></tr></thead><tbody>
+      ${ps.map((p) => `<tr><td>${p.rank}</td><td class="nowrap">${esc(p.name)}</td>${(r.questions || []).map((q, i) => cell(p.a[i], q)).join('')}<td class="right"><b>${p.score}</b></td></tr>`).join('')}</tbody></table></div>`;
+  }
   async function getReport(sid) { return (await api('/api/admin/games/reports/' + encodeURIComponent(sid))).report; }
   function csv(r) {
     const cell = (v) => { const s = String(v ?? ''); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
-    const rows = [['Rank', 'Player', 'Points', 'Right', 'Answered', 'Questions played']].concat((r.players || []).map((p) => [p.rank, p.name, p.score, p.right, p.answered, r.asked]));
+    const qn = (r.questions || []).map((q, i) => 'Q' + (i + 1));
+    const rows = [['Rank', 'Player', 'Points', 'Right', 'Answered', 'Questions played'].concat(qn)].concat((r.players || []).map((p) => [p.rank, p.name, p.score, p.right, p.answered, r.asked].concat((p.a || []).map((x, i) => (x ? ((r.questions[i].answers[x[0]] || '') + (x[1] ? ' ✓' : ' ✗')) : '–')))));
     rows.push([]); rows.push(['Question', 'Right answer', 'Right', 'Answered']);
     (r.questions || []).forEach((q, i) => rows.push([(i + 1) + '. ' + q.text, q.correct.map((k) => q.answers[k]).join(' / '), q.right, q.answered]));
     const blob = new Blob(['﻿' + rows.map((x) => x.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
@@ -264,7 +287,7 @@
   async function host(id) {
     const w = window.open('about:blank', '_blank');   // opened at the click, so the browser does not block it
     try {
-      const d = await api('/api/admin/games/' + encodeURIComponent(id) + '/host', { method: 'POST' });
+      const d = await api('/api/admin/games/' + encodeURIComponent(id) + '/host', { method: 'POST', body: JSON.stringify({ mode }) });
       const url = '/game-host?pin=' + d.pin;
       if (w) w.location.href = url; else location.href = url;
       toast('Game PIN ' + d.pin + ' — the host screen is open');
@@ -282,6 +305,7 @@
       else if (a === 'edit' && g) { busy = true; render(); try { edit = (await api('/api/admin/games/' + encodeURIComponent(g.id))).quiz; edit.questions.forEach((q) => { if (q.type !== 'tf') q.answers = fourAnswers(q); }); } finally { busy = false; } importOpen = false; render(); $('#content-games').scrollIntoView({ block: 'start' }); }
       else if (a === 'cancel') { if (!confirm('Leave the editor? Changes that were not saved are lost.')) return; edit = null; importOpen = false; render(); }
       else if (a === 'subject') { subject = t.dataset.s; render(); }
+      else if (a === 'mode' && MODES[t.dataset.m]) { mode = t.dataset.m; try { localStorage.setItem('ix-game-mode', mode); } catch (e) { /* only this visit */ } render(); }
       else if (a === 'addq' || a === 'addtf') { edit.questions.push(blankQ(a === 'addtf' ? 'tf' : 'quiz')); render(); const qs = document.querySelectorAll('.gm-q-text'); const last = qs[qs.length - 1]; if (last) { last.focus(); last.scrollIntoView({ block: 'center' }); } }
       else if (a === 'up' || a === 'down') { const i = Number(t.dataset.qi), j = a === 'up' ? i - 1 : i + 1; if (j < 0 || j >= edit.questions.length) return; const x = edit.questions[i]; edit.questions[i] = edit.questions[j]; edit.questions[j] = x; render(); }
       else if (a === 'dupq') { const i = Number(t.dataset.qi); edit.questions.splice(i + 1, 0, JSON.parse(JSON.stringify(edit.questions[i]))); render(); }

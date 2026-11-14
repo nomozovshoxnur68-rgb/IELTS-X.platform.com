@@ -1387,6 +1387,7 @@ server.listen(0, async () => {
       assert.equal((await call('GET', '/api/admin/games')).status, 401);
       assert.equal((await call('GET', '/api/admin/games', { jar: user })).status, 403);
       assert.equal((await call('POST', '/api/admin/games', { jar: boss, body: { title: 'x', questions: [{ text: 'q', answers: ['a', 'b'], correct: [] }] } })).status, 400, 'no right answer');
+      assert.equal((await call('POST', '/api/admin/games', { jar: boss, body: { title: 'x', questions: [{ text: 'q', answers: ['Yes', 'yes '], correct: [0] }] } })).status, 400, 'two answers the same');
       const made = await call('POST', '/api/admin/games', { jar: boss, body: { title: 'Huquq: 1-bob', subject: 'Huquq', questions: [
         { text: 'Konstitutsiya qachon qabul qilingan?', answers: ['1991', '1992', '', '1993'], correct: [1], time: 10 },
         { type: 'tf', text: 'x > 1 when x = 2', answers: ['True', 'False'], correct: [0], time: 5, points: 2 }] } });
@@ -1407,6 +1408,7 @@ server.listen(0, async () => {
       assert.equal((await call('POST', '/api/game/answer', { headers: as(a), body: { q: 0, c: 1 } })).status, 409, 'not before the answers open');
       const live = G.mem.get('game-live:' + pin); live.openAt = Date.now() - 1000; live.endsAt = live.openAt + 10000;
       const s1 = await call('GET', '/api/game/state', { headers: as(a) }); assert.equal(s1.json.phase, 'answer'); assert.ok(!s1.text.includes('"correct"'), 'the right answer is not sent while the clock runs');
+      assert.ok(s1.json.mode === 'classic' && s1.json.question.count === 3 && !s1.json.question.text && !s1.json.question.answers && !s1.text.includes('1992'), 'classic: only the shapes on the phones');
       assert.equal((await call('POST', '/api/game/answer', { headers: as(a), body: { q: 0, c: 1 } })).status, 200);
       assert.equal((await call('POST', '/api/game/answer', { headers: as(a), body: { q: 0, c: 0 } })).json.duplicate, true, 'an answer counts once');
       await call('POST', '/api/game/answer', { headers: as(v), body: { q: 0, c: 0 } });
@@ -1415,18 +1417,38 @@ server.listen(0, async () => {
       const ra = await state(a), rv = await state(v);
       assert.ok(ra.result.ok && ra.result.pts > 900 && ra.result.pts <= 1000 && ra.you.score === ra.result.pts); assert.ok(!rv.result.ok && rv.result.pts === 0);
       assert.deepEqual((await call('GET', '/api/admin/games/live/' + pin, { jar: boss })).json.dist, [1, 1, 0]);
-      assert.equal((await host({ action: 'next', q: 0 })).json.phase, 'scoreboard'); assert.equal((await state(v)).you.rank, 2);
+      const board = await host({ action: 'next', q: 0 }); assert.equal(board.json.phase, 'scoreboard');
+      assert.ok(board.json.players[0].name === 'Ali' && board.json.players[0].gain > 900 && board.json.players[1].rank === 2 && board.json.auto === true, 'the host sees every place and the points');
+      const sv = await state(v); assert.equal(sv.you.rank, 2); assert.equal(sv.you.behind.name, 'Ali'); assert.equal(sv.you.behind.points, ra.result.pts);
       assert.equal((await host({ action: 'next', q: 0 })).json.q, 1); assert.equal((await host({ action: 'next', q: 0 })).status, 409, 'a second click does not skip a question');
       assert.equal((await host({ action: 'end' })).json.phase, 'final');
       const fin = await state(a); assert.equal(fin.phase, 'final'); assert.equal(fin.you.rank, 1); assert.equal(fin.top[0].name, 'Ali');
       const reps = (await call('GET', '/api/admin/games', { jar: boss })).json.reports; const rep = reps.find((r) => r.pin === pin);
-      assert.ok(rep && rep.count === 2 && rep.winner.name === 'Ali');
-      assert.equal((await call('GET', '/api/admin/games/reports/' + rep.sid, { jar: boss })).json.report.questions[0].right, 1);
+      assert.ok(rep && rep.count === 2 && rep.winner.name === 'Ali' && rep.mode === 'classic');
+      const full = (await call('GET', '/api/admin/games/reports/' + rep.sid, { jar: boss })).json.report;
+      assert.equal(full.questions[0].right, 1); assert.deepEqual(full.players[0].a[0].slice(0, 2), [1, 1], 'every answer of every player is in the report'); assert.equal(full.players[1].a[0][1], 0);
       assert.equal((await host({ action: 'close' })).json.closed, true); assert.equal((await state(a)).phase, 'gone');
+      // the second game type: the question and the answers on every phone (never the right answer before the end)
+      const pin2 = (await call('POST', '/api/admin/games/' + quiz.id + '/host', { jar: boss, body: { mode: 'phone' } })).json.pin;
+      assert.equal((await call('POST', '/api/game/pin', { body: { pin: pin2 } })).json.mode, 'phone');
+      const p2 = (await call('POST', '/api/game/join', { body: { pin: pin2, name: 'Sardor' } })).json.token;
+      assert.equal((await call('POST', '/api/admin/games/live/' + pin2, { jar: boss, body: { action: 'auto', auto: false } })).json.auto, false);
+      await call('POST', '/api/admin/games/live/' + pin2, { jar: boss, body: { action: 'start' } });
+      const live2 = G.mem.get('game-live:' + pin2); live2.openAt = Date.now() - 500; live2.endsAt = live2.openAt + 10000;
+      const s2 = await call('GET', '/api/game/state', { headers: as(p2) });
+      assert.ok(s2.json.mode === 'phone' && s2.json.question.text.includes('Konstitutsiya') && s2.json.question.answers.length === 3 && !s2.text.includes('"correct"'));
+      assert.equal((await call('POST', '/api/admin/games/live/' + pin2, { jar: boss, body: { action: 'close' } })).json.closed, true);
       assert.ok(G.pointsFor({ time: 20, points: 1 }, 0) === 1000 && G.pointsFor({ time: 20, points: 1 }, 20000) === 500 && G.pointsFor({ time: 20, points: 2 }, 0) === 2000 && G.pointsFor({ time: 20, points: 0 }, 0) === 0);
       assert.equal((await call('GET', '/quiz-game.js')).status, 404); assert.equal((await call('GET', '/game')).status, 200); assert.equal((await call('GET', '/game-host')).status, 200);
       assert.equal((await call('DELETE', '/api/admin/games/' + quiz.id, { jar: boss })).status, 200);
-      ok('live quiz games: admin only, PIN, unique nicknames, signed players, no right answer before the end, points on the server, once, ranks, report, close');
+      // the site logo at fixed addresses (favicon, Google, link previews): the built-in one, then the one chosen in the panel
+      const fav = await call('GET', '/favicon.ico'); assert.equal(fav.status, 200); assert.ok(/^image\//.test(fav.headers.get('content-type')));
+      assert.equal((await call('GET', '/logo.png')).status, 200);
+      await call('POST', '/api/admin/branding', { jar: boss, body: { iconUrl: '/assets/ieltsx-only-logo-BajnupZg.png' } });
+      const ic = await fetch(base + '/icon.png'); const icBuf = Buffer.from(await ic.arrayBuffer());
+      assert.equal(ic.status, 200); assert.equal(icBuf.length, fs.statSync(path.join(__dirname, '..', 'assets', 'ieltsx-only-logo-BajnupZg.png')).size, '/icon.png sends the icon chosen in the panel');
+      await call('POST', '/api/admin/branding', { jar: boss, body: {} });
+      ok('live quiz games: admin only, PIN, two game types (classic: shapes only / phone), unique nicknames, signed players, no right answer before the end, points on the server, once, full ranking, points behind, report with every answer, close; the logo at fixed addresses');
     }
 
     // --- rate limit

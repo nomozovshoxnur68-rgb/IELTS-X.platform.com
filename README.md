@@ -619,3 +619,35 @@ classroom on one Wi-Fi is fine), nicknames are unique per game, at most 300 play
 never sent as a file (server + `middleware.js`).
 
 `npm test`: 53 checks.
+
+## Game v2: two game types, automatic flow, ranking after every question, the logo everywhere (November 2026)
+
+**Two game types** (Admin → Games, the two cards above the games; the chosen one is used by **▶ Host**):
+* **Klassik / Classic** — the question and the answers are only on the host screen; the phones show the four big coloured
+  shapes ▲ ◆ ● ■ (the server does not even send the question to the phones).
+* **Telefonda / On every phone** — the question and the answers are on every phone too (big rooms, weak projectors, home).
+
+**Automatic flow** (host screen, **Avto** switch, on by default): when everybody has answered (or the time is up) the right
+answer is shown for 3.5 s, then the **ranking of all players** for 4.5 s (place, ▲▼ change of place, points of this question,
+total; the top 8 big, everybody else in a grid), then the next question; after the last one, the podium. The big button fills up
+while it waits and skips the wait when pressed. The phones show "#3 of 25 · 120 points behind Ali".
+
+**Faster**: every host action answers with the new state (drawn at once, no second request); the host reads the game and the
+players in one round trip; the phones ask the server exactly when the state is due to change (answers open, time ends, the next
+step of an automatic game) and every 0.6 s after answering; the question shows 3 s (classic) / 1.5 s (phone) before the answers
+open; the live rows are written without the database sending them back.
+
+**Results**: the report keeps every player's answer to every question (tile, right / wrong, points, time) — Admin → Games →
+Past games → Open shows the matrix, the CSV has it too. The phone shows "You chose ▲ … · Right answer ◆ …". True / False
+questions start with no answer marked (the right one must be chosen), two equal answers are refused.
+
+**Other**: no right-click / long-press menu on the game pages (`no-context-menu.js`, no text selection outside the inputs),
+Montserrat font, timer line, bigger tiles, confetti at the end, Uzbek by default.
+
+**The logo (and the icon Google shows)**: `/favicon.ico`, `/favicon.png`, `/icon.png`, `/apple-touch-icon.png` and `/logo.png`
+now send the logo chosen in **Admin → Logo** (server.js `brandImage`; on Vercel these addresses go to the API, see vercel.json),
+the built-in files when nothing is chosen. Every page links its icon to `/favicon.ico` (the home page had none, so Google took
+the old built-in mark), and the old leftovers of another site were removed from 14 saved pages: `rel="canonical"` and `og:url`
+pointing to ieltsx.com (they told Google to show that site instead) and preview pictures from ieltsx.com (now `/logo.png`).
+The home page adds Organization / WebSite structured data with `/icon.png` (branding.js). Google updates the icon in the search
+results on its next visit; Search Console → URL inspection → Request indexing for the home page speeds it up.

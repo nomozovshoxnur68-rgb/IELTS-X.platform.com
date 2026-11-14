@@ -2,28 +2,34 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>IELTSX Game — enter the PIN</title>
 <meta name="description" content="Join a live IELTSX quiz game: type the game PIN from the screen and answer on your phone.">
 <meta property="og:title" content="IELTSX Game">
 <meta property="og:description" content="Join a live quiz game: type the game PIN from the screen and answer on your phone.">
+<meta property="og:image" content="/logo.png">
 <meta name="theme-color" content="#2b0a45">
-<link rel="icon" href="/assets/ieltsx-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap">
 <link rel="stylesheet" href="/assets/css/game.css">
+<script src="/assets/js/no-context-menu.js"></script>
 </head>
 <body class="gp">
 <div class="g-bg" aria-hidden="true"><span></span><span></span></div>
 
 <header class="g-top" id="top">
-  <a class="g-brand" href="/"><img src="/assets/ieltsx-mark.png" alt="">IELTSX</a>
+  <a class="g-brand" href="/"><img class="brand-logo" src="/icon.png" alt="" width="30" height="30">IELTSX</a>
   <button class="g-lang" id="lang-btn" type="button" aria-label="Language / Til / Язык"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> UZ</button>
 </header>
-<div class="g-qbar" id="qbar" hidden><span id="qbar-n"></span><span class="g-timer" id="qbar-t" aria-live="off"></span><span id="qbar-x"></span></div>
+<div class="g-qbar" id="qbar" hidden><span id="qbar-n"></span><span class="g-timer" id="qbar-t" aria-live="off"></span><span id="qbar-x"></span><i class="g-qbar-line" id="qbar-line" aria-hidden="true"></i></div>
 
 <main class="g-main">
   <!-- 1. the PIN -->
   <section class="g-screen" id="s-pin">
-    <div class="g-logo">IELTSX Game<small data-t="tagline">Live quiz with your class</small></div>
+    <div class="g-logo">IELTSX <span>Game</span><small data-t="tagline">Live quiz with your class</small></div>
     <form class="g-card" id="f-pin" novalidate autocomplete="off">
       <label for="pin" data-t="pinLabel">Game PIN</label>
       <input class="g-input" id="pin" name="pin" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" data-t-ph="pinPh" placeholder="Enter PIN" aria-describedby="pin-err">
@@ -35,7 +41,7 @@
 
   <!-- 2. the nickname -->
   <section class="g-screen" id="s-name" hidden>
-    <span class="g-subject" id="name-subject"></span>
+    <div class="g-row"><span class="g-subject" id="name-subject"></span><span class="g-subject" id="name-mode"></span></div>
     <div class="g-big" id="name-title"></div>
     <form class="g-card" id="f-name" novalidate autocomplete="off">
       <label for="nick" data-t="nickLabel">Nickname</label>
@@ -43,7 +49,7 @@
       <button class="g-btn" type="submit" data-t="go">OK, go!</button>
       <div class="g-err" id="nick-err" role="alert"></div>
     </form>
-    <button class="g-btn ghost" id="name-back" type="button">←</button>
+    <button class="g-btn ghost" id="name-back" type="button" aria-label="Back">←</button>
   </section>
 
   <!-- 3. waiting for the start -->
@@ -54,20 +60,22 @@
     <div class="g-dots" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="g-sub" data-t="waitStart">Waiting for the host to start…</div>
     <div class="g-game-name"><span class="g-subject" id="lobby-subject"></span> <span id="lobby-title"></span></div>
+    <div class="g-sub small" id="lobby-mode"></div>
     <button class="g-btn ghost" id="lobby-leave" type="button" data-t="leave">Leave</button>
   </section>
 
-  <!-- 4. the question is read -->
+  <!-- 4. the question is shown -->
   <section class="g-screen" id="s-ready" hidden>
     <div class="g-sub" id="ready-n"></div>
     <div id="ready-tag"></div>
     <div class="g-qtext" id="ready-q"></div>
+    <div class="g-look" id="ready-look" hidden><span aria-hidden="true">👀</span><b data-t="lookScreen">Read the question on the screen!</b></div>
     <div class="g-progress" aria-hidden="true"><i id="ready-bar"></i></div>
     <div class="g-sub" data-t="getReady">Get ready…</div>
   </section>
 
   <!-- 5. the answer tiles -->
-  <section class="g-screen" id="s-answer" hidden>
+  <section class="g-screen g-answer" id="s-answer" hidden>
     <div class="g-qtext" id="ans-q"></div>
     <img class="g-qimg" id="ans-img" alt="" hidden>
     <div class="g-tiles" id="ans-tiles"></div>
@@ -87,7 +95,7 @@
     <div class="g-mark" id="res-mark" aria-hidden="true"></div>
     <div class="g-gain" id="res-gain" hidden></div>
     <div class="g-sub" id="res-streak" hidden></div>
-    <div class="g-sub" id="res-right" hidden></div>
+    <div class="g-answers-note" id="res-note"></div>
   </section>
 
   <!-- 8. the place after a question -->
@@ -95,10 +103,12 @@
     <div class="g-place" id="board-place"></div>
     <div class="g-sub" id="board-of"></div>
     <div class="g-gain" id="board-score"></div>
+    <div class="g-sub" id="board-behind"></div>
   </section>
 
   <!-- 9. the end -->
   <section class="g-screen" id="s-final" hidden>
+    <div class="g-confetti" id="final-confetti" aria-hidden="true"></div>
     <div class="g-sub" id="final-title"></div>
     <div class="g-place" id="final-place"></div>
     <div class="g-sub" id="final-of"></div>
@@ -118,6 +128,7 @@
 <footer class="g-foot" id="foot" hidden><b id="foot-name"></b><span class="g-score" id="foot-score">0</span></footer>
 <div class="g-offline" id="offline" role="status" hidden data-t="offline">Connection lost. Reconnecting…</div>
 <div class="g-toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/assets/js/branding.js" defer></script>
 <script src="/assets/js/game-i18n.js"></script>
 <script src="/assets/js/game-play.js"></script>
 </body>
