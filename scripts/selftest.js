@@ -1381,6 +1381,54 @@ server.listen(0, async () => {
       } finally { if (env3.AI_PROVIDER === undefined) delete process.env.AI_PROVIDER; else process.env.AI_PROVIDER = env3.AI_PROVIDER; }
     }
 
+    // --- live quiz games (quiz-game.js): made by admins, a PIN, players with a signed token, points on the server
+    {
+      const G = require('../quiz-game.js')._test;
+      assert.equal((await call('GET', '/api/admin/games')).status, 401);
+      assert.equal((await call('GET', '/api/admin/games', { jar: user })).status, 403);
+      assert.equal((await call('POST', '/api/admin/games', { jar: boss, body: { title: 'x', questions: [{ text: 'q', answers: ['a', 'b'], correct: [] }] } })).status, 400, 'no right answer');
+      const made = await call('POST', '/api/admin/games', { jar: boss, body: { title: 'Huquq: 1-bob', subject: 'Huquq', questions: [
+        { text: 'Konstitutsiya qachon qabul qilingan?', answers: ['1991', '1992', '', '1993'], correct: [1], time: 10 },
+        { type: 'tf', text: 'x > 1 when x = 2', answers: ['True', 'False'], correct: [0], time: 5, points: 2 }] } });
+      assert.equal(made.status, 201, made.text); const quiz = made.json.quiz;
+      assert.deepEqual(quiz.questions[0].answers, ['1991', '1992', '1993'], 'an empty answer box is left out'); assert.equal(quiz.questions[1].text, 'x > 1 when x = 2');
+      const list = await call('GET', '/api/admin/games', { jar: boss }); assert.ok(list.json.quizzes.some((q) => q.id === quiz.id && q.count === 2 && !q.questions));
+      const pin = (await call('POST', '/api/admin/games/' + quiz.id + '/host', { jar: boss })).json.pin; assert.ok(/^\d{6}$/.test(pin));
+      assert.equal((await call('POST', '/api/game/pin', { body: { pin: pin === '123456' ? '654321' : '123456' } })).status, 404);
+      assert.equal((await call('POST', '/api/game/pin', { body: { pin } })).json.title, 'Huquq: 1-bob');
+      const join = (name) => call('POST', '/api/game/join', { body: { pin, name } });
+      const a = (await join('Ali')).json.token, v = (await join('Vali')).json.token;
+      assert.equal((await join('ALI')).status, 409, 'nicknames are unique');
+      const as = (tk) => ({ 'x-game-token': tk });
+      const state = (tk) => call('GET', '/api/game/state', { headers: as(tk) }).then((r) => r.json);
+      assert.equal((await state(a)).phase, 'lobby'); assert.equal((await call('GET', '/api/game/state', { headers: as('x.y') })).status, 401);
+      const host = (body) => call('POST', '/api/admin/games/live/' + pin, { jar: boss, body });
+      assert.equal((await host({ action: 'start' })).status, 200);
+      assert.equal((await call('POST', '/api/game/answer', { headers: as(a), body: { q: 0, c: 1 } })).status, 409, 'not before the answers open');
+      const live = G.mem.get('game-live:' + pin); live.openAt = Date.now() - 1000; live.endsAt = live.openAt + 10000;
+      const s1 = await call('GET', '/api/game/state', { headers: as(a) }); assert.equal(s1.json.phase, 'answer'); assert.ok(!s1.text.includes('"correct"'), 'the right answer is not sent while the clock runs');
+      assert.equal((await call('POST', '/api/game/answer', { headers: as(a), body: { q: 0, c: 1 } })).status, 200);
+      assert.equal((await call('POST', '/api/game/answer', { headers: as(a), body: { q: 0, c: 0 } })).json.duplicate, true, 'an answer counts once');
+      await call('POST', '/api/game/answer', { headers: as(v), body: { q: 0, c: 0 } });
+      assert.equal((await state(a)).you.score, 0, 'the score of this question shows only when it closes');
+      assert.equal((await host({ action: 'reveal', q: 0 })).status, 200);
+      const ra = await state(a), rv = await state(v);
+      assert.ok(ra.result.ok && ra.result.pts > 900 && ra.result.pts <= 1000 && ra.you.score === ra.result.pts); assert.ok(!rv.result.ok && rv.result.pts === 0);
+      assert.deepEqual((await call('GET', '/api/admin/games/live/' + pin, { jar: boss })).json.dist, [1, 1, 0]);
+      assert.equal((await host({ action: 'next', q: 0 })).json.phase, 'scoreboard'); assert.equal((await state(v)).you.rank, 2);
+      assert.equal((await host({ action: 'next', q: 0 })).json.q, 1); assert.equal((await host({ action: 'next', q: 0 })).status, 409, 'a second click does not skip a question');
+      assert.equal((await host({ action: 'end' })).json.phase, 'final');
+      const fin = await state(a); assert.equal(fin.phase, 'final'); assert.equal(fin.you.rank, 1); assert.equal(fin.top[0].name, 'Ali');
+      const reps = (await call('GET', '/api/admin/games', { jar: boss })).json.reports; const rep = reps.find((r) => r.pin === pin);
+      assert.ok(rep && rep.count === 2 && rep.winner.name === 'Ali');
+      assert.equal((await call('GET', '/api/admin/games/reports/' + rep.sid, { jar: boss })).json.report.questions[0].right, 1);
+      assert.equal((await host({ action: 'close' })).json.closed, true); assert.equal((await state(a)).phase, 'gone');
+      assert.ok(G.pointsFor({ time: 20, points: 1 }, 0) === 1000 && G.pointsFor({ time: 20, points: 1 }, 20000) === 500 && G.pointsFor({ time: 20, points: 2 }, 0) === 2000 && G.pointsFor({ time: 20, points: 0 }, 0) === 0);
+      assert.equal((await call('GET', '/quiz-game.js')).status, 404); assert.equal((await call('GET', '/game')).status, 200); assert.equal((await call('GET', '/game-host')).status, 200);
+      assert.equal((await call('DELETE', '/api/admin/games/' + quiz.id, { jar: boss })).status, 200);
+      ok('live quiz games: admin only, PIN, unique nicknames, signed players, no right answer before the end, points on the server, once, ranks, report, close');
+    }
+
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');
