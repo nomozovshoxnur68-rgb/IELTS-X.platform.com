@@ -1451,6 +1451,56 @@ server.listen(0, async () => {
       ok('live quiz games: admin only, PIN, two game types (classic: shapes only / phone), unique nicknames, signed players, no right answer before the end, points on the server, once, full ranking, points behind, report with every answer, close; the logo at fixed addresses');
     }
 
+    // --- sign-in help: a Google-only account, a password set by an admin, an e-mail saved with capitals
+    {
+      const dbFile = path.join(tmp, 'db.json'); const d = JSON.parse(fs.readFileSync(dbFile, 'utf8')); const gid = crypto.randomUUID();
+      d.users.push({ id: gid, name: 'Gina', email: 'Gina.Google@Example.com', role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: '', passwordSalt: '', emailVerified: true, createdAt: new Date().toISOString() });
+      fs.writeFileSync(dbFile, JSON.stringify(d, null, 2));
+      let r = await call('POST', '/api/auth/login', { body: { email: 'gina.google@example.com', password: 'Some-pass-123' } });
+      assert.equal(r.status, 401); assert.ok(/Google/.test(r.json.error), 'a Google-only account is told to use Google');
+      assert.equal((await call('POST', '/api/auth/login', { body: { email: 'not-an-email', password: 'x' } })).status, 400);
+      assert.equal((await call('POST', '/api/admin/users/' + gid + '/password', { jar: user, body: { password: 'Fresh-pass-901' } })).status, 403);
+      assert.equal((await call('POST', '/api/admin/users/' + gid + '/password', { jar: boss, body: { password: '12345678' } })).status, 400, 'the password rules apply');
+      assert.equal((await call('POST', '/api/admin/users/' + bossId + '/password', { jar: boss, body: { password: 'Fresh-pass-901' } })).status, 400, 'not for your own account');
+      assert.equal((await call('POST', '/api/admin/users/' + gid + '/password', { jar: boss, body: { password: 'Fresh-pass-901' } })).status, 200);
+      r = await call('POST', '/api/auth/login', { body: { email: 'GINA.google@example.com', password: 'Fresh-pass-901' } }); assert.equal(r.status, 200, 'an e-mail saved with capitals signs in');
+      assert.ok((await call('GET', '/api/admin/audit?limit=20', { jar: boss })).json.entries.some((e) => e.action === 'user.password'), 'recorded in the activity log');
+      ok('sign-in help: Google-only accounts are told so, an admin sets a password, e-mails saved with capitals are found');
+    }
+
+    // --- predictions (predictions.js): made in the admin panel, locked by plan on the server
+    {
+      assert.ok([403, 404].includes((await call('GET', '/predictions.js')).status), 'the server module is private');
+      assert.equal((await call('GET', '/assets/js/predictions-page.js')).status, 200, 'the page script is public');
+      let r = await call('GET', '/api/predictions'); assert.equal(r.status, 200); assert.ok(r.json.collections.length >= 4, 'the four collections of the old page');
+      assert.ok(r.json.collections.every((c) => !c.items), 'the list never carries questions or links');
+      assert.equal((await call('GET', '/api/admin/predictions')).status, 401);
+      assert.equal((await call('GET', '/api/admin/predictions', { jar: user })).status, 403);
+      assert.equal((await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'X', skill: 'reading', items: [{ kind: 'test', title: 'bad', href: 'javascript:alert(1)' }] } } })).status, 400, 'a test needs a link of the site');
+      assert.equal((await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: ' ', skill: 'reading' } } })).status, 400, 'a name is needed');
+      assert.equal((await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'Y', skill: 'maths' } } })).status, 400, 'a known skill');
+      r = await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'Speaking Max', skill: 'speaking', plan: 'max', items: [
+        { kind: 'question', part: 'Part 1', text: 'Where is your hometown?', hot: true }, { kind: 'test', title: 'Reading 1', href: '/full-tests/reading/test-1' }, { kind: 'question', text: '' }] } } });
+      assert.equal(r.status, 201); const maxId = r.json.collection.id;
+      assert.equal(r.json.collection.items.length, 2, 'empty rows are dropped'); assert.equal(r.json.collection.hot, 1); assert.equal(r.json.collection.items[0].title, 'Where is your hometown?', 'the title comes from the question');
+      const freeId = (await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'Writing free', skill: 'writing', plan: 'free', items: [{ kind: 'question', part: 'Task 2', text: 'Some people think so.' }] } } })).json.collection.id;
+      const hiddenId = (await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'Draft', skill: 'reading', plan: 'free', published: false } } })).json.collection.id;
+      r = await call('GET', '/api/predictions/' + maxId); assert.equal(r.status, 403); assert.equal(r.json.collection.items, undefined, 'a locked collection: no questions'); assert.equal(r.json.collection.count, 2); assert.ok(r.json.price.startsWith('/Price'));
+      r = await call('GET', '/api/predictions/' + freeId); assert.equal(r.status, 200); assert.equal(r.json.collection.items[0].text, 'Some people think so.');
+      assert.equal((await call('GET', '/api/predictions/' + hiddenId)).status, 404, 'hidden from students');
+      assert.ok(!(await call('GET', '/api/predictions')).json.collections.some((c) => c.id === hiddenId));
+      assert.equal((await call('GET', '/api/predictions/' + hiddenId, { jar: boss })).status, 200, 'admins can preview a hidden one');
+      r = await call('GET', '/api/predictions/' + maxId, { jar: boss }); assert.equal(r.status, 200); assert.equal(r.json.collection.items.length, 2);
+      r = await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { id: freeId, title: 'Writing free', skill: 'writing', plan: 'free', status: 'complete', items: [] } } }); assert.equal(r.status, 200); assert.equal(r.json.collection.status, 'complete');
+      r = await call('POST', '/api/admin/predictions/order', { jar: boss, body: { ids: [hiddenId, freeId] } }); assert.equal(r.json.collections[0].id, hiddenId); assert.equal(r.json.collections[1].id, freeId);
+      await call('POST', '/api/admin/predictions/' + hiddenId + '/publish', { jar: boss, body: { published: true } });
+      assert.equal((await call('GET', '/api/predictions/' + hiddenId)).status, 200, 'published');
+      assert.equal((await call('DELETE', '/api/admin/predictions/' + maxId, { jar: boss })).status, 200);
+      assert.equal((await call('GET', '/api/predictions/' + maxId, { jar: boss })).status, 404, 'deleted');
+      assert.equal((await call('GET', '/Predictions')).status, 200);
+      ok('predictions: admin only, links checked, locked by plan on the server (no questions sent), drafts hidden, edit, order, publish, delete');
+    }
+
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');

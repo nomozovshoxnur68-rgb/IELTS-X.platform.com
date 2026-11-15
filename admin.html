@@ -1,12 +1,15 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* light / dark before the first paint: the same "theme" choice as the website (assets/js/theme-init.js) */
+(function(){try{var s=localStorage.getItem('theme');var d=s==='dark'||(s!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
 <script src="/assets/js/loading.js"></script>
 <meta charset="UTF-8">
 <link rel="icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
 <title>IELTSX — Admin Panel</title>
 <link rel="stylesheet" href="admin.css">
     <script src="/assets/js/branding.js" defer></script>
@@ -21,49 +24,52 @@
     <div><strong>IELTSX</strong><small>Admin Panel</small></div>
   </div>
   <nav class="admin-nav">
-    <div class="nav-label">Management</div>
-    <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico">▦</span><span class="grow">Dashboard</span></a>
-    <a class="nav-item" href="#sitecheck" data-nav="sitecheck"><span class="ico">✓</span><span class="grow">Website check</span></a>
-    <a class="nav-item" href="#users" data-nav="users"><span class="ico">♙</span><span class="grow">Users</span></a>
-    <a class="nav-item" href="#premium" data-nav="premium"><span class="ico">★</span><span class="grow">Premium</span></a>
-    <a class="nav-item" href="#orders" data-nav="orders"><span class="ico">◈</span><span class="grow">Orders</span><span id="orders-count" class="pill" hidden>0</span></a>
-    <a class="nav-item" href="#activity" data-nav="activity"><span class="ico">✎</span><span class="grow">Test activity</span></a>
-    <a class="nav-item" href="#audit" data-nav="audit"><span class="ico">☰</span><span class="grow">Activity log</span></a>
-    <div class="nav-label">Tests · AI</div>
-    <a class="nav-item" href="#ai" data-nav="ai"><span class="ico">✦</span><span class="grow">AI Test Generator</span></a>
-    <div class="nav-label">Tests · Part practice</div>
-    <a class="nav-item" href="#reading" data-nav="reading"><span class="ico">▤</span><span class="grow">Reading · Part</span></a>
-    <a class="nav-item" href="#listening" data-nav="listening"><span class="ico">♪</span><span class="grow">Listening · Part</span></a>
-    <a class="nav-item" href="#writing" data-nav="writing"><span class="ico">✐</span><span class="grow">Writing · Part</span></a>
-    <a class="nav-item" href="#speaking" data-nav="speaking"><span class="ico">☏</span><span class="grow">Speaking · Part</span></a>
-    <div class="nav-label">Tests · Full tests</div>
-    <a class="nav-item" href="#readingfull" data-nav="readingfull"><span class="ico">▥</span><span class="grow">Reading · Full</span></a>
-    <a class="nav-item" href="#listeningfull" data-nav="listeningfull"><span class="ico">♫</span><span class="grow">Listening · Full</span></a>
-    <a class="nav-item" href="#writingfull" data-nav="writingfull"><span class="ico">✎</span><span class="grow">Writing · Full</span></a>
-    <a class="nav-item" href="#speakingfull" data-nav="speakingfull"><span class="ico">☎</span><span class="grow">Speaking · Full</span></a>
-    <a class="nav-item" href="#packs" data-nav="packs"><span class="ico">▦</span><span class="grow">Packs (all Full Tests cards)</span></a>
-    <a class="nav-item" href="#mocks" data-nav="mocks"><span class="ico">⏱</span><span class="grow">Mock tests</span></a>
+    <div class="nav-label">Overview</div>
+    <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico" data-i="dashboard"></span><span class="grow">Dashboard</span></a>
+    <a class="nav-item" href="#sitecheck" data-nav="sitecheck"><span class="ico" data-i="shield"></span><span class="grow">Website check</span></a>
+    <div class="nav-label">People</div>
+    <a class="nav-item" href="#users" data-nav="users"><span class="ico" data-i="users"></span><span class="grow">Users</span></a>
+    <a class="nav-item" href="#premium" data-nav="premium"><span class="ico" data-i="crown"></span><span class="grow">Premium</span></a>
+    <a class="nav-item" href="#orders" data-nav="orders"><span class="ico" data-i="bag"></span><span class="grow">Orders</span><span id="orders-count" class="pill" hidden>0</span></a>
+    <a class="nav-item" href="#activity" data-nav="activity"><span class="ico" data-i="activity"></span><span class="grow">Test activity</span></a>
+    <a class="nav-item" href="#audit" data-nav="audit"><span class="ico" data-i="history"></span><span class="grow">Activity log</span></a>
+    <div class="nav-label">Exam content</div>
+    <a class="nav-item" href="#predictions" data-nav="predictions"><span class="ico" data-i="layers"></span><span class="grow">Predictions</span><span class="nav-new">NEW</span></a>
+    <a class="nav-item" href="#ai" data-nav="ai"><span class="ico" data-i="sparkles"></span><span class="grow">AI Test Generator</span></a>
+    <a class="nav-item" href="#mocks" data-nav="mocks"><span class="ico" data-i="timer"></span><span class="grow">Mock tests</span></a>
+    <div class="nav-label">Part practice</div>
+    <a class="nav-item" href="#reading" data-nav="reading"><span class="ico" data-i="book"></span><span class="grow">Reading · Part</span></a>
+    <a class="nav-item" href="#listening" data-nav="listening"><span class="ico" data-i="headphones"></span><span class="grow">Listening · Part</span></a>
+    <a class="nav-item" href="#writing" data-nav="writing"><span class="ico" data-i="pen"></span><span class="grow">Writing · Part</span></a>
+    <a class="nav-item" href="#speaking" data-nav="speaking"><span class="ico" data-i="mic"></span><span class="grow">Speaking · Part</span></a>
+    <div class="nav-label">Full tests</div>
+    <a class="nav-item" href="#readingfull" data-nav="readingfull"><span class="ico" data-i="library"></span><span class="grow">Reading · Full</span></a>
+    <a class="nav-item" href="#listeningfull" data-nav="listeningfull"><span class="ico" data-i="audio"></span><span class="grow">Listening · Full</span></a>
+    <a class="nav-item" href="#writingfull" data-nav="writingfull"><span class="ico" data-i="filepen"></span><span class="grow">Writing · Full</span></a>
+    <a class="nav-item" href="#speakingfull" data-nav="speakingfull"><span class="ico" data-i="messages"></span><span class="grow">Speaking · Full</span></a>
+    <a class="nav-item" href="#packs" data-nav="packs"><span class="ico" data-i="package"></span><span class="grow">Packs (all Full Tests cards)</span></a>
     <div class="nav-label">Games</div>
-    <a class="nav-item" href="#games" data-nav="games"><span class="ico">🎮</span><span class="grow">Games (live quiz)</span><span id="games-live" class="pill" hidden>0</span></a>
+    <a class="nav-item" href="#games" data-nav="games"><span class="ico" data-i="gamepad"></span><span class="grow">Games (live quiz)</span><span id="games-live" class="pill" hidden>0</span></a>
     <div class="nav-label">Content</div>
-    <a class="nav-item" href="#articles" data-nav="articles"><span class="ico">▣</span><span class="grow">Article cards</span></a>
-    <a class="nav-item" href="#pdf" data-nav="pdf"><span class="ico">⇩</span><span class="grow">PDF materials</span></a>
-    <a class="nav-item" href="#access" data-nav="access"><span class="ico">⚿</span><span class="grow">Access (lock / plans)</span></a>
-    <a class="nav-item" href="#pricing" data-nav="pricing"><span class="ico">$</span><span class="grow">Price control</span></a>
-    <a class="nav-item" href="#vocab" data-nav="vocab"><span class="ico">Aa</span><span class="grow">Vocabulary</span></a>
-    <div class="nav-label">Site</div>
-    <a class="nav-item" href="#branding" data-nav="branding"><span class="ico">◎</span><span class="grow">Logo</span></a>
-    <a class="nav-item" href="/"><span class="ico">⌂</span><span class="grow">Open website</span></a>
-    <button class="nav-item" data-logout type="button"><span class="ico">↪</span><span class="grow">Sign out</span></button>
+    <a class="nav-item" href="#articles" data-nav="articles"><span class="ico" data-i="newspaper"></span><span class="grow">Article cards</span></a>
+    <a class="nav-item" href="#pdf" data-nav="pdf"><span class="ico" data-i="filedown"></span><span class="grow">PDF materials</span></a>
+    <a class="nav-item" href="#vocab" data-nav="vocab"><span class="ico" data-i="languages"></span><span class="grow">Vocabulary</span></a>
+    <div class="nav-label">Settings</div>
+    <a class="nav-item" href="#access" data-nav="access"><span class="ico" data-i="lock"></span><span class="grow">Access (lock / plans)</span></a>
+    <a class="nav-item" href="#pricing" data-nav="pricing"><span class="ico" data-i="tag"></span><span class="grow">Price control</span></a>
+    <a class="nav-item" href="#branding" data-nav="branding"><span class="ico" data-i="image"></span><span class="grow">Logo</span></a>
+    <a class="nav-item" href="/" target="_blank" rel="noopener"><span class="ico" data-i="globe"></span><span class="grow">Open website</span></a>
+    <button class="nav-item" data-logout type="button"><span class="ico" data-i="logout"></span><span class="grow">Sign out</span></button>
   </nav>
 </aside>
 <div class="scrim" id="scrim"></div>
 
 <main class="admin-main">
   <header class="topbar">
-    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu">☰</button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu"><span data-i="menu"></span></button>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
-    <button class="btn btn-sm" id="refresh" type="button" title="Reload all data">↻ Refresh</button>
+    <button class="btn btn-sm" id="refresh" type="button" title="Reload all data"><span data-i="refresh" class="ico-inline"></span><span class="lbl-txt">Refresh</span></button>
+    <button class="icon-btn theme-toggle" id="theme-toggle" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode"><span class="moon" data-i="moon"></span><span class="sun" data-i="sun"></span></button>
     <div class="admin-user"><div><strong id="admin-name" style="font-size:13px">Administrator</strong><div id="admin-role" class="muted sm">Full access</div></div><div id="admin-avatar" class="avatar">A</div></div>
   </header>
 
@@ -71,19 +77,31 @@
 
   <!-- ═════════ Dashboard ═════════ -->
   <section class="view active" id="view-dashboard">
-    <div class="grid stats">
-      <div class="card stat"><div><div class="stat-label">Total users</div><div class="stat-value" id="stat-users">–</div><div class="stat-sub" id="stat-users-sub">&nbsp;</div></div><div class="stat-icon">♙</div></div>
-      <div class="card stat"><div><div class="stat-label">Premium users</div><div class="stat-value" id="stat-premium">–</div><div class="stat-sub" id="stat-premium-sub">&nbsp;</div></div><div class="stat-icon">★</div></div>
-      <div class="card stat"><div><div class="stat-label">Tests taken</div><div class="stat-value" id="stat-tests">–</div><div class="stat-sub" id="stat-tests-sub">&nbsp;</div></div><div class="stat-icon">✎</div></div>
-      <div class="card stat"><div><div class="stat-label">Revenue (confirmed)</div><div class="stat-value" id="stat-revenue">–</div><div class="stat-sub" id="stat-revenue-sub">&nbsp;</div></div><div class="stat-icon">◈</div></div>
+    <div class="dash-hero">
+      <div><div class="eyebrow" id="dash-date">&nbsp;</div><h1 id="dash-hello">Welcome back</h1><p id="dash-summary">Loading the latest numbers…</p></div>
+      <div class="btn-row"><a class="btn" href="#predictions"><span data-i="layers" class="ico-inline"></span>Predictions</a><a class="btn" href="#users"><span data-i="users" class="ico-inline"></span>Users</a><a class="btn btn-primary" href="/" target="_blank" rel="noopener"><span data-i="globe" class="ico-inline"></span>Open website</a></div>
     </div>
-    <div class="grid two-col">
-      <div class="card"><div class="section-head"><div><div class="section-title">New sign-ups</div><div class="muted sm">Last 14 days</div></div></div><div class="chart" id="chart-signups"></div><div class="chart-x" id="chart-signups-x"></div></div>
-      <div class="card"><div class="section-head"><div><div class="section-title">Tests finished</div><div class="muted sm">Last 14 days</div></div></div><div class="chart" id="chart-tests"></div><div class="chart-x" id="chart-tests-x"></div></div>
+    <div class="grid kpis" id="kpis">
+      <div class="card kpi"><div class="skeleton" style="height:96px"></div></div><div class="card kpi"><div class="skeleton" style="height:96px"></div></div>
+      <div class="card kpi"><div class="skeleton" style="height:96px"></div></div><div class="card kpi"><div class="skeleton" style="height:96px"></div></div>
     </div>
-    <div class="grid two-col">
+    <div class="dash-row r-main">
+      <div class="card">
+        <div class="section-head"><div><div class="section-title">Activity</div><div class="muted sm">Sign-ups and finished tests · last 14 days</div></div>
+          <div class="seg" id="act-seg" role="group" aria-label="Series"><button class="on" data-series="both" type="button">Both</button><button data-series="signups" type="button">Sign-ups</button><button data-series="tests" type="button">Tests</button></div></div>
+        <div class="lc" id="chart-activity"><div class="skeleton" style="height:240px"></div></div>
+        <div class="lc-legend" id="act-legend"></div>
+      </div>
+      <div class="card"><div class="section-head"><div><div class="section-title">Audience</div><div class="muted sm">Every account on the website</div></div></div><div id="audience"><div class="skeleton" style="height:150px"></div></div></div>
+    </div>
+    <div class="dash-row r-3">
       <div class="card"><div class="section-head"><div class="section-title">Needs your attention</div></div><div id="attention"><div class="empty">Loading…</div></div></div>
-      <div class="card"><div class="section-head"><div class="section-title">Audience</div></div><div id="audience"></div></div>
+      <div class="card"><div class="section-head"><div><div class="section-title">Tests by section</div><div class="muted sm">Every finished test</div></div></div><div id="sections" class="hbars"></div></div>
+      <div class="card"><div class="section-head"><div class="section-title">Quick actions</div></div><div class="quick" id="quick"></div></div>
+    </div>
+    <div class="dash-row r-2">
+      <div class="card"><div class="section-head"><div><div class="section-title">Newest students</div><div class="muted sm">The latest sign-ups</div></div><a class="btn btn-sm" href="#users">All users</a></div><div class="dash-list" id="recent-users"></div></div>
+      <div class="card"><div class="section-head"><div><div class="section-title">Latest results</div><div class="muted sm">Finished tests of every student</div></div><a class="btn btn-sm" href="#activity">All activity</a></div><div class="dash-list" id="recent-results"></div></div>
     </div>
   </section>
 
@@ -166,6 +184,7 @@
   <section class="view" id="view-pricing"><div id="content-pricing"></div></section>
   <section class="view" id="view-branding"><div id="content-branding"></div></section>
   <section class="view" id="view-sitecheck"><div id="content-sitecheck"></div></section>
+  <section class="view" id="view-predictions"><div id="content-predictions"></div></section>
 
   </div>
 </main>
@@ -204,6 +223,7 @@
 <script src="admin-sitecheck.js"></script>
 <script src="admin-mocks.js"></script>
 <script src="admin-games.js"></script>
+<script src="admin-predictions.js"></script>
 </body>
 </html>
 

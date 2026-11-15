@@ -159,13 +159,22 @@ function memoGet(key, load) {
   return p;
 }
 const memoClear = (prefix) => { for (const k of [...memo.keys()]) if (k.startsWith(prefix)) memo.delete(k); };
-const MEMO_SETTINGS = new Set(['branding', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests']);
+const MEMO_SETTINGS = new Set(['branding', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions']);
 
 const store = {
   async listUsers() { return USE_SUPABASE ? ((await sb('ieltsx_users?select=*&order=createdAt.desc')) || []) : loadDb().users; },
   async findUserByEmail(email) {
-    if (USE_SUPABASE) return ((await sb(`ieltsx_users?email=eq.${eq(email)}&limit=1`)) || [])[0] || null;
-    return loadDb().users.find((u) => u.email === email) || null;
+    email = normEmail(email);
+    if (!email) return null;
+    if (USE_SUPABASE) {
+      const exact = ((await sb(`ieltsx_users?email=eq.${eq(email)}&limit=1`)) || [])[0];
+      if (exact) return exact;
+      // an account saved with capital letters (typed by hand in Supabase, or by an older version) could never sign in:
+      // look it up without case too. "_" and "*" are wildcards in ilike, so the rows are compared again here.
+      const rows = (await sb(`ieltsx_users?email=ilike.${eq(email)}&limit=20`)) || [];
+      return rows.find((u) => normEmail(u.email) === email) || null;
+    }
+    return loadDb().users.find((u) => normEmail(u.email) === email) || null;
   },
   async findUserById(id) {
     if (!id) return null;
@@ -390,14 +399,14 @@ async function currentUser(req) {
 }
 
 /* ───────────────────────── users, roles, premium ───────────────────────── */
-function isAdmin(u) { return !!u && (u.role === 'admin' || ADMIN_EMAILS.has(u.email)); }
+function isAdmin(u) { return !!u && (u.role === 'admin' || ADMIN_EMAILS.has(normEmail(u.email))); }
 function isPremium(u) {
   if (!u) return false;
   if (isAdmin(u)) return true;
   return !!u.premiumActive && (!u.premiumExpiresAt || new Date(u.premiumExpiresAt) > new Date());
 }
 async function syncAdminRole(u) {
-  if (ADMIN_EMAILS.has(u.email) && u.role !== 'admin') {
+  if (ADMIN_EMAILS.has(normEmail(u.email)) && u.role !== 'admin') {
     return (await store.updateUser(u.id, { role: 'admin', plan: 'Admin', premiumActive: true, premiumExpiresAt: null })) || u;
   }
   return u;
@@ -627,6 +636,8 @@ const mockCtx = (extra) => Object.assign(mockCtxInst || (mockCtxInst = { store, 
 /* live quiz games (quiz-game.js): the quizzes of the admin panel, the host screen, the players */
 let gameCtxInst = null;
 const gameCtx = (extra) => ({ ...(gameCtxInst || (gameCtxInst = { store, currentUser, isAdmin, send, readJson, rateLimit, HttpError, purposeToken, readPurposeToken, audit, cleanUrl, clientIp, USE_SUPABASE })), ...(extra || {}) });
+/* Predictions (predictions.js): the collections of the Predictions page and of the admin panel */
+const predCtx = (extra) => ({ store, currentUser, isAdmin, userLevel, send, readJson, rateLimit, HttpError, audit, clientIp, ...(extra || {}) });
 const aiStore = () => aiStoreInst || (aiStoreInst = require('./ai-store').createAiStore({ USE_SUPABASE, sb, eq, DATA_DIR, HttpError }));
 
 function readBody(req, limit = 100 * 1024) {
@@ -1250,7 +1261,13 @@ async function api(req, res, url) {
     const b = await readJson(req); const email = normEmail(b.email);
     rateLimit('login:' + clientIp(req) + ':' + email, 8, 15 * 60000);
     if (rateBlocked('loginfail:' + email, 15)) throw new HttpError(429, 'Too many failed attempts for this account. Please wait 15 minutes or reset your password.');
+    if (!validEmail(email)) throw new HttpError(400, 'Please enter a valid email address.');
     const found = await store.findUserByEmail(email);
+    // an account made with "Continue with Google" has no password: "Incorrect email or password" sent people round in circles
+    if (found && !found.passwordHash) {
+      verifyPassword('x', DUMMY.salt, DUMMY.hash); rateHit('loginfail:' + email, 15 * 60000);
+      throw new HttpError(401, 'This account was created with Google, so it has no password yet. Press "Continue with Google" above. (You can add a password later on your Account page.)');
+    }
     const ok = found ? verifyPassword(String(b.password || ''), found.passwordSalt, found.passwordHash) : (verifyPassword('x', DUMMY.salt, DUMMY.hash), false);
     if (!ok) { rateHit('loginfail:' + email, 15 * 60000); throw new HttpError(401, 'Incorrect email or password.'); }
     attempts.delete('loginfail:' + email);
@@ -1510,6 +1527,9 @@ async function api(req, res, url) {
     throw new HttpError(405, 'Method not allowed.');
   }
 
+  /* ---- Predictions (predictions.js): the published collections; questions and links only with the plan ---- */
+  if (p === '/api/predictions' || p.startsWith('/api/predictions/')) return require('./predictions').route(req, res, p, method, predCtx());
+
   /* ---- Full Mock Tests (mock-tests.js): the cards, starting / resuming / finishing an attempt ---- */
   if (p === '/api/mocks' || p.startsWith('/api/mocks/') || p.startsWith('/api/mock/')) return require('./mock-tests').route(req, res, p, method, url, mockCtx());
 
@@ -1528,6 +1548,7 @@ async function api(req, res, url) {
     if (p.startsWith('/api/admin/ai/')) return require('./ai-generator').route(req, res, p, method, { admin, send, readJson, audit, rateLimit, HttpError, UPLOAD_DIR, SUPABASE_URL, MEDIA_BUCKET, IS_VERCEL, USE_SUPABASE, AUDIO_EXT, PDF_EXT });
     if (p === '/api/admin/mocks' || p.startsWith('/api/admin/mocks/')) return require('./mock-tests').adminRoute(req, res, p, method, url, mockCtx({ admin }));
     if (p === '/api/admin/games' || p.startsWith('/api/admin/games/')) return require('./quiz-game').adminRoute(req, res, p, method, url, gameCtx({ admin }));
+    if (p === '/api/admin/predictions' || p.startsWith('/api/admin/predictions/')) return require('./predictions').adminRoute(req, res, p, method, predCtx({ admin }));
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {
@@ -1672,13 +1693,29 @@ async function api(req, res, url) {
       await audit(admin, 'premium.revoke', u.email);
       return send(res, 200, { user: adminUser(await store.updateUser(u.id, { premiumActive: false, plan: 'Free', premiumExpiresAt: null })) });
     }
+    // a new password chosen by an admin (no e-mail service: "Forgot password" cannot send a link, so support does it here).
+    // The person is signed out on every device (the session version follows the password).
+    m = p.match(/^\/api\/admin\/users\/([^/]+)\/password$/);
+    if (m && method === 'POST') {
+      const u = await store.findUserById(decodeURIComponent(m[1])); if (!u) throw new HttpError(404, 'User not found.');
+      if (u.id === admin.id) throw new HttpError(400, 'Change your own password on your Account page.');
+      if (isAdmin(u)) throw new HttpError(400, 'Remove the admin role first: another admin sets their own password.');
+      rateLimit('admin-pwd:' + admin.id, 20, 60 * 60000);
+      const next = String((await readJson(req)).password || '');
+      checkPassword(next, u.email, u.name);
+      const hp = hashPassword(next);
+      const updated = await store.updateUser(u.id, { passwordHash: hp.hash, passwordSalt: hp.salt });
+      attempts.delete('loginfail:' + normEmail(u.email));
+      await audit(admin, 'user.password', u.email);
+      return send(res, 200, { user: adminUser(updated) });
+    }
     m = p.match(/^\/api\/admin\/users\/([^/]+)\/role$/);
     if (m && method === 'POST') {
       const u = await store.findUserById(decodeURIComponent(m[1])); if (!u) throw new HttpError(404, 'User not found.');
       const role = (await readJson(req)).role === 'admin' ? 'admin' : 'user';
       if (role === 'user') {
         if (u.id === admin.id) throw new HttpError(400, 'You cannot remove your own admin role.');
-        if (ADMIN_EMAILS.has(u.email)) throw new HttpError(400, 'This account is listed in ADMIN_EMAILS. Remove it there first.');
+        if (ADMIN_EMAILS.has(normEmail(u.email))) throw new HttpError(400, 'This account is listed in ADMIN_EMAILS. Remove it there first.');
         const admins = (await store.listUsers()).filter(isAdmin);
         if (admins.length <= 1) throw new HttpError(400, 'There must be at least one admin.');
       }
@@ -1820,7 +1857,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
