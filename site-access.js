@@ -191,10 +191,12 @@ window.IELTSXSiteAccess = { currentUser: loadUser, requireLogin, refresh, logout
 
 /* A visitor who has never been here before (no account on this browser, never sent to the sign-in page) is shown the
    sign-in page first, once, and comes back to the same page afterwards. Later visits are not interrupted. Search engine
-   robots are left alone, and a browser that blocks storage is never sent (it could not remember the first time). */
+   robots are left alone, and a browser that blocks storage is never sent (it could not remember the first time).
+   So are browsers driven by a program (navigator.webdriver): PageSpeed Insights / Lighthouse runs a headless Chrome with
+   an ordinary phone user agent (no "Lighthouse" in it), and was measuring the sign-in page instead of the page asked for. */
 const FIRST_VISIT_KEY = 'ix-first-visit-done';
 function sendFirstVisitToLogin() {
-  if (/bot|crawl|spider|slurp|lighthouse|preview|facebookexternalhit|telegram/i.test(navigator.userAgent || '')) return false;
+  if (navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|headless|inspectiontool|preview|facebookexternalhit|telegram/i.test(navigator.userAgent || '')) return false;
   try {
     if (localStorage.getItem(FIRST_VISIT_KEY) || localStorage.getItem('ieltsx_logged_in_email')) return false;
     localStorage.setItem(FIRST_VISIT_KEY, String(Date.now()));

@@ -305,7 +305,11 @@ server.listen(0, async () => {
 
     // --- search engines
     r = await call('GET', '/robots.txt'); assert.ok(r.text.includes('Disallow: /admin') && /Sitemap: http/.test(r.text));
-    r = await call('GET', '/sitemap.xml'); assert.ok(r.text.includes('/pessages/test-1') && r.text.includes('/full-tests/reading/') && !r.text.includes('/pessages/test-3') && !r.text.includes('/admin')); ok('robots.txt + sitemap.xml (no placeholders, no admin)');
+    assert.ok(r.text.includes('Allow: /api/materials') && !/Disallow: \/(login|account)/.test(r.text), 'robots.txt: pages drawn from the API stay readable, noindex pages are not hidden');
+    r = await call('GET', '/sitemap.xml'); assert.ok(r.text.includes('/pessages/test-1') && r.text.includes('/full-tests/reading/') && !r.text.includes('/pessages/test-3') && !r.text.includes('/admin'));
+    assert.ok(!r.text.includes('/sections/test-5') && !r.text.includes('<lastmod>'), 'sitemap: no noindex page, no made-up dates');
+    assert.ok(/<link rel="canonical" href="https:\/\/ielts-x\.uz\/">/.test((await call('GET', '/')).text) && /name="robots" content="noindex"/.test((await call('GET', '/login')).text), 'home page canonical, sign-in page noindex');
+    ok('robots.txt + sitemap.xml (no placeholders, no admin)');
 
 
     // --- v3: password policy, suspend, notes, details, stats, csv, extend, headers
@@ -535,6 +539,11 @@ server.listen(0, async () => {
       await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'default' }, { key: 'test:reading/pack-1/test-6', mode: 'default' }] }, jar: boss });
       assert.equal((await call('GET', page, { jar: nobody.j })).status, 302, 'back to the default lock');
       assert.equal((await call('GET', page, { jar: stdU.j })).status, 200);
+      // a practice page locked here is left out of the sitemap (Google would only be sent to the Price page)
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-20', mode: 'max' }] }, jar: boss });
+      let sm = (await call('GET', '/sitemap.xml')).text; assert.ok(!sm.includes('/pessages/test-20<') && sm.includes('/pessages/test-21<'), 'locked practice page not in the sitemap');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-20', mode: 'default' }] }, jar: boss });
+      sm = (await call('GET', '/sitemap.xml')).text; assert.ok(sm.includes('/pessages/test-20<'), 'free again: back in the sitemap');
       ok('packs: free / Max / default, inheritance, a test setting beats its pack');
 
       // tests made in the admin panel follow the same rules (and the old premium flag stays in step)
@@ -655,6 +664,11 @@ server.listen(0, async () => {
       await call('POST', '/api/admin/access', { body: { changes: [{ key: 'pack:reading/pack-1', mode: 'default' }, { key: 'test:reading/pack-1/test-6', mode: 'default' }] }, jar: boss });
       assert.equal((await call('GET', page, { jar: nobody.j })).status, 302, 'back to the default lock');
       assert.equal((await call('GET', page, { jar: stdU.j })).status, 200);
+      // a practice page locked here is left out of the sitemap (Google would only be sent to the Price page)
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-20', mode: 'max' }] }, jar: boss });
+      let sm = (await call('GET', '/sitemap.xml')).text; assert.ok(!sm.includes('/pessages/test-20<') && sm.includes('/pessages/test-21<'), 'locked practice page not in the sitemap');
+      await call('POST', '/api/admin/access', { body: { changes: [{ key: 'test:reading/practice-cards/test-20', mode: 'default' }] }, jar: boss });
+      sm = (await call('GET', '/sitemap.xml')).text; assert.ok(sm.includes('/pessages/test-20<'), 'free again: back in the sitemap');
       ok('packs: free / Max / default, inheritance, a test setting beats its pack');
 
       // tests made in the admin panel follow the same rules (and the old premium flag stays in step)
