@@ -40,6 +40,7 @@
         "pdf-materials": "/study/Tools/Pdf%20materials",
         "articles": "/study/Tools/Articles",
         "vocabulary": "/vocabulary",
+        "settings": "/settings",        // added under Study Tools by assets/js/site-design.js
 
         // ── account ──
         "pricing": "/Price",

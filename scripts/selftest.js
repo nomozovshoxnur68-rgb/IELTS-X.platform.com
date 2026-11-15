@@ -247,6 +247,49 @@ server.listen(0, async () => {
     await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: '', iconUrl: '' } });
     assert.equal((await call('GET', '/api/branding')).json.logoUrl, ''); ok('site logo: admin only, links checked, public read');
 
+    // --- site design (Admin -> Design, the Settings page, assets/js/site-design.js)
+    r = await call('GET', '/api/design');
+    assert.equal(r.status, 200); assert.equal(r.json.default, 'classic'); assert.equal(r.json.cosmicVisible, true); assert.deepEqual(r.json.themes, []);
+    assert.equal(r.json.accents.length, 6, 'the standard accent colours'); assert.ok(/no-cache/.test(r.headers.get('cache-control')));
+    assert.equal((await call('POST', '/api/admin/design', { body: { default: 'cosmic' } })).status, 401);
+    assert.equal((await call('POST', '/api/admin/design', { jar: user, body: { default: 'cosmic' } })).status, 403);
+    r = await call('POST', '/api/admin/design', { jar: boss, body: { default: 't-ocean1', cosmicVisible: false,
+      colors: { accent: '#1A2', sidebarLight: 'red', cardDark: '#1a1a1a', bgDark: 'url(x)' },
+      themes: [{ id: 't-ocean1', name: '<b>Ocean</b>', bgLight: 'javascript:alert(1)', bgDark: 'https://cdn.example.com/night.jpg', accent: '#0EA5E9', veil: 500, stars: 1 }, { id: 'bad id', name: '' }],
+      accents: [{ name: 'Sky', color: '#38bdf8' }, { name: 'Same', color: '#38BDF8' }, { name: 'Bad', color: 'blue' }] } });
+    assert.equal(r.status, 200); const ds = r.json.design;
+    assert.equal(ds.default, 't-ocean1'); assert.equal(ds.cosmicVisible, false);
+    assert.deepEqual(ds.colors, { accent: '#11aa22', sidebarLight: '', sidebarDark: '', cardLight: '', cardDark: '#1a1a1a', bgLight: '', bgDark: '' }, 'colours: hex only');
+    assert.equal(ds.themes.length, 2); assert.equal(ds.themes[0].name, 'bOcean/b'); assert.equal(ds.themes[0].bgLight, '', 'no javascript: picture');
+    assert.equal(ds.themes[0].bgDark, 'https://cdn.example.com/night.jpg'); assert.equal(ds.themes[0].accent, '#0ea5e9'); assert.equal(ds.themes[0].veil, 80); assert.equal(ds.themes[0].stars, true);
+    assert.ok(/^t-[a-z0-9]{4,16}$/.test(ds.themes[1].id) && ds.themes[1].name === 'Custom design', 'a bad id gets a new one');
+    assert.deepEqual(ds.accents, [{ name: 'Sky', color: '#38bdf8' }], 'accent colours: hex only, no copies');
+    r = await call('GET', '/api/design'); assert.equal(r.json.themes[0].id, 't-ocean1'); assert.ok(r.json.updatedAt);
+    r = await call('POST', '/api/admin/design', { jar: boss, body: { default: 't-gone99', themes: [] } }); assert.equal(r.json.design.default, 'classic', 'a default that is not there falls back to classic');
+    assert.equal((await call('GET', '/api/account/design')).status, 401);
+    r = await call('POST', '/api/account/design', { jar: user, body: { design: 'cosmic', accent: '#ABCDEF', motion: false, at: 1234 } });
+    assert.equal(r.status, 200); assert.deepEqual(r.json.pref, { design: 'cosmic', accent: '#abcdef', motion: false, at: 1234 });
+    assert.equal((await call('POST', '/api/account/design', { jar: user, body: { design: '"><script>', accent: 'red' } })).json.pref.design, '');
+    await call('POST', '/api/account/design', { jar: user, body: { design: 'cosmic', at: 99 } });
+    r = await call('GET', '/api/account/design', { jar: user }); assert.equal(r.json.pref.design, 'cosmic'); assert.equal(r.json.pref.at, 99);
+    assert.equal((await call('GET', '/api/account/design', { jar: boss })).json.pref, null, 'each account has its own');
+    await call('POST', '/api/admin/design', { jar: boss, body: {} });
+    r = await call('GET', '/settings'); assert.equal(r.status, 200); assert.ok(r.text.includes('site-design.js') && r.text.includes('settings-page.js') && r.text.includes('id="ixs-designs"'));
+    assert.equal((await call('GET', '/assets/js/site-design.js')).status, 200);
+    ok('site design: admin only, colours and pictures checked, public read, each visitor\'s own choice with the account, Settings page');
+    {
+      // the design is on the ordinary pages only: never on a test or exam page (it would move behind the test)
+      const ROOT = path.join(__dirname, '..'), pages = [];
+      const walk = (dir) => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { if (['node_modules', '.git', '.claude', 'data', 'uploads'].includes(e.name)) continue; const f = path.join(dir, e.name); if (e.isDirectory()) walk(f); else if (/\.html$/i.test(e.name)) pages.push(path.relative(ROOT, f).replace(/\\/g, '/')); } };
+      walk(ROOT);
+      const TEST = /^(full-tests\/[^/]+\/test-|pessages?\/|sections\/|full-mock\/|exam\/|writing\/|listening\/|test\.html$|game|speaking|reading with Answers\/)/i;
+      const withDesign = pages.filter((p) => fs.readFileSync(path.join(ROOT, p), 'utf8').includes('site-design.js'));
+      const onTests = withDesign.filter((p) => TEST.test(p)); assert.deepEqual(onTests, [], 'no test page loads the design');
+      for (const p of ['index.html', 'settings.html', 'Predictions.html', 'Mock tests.html', 'Price.html', 'account.html', 'vocabulary.html', 'part/practice/reading.html', 'full-tests/reading/index.html', 'study/Tools/Articles.html', 'study/Tools/Performance.html', 'study/Tools/Pdf materials.html'])
+        assert.ok(withDesign.includes(p), p + ' loads the design');
+      ok('the design is on ' + withDesign.length + ' ordinary pages and on no test or exam page');
+    }
+
     // --- Website check (admin panel) + speed: versioned styles/scripts, prefetch never opens a locked test
     assert.equal((await call('GET', '/api/admin/site-check', { jar: user })).status, 403);
     r = await call('GET', '/api/admin/site-check?fresh=1', { jar: boss }); assert.equal(r.status, 200);

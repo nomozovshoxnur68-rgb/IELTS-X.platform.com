@@ -5,7 +5,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
-  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', mocks: 'Mock tests', games: 'Games · live quiz',listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', sitecheck: 'Website check', predictions: 'Predictions' };
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', mocks: 'Mock tests', games: 'Games · live quiz',listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', design: 'Design', sitecheck: 'Website check', predictions: 'Predictions' };
 
   /* ───────── icons (one stroke set, drawn with currentColor so they follow light / dark) ───────── */
   const ICONS = {
@@ -35,6 +35,7 @@
     lock: '<circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/>',
     tag: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
     image: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+    palette: '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
     globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
     refresh: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
