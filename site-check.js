@@ -99,7 +99,7 @@ async function scanPages(root, ctx) {
 }
 
 function seo(root, publicPages) {
-  const missing = { title: [], description: [], viewport: [], lang: [] };
+  const missing = { title: [], description: [], viewport: [], lang: [], index: [] };
   let checked = 0;
   for (const u of publicPages) {
     const rel = decodeURIComponent(u).replace(/\/$/, '/index.html');
@@ -113,6 +113,7 @@ function seo(root, publicPages) {
     if (!/<meta[^>]+name=["']description["'][^>]*content=["'][^"']{20,}/i.test(head)) missing.description.push(u);
     if (!/<meta[^>]+name=["']viewport["']/i.test(head)) missing.viewport.push(u);
     if (!/<html[^>]+lang=/i.test(head)) missing.lang.push(u);
+    if (/<meta[^>]+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(head)) missing.index.push(u);   // a public page that tells Google to leave it out
   }
   return { checked, missing };
 }
@@ -234,7 +235,7 @@ async function run(ctx, opts = {}) {
       ? { level: scan.heavy.some((h) => h.size > 2 * 1048576) ? 'warn' : 'info', title: plural(scan.heavy.length, 'heavy file'), detail: 'Big pictures and pages load slowly on phones.', fix: 'Compress pictures (WebP, ≤ 300 KB).', items: scan.heavy.slice(0, 15).map((h) => `${h.file} — ${kb(h.size)}`) }
       : { level: 'ok', title: 'No heavy files', detail: 'Every page, picture and script is a reasonable size.' });
     const s = seo(ctx.root, ctx.publicPages);
-    const seoIssues = [['title', 'a title', 'no title'], ['description', 'a description for Google', 'no description for Google'], ['viewport', 'the phone (viewport) setting', 'no phone (viewport) setting'], ['lang', 'a language (lang)', 'no language (lang)']].filter(([k]) => s.missing[k].length);
+    const seoIssues = [['title', 'a title', 'no title'], ['description', 'a description for Google', 'no description for Google'], ['viewport', 'the phone (viewport) setting', 'no phone (viewport) setting'], ['lang', 'a language (lang)', 'no language (lang)'], ['index', 'permission to be shown in Google (it says noindex)', 'says noindex: Google leaves it out']].filter(([k]) => s.missing[k].length);
     pages.push(seoIssues.length
       ? { level: 'warn', title: 'Search engines: ' + plural(new Set(seoIssues.flatMap(([k]) => s.missing[k])).size, 'public page') + ' to improve', detail: seoIssues.map(([k, n]) => `${s.missing[k].length} without ${n}`).join(' · '), items: seoIssues.flatMap(([k, , short]) => s.missing[k].slice(0, 6).map((u) => `${u} — ${short}`)).slice(0, 24) }
       : { level: 'ok', title: 'Search engines: the public pages are ready', detail: `${s.checked} pages have a title, a description, the phone setting and a language.` });

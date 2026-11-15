@@ -81,9 +81,11 @@
         homeData();
     }
     /* the home page tells search engines the site's name and logo (Google shows them in the results); it points at
-       the fixed logo address, so a logo changed in the admin panel is what Google finds next time */
+       the fixed logo address, so a logo changed in the admin panel is what Google finds next time. index.html now
+       carries this data itself (WebSite + Organization, with the one address https://ielts-x.uz), so it is only added
+       to a home page that has none: two different copies would give Google two names for the same site. */
     function homeData() {
-        if (!/^\/(index(\.html)?)?$/.test(location.pathname) || document.getElementById('ix-site-data')) return;
+        if (!/^\/(index(\.html)?)?$/.test(location.pathname) || document.getElementById('ix-site-data') || document.querySelector('script[type="application/ld+json"]')) return;
         var o = location.origin, s = document.createElement('script');
         s.type = 'application/ld+json'; s.id = 'ix-site-data';
         s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': [

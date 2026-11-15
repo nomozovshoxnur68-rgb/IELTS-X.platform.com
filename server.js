@@ -2118,26 +2118,47 @@ async function brandImage(req, res, kind) {
   return res.end(req.method === 'HEAD' ? undefined : img.buf);
 }
 
-/* ───────────────────────── sitemap (public pages only) ───────────────────────── */
-function sitemap(origin) {
-  const body = publicUrls().map((u) => {
-    let last = '';
-    const rel = decodeURIComponent(u).replace(/\/$/, '/index.html');
-    for (const cand of [rel, rel + '.html']) { try { last = fs.statSync(path.join(ROOT, cand)).mtime.toISOString().slice(0, 10); break; } catch (e) { /* try next */ } }
-    return `  <url><loc>${origin}${u}</loc>${last ? `<lastmod>${last}</lastmod>` : ''}</url>`;
-  }).join('\n');
+/* ───────────────────────── sitemap and robots.txt (public pages only) ─────────────────────────
+   Every public page names https://ielts-x.uz as its one address (<link rel="canonical">), so the sitemap and robots.txt
+   use it too, on whatever address they are asked (the *.vercel.app one included). PUBLIC_URL wins when it is set; the
+   server on this computer (npm start, the self-test) keeps its own address. No <lastmod>: on Vercel every file carries
+   the same made-up date (2018), and a wrong date only teaches Google to ignore it. */
+const CANONICAL_ORIGIN = 'https://ielts-x.uz';
+function seoOrigin(req) {
+  if (PUBLIC_URL) return PUBLIC_URL;
+  return /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(String(req.headers.host || '')) ? siteUrl(req) : CANONICAL_ORIGIN;
+}
+async function sitemap(origin) {
+  const urls = [];
+  for (const u of publicUrls()) {
+    if (/^\/(pessages|sections)\/test-\d+$/.test(u)) {   // a practice page locked in the admin panel sends Google to the Price page: not listed
+      const gate = await gateForPath(u + '.html').catch(() => null);
+      if (gate && gate.locked) continue;
+    }
+    urls.push(u);
+  }
+  const body = urls.map((u) => `  <url><loc>${origin}${u}</loc></url>`).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+/* Google may read the API answers the public pages are drawn from (test cards, articles, packs, plans, the logo), else
+   it sees those pages empty; the rest of /api/, the admin panel and uploaded files stay closed. Sign-in, account and
+   test pages are not listed here on purpose: they say "noindex" themselves, and Google can only see that if it may open them. */
+function robotsTxt(req) {
+  const open = ['/api/branding', '/api/materials', '/api/packs', '/api/plans', '/api/predictions', '/api/mocks', '/api/access', '/api/media/'];
+  return ['User-agent: *', 'Allow: /', 'Disallow: /admin', 'Disallow: /api/', ...open.map((p) => 'Allow: ' + p), 'Disallow: /uploads/', '', `Sitemap: ${seoOrigin(req)}/sitemap.xml`, ''].join('\n');
 }
 /* the public pages: the sitemap, and the search-engine check of the admin Website check (site-check.js) */
 function publicUrls() {
-  const urls = new Set(['/', '/Price', '/Predictions', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
-    '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/game', '/privacy-policy', '/terms-of-service']);
+  const urls = new Set(['/', '/Price', '/Predictions', '/Mock%20tests', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
+    '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/full-tests/writing/', '/full-tests/speaking/',
+    '/vocabulary', '/game', '/privacy-policy', '/terms-of-service']);
   for (const dir of ['pessages', 'sections']) {
     try {
       for (const f of fs.readdirSync(path.join(ROOT, dir))) {
         if (!/^test-\d+\.html$/.test(f)) continue;
         const text = fs.readFileSync(path.join(ROOT, dir, f), 'utf8');
         if (text.length < 6000 && text.includes('being prepared')) continue; // not ready yet
+        if (/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(text.slice(0, 20000))) continue;   // a page kept out of Google
         urls.add(`/${dir}/${f.replace(/\.html$/, '')}`);
       }
     } catch (e) { /* folder missing */ }
@@ -2151,12 +2172,12 @@ const requestHandler = async (req, res) => {
     if (isHttps(req)) res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     if (url.pathname === '/robots.txt' || url.pathname === '/api/robots') {
-      return send(res, 200, `User-agent: *\nDisallow: /admin\nDisallow: /api/\nDisallow: /account.html\nDisallow: /login.html\nDisallow: /uploads/\nAllow: /\n\nSitemap: ${siteUrl(req)}/sitemap.xml\n`, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
+      return send(res, 200, robotsTxt(req), { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     }
     const bi = /^\/(favicon\.ico|favicon\.png|icon\.png|apple-touch-icon(?:-precomposed)?\.png|logo\.png)$/i.exec(url.pathname);
     if (bi && (req.method === 'GET' || req.method === 'HEAD')) return await brandImage(req, res, /^logo/i.test(bi[1]) ? 'logo' : 'icon');   // the logo of the admin panel at a fixed address (favicon, Google, link previews)
     if (url.pathname === '/sitemap.xml' || url.pathname === '/api/sitemap') {
-      return send(res, 200, sitemap(siteUrl(req)), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
+      return send(res, 200, await sitemap(seoOrigin(req)), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     }
     if ((url.pathname === '/test' || url.pathname === '/test.html') && url.searchParams.get('id')) {   // an old /test?id= link of a Listening test -> its new page
       const lm = await store.getMaterial(url.searchParams.get('id')).catch(() => null);
