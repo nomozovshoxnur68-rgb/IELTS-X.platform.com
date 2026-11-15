@@ -159,7 +159,7 @@ function memoGet(key, load) {
   return p;
 }
 const memoClear = (prefix) => { for (const k of [...memo.keys()]) if (k.startsWith(prefix)) memo.delete(k); };
-const MEMO_SETTINGS = new Set(['branding', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions']);
+const MEMO_SETTINGS = new Set(['branding', 'design', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions']);
 
 const store = {
   async listUsers() { return USE_SUPABASE ? ((await sb('ieltsx_users?select=*&order=createdAt.desc')) || []) : loadDb().users; },
@@ -575,6 +575,46 @@ const cleanBranding = (b) => ({ logoUrl: cleanUrl(b && b.logoUrl), iconUrl: clea
 async function getBranding() {
   let s = null; try { s = await store.getSetting('branding'); } catch (e) { /* no logo set */ }
   return { ...cleanBranding(s), updatedAt: (s && s.updatedAt) || '' };
+}
+/* ---- site design (admin panel -> Design, the Settings page): kept in settings like the logo; assets/js/site-design.js
+   draws it on the ordinary pages only (never on a test or exam page). Built-in designs: "classic" (the site as it was)
+   and "cosmic" (the animated space background). The admin adds designs (a background picture or colour for light and
+   dark, an accent colour), the accent colours offered in Settings, and the colours of the classic site. ---- */
+const DESIGN_IDS = /^(classic|cosmic|t-[a-z0-9]{4,16})$/;
+const cleanHex = (v) => { const s = String(v || '').trim().toLowerCase(); return /^#[0-9a-f]{6}$/.test(s) ? s : /^#[0-9a-f]{3}$/.test(s) ? '#' + s.slice(1).split('').map((c) => c + c).join('') : ''; };
+const DESIGN_COLOR_KEYS = ['accent', 'sidebarLight', 'sidebarDark', 'cardLight', 'cardDark', 'bgLight', 'bgDark'];
+const DEFAULT_ACCENTS = [{ name: 'Blue', color: '#2563eb' }, { name: 'Violet', color: '#7c3aed' }, { name: 'Emerald', color: '#059669' }, { name: 'Rose', color: '#e11d48' }, { name: 'Amber', color: '#d97706' }, { name: 'Teal', color: '#0d9488' }];
+function cleanDesign(d) {
+  d = d && typeof d === 'object' ? d : {};
+  const colors = {}; const c = d.colors && typeof d.colors === 'object' ? d.colors : {};
+  DESIGN_COLOR_KEYS.forEach((k) => { colors[k] = cleanHex(c[k]); });
+  const seen = new Set();
+  const themes = (Array.isArray(d.themes) ? d.themes : []).slice(0, 20).map((t) => {
+    t = t && typeof t === 'object' ? t : {};
+    let id = String(t.id || '').toLowerCase();
+    if (!/^t-[a-z0-9]{4,16}$/.test(id) || seen.has(id)) id = 't-' + crypto.randomBytes(5).toString('hex');
+    seen.add(id);
+    const veil = Math.round(Number(t.veil));
+    return { id, name: cut(String(t.name || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim(), 40) || 'Custom design',
+      bgLight: cleanUrl(t.bgLight), bgDark: cleanUrl(t.bgDark), colorLight: cleanHex(t.colorLight), colorDark: cleanHex(t.colorDark),
+      accent: cleanHex(t.accent), stars: !!t.stars, veil: Number.isFinite(veil) ? Math.max(0, Math.min(80, veil)) : 20, visible: t.visible !== false };
+  });
+  const accents = (Array.isArray(d.accents) ? d.accents : DEFAULT_ACCENTS).slice(0, 24)
+    .map((a) => ({ name: cut(String((a && a.name) || '').replace(/[<>]/g, '').trim(), 24), color: cleanHex(a && a.color) }))
+    .filter((a, i, all) => a.color && all.findIndex((x) => x.color === a.color) === i).map((a) => ({ ...a, name: a.name || a.color }));
+  let def = String(d.default || 'classic').toLowerCase();
+  if (!DESIGN_IDS.test(def) || (def.startsWith('t-') && !themes.some((t) => t.id === def))) def = 'classic';
+  return { default: def, cosmicVisible: d.cosmicVisible !== false, colors, themes, accents };
+}
+async function getDesign() {
+  let s = null; try { s = await store.getSetting('design'); } catch (e) { /* the built-in designs */ }
+  return { ...cleanDesign(s), updatedAt: (s && s.updatedAt) || '' };
+}
+/* one visitor's own choice (Settings page), kept with the account so it follows them to another browser */
+function cleanDesignPref(b) {
+  b = b && typeof b === 'object' ? b : {};
+  const id = String(b.design || '').toLowerCase();
+  return { design: DESIGN_IDS.test(id) ? id : '', accent: cleanHex(b.accent), motion: b.motion !== false, at: Math.max(0, Math.min(Date.now() + 60000, Math.floor(Number(b.at) || Date.now()))) };
 }
 async function getPricing() {
   let s = null; try { s = await store.getSetting('pricing-config'); } catch (e) { /* defaults */ }
@@ -1374,6 +1414,16 @@ async function api(req, res, url) {
   /* ---- plans + orders (manual payment confirmed by an admin, or by a signed webhook) ---- */
   // no-cache: a browser that kept the old (empty) answer used to take a just-saved logo off the next page it opened
   if (method === 'GET' && p === '/api/branding') return send(res, 200, await getBranding(), { 'Cache-Control': 'no-cache' });
+  // the designs of the Settings page (assets/js/site-design.js) and a signed-in visitor's own choice
+  if (method === 'GET' && p === '/api/design') return send(res, 200, await getDesign(), { 'Cache-Control': 'no-cache' });
+  if (p === '/api/account/design' && (method === 'GET' || method === 'POST')) {
+    const u = await requireUser(req);
+    if (method === 'GET') { let v = null; try { v = await store.getSetting('ui:' + u.id); } catch (e) { /* none yet */ } return send(res, 200, { pref: v ? cleanDesignPref(v) : null }, { 'Cache-Control': 'no-store' }); }
+    rateLimit('design:' + u.id, 60, 10 * 60000);
+    const pref = cleanDesignPref(await readJson(req, 4 * 1024));
+    await store.setSetting('ui:' + u.id, pref, { minimal: true });
+    return send(res, 200, { pref });
+  }
   if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions, promo: promoPublic(bannerPromo(cfg)) }, { 'Cache-Control': 'no-store' }); }
   // a promo code typed on the Price page: is it valid (and for which plans)? Only the code in the promo strip is public.
   if (method === 'POST' && p === '/api/promo/check') {
@@ -1582,6 +1632,13 @@ async function api(req, res, url) {
       await store.setSetting('branding', { ...b, updatedAt: new Date().toISOString() });
       await audit(admin, 'branding.save', 'logo', { logo: !!b.logoUrl, icon: !!b.iconUrl });
       return send(res, 200, { branding: await getBranding() });
+    }
+    if (method === 'GET' && p === '/api/admin/design') return send(res, 200, { design: await getDesign() }, { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/design') {
+      const d = cleanDesign(await readJson(req, 64 * 1024));
+      await store.setSetting('design', { ...d, updatedAt: new Date().toISOString() });
+      await audit(admin, 'design.save', 'design', { default: d.default, themes: d.themes.length, accents: d.accents.length });
+      return send(res, 200, { design: await getDesign() });
     }
     if (method === 'GET' && p === '/api/admin/site-check') {   // Website check (site-check.js): read only
       let dbSize = 0; if (!USE_SUPABASE) { try { dbSize = fs.statSync(DB_FILE).size; } catch (e) { /* no file yet */ } }
