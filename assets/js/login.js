@@ -113,8 +113,20 @@ function loadScript(src) {
         document.head.appendChild(s);
     });
 }
+/* Google refuses to sign in inside the browsers built into apps (Telegram, Instagram, Facebook, TikTok …: "disallowed_useragent"),
+   and most students open the site from a Telegram link. Say so under the button instead of a Google error page. */
+const IN_APP = /Telegram|Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|musical_ly|Snapchat|; wv\)/i.test(navigator.userAgent || '') || typeof window.TelegramWebviewProxy !== 'undefined';
+function inAppNote() {
+    if (!IN_APP || $('#inapp-note')) return;
+    const p = document.createElement('p');
+    p.id = 'inapp-note'; p.className = 'notice'; p.setAttribute('role', 'note');
+    p.style.cssText = 'margin:10px 0 0;font-size:13px';
+    p.textContent = "Google bilan kirish Telegram/Instagram ichidagi brauzerda ishlamaydi. Yuqoridagi ⋮ menyudan \"Open in browser\" (Chrome yoki Safari) ni tanlang yoki email va parol bilan kiring.";
+    $('#google-btn').after(p);
+}
 async function setupGoogle() {
     const { googleClientId, apiError } = await getAuthConfig();
+    inAppNote();
     if (!googleClientId) {
         // Not configured yet: keep the button visible so it is obvious, and explain what is missing.
         const slot = $('#google-btn');

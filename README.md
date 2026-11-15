@@ -651,3 +651,30 @@ the old built-in mark), and the old leftovers of another site were removed from 
 pointing to ieltsx.com (they told Google to show that site instead) and preview pictures from ieltsx.com (now `/logo.png`).
 The home page adds Organization / WebSite structured data with `/icon.png` (branding.js). Google updates the icon in the search
 results on its next visit; Search Console → URL inspection → Request indexing for the home page speeds it up.
+
+## Predictions, admin redesign, light / dark mode, sign-in fixes (November 2026)
+
+**Predictions** (`/admin#predictions` → `/Predictions`). The page no longer shows four fixed cards: admins make
+*collections* of what keeps appearing in the real exam (`predictions.js`, server only; one setting `predictions`).
+* A collection has a skill, a period, a plan (Free / Standard / Max / Ultra), a status (Updating / Complete) and can be hidden.
+* Items: **test links** (pick any test of the website, the same list as Access) or **questions / tasks** written out
+  (Part / Task, optional picture, 🔥 *very likely*). **Paste many**: one question per line, a line `Part 2` sets the part,
+  an empty line before and after keeps a cue card together, `*` or 🔥 at the start marks it very likely.
+* The server decides access: a locked collection is listed with its name and size only, never its questions or links
+  (`GET /api/predictions`, `GET /api/predictions/<id>` → 403 with a Price link). Hidden ones are for admins only.
+* Students tick what they have practised; the progress stays on their device (`localStorage`, `ix-pred-done:<id>`).
+* The page script is `assets/js/predictions-page.js` (a file called `predictions.js` anywhere is refused by the server).
+
+**Admin panel**: new look, icons in the menu, a **light / dark** switch in the top bar (the same `theme` choice as the
+website; it follows the system until you pick one). The **Dashboard** has KPI cards with 14-day lines and week-on-week
+change, an activity chart (sign-ups / tests, hover for the day), the audience donut, things that need you, tests by
+section, quick actions, the newest students and the latest results. Every colour is a token at the top of `admin.css`.
+
+**Sign-in fixes**
+* An account made with *Continue with Google* has no password: signing in with a password now says so instead of
+  "Incorrect email or password".
+* An e-mail saved with capital letters (by hand in Supabase, or an older version) is found again; `ADMIN_EMAILS`
+  ignores case too.
+* No e-mail service (`RESEND_API_KEY`) means "Forgot password" cannot send a link: an admin can now **set a new
+  password** in the user's drawer (*Sign-in help*). The person is signed out everywhere; it is in the Activity log.
+* The sign-in page explains that Google sign-in does not work inside the Telegram / Instagram browser.

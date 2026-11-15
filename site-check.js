@@ -54,6 +54,8 @@ function makeExists(root, ctx) {
     if (urlPath === '/' || ctx.aliasMap.has(low) || ctx.aliasMap.has(low.replace(/\/$/, ''))) ok = true;
     // pages made on the fly by the server
     else if (/^\/(api|exam|test|premium-audio)(\/|$)/i.test(urlPath) || /^\/test(\.html)?$/i.test(urlPath)) ok = true;
+    // the logo and the icon chosen in Admin -> Logo, sent by the server (and vercel.json) at fixed addresses
+    else if (/^\/(favicon\.ico|favicon\.png|icon\.png|apple-touch-icon(?:-precomposed)?\.png|logo\.png)$/i.test(urlPath)) ok = true;
     else if (/^\/full-tests\/(listening|reading|writing|speaking)\/(?!test-|index)[a-z0-9][a-z0-9_-]*\/?$/i.test(urlPath)) ok = true;
     else if (/^\/(pessages|sections)\/test-\d+(\.html)?$/i.test(urlPath) || /^\/full-tests\/reading\/test-\d+(\.html)?$/i.test(urlPath)) ok = true;   // tests made in the admin panel
     else if (/^\/uploads\//i.test(urlPath)) ok = isFile(path.join(ctx.uploadDir, urlPath.slice('/uploads/'.length)));
