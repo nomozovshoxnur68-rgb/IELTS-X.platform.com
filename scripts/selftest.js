@@ -316,7 +316,10 @@ server.listen(0, async () => {
       assert.equal(v.themes[1].allowed, true); assert.equal(v.themes[1].bgLight, '/uploads/images/open.webp');
       assert.ok(!/gold\.webp|gold-night|draft/.test(JSON.stringify(v)), 'nothing of a locked or hidden design leaks');
       // the code of Cosmic and of the animations: only for who may use it
-      const fx = (id, j) => call('GET', '/api/design/fx/' + id + '.js', { jar: j });
+      // asked for without ".js" (Vercel takes ".js" off /api/ addresses); the old address with ".js" still works
+      const fx = (id, j) => call('GET', '/api/design/fx/' + id, { jar: j });
+      r = await call('GET', '/api/design/fx/garland.js'); assert.equal(r.status, 200, 'the address with ".js" still works'); assert.ok(r.text.includes("defineFx('garland'"));
+      const sdCode = fs.readFileSync(path.join(__dirname, '..', 'assets/js/site-design.js'), 'utf8'); assert.ok(sdCode.includes("FX_URL = '/api/design/fx/'") && sdCode.includes("s.src = FX_URL + id + (cat.fxVersion") && sdCode.includes("FX_URL + 'cosmic' + (job.v") && !/fx\/' \+ id \+ '\.js'|cosmic\.js' \+/.test(sdCode), 'the pages ask for the animation code without ".js"');
       r = await fx('cosmic'); assert.equal(r.status, 403); assert.ok(!r.text.includes('defineFx') && r.json.price.includes('plan=standard')); assert.ok(/no-store/.test(r.headers.get('cache-control')));
       assert.equal((await fx('cosmic', free.j)).status, 403);
       r = await fx('cosmic', std.j); assert.equal(r.status, 200); assert.ok(/javascript/.test(r.headers.get('content-type')) && r.text.includes("defineFx('cosmic'"), 'Standard member gets Cosmic');

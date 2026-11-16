@@ -10,7 +10,7 @@
  *
  * Who may use each design and animation is set in Admin → Design (free, locked for a plan, hidden) and kept by the
  * server: /api/design lists only what this visitor may see (a locked design comes without its pictures), and the drawing
- * code of Cosmic, Snowfall and New Year lights is not in this file: it comes from /api/design/fx/<id>.js, which the
+ * code of Cosmic, Snowfall and New Year lights is not in this file: it comes from /api/design/fx/<id>, which the
  * server sends only to a visitor who may use it (design-src/ on the server).
  *
  * Loaded with ONE line at the end of <head> of the ordinary pages only (home, practice and full-test lists,
@@ -256,15 +256,19 @@
         } catch (e) { return false; }
     })();
 
-    /* ───────── the code of Cosmic and of the animations (/api/design/fx/<id>.js, sent only to who may use it) ───────── */
-    var fxDefs = {}, fxLoading = {}, fxFailedAt = 0;
+    /* ───────── the code of Cosmic and of the animations (/api/design/fx/<id>, sent only to who may use it) ───────── */
+    /* The address has no ".js" at the end: Vercel takes ".js" off /api/ addresses, so "/api/design/fx/cosmic.js" never
+       reached the server's route there (404) and Cosmic, Snowfall and New Year lights did not show at all on the live site. */
+    var FX_URL = '/api/design/fx/';
+    var fxDefs = {}, fxLoading = {}, fxFailed = {}, fxFailedAt = 0;
     function needFx(id, cat) {
         if (fxDefs[id] || fxLoading[id] || !window.fetch || location.protocol === 'file:') return;
+        if (fxFailed[id] && Date.now() - fxFailed[id] < 30000) return;   // refused a moment ago: not asked again at every redraw
         fxLoading[id] = 1;
         var s = doc.createElement('script'); s.async = true;
-        s.src = '/api/design/fx/' + id + '.js' + (cat.fxVersion ? '?v=' + cat.fxVersion : '');
+        s.src = FX_URL + id + (cat.fxVersion ? '?v=' + cat.fxVersion : '');
         s.onerror = function () {   // refused (locked or hidden since) or offline: ask the server again what this visitor may use
-            fxLoading[id] = 0; s.remove();
+            fxLoading[id] = 0; fxFailed[id] = Date.now(); s.remove();
             if (Date.now() - fxFailedAt > 60000) { fxFailedAt = Date.now(); refresh(true); }
         };
         (doc.head || html).appendChild(s);
@@ -457,7 +461,7 @@
         }
         if (worker === false) return sceneHere(job);
         job.id = ++jobN; jobs[job.id] = job;
-        worker.postMessage({ id: job.id, src: location.origin + '/api/design/fx/cosmic.js' + (job.v ? '?v=' + job.v : ''), w: job.w, h: job.h, dpr: job.dpr, pw: job.pw, ph: job.ph, dark: job.dark });
+        worker.postMessage({ id: job.id, src: location.origin + FX_URL + 'cosmic' + (job.v ? '?v=' + job.v : ''), w: job.w, h: job.h, dpr: job.dpr, pw: job.pw, ph: job.ph, dark: job.dark });
     }
     var layer = null, fxLayer = null, drawn = '', lastW = 0, lastH = 0;
     function drawScene(st) {
@@ -556,6 +560,7 @@
         p.at = Date.now();
         writeJSON(PREF_KEY, { design: p.design, effect: p.effect, accent: p.accent, motion: p.motion !== false, at: p.at });
         pushToAccount(readPref());
+        fxFailed = {};   // a choice made on purpose: its code is asked for again at once
         return apply();
     }
     var refreshing = null;
@@ -570,7 +575,7 @@
                 var before = JSON.stringify([cat.default, cat.defaultEffect, cat.builtins, cat.themes, cat.colors, cat.accents, cat.updatedAt, cat.uid]);
                 d.t = Date.now(); writeJSON(SITE_KEY, d);
                 var now = catalog();
-                if (JSON.stringify([now.default, now.defaultEffect, now.builtins, now.themes, now.colors, now.accents, now.updatedAt, now.uid]) !== before) { drawn = ''; apply(); }
+                if (JSON.stringify([now.default, now.defaultEffect, now.builtins, now.themes, now.colors, now.accents, now.updatedAt, now.uid]) !== before) { drawn = ''; fxFailed = {}; apply(); }
                 return now;
             })
             .catch(function () { return cat; })
