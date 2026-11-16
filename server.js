@@ -660,7 +660,7 @@ async function getBranding() {
    Who may use each one is set in the admin panel, like the tests: free, locked (a plan: standard / max / ultra) or hidden.
    The server keeps to it: /api/design lists for each visitor only what they may see (a locked design without its
    pictures, a hidden one not at all), the drawing code of Cosmic and of the animations (design-src/, never a static
-   file) is sent by /api/design/fx/<id>.js only to a visitor who may use it, and a visitor's choice is refused when it
+   file) is sent by /api/design/fx/<id> only to a visitor who may use it, and a visitor's choice is refused when it
    is locked or hidden for them. ---- */
 const DESIGN_IDS = /^(classic|cosmic|t-[a-z0-9]{4,16})$/;
 const DESIGN_FX = ['snow', 'garland'];
@@ -1550,8 +1550,10 @@ async function api(req, res, url) {
   // the designs of the Settings page (assets/js/site-design.js) and a signed-in visitor's own choice
   // (each visitor gets their own list: what is locked or hidden for them depends on the account)
   if (method === 'GET' && p === '/api/design') return send(res, 200, designFor(await getDesign(), await currentUser(req)), { 'Cache-Control': 'private, no-cache', Vary: 'Cookie' });
-  // the drawing code of Cosmic, Snowfall and New Year lights: only for a visitor who may use it
-  const fxm = method === 'GET' && p.match(/^\/api\/design\/fx\/([a-z]+)\.js$/);
+  // the drawing code of Cosmic, Snowfall and New Year lights: only for a visitor who may use it.
+  // Asked for as /api/design/fx/<id> (no ".js": Vercel takes ".js" off the end of an /api/ address before it reaches
+  // this handler, so "/api/design/fx/cosmic.js" arrived here as "/api/design/fx/cosmic" and was not found); ".js" still works.
+  const fxm = method === 'GET' && p.match(/^\/api\/design\/fx\/([a-z]+)(?:\.js)?$/);
   if (fxm) {
     const it = DESIGN_BUILTINS[fxm[1]] ? designFor(await getDesign(), await currentUser(req)).builtins[fxm[1]] : null;
     if (!it) return send(res, 404, { error: 'Not found.' });
