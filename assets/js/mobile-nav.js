@@ -1,14 +1,51 @@
 /*
- * IELTSX — mobile navigation drawer (assets/js/mobile-nav.js)
- * On phones the desktop sidebar is hidden, so the "Toggle Sidebar" button had nothing to open.
- * This turns that same button into a slide-in menu on screens narrower than 768px: it copies the
- * current sidebar (so links, plan label and the dark theme always match) into a drawer.
- * Closes with the backdrop, the × button, the Escape key or by choosing a link.
+ * IELTSX — the sidebar of every page (assets/js/mobile-nav.js): ONE handler for the "Toggle Sidebar" button, the rail
+ * on the sidebar's edge and the menu button of the Articles / Vocabulary pages.
+ *  - Computer (768px and wider): the sidebar folds to its icons and opens again. The choice is kept (localStorage
+ *    "ix-sidebar": "collapsed" / "open", the same key as the Account page), so the next page opens the same way.
+ *  - Phone: the desktop sidebar is hidden, so the same button opens a slide-in menu: a copy of the current sidebar (so
+ *    links, plan label and the dark theme always match). Closes with the backdrop, the × button, the Escape key or by
+ *    choosing a link.
+ * The pages used to carry six different copies of the toggle (assets/js/app.js, Predictions.html): on the Full Tests,
+ * pack, Mock Tests and Settings pages none of them found its sidebar, so the button did nothing; the Vocabulary button
+ * had no handler at all. This file runs first (capture phase) and stops the click there, so nothing toggles twice.
  */
 (function () {
     'use strict';
     var mq = window.matchMedia ? window.matchMedia('(max-width: 767px)') : { matches: false };
     var drawer = null, lastFocus = null;
+    var BUTTONS = '[data-sidebar="trigger"], [data-sidebar="rail"], #sidebarToggleBtn';
+    var KEY = 'ix-sidebar';
+
+    /* ───────── computer: fold / unfold ───────── */
+    // the element that carries the state (Tailwind's group-data-[collapsible=icon] rules hang on it), whatever its id
+    function groups() { return document.querySelectorAll('[data-variant="sidebar"][data-side], #main-sidebar-root, #sidebarContainer, #mainSidebarContainer'); }
+    function isCollapsed() { var g = groups()[0]; return !!g && g.getAttribute('data-collapsible') === 'icon'; }
+    function setCollapsed(collapsed, instant) {
+        var gs = groups();
+        if (!gs.length) return;
+        var html = document.documentElement;
+        if (instant) html.classList.add('ix-sb-instant');   // the state of the last page: shown at once, not animated
+        for (var i = 0; i < gs.length; i++) {
+            // the Articles pages have no width of their own for the folded sidebar (it was 4rem there, 3rem elsewhere)
+            if (!gs[i].style.getPropertyValue('--sidebar-width-icon')) gs[i].style.setProperty('--sidebar-width-icon', '3rem');
+            gs[i].setAttribute('data-collapsible', collapsed ? 'icon' : '');
+            gs[i].setAttribute('data-state', collapsed ? 'collapsed' : 'expanded');
+            if (gs[i].style.width) gs[i].style.width = gs[i].style.minWidth = collapsed ? 'var(--sidebar-width-icon)' : 'var(--sidebar-width)';
+        }
+        // the spacer, the fixed panel and the main area all read --sidebar-width: one width for every page (3rem)
+        var w = document.querySelector('.group\\/sidebar-wrapper');
+        if (w) {
+            if (!w.hasAttribute('data-ix-sb-width')) w.setAttribute('data-ix-sb-width', w.style.getPropertyValue('--sidebar-width') || '16rem');
+            if (!w.style.getPropertyValue('--sidebar-width-icon')) w.style.setProperty('--sidebar-width-icon', '3rem');
+            w.style.setProperty('--sidebar-width', collapsed ? w.style.getPropertyValue('--sidebar-width-icon') : w.getAttribute('data-ix-sb-width'));
+        }
+        var t = document.querySelectorAll(BUTTONS);
+        for (var k = 0; k < t.length; k++) if (t[k].getAttribute('data-sidebar') !== 'rail') t[k].setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        if (instant) setTimeout(function () { html.classList.remove('ix-sb-instant'); }, 60);
+    }
+    function remembered() { try { return localStorage.getItem(KEY) === 'collapsed'; } catch (e) { return false; } }
+    function remember(collapsed) { try { localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); } catch (e) { /* blocked */ } }
 
     var CSS = `/* ==== mobile navigation drawer (assets/js/mobile-nav.js) ==== */
 html.ix-drawer-open { overflow: hidden; }
@@ -34,6 +71,7 @@ html.ix-drawer-open { overflow: hidden; }
 .ix-drawer-close:hover, .ix-drawer-close:focus-visible { background: hsl(var(--sidebar-accent, 240 5% 96%)); outline: none; }
 @media (prefers-reduced-motion: reduce) { .ix-drawer-backdrop, .ix-drawer-panel { transition: none; } }
 @media (min-width: 768px) { .ix-drawer { display: none !important; } }
+html.ix-sb-instant *, html.ix-sb-instant *::before, html.ix-sb-instant *::after { transition: none !important; }
 `;
     function ensureStyle() {
         if (document.getElementById('ix-drawer-style')) return;
@@ -123,15 +161,21 @@ html.ix-drawer-open { overflow: hidden; }
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
 
-    // capture phase: on phones this wins over the desktop "collapse" handler of the page
+    // capture phase: this runs before anything on the button itself, and stops the click here
     document.addEventListener('click', function (e) {
-        var t = e.target && e.target.closest ? e.target.closest('[data-sidebar="trigger"]') : null;
-        if (!t || !mq.matches) return;
+        var t = e.target && e.target.closest ? e.target.closest(BUTTONS) : null;
+        if (!t) return;
         e.preventDefault();
         e.stopPropagation();
-        if (drawer) close(); else open();
+        if (mq.matches) { if (t.getAttribute('data-sidebar') !== 'rail') { if (drawer) close(); else open(); } return; }
+        var c = !isCollapsed();
+        ensureStyle(); setCollapsed(c, false); remember(c);
     }, true);
 
     if (mq.addEventListener) mq.addEventListener('change', function (ev) { if (!ev.matches) close(); });
     window.addEventListener('pagehide', close);
+
+    // the state chosen on the last page (this file is loaded with "defer": the sidebar is already in the page)
+    function restore() { if (remembered()) { ensureStyle(); setCollapsed(true, true); } }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', restore); else restore();
 })();

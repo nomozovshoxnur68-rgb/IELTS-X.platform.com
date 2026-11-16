@@ -256,3 +256,7 @@ body[data-theme="dark"] .opt.active { background: #2b3040; color: #fff; border-c
   .btn-back { position: static; }
   .btn-start { padding: 12px 36px; }
 }
+/* The logo: the one chosen in Admin -> Logo, sent by the server as /icon.png. The red <svg> of the page only gives
+   its place and size; it is never shown, so the old logo does not flash before assets/js/branding.js runs. */
+.logo-box > svg { background: url(/icon.png) center / contain no-repeat; }
+.logo-box > svg > * { display: none; }
