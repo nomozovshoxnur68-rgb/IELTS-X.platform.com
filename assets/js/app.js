@@ -929,31 +929,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
   var pages = {};
 
   pages['index'] = function () {
-      // ---- index.js ----
-        (function () {
-            // Sidebar toggle (the sidebar markup lives in index.html, like on the other pages)
-            const sidebarContainer = document.getElementById('main-sidebar-root');
-            const toggleButtons = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
-            if (!sidebarContainer) return;
-
-            function toggleSidebar(e) {
-                if (e) e.preventDefault();
-                const isCollapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-
-                sidebarContainer.setAttribute('data-collapsible', isCollapsed ? '' : 'icon');
-                sidebarContainer.setAttribute('data-state', isCollapsed ? 'expanded' : 'collapsed');
-
-                const wrapper = document.querySelector('.group\\/sidebar-wrapper');
-                if (wrapper) {
-                    wrapper.style.setProperty('--sidebar-width', isCollapsed ? '16rem' : '3rem');
-                }
-            }
-
-            toggleButtons.forEach(function (btn) {
-                btn.addEventListener('click', toggleSidebar);
-            });
-        })();
-
+      // (the sidebar toggle of every page is assets/js/mobile-nav.js)
       // ---- index-2.js ----
         (function () {
             // Avatar dropdown
@@ -1211,29 +1187,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             render(cardData);
         }
 
-        // ---------- SIDEBAR / AVATAR ----------
+        // ---------- AVATAR (the sidebar toggle of every page is assets/js/mobile-nav.js) ----------
         function initSidebarAndAvatar() {
-            const sidebarContainer = document.getElementById('main-sidebar-root');
-            const toggleBtns = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
-
-            function updateSidebarState() {
-                if (!sidebarContainer) return;
-                const isCollapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-                if (isCollapsed) {
-                    sidebarContainer.setAttribute('data-collapsible', '');
-                    sidebarContainer.setAttribute('data-state', 'expanded');
-                } else {
-                    sidebarContainer.setAttribute('data-collapsible', 'icon');
-                    sidebarContainer.setAttribute('data-state', 'collapsed');
-                }
-            }
-            toggleBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    updateSidebarState();
-                });
-            });
-
             const avatarTrigger = document.getElementById('avatar-dropdown-trigger');
             const userDropdown = document.getElementById('user-dropdown');
             let isOpen = false;
@@ -1798,31 +1753,8 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
             render();
         }
 
-        // ---------- SIDEBAR / AVATAR (unchanged) ----------
+        // ---------- AVATAR (the sidebar toggle of every page is assets/js/mobile-nav.js) ----------
         function initSidebarAndAvatar() {
-            // Sidebar toggle
-            const sidebarContainer = document.querySelector(
-                '.group\\/sidebar-wrapper .group.peer.hidden.md\\:block');
-            const toggleBtns = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
-
-            function updateSidebarState() {
-                if (!sidebarContainer) return;
-                const isCollapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-                if (isCollapsed) {
-                    sidebarContainer.setAttribute('data-collapsible', '');
-                    sidebarContainer.setAttribute('data-state', 'expanded');
-                } else {
-                    sidebarContainer.setAttribute('data-collapsible', 'icon');
-                    sidebarContainer.setAttribute('data-state', 'collapsed');
-                }
-            }
-            toggleBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    updateSidebarState();
-                });
-            });
-
             // Avatar dropdown
             const avatarTrigger = document.getElementById('avatar-dropdown-trigger');
             const userDropdown = document.getElementById('user-dropdown');
@@ -2029,63 +1961,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         document.getElementById('searchInput').addEventListener('input', IELTSX.debounce(function() { currentPage = 1; renderCards(); }, 150));
         document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
 
-        // ─── Sidebar Toggle ───
-        (function() {
-            const sidebarContainer = document.getElementById('sidebarContainer');
-            const sidebarRoot = document.getElementById('main-sidebar-root');
-            const toggleBtn = document.getElementById('sidebar-toggle-btn');
-            const overlay = document.getElementById('sidebarOverlay');
-            const railBtn = document.querySelector('[data-sidebar="rail"]');
-
-            function toggleSidebar() {
-                const isMobile = window.innerWidth < 768;
-                if (isMobile) {
-                    sidebarContainer.classList.toggle('mobile-open');
-                    overlay.classList.toggle('active', sidebarContainer.classList.contains('mobile-open'));
-                } else {
-                    const currentState = sidebarContainer.getAttribute('data-collapsible');
-                    const isIcon = currentState === 'icon';
-                    const newState = isIcon ? '' : 'icon';
-                    const newDataState = isIcon ? 'expanded' : 'collapsed';
-                    sidebarContainer.setAttribute('data-collapsible', newState);
-                    sidebarContainer.setAttribute('data-state', newDataState);
-                    if (sidebarRoot) {
-                        sidebarRoot.setAttribute('data-collapsible', newState);
-                        sidebarRoot.setAttribute('data-state', newDataState);
-                    }
-                    void sidebarContainer.offsetWidth;
-                }
-            }
-
-            if (toggleBtn) toggleBtn.addEventListener('click', function(e) { e.preventDefault();
-                toggleSidebar(); });
-            if (railBtn) railBtn.addEventListener('click', function(e) { e.preventDefault();
-                toggleSidebar(); });
-            if (overlay) overlay.addEventListener('click', function() {
-                sidebarContainer.classList.remove('mobile-open');
-                overlay.classList.remove('active');
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    sidebarContainer.classList.remove('mobile-open');
-                    if (overlay) overlay.classList.remove('active');
-                }
-            });
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    sidebarContainer.classList.remove('mobile-open');
-                    if (overlay) overlay.classList.remove('active');
-                }
-            });
-            // sync initial
-            if (sidebarRoot) {
-                const cs = sidebarContainer.getAttribute('data-collapsible') || '';
-                const cd = sidebarContainer.getAttribute('data-state') || 'expanded';
-                if (cs !== sidebarRoot.getAttribute('data-collapsible')) sidebarRoot.setAttribute('data-collapsible',
-                    cs);
-                if (cd !== sidebarRoot.getAttribute('data-state')) sidebarRoot.setAttribute('data-state', cd);
-            }
-        })();
+        // (the sidebar toggle of every page is assets/js/mobile-nav.js)
 
         // ─── Init ───
         window.IELTSX_ADMIN_CARDS_READY = new Promise(function (resolve) {
@@ -2252,81 +2128,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         document.getElementById('searchInput').addEventListener('input', IELTSX.debounce(function() { currentPage = 1; renderCards(); }, 150));
         document.getElementById('searchBtn').addEventListener('click', function() { currentPage = 1; renderCards(); });
 
-        // ─── Sidebar Toggle ───
-        (function() {
-            const sidebarContainer = document.getElementById('sidebarContainer');
-            const sidebarRoot = document.getElementById('main-sidebar-root');
-            const toggleBtn = document.getElementById('sidebar-toggle-btn');
-            const overlay = document.getElementById('sidebarOverlay');
-            const railBtn = document.querySelector('[data-sidebar="rail"]');
-
-            function setDesktopSidebarState(collapsed) {
-                const state = collapsed ? 'icon' : '';
-                const dataState = collapsed ? 'collapsed' : 'expanded';
-
-                sidebarContainer.setAttribute('data-collapsible', state);
-                sidebarContainer.setAttribute('data-state', dataState);
-
-                if (sidebarRoot) {
-                    sidebarRoot.setAttribute('data-collapsible', state);
-                    sidebarRoot.setAttribute('data-state', dataState);
-                }
-
-                /* Keep the layout dimensions synchronized with the visual state. */
-                sidebarContainer.style.width = collapsed
-                    ? 'var(--sidebar-width-icon)'
-                    : 'var(--sidebar-width)';
-                sidebarContainer.style.minWidth = collapsed
-                    ? 'var(--sidebar-width-icon)'
-                    : 'var(--sidebar-width)';
-
-                /* Force a single clean reflow after changing the state. */
-                void sidebarContainer.offsetWidth;
-            }
-
-            function toggleSidebar() {
-                const isMobile = window.innerWidth < 768;
-
-                if (isMobile) {
-                    const open = !sidebarContainer.classList.contains('mobile-open');
-                    sidebarContainer.classList.toggle('mobile-open', open);
-                    overlay.classList.toggle('active', open);
-                    return;
-                }
-
-                const collapsed =
-                    sidebarContainer.getAttribute('data-collapsible') === 'icon';
-
-                setDesktopSidebarState(!collapsed);
-            }
-
-            if (toggleBtn) toggleBtn.addEventListener('click', function(e) { e.preventDefault(); toggleSidebar(); });
-            if (railBtn) railBtn.addEventListener('click', function(e) { e.preventDefault(); toggleSidebar(); });
-            if (overlay) overlay.addEventListener('click', function() {
-                sidebarContainer.classList.remove('mobile-open');
-                overlay.classList.remove('active');
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    sidebarContainer.classList.remove('mobile-open');
-                    if (overlay) overlay.classList.remove('active');
-                }
-            });
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    sidebarContainer.classList.remove('mobile-open');
-                    if (overlay) overlay.classList.remove('active');
-
-                    const collapsed =
-                        sidebarContainer.getAttribute('data-collapsible') === 'icon';
-                    setDesktopSidebarState(collapsed);
-                }
-            });
-            if (sidebarRoot) {
-                const collapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-                setDesktopSidebarState(collapsed);
-            }
-        })();
+        // (the sidebar toggle of every page is assets/js/mobile-nav.js)
 
         // ─── Init ───
         /* Writing tasks made in the admin panel become cards at the START of the grid (newest first). */
@@ -2356,83 +2158,12 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
     
   };
 
-  // Sidebar (desktop collapse, mobile slide-in) and avatar menu of the Articles shell.
-  // The Articles list and every article page (collections/article*.html) share this shell.
+  // Avatar menu of the Articles shell (the Articles list and every article page, collections/article*.html).
+  // The sidebar toggle of every page is assets/js/mobile-nav.js.
   function articlesShell() {
         const sidebarContainer = document.getElementById('mainSidebarContainer');
         const sidebarRoot = document.getElementById('main-sidebar-root');
-        const toggleBtn = document.getElementById('sidebarToggleBtn');
-        const overlay = document.getElementById('sidebarOverlay');
-        const railBtn = document.querySelector('[data-sidebar="rail"]');
         if (!sidebarContainer) return;
-
-        // ----- SIDEBAR TOGGLE (core fix) -----
-        function toggleSidebar() {
-            const isMobile = window.innerWidth < 768;
-
-            if (isMobile) {
-                // Mobile: slide in/out
-                sidebarContainer.classList.toggle('mobile-open');
-                if (sidebarContainer.classList.contains('mobile-open')) {
-                    overlay.classList.add('active');
-                } else {
-                    overlay.classList.remove('active');
-                }
-            } else {
-                // Desktop: toggle icon mode
-                const currentState = sidebarContainer.getAttribute('data-collapsible');
-                const isIcon = currentState === 'icon';
-                const newState = isIcon ? '' : 'icon';
-                const newDataState = isIcon ? 'expanded' : 'collapsed';
-
-                // Update the outer container
-                sidebarContainer.setAttribute('data-collapsible', newState);
-                sidebarContainer.setAttribute('data-state', newDataState);
-
-                // Update the sidebar root (the element with the 'group' class)
-                if (sidebarRoot) {
-                    sidebarRoot.setAttribute('data-collapsible', newState);
-                    sidebarRoot.setAttribute('data-state', newDataState);
-                }
-
-                // Force reflow for smooth transition
-                void sidebarContainer.offsetWidth;
-            }
-        }
-
-        // Toggle button (hamburger)
-        toggleBtn?.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleSidebar();
-        });
-
-        // Rail button (the vertical bar on the sidebar edge)
-        railBtn?.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleSidebar();
-        });
-
-        // Overlay closes mobile sidebar
-        overlay?.addEventListener('click', function() {
-            sidebarContainer.classList.remove('mobile-open');
-            overlay.classList.remove('active');
-        });
-
-        // Escape key closes mobile sidebar
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                sidebarContainer.classList.remove('mobile-open');
-                overlay.classList.remove('active');
-            }
-        });
-
-        // Resize: reset mobile state on desktop
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                sidebarContainer.classList.remove('mobile-open');
-                overlay.classList.remove('active');
-            }
-        });
 
         // Avatar dropdown
         const avatarTrigger = document.getElementById('avatar-dropdown-trigger');
@@ -2616,25 +2347,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
   pages['pdf_materials'] = function () {
       // ---- pdf_materials.js ----
     (function() {
-        const sidebarContainer = document.querySelector('#main-sidebar-root');
-        const toggleButtons = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
-        function updateSidebarState() {
-            if (!sidebarContainer) return;
-            const isCollapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-            if (isCollapsed) {
-                sidebarContainer.setAttribute('data-collapsible', '');
-                sidebarContainer.setAttribute('data-state', 'expanded');
-            } else {
-                sidebarContainer.setAttribute('data-collapsible', 'icon');
-                sidebarContainer.setAttribute('data-state', 'collapsed');
-            }
-        }
-        toggleButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                updateSidebarState();
-            });
-        });
+        // (the sidebar toggle of every page is assets/js/mobile-nav.js)
         IELTSX.startCountdown((2 * 86400) + (0 * 3600) + (21 * 60) + 55, ['daysLeft', 'hoursLeft', 'minutesLeft', 'secondsLeft']);
     })();
 
@@ -2689,28 +2402,7 @@ window.IELTSX_SHOW_BUILTIN_CARDS = false;
         (function () {
             // ─── Dark / Light / System: handled by IELTSX.theme ───
 
-            // ─── Sidebar Toggle ───
-            const sidebarContainer = document.getElementById('main-sidebar-root');
-            const toggleButtons = document.querySelectorAll('[data-sidebar="trigger"], [data-sidebar="rail"]');
-
-            function updateSidebarState() {
-                if (!sidebarContainer) return;
-                const isCollapsed = sidebarContainer.getAttribute('data-collapsible') === 'icon';
-                if (isCollapsed) {
-                    sidebarContainer.setAttribute('data-collapsible', '');
-                    sidebarContainer.setAttribute('data-state', 'expanded');
-                } else {
-                    sidebarContainer.setAttribute('data-collapsible', 'icon');
-                    sidebarContainer.setAttribute('data-state', 'collapsed');
-                }
-            }
-
-            toggleButtons.forEach(function (btn) {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    updateSidebarState();
-                });
-            });
+            // (the sidebar toggle of every page is assets/js/mobile-nav.js)
 
             // ─── Countdown Timer ───
             IELTSX.startCountdown((2 * 86400) + (23 * 3600) + (24 * 60) + 53, ['daysLeft', 'hoursLeft', 'minutesLeft', 'secondsLeft']);

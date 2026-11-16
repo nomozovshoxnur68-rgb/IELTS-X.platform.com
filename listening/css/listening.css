@@ -4542,3 +4542,7 @@ body.dark-mode,body.dark-mode #stage-listening,body.dark-mode #listening-area{ba
 body.dark-mode .option{background:transparent}
 body.dark-mode .option:hover{background:#15181c}
 body.dark-mode .option.selected{background:#132741}
+/* The logo: the one chosen in Admin -> Logo, sent by the server as /icon.png. The red <svg> of the page only gives
+   its place and size; it is never shown, so the old logo does not flash before assets/js/branding.js runs. */
+svg.hdr-logo, svg.xr-logo { background: url(/icon.png) center / contain no-repeat; }
+svg.hdr-logo > *, svg.xr-logo > * { display: none; }

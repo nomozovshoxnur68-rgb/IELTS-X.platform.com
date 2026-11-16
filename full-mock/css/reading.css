@@ -5634,3 +5634,7 @@ body.dark-mode .option,body.dark-mode .multi-opts .option,body.dark-mode .tfn-op
 body.dark-mode .option:hover,body.dark-mode .multi-opts .option:hover{background:#15181c !important}
 body.dark-mode .option.selected,body.dark-mode .multi-opts .option.selected,body.dark-mode .tfn-opts .option.selected{background:#132741 !important}
 body.dark-mode .heading-bank-list,body.dark-mode .word-bank-list,body.dark-mode .option-list-box,body.dark-mode .para-heading-slot{background:transparent}
+/* The logo: the one chosen in Admin -> Logo, sent by the server as /icon.png. The red <svg> of the page only gives
+   its place and size; it is never shown, so the old logo does not flash before assets/js/branding.js runs. */
+.ex-logo > svg, .ei-logo > svg { background: url(/icon.png) center / contain no-repeat; }
+.ex-logo > svg > *, .ei-logo > svg > * { display: none; }

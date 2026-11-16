@@ -1,33 +1,30 @@
 /*
  * IELTSX — the site logo chosen in the admin panel (admin.html#branding), assets/js/branding.js.
- * GET /api/branding -> { logoUrl, iconUrl }. Swaps the IELTSX logo pictures of the page, the red placeholder mark in the
- * header of the test pages (.ex-logo) and the browser-tab icon. Nothing set = the built-in logos stay.
- * The last answer is kept in localStorage, so the next page shows the new logo straight away.
+ *
+ * The server sends the chosen logo at fixed addresses (server.js, brandImage): /icon.png (the square mark),
+ * /logo.png (the wide logo), /favicon.ico and /apple-touch-icon.png. Every page points its logo pictures at those
+ * addresses in its HTML, and the test pages paint their placeholder <svg> with /icon.png in their CSS, so the logo
+ * of the admin panel is what shows from the first paint. (The pages used to show the old built-in logo and swap it
+ * here after asking /api/branding: the old logo flashed on every page, and every page made one more server call.)
+ *
+ * What is left for this file: pictures that page scripts draw later with an old built-in file name, the placeholder
+ * <svg> of a test page whose CSS does not paint it, and showing a logo just saved in the admin panel at once.
  * Loaded by site-access.js (most pages) and with a <script> tag on the pages without it.
  */
 (function () {
     'use strict';
     if (window.__ixBranding) return; window.__ixBranding = true;
-    var KEY = 'ix-branding';
-    var MARK = /ieltsx-only-logo|ieltsx-mark/i;                     // the small square mark (sidebars, headers)
-    var WORD = /ieltsx-logo-transparent/i;                          // the wide logo (sign-in and legal pages)
-    function safe(u) {
-        u = String(u || '');
-        return /^\/(api\/media\/[A-Za-z0-9_-]{8,40}|uploads\/[^\s"'<>]+|assets\/[^\s"'<>]+)$/.test(u) || /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : '';
-    }
-    function setImg(img, url) {
-        if (!img.hasAttribute('data-ix-orig')) img.setAttribute('data-ix-orig', img.getAttribute('src') || '');
-        var want = url || img.getAttribute('data-ix-orig');
-        if (want && img.getAttribute('src') !== want) img.setAttribute('src', want);
-    }
-    /* the size the built-in mark is drawn at: an uploaded logo takes exactly that place, whatever the size of the file
-       (a box without a size of its own, like the header of the reading test, used to grow to the picture's own size) */
+    var MARK = /ieltsx-only-logo|ieltsx-mark/i;                     // the old built-in square mark
+    var WORD = /ieltsx-logo-transparent/i;                          // the old built-in wide logo
+    var FIXED = /^\/(icon|logo)\.png(?:[?#]|$)/;
+    var bust = '';                                                  // "?v=…" after a logo was saved in the admin panel
+    function setImg(img, url) { if (img.getAttribute('src') !== url) img.setAttribute('src', url); }
+    /* the size the placeholder is drawn at: the logo takes exactly that place, whatever the size of the file */
     function markSize(el) {
         if (!el) return null;
         var r = el.getBoundingClientRect();
         if (r.width > 2 && r.height > 2) return [Math.round(r.width) + 'px', Math.round(r.height) + 'px'];
-        // a hidden screen (the exam bar, the results) has no box yet: its CSS size, kept as written. "100%" stays "100%"
-        // (it used to be read as 100px, so the logo of the writing exam bar grew to 100 x 100)
+        // a hidden screen (the exam bar, the results) has no box yet: its CSS size, kept as written ("100%" stays "100%")
         var cs = getComputedStyle(el), w = cs.width, h = cs.height;
         var ok = function (v) { return /^\d+(\.\d+)?%$/.test(v) || (/px$/.test(v) && parseFloat(v) > 2); };
         return ok(w) && ok(h) ? [w, h] : null;
@@ -35,82 +32,47 @@
     function sizeStyle(sz) {
         return 'display:block;object-fit:contain;flex:0 0 auto;' + (sz ? 'width:' + sz[0] + ';height:' + sz[1] : 'width:auto;height:32px;max-width:100%');
     }
-    function apply(b) {
-        var logo = safe(b && b.logoUrl), icon = safe(b && b.iconUrl);
-        var mark = icon || logo, word = logo || icon;
+    function apply() {
+        var mark = '/icon.png' + bust, word = '/logo.png' + bust;
         var imgs = document.querySelectorAll('img');
         for (var i = 0; i < imgs.length; i++) {
-            var img = imgs[i], src = img.getAttribute('data-ix-orig') || img.getAttribute('src') || '';
-            // the wide logo drawn in a small square box (admin sidebar) gets the square icon
+            var img = imgs[i], src = img.getAttribute('src') || '';
+            if (FIXED.test(src)) { if (bust && src.indexOf(bust) < 0) setImg(img, src.replace(/[?#].*$/, '') + bust); continue; }
+            // the wide logo drawn in a small square box (admin sidebar) gets the square mark
             if (WORD.test(src)) setImg(img, img.width && img.width <= 48 && Math.abs(img.width - img.height) < 8 ? mark : word);
-            else if (MARK.test(src) || img.classList.contains('brand-logo') || img.classList.contains('brand-ref')) setImg(img, mark);
+            else if (MARK.test(src) || ((img.classList.contains('brand-logo') || img.classList.contains('brand-ref')) && !/^data:/.test(src) && src !== mark)) setImg(img, mark);
         }
-        // the test pages draw a placeholder <svg>: inside a box (reading, writing, the start screen) ...
+        // the placeholder <svg> of the test pages: inside a box (reading, writing, the start screen) ...
         var boxes = document.querySelectorAll('.ex-logo, .ei-logo, .logo-box');
         for (var j = 0; j < boxes.length; j++) {
             var box = boxes[j], pic = box.querySelector('img[data-ix-logo]'), svg = box.querySelector('svg');
-            if (mark) {
-                if (!pic) { pic = document.createElement('img'); pic.setAttribute('data-ix-logo', ''); pic.alt = 'Logo'; pic.style.cssText = sizeStyle(markSize(svg) || markSize(box)); box.appendChild(pic); }
-                if (pic.getAttribute('src') !== mark) pic.setAttribute('src', mark);
-                if (svg) svg.style.display = 'none';
-            } else { if (pic) pic.remove(); if (svg) svg.style.display = ''; }
+            if (!pic) { pic = document.createElement('img'); pic.setAttribute('data-ix-logo', ''); pic.alt = 'Logo'; pic.style.cssText = sizeStyle(markSize(svg) || markSize(box)); box.appendChild(pic); }
+            setImg(pic, mark);
+            if (svg) svg.style.display = 'none';
         }
         // ... or as the <svg> itself, which carries the size class (listening)
         var svgs = document.querySelectorAll('svg.hdr-logo, svg.xr-logo');
         for (var k = 0; k < svgs.length; k++) {
             var mk = svgs[k], prev = mk.previousElementSibling, own = prev && prev.hasAttribute('data-ix-logo') ? prev : null;
-            if (mark) {
-                if (!own) { own = document.createElement('img'); own.setAttribute('data-ix-logo', ''); own.alt = 'Logo'; own.setAttribute('class', mk.getAttribute('class') || ''); own.style.cssText = sizeStyle(markSize(mk)); mk.parentNode.insertBefore(own, mk); }
-                if (own.getAttribute('src') !== mark) own.setAttribute('src', mark);
-                mk.style.display = 'none';
-            } else { if (own) own.remove(); mk.style.display = ''; }
+            if (!own) { own = document.createElement('img'); own.setAttribute('data-ix-logo', ''); own.alt = 'Logo'; own.setAttribute('class', mk.getAttribute('class') || ''); own.style.cssText = sizeStyle(markSize(mk)); mk.parentNode.insertBefore(own, mk); }
+            setImg(own, mark);
+            mk.style.display = 'none';
         }
-        // the tab icon: /favicon.ico already sends the chosen icon (server.js), so it only gets "?v=" for a new one (the
-        // address Google reads stays /favicon.ico); a page with another icon address gets the chosen picture
+        // the tab icon: the fixed addresses already send the chosen icon; a page with another icon address gets /icon.png
         var links = document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]');
-        if (!links.length && mark) { var nl = document.createElement('link'); nl.rel = 'icon'; nl.setAttribute('data-ix-added', ''); document.head.appendChild(nl); links = [nl]; }
         for (var l = 0; l < links.length; l++) {
-            var link = links[l];
-            if (!link.hasAttribute('data-ix-orig')) link.setAttribute('data-ix-orig', link.getAttribute('href') || '');
-            var orig = link.getAttribute('data-ix-orig');
-            var fixed = /^\/(favicon\.ico|favicon\.png|icon\.png|apple-touch-icon\.png)$/.test(orig);
-            var want = fixed ? orig + (b && b.updatedAt ? '?v=' + encodeURIComponent(b.updatedAt) : '') : mark || orig;
-            if (link.hasAttribute('data-ix-added') && !mark) { link.remove(); continue; }
-            if (want && link.getAttribute('href') !== want) link.setAttribute('href', want);
+            var href = links[l].getAttribute('href') || '';
+            var fixed = /^\/(favicon\.ico|favicon\.png|icon\.png|apple-touch-icon\.png)(?:[?#]|$)/.test(href);
+            var want = fixed ? href.replace(/[?#].*$/, '') + bust : mark;
+            if (href !== want) links[l].setAttribute('href', want);
         }
-        homeData();
     }
-    /* the home page tells search engines the site's name and logo (Google shows them in the results); it points at
-       the fixed logo address, so a logo changed in the admin panel is what Google finds next time. index.html now
-       carries this data itself (WebSite + Organization, with the one address https://ielts-x.uz), so it is only added
-       to a home page that has none: two different copies would give Google two names for the same site. */
-    function homeData() {
-        if (!/^\/(index(\.html)?)?$/.test(location.pathname) || document.getElementById('ix-site-data') || document.querySelector('script[type="application/ld+json"]')) return;
-        var o = location.origin, s = document.createElement('script');
-        s.type = 'application/ld+json'; s.id = 'ix-site-data';
-        s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': [
-            { '@type': 'Organization', '@id': o + '/#organization', name: 'IELTSX', url: o + '/', logo: o + '/icon.png' },
-            { '@type': 'WebSite', '@id': o + '/#website', name: 'IELTSX', url: o + '/', publisher: { '@id': o + '/#organization' } }
-        ] });
-        document.head.appendChild(s);
-    }
-    var cached = null;
-    try { cached = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { /* blocked or broken */ }
-    function run(b) { try { apply(b); } catch (e) { /* the built-in logos stay */ } }
-    window.IXBranding = { apply: function (b) { cached = b; run(b); } };   // the admin panel shows a saved logo at once
+    function run() { try { apply(); } catch (e) { /* the pictures of the page stay */ } }
+    // the admin panel shows a logo it has just saved at once (the fixed addresses are kept by the browser for an hour)
+    window.IXBranding = { apply: function (b) { bust = '?v=' + encodeURIComponent((b && b.updatedAt) || Date.now()); run(); } };
     function start() {
-        if (cached) run(cached);
-        if (!window.fetch || location.protocol === 'file:') return;
-        fetch('/api/branding', { credentials: 'same-origin', cache: 'no-cache' })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (d) {
-                if (!d) return;
-                var b = { logoUrl: d.logoUrl || '', iconUrl: d.iconUrl || '', updatedAt: d.updatedAt || '' };
-                try { if (b.logoUrl || b.iconUrl) localStorage.setItem(KEY, JSON.stringify(b)); else localStorage.removeItem(KEY); } catch (e) { /* blocked */ }
-                cached = b; run(b);
-                setTimeout(function () { run(b); }, 1500);     // pictures drawn later by the page scripts (sidebars, results)
-            })
-            .catch(function () { /* offline: keep what is shown */ });
+        run();
+        setTimeout(run, 1500);     // pictures drawn later by the page scripts (sidebars, results)
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
