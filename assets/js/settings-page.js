@@ -42,17 +42,57 @@
         }
         return '<span class="ixs-prev ixs-prev-classic' + (dark ? ' is-dark' : '') + '">' + mini + '</span>';
     }
+    var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="11" x="4" y="11" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+    var planName = function (p) { p = String(p || 'standard'); return p.charAt(0).toUpperCase() + p.slice(1); };
+    /* a badge for what is not simply free: locked for this visitor, or (seen only by admins) hidden / locked for others */
+    function badge(d) {
+        if (d.access === 'hidden') return ' <em class="ixs-tag-hidden" title="Only admins see this">Hidden</em>';
+        if (d.access === 'locked') return d.allowed ? ' <em class="ixs-tag-plan">' + esc(planName(d.plan)) + '</em>' : ' <em class="ixs-tag-lock">' + LOCK + esc(planName(d.plan)) + '</em>';
+        return '';
+    }
+    /* one choice: a design or an animation (a locked one leads to the Price page instead of being chosen) */
+    function card(d, attr, on, isDefault, prev, about) {
+        var locked = d.allowed === false;
+        return '<button type="button" role="radio" class="ixs-design' + (locked ? ' is-locked' : '') + '" aria-checked="' + (on && !locked) + '" ' + attr + '="' + esc(d.id) + '"' +
+            (locked ? ' data-ixs-locked="' + esc(d.plan || 'standard') + '" aria-label="' + esc(d.name + ': for the ' + planName(d.plan) + ' plan') + '"' : '') + '>' + prev +
+            (locked ? '<span class="ixs-lock" aria-hidden="true">' + LOCK + '</span>' : '') +
+            '<span class="ixs-design-text"><strong>' + esc(d.name) + (isDefault ? ' <em>Default</em>' : '') + badge(d) + '</strong><span>' +
+            esc(locked ? 'For the ' + planName(d.plan) + ' plan. ' + about : about) + '</span></span>' +
+            '<span class="ixs-tick" aria-hidden="true">' + CHECK + '</span></button>';
+    }
+    function fxPreview(id, dark) {
+        var mini = '<span class="ixs-mini"><i class="ixs-mini-side"></i><i class="ixs-mini-head"></i><i class="ixs-mini-c"></i><i class="ixs-mini-c"></i><i class="ixs-mini-c"></i></span>';
+        var cls = 'ixs-prev ixs-prev-fx ixs-prev-' + id + (dark ? ' is-dark' : '');
+        if (id === 'snow') { var f = ''; for (var i = 0; i < 18; i++) f += '<i class="ixs-flake" style="left:' + ((i * 37) % 97 + 1) + '%;top:' + ((i * 53) % 88 + 4) + '%;--s:' + (2 + (i % 3)) + 'px"></i>'; return '<span class="' + cls + '">' + mini + f + '</span>'; }
+        if (id === 'garland') {   // three sagging spans of wire with bulbs, like the real one
+            var C = ['#ff4d4d', '#ffd23f', '#3ddc84', '#3fa9ff', '#ff6ad5'], wire = '', bulbs = '', n = 0;
+            for (var s = 0; s < 3; s++) {
+                var x0 = -6 + s * 72, x1 = x0 + 72, cx = x0 + 36, cy = 30;
+                wire += 'M' + x0 + ' 2Q' + cx + ' ' + cy + ' ' + x1 + ' 2';
+                for (var k = 0; k < 4; k++) {
+                    var t = (k + 0.5) / 4, mt = 1 - t, px = mt * mt * x0 + 2 * mt * t * cx + t * t * x1, py = mt * mt * 2 + 2 * mt * t * cy + t * t * 2;
+                    bulbs += '<ellipse cx="' + px.toFixed(1) + '" cy="' + (py + 6).toFixed(1) + '" rx="3.2" ry="4.6" fill="' + C[n % 5] + '" filter="url(#ixs-glow)"/>'; n++;
+                }
+            }
+            return '<span class="' + cls + '">' + mini + '<svg class="ixs-garland" viewBox="0 0 204 40" aria-hidden="true"><defs><filter id="ixs-glow" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="' + wire + '" fill="none" stroke="#2b4a35" stroke-width="1.6"/>' + bulbs + '</svg></span>';
+        }
+        return '<span class="' + cls + '">' + mini + '</span>';
+    }
     function render() {
         var st = D.current(), cat = D.catalog(), dark = document.documentElement.classList.contains('dark-mode'), pref = D.get();
         var list = D.designs(cat), box = $('#ixs-designs');
         if (box) {
             box.innerHTML = list.map(function (d) {
-                var on = d.id === st.id, isDefault = d.id === cat.default;
                 var about = d.about || (d.theme && d.theme.stars ? 'A background picture with twinkling stars.' : 'A design added by IELTS-X.');
-                return '<button type="button" role="radio" class="ixs-design" aria-checked="' + on + '" data-ixs-design="' + esc(d.id) + '">' + preview(d, dark) +
-                    '<span class="ixs-design-text"><strong>' + esc(d.name) + (isDefault ? ' <em>Default</em>' : '') + '</strong><span>' + esc(about) + '</span></span>' +
-                    '<span class="ixs-tick" aria-hidden="true">' + CHECK + '</span></button>';
+                return card(d, 'data-ixs-design', d.id === st.id, d.id === cat.default, preview(d, dark), about);
             }).join('');
+        }
+        var fx = D.effects ? D.effects(cat) : [], fxBox = $('#ixs-effects'), fxCard = $('#ixs-fx-card');
+        if (fxCard) fxCard.hidden = !fx.length;
+        if (fxBox && fx.length) {
+            var none = { id: 'none', name: 'None', allowed: true, access: 'free' };
+            fxBox.innerHTML = card(none, 'data-ixs-effect', !st.effect, !cat.defaultEffect, fxPreview('none', dark), 'No animation.') +
+                fx.map(function (e) { return card(e, 'data-ixs-effect', e.id === st.effect, e.id === cat.defaultEffect, fxPreview(e.id, dark), e.about || ''); }).join('');
         }
         var acc = $('#ixs-accents');
         if (acc) {
@@ -67,7 +107,7 @@
             mo.checked = pref.motion !== false && !D.reducedMotion();
             mo.disabled = D.reducedMotion();
             var help = $('#ixs-motion-help');
-            if (help) help.textContent = D.reducedMotion() ? 'Off: your device asks for less motion.' : 'Twinkling stars and shooting stars on the designs that have them. Turn it off on a slow phone.';
+            if (help) help.textContent = D.reducedMotion() ? 'Off: your device asks for less motion.' : 'Twinkling and shooting stars on the designs that have them (Cosmic, designs with stars). Turn it off on a slow phone.';
         }
         paintModes();
     }
@@ -79,13 +119,21 @@
     }
 
     document.addEventListener('click', function (e) {
-        var t = e.target.closest && e.target.closest('[data-ixs-design],[data-ixs-accent],#ixs-reset');
+        var t = e.target.closest && e.target.closest('[data-ixs-design],[data-ixs-effect],[data-ixs-accent],#ixs-reset');
         if (!t) return;
-        if (t.id === 'ixs-reset') { D.set({ design: '', accent: '', motion: true }); render(); saved('Back to the default design'); return; }
+        if (t.id === 'ixs-reset') { D.set({ design: '', effect: '', accent: '', motion: true }); render(); saved('Back to the default design'); return; }
+        if (t.hasAttribute('data-ixs-locked')) {   // the server would refuse it too: show the plans instead
+            var plan = t.getAttribute('data-ixs-locked');
+            saved('This one is for the ' + planName(plan) + ' plan');
+            location.href = D.priceUrl ? D.priceUrl(plan) : '/Price';
+            return;
+        }
         if (t.hasAttribute('data-ixs-design')) D.set({ design: t.getAttribute('data-ixs-design') });
+        else if (t.hasAttribute('data-ixs-effect')) D.set({ effect: t.getAttribute('data-ixs-effect') });
         else D.set({ accent: t.getAttribute('data-ixs-accent') });
         render(); saved();
-        var again = document.querySelector('[data-ixs-design="' + (t.getAttribute('data-ixs-design') || '') + '"],[data-ixs-accent="' + (t.getAttribute('data-ixs-accent') || '') + '"]');
+        var sel = ['design', 'effect', 'accent'].map(function (k) { var v = t.getAttribute('data-ixs-' + k); return v === null ? '' : '[data-ixs-' + k + '="' + v + '"]'; }).filter(Boolean).join(',');
+        var again = sel && document.querySelector(sel);
         if (again && again.focus) again.focus({ preventScroll: true });
     });
     /* arrow keys move inside a group of choices, like the header switch */
@@ -93,8 +141,9 @@
         if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].indexOf(e.key) < 0) return;
         var b = e.target.closest && e.target.closest('[role="radio"]'), g = b && b.closest('[role="radiogroup"]');
         if (!g || !g.closest('#ixs-root')) return;
-        var all = Array.prototype.slice.call(g.querySelectorAll('[role="radio"]')), i = all.indexOf(b);
-        var next = all[(i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : all.length - 1)) % all.length];
+        var all = Array.prototype.slice.call(g.querySelectorAll('[role="radio"]:not([data-ixs-locked])')), i = all.indexOf(b);   // the arrows skip what is locked
+        if (!all.length) return;
+        var next = all[(i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : all.length - 1) + all.length) % all.length];
         e.preventDefault(); next.focus(); next.click();
     });
     document.addEventListener('change', function (e) {

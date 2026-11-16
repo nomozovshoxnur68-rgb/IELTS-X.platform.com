@@ -1,12 +1,15 @@
 /*
  * IELTSX admin: Design (admin.html#design).
  * What the visitors can choose on the Settings page of the website (/settings) and how the site looks for everybody:
- *  - the default design (Classic, Cosmic or a design added here) and whether Cosmic is offered
+ *  - who may use each design and animation: free, locked for a plan (Standard, Max, Ultra) or hidden — kept by the
+ *    server (/api/design, /api/design/fx/, /api/account/design), not only by the page
+ *  - the default design (Classic, Cosmic or a design added here) and the default animation (none, Snowfall, New Year lights)
  *  - the site colours of the Classic design (accent, sidebar, cards, page background; light and dark)
  *  - designs of your own: a background picture (or colour) for light and dark mode, an accent colour, twinkling stars
  *  - the accent colours offered in Settings
  * Kept like the logo: the server keeps it in Settings ("design", /api/admin/design), assets/js/site-design.js draws it on
- * the ordinary pages (never on a test or exam page). Pictures are uploaded with /api/admin/uploads like the logo.
+ * the ordinary pages (never on a test or exam page). Pictures are uploaded with /api/admin/uploads like the logo; a
+ * picture is sent as it is when it fits, otherwise made smaller with a good resampling (see prepare()).
  */
 (() => {
   'use strict';
@@ -25,12 +28,39 @@
   }
   function toast(m, bad) { const t = $('#toast'); if (!t) return; t.textContent = m; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), bad ? 4500 : 2600); }
   const fail = (e) => toast((e && e.message) || 'Something went wrong', true);
-  const plain = (d) => JSON.stringify({ default: d.default, cosmicVisible: d.cosmicVisible, colors: d.colors, themes: d.themes, accents: d.accents });
+  const plain = (d) => JSON.stringify({ default: d.default, defaultEffect: d.defaultEffect, builtins: d.builtins, colors: d.colors, themes: d.themes, accents: d.accents });
   const dirty = () => !!cfg && plain(cfg) !== saved;
   const newId = () => 't-' + Math.random().toString(36).slice(2, 10).replace(/[^a-z0-9]/g, '').padEnd(6, '0');
+  const BUILTINS = [['cosmic', 'Cosmic', 'design', 'The space background: a ringed planet by day, the Earth at night.'],
+    ['snow', 'Snowfall', 'effect', 'New Year animation: gentle snow over the page.'], ['garland', 'New Year lights', 'effect', 'New Year animation: twinkling lights along the top.']];
   function fromServer(d) {
-    return { default: d.default || 'classic', cosmicVisible: d.cosmicVisible !== false, colors: { ...(d.colors || {}) },
-      themes: (d.themes || []).map((t) => ({ ...t })), accents: (d.accents || DEFAULT_ACCENTS).map((a) => ({ ...a })) };
+    const b = d.builtins || {};
+    return { default: d.default || 'classic', defaultEffect: d.defaultEffect || '',
+      builtins: Object.fromEntries(BUILTINS.map(([id]) => [id, { access: (b[id] && b[id].access) || 'free', plan: (b[id] && b[id].plan) || 'standard' }])),
+      colors: { ...(d.colors || {}) }, themes: (d.themes || []).map((t) => ({ ...t, access: t.access || 'free', plan: t.plan || 'standard' })), accents: (d.accents || DEFAULT_ACCENTS).map((a) => ({ ...a })) };
+  }
+
+  /* ───────── who may use a design or an animation: free / locked for a plan / hidden (the server keeps to it) ───────── */
+  const ACCESS_OPTS = [['free', 'Free — everybody'], ['standard', 'Locked — Standard and higher'], ['max', 'Locked — Max and higher'], ['ultra', 'Locked — Ultra only'], ['hidden', 'Hidden — nobody (admins can try it)']];
+  const accessOf = (r) => (r.access === 'locked' ? r.plan || 'standard' : r.access || 'free');
+  const accessBadge = (r) => { const a = accessOf(r); return a === 'free' ? '<span class="ds-badge free">Free</span>' : a === 'hidden' ? '<span class="ds-badge hidden">Hidden</span>' : `<span class="ds-badge locked">🔒 ${esc(a.charAt(0).toUpperCase() + a.slice(1))}</span>`; };
+  const accessSelect = (r, attrs) => `<select class="field ds-access" ${attrs} aria-label="Who may use it">${ACCESS_OPTS.map(([v, l]) => `<option value="${v}" ${accessOf(r) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  function setAccess(r, v) { if (v === 'free' || v === 'hidden') { r.access = v; } else { r.access = 'locked'; r.plan = v; } }
+  function accessRows() {
+    const row = (name, kind, about, r, attrs) => `<div class="ds-ax-row"><div class="ds-ax-name"><strong>${esc(name)}</strong> <span class="muted sm">${esc(kind)}</span>${about ? `<span class="muted sm">${esc(about)}</span>` : ''}</div>${accessBadge(r)}${accessSelect(r, attrs)}</div>`;
+    return `<div class="ds-ax-row"><div class="ds-ax-name"><strong>Classic</strong> <span class="muted sm">design</span><span class="muted sm">The plain site. Always free: it is what everybody else falls back to.</span></div><span class="ds-badge free">Free</span><span></span></div>` +
+      BUILTINS.map(([id, name, kind, about]) => row(name, kind === 'effect' ? 'animation' : 'design', about, cfg.builtins[id], `data-ds-access="${id}"`)).join('') +
+      cfg.themes.map((t) => row(t.name || 'Custom design', 'your design', '', t, `data-ds-access="${esc(t.id)}" data-tid="${esc(t.id)}"`)).join('');
+  }
+  function defaultWarn() {
+    const d = cfg.default === 'cosmic' ? cfg.builtins.cosmic : cfg.themes.find((t) => t.id === cfg.default);
+    const e = cfg.defaultEffect ? cfg.builtins[cfg.defaultEffect] : null;
+    const w = [];
+    if (d && d.access === 'locked') w.push('The default design is locked: visitors without that plan get Classic.');
+    if (d && d.access === 'hidden') w.push('The default design is hidden: everybody gets Classic.');
+    if (e && e.access === 'locked') w.push('The default animation is locked: visitors without that plan get none.');
+    if (e && e.access === 'hidden') w.push('The default animation is hidden: nobody gets it.');
+    return w.length ? `<div class="ds-warn">${w.map(esc).join('<br>')}</div>` : '';
   }
 
   /* ───────── site colours ───────── */
@@ -76,7 +106,7 @@
         <div class="ds-theme-main">
           <label class="lbl">Name<input class="field" data-ds-tf="name" data-tid="${t.id}" value="${esc(t.name)}" maxlength="40" placeholder="Ocean, Sunset…"></label>
           <div class="ds-inline">
-            <label class="ds-check"><input type="checkbox" data-ds-tb="visible" data-tid="${t.id}" ${t.visible !== false ? 'checked' : ''}> Shown in Settings</label>
+            <label class="lbl ds-inline-lbl">Who may use it ${accessSelect(t, `data-ds-access="${esc(t.id)}" data-tid="${esc(t.id)}"`)}</label>
             <label class="ds-check"><input type="checkbox" data-ds-tb="stars" data-tid="${t.id}" ${t.stars ? 'checked' : ''}> Twinkling stars</label>
           </div>
           <div class="btn-row"><button class="btn btn-sm" type="button" data-ds="move" data-dir="-1" data-tid="${t.id}" ${i ? '' : 'disabled'}>↑</button><button class="btn btn-sm" type="button" data-ds="move" data-dir="1" data-tid="${t.id}" ${i < cfg.themes.length - 1 ? '' : 'disabled'}>↓</button><button class="btn btn-sm btn-danger" type="button" data-ds="delete-theme" data-tid="${t.id}">Delete</button></div>
@@ -87,7 +117,7 @@
         ${colorRow('colorLight', 'Background colour · light', 'Without a picture, or around it.', '#eef1f8', t.colorLight, t.id)}
         ${colorRow('colorDark', 'Background colour · dark', '', '#0d1018', t.colorDark, t.id)}
       </div>
-      <label class="lbl">Veil over the picture: <span data-veil-out="${t.id}">${t.veil || 0}%</span> <span class="muted sm">(makes the text easier to read: white in light mode, black in dark mode)</span>
+      <label class="lbl">Veil over the picture: <span data-veil-out="${t.id}">${t.veil || 0}%</span> <span class="muted sm">(a white haze in light mode, a dark one in dark mode. 0% shows the picture exactly as uploaded; the cards already keep the text readable)</span>
         <input type="range" min="0" max="80" step="5" data-ds-veil data-tid="${t.id}" value="${t.veil || 0}"></label>
     </div>`;
   }
@@ -95,16 +125,23 @@
   function render() {
     const mount = $('#content-design'); if (!mount) return;
     if (!cfg) { mount.innerHTML = '<div class="empty">Loading…</div>'; return; }
-    const opts = [['classic', 'Classic (the plain site)'], ['cosmic', 'Cosmic (animated space)'], ...cfg.themes.map((t) => [t.id, t.name || 'Custom design'])];
+    const tag = (r) => (r.access === 'hidden' ? ' — hidden' : r.access === 'locked' ? ' — 🔒 ' + (r.plan || 'standard') : '');
+    const opts = [['classic', 'Classic (the plain site)'], ['cosmic', 'Cosmic (space)' + tag(cfg.builtins.cosmic)], ...cfg.themes.map((t) => [t.id, (t.name || 'Custom design') + tag(t)])];
+    const fxOpts = [['', 'None'], ['snow', 'Snowfall' + tag(cfg.builtins.snow)], ['garland', 'New Year lights' + tag(cfg.builtins.garland)]];
     mount.innerHTML = `
       <div class="card"><div class="section-head"><div><div class="section-title">Design</div>
-        <div class="muted sm">How the website looks. Every visitor can pick a design and an accent colour on the <a href="/settings" target="_blank" rel="noopener">Settings</a> page; what you set here is what they can choose from. Tests and exams always keep their plain look. Visitors see a change within a few minutes.</div></div>
+        <div class="muted sm">How the website looks. Every visitor can pick a design, an animation and an accent colour on the <a href="/settings" target="_blank" rel="noopener">Settings</a> page; what you set here is what they can choose from. Tests and exams always keep their plain look. Visitors see a change within a few minutes.</div></div>
         <div class="btn-row"><a class="btn" href="/settings" target="_blank" rel="noopener">Open Settings ↗</a><button class="btn btn-primary" data-ds="save" type="button" ${dirty() && !busy ? '' : 'disabled'}>Save</button></div></div>
         <div class="ds-grid2">
           <label class="lbl">Default design (for visitors who have not chosen one)
             <select class="field" data-ds-default>${opts.map(([v, l]) => `<option value="${esc(v)}" ${cfg.default === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>
-          <label class="ds-check ds-check-top"><input type="checkbox" data-ds-cosmic ${cfg.cosmicVisible ? 'checked' : ''}> Offer the Cosmic design in Settings</label>
-        </div></div>
+          <label class="lbl">Default animation (for visitors who have not chosen one)
+            <select class="field" data-ds-default-fx>${fxOpts.map(([v, l]) => `<option value="${esc(v)}" ${cfg.defaultEffect === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>
+        </div>${defaultWarn()}</div>
+
+      <div class="card"><div class="section-head"><div><div class="section-title">Who may use each design and animation</div>
+        <div class="muted sm"><b>Free</b>: everybody. <b>Locked</b>: only members of that plan (or a higher one); the others see it in Settings with a lock and a link to the Price page. <b>Hidden</b>: not offered at all (you, as an admin, still see it in Settings to try it). The server keeps to this: a locked design is sent without its pictures, and the code of Cosmic and of the animations is not sent to anyone who may not use them.</div></div></div>
+        <div class="ds-ax-list">${accessRows()}</div></div>
 
       <div class="card"><div class="section-head"><div><div class="section-title">Site colours</div>
         <div class="muted sm">The colours of the Classic design. Leave one on "default" to keep the IELTS-X colour. The accent is used by every design.</div></div></div>
@@ -112,7 +149,7 @@
         <div class="ds-colors">${COLORS.map(([k, l, h, d]) => colorRow(k, l, h, d, cfg.colors[k], '')).join('')}</div></div>
 
       <div class="card"><div class="section-head"><div><div class="section-title">Your designs</div>
-        <div class="muted sm">Each one appears in Settings with its own picture: a background picture (or colour) for light and dark mode, an accent colour and, if you like, twinkling stars. Wide pictures work best (at least 1920 × 1080, JPG or WebP); a big photo is made smaller before it is uploaded.</div></div>
+        <div class="muted sm">Each one appears in Settings with its own picture: a background picture (or colour) for light and dark mode, an accent colour and, if you like, twinkling stars. Wide pictures work best: 2560 × 1440 or 3840 × 2160 (4K) stays sharp on large and high-resolution screens. A picture under 2.8 MB is uploaded exactly as it is; a bigger one is made smaller with a high-quality resize (at most 3840 px, WebP quality 92 %).</div></div>
         <div class="btn-row"><button class="btn btn-primary" type="button" data-ds="add-theme" ${cfg.themes.length >= 20 ? 'disabled' : ''}>+ Add a design</button></div></div>
         ${cfg.themes.length ? cfg.themes.map(themeCard).join('') : '<div class="empty">No designs of your own yet. Press "Add a design".</div>'}</div>
 
@@ -136,24 +173,66 @@
       inp.click();
     });
   }
-  /* a background photo is made at most 2400 px wide and saved as WebP (the server takes up to 3 MB) */
+  /* A background picture has to stay sharp on a large or high-resolution screen (a 1440p screen at 2× shows 5120 px).
+     The first version made every picture over 1.2 MB at most 2400 px wide in one step (the browser's quick, blurry
+     resampling) and saved it again as WebP at quality 86 → 64: that was the blur. Now:
+       - a picture that fits (≤ 2.8 MB, at most 4096 px, not AVIF) is uploaded exactly as it is, byte for byte;
+       - a bigger one is made smaller only as much as needed (3840 px, then 3200, then 2560), halving in steps with
+         high-quality smoothing (sharp, no moiré), and saved as WebP at quality 92 → 88 → 84 (JPEG where the browser
+         cannot write WebP), the first that is under 2.8 MB (the server on Vercel takes up to 3 MB). */
+  const KEEP_BYTES = 2.8 * 1024 * 1024, KEEP_SIDE = 4096;
+  async function openImage(f) {
+    if (window.createImageBitmap) { try { return await createImageBitmap(f); } catch (e) { /* try the <img> way */ } }
+    const url = URL.createObjectURL(f);
+    try { return await new Promise((res, rej) => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = () => rej(new Error('This picture could not be opened.')); i.src = url; }); }
+    finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
+  }
+  function resample(img, W, H) {
+    let src = img, w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+    while (w / 2 >= W && h / 2 >= H) {   // halve while it stays above the size wanted: every step averages 2×2 pixels
+      const c = document.createElement('canvas'); c.width = Math.round(w / 2); c.height = Math.round(h / 2);
+      const x = c.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, c.width, c.height);
+      src = c; w = c.width; h = c.height;
+    }
+    const out = document.createElement('canvas'); out.width = W; out.height = H;
+    const x = out.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, W, H);
+    return out;
+  }
+  const encode = (c, type, q) => new Promise((res) => c.toBlob(res, type, q));
   async function prepare(f) {
-    if (f.size <= 1.2 * 1024 * 1024 && !/\.avif$/i.test(f.name)) return f;
-    const url = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(new Error('This picture could not be read.')); fr.readAsDataURL(f); });
-    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('This picture could not be opened.')); i.src = url; });
-    let w = img.naturalWidth || 1920, h = img.naturalHeight || 1080; const k = Math.min(1, 2400 / Math.max(w, h)); w = Math.round(w * k); h = Math.round(h * k);
-    const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
-    let blob = null;
-    for (const q of [0.86, 0.76, 0.64]) { blob = await new Promise((res) => c.toBlob(res, 'image/webp', q)); if (blob && blob.size < 2.6 * 1024 * 1024) break; }
-    if (!blob) throw new Error('This picture could not be converted.');
-    return new File([blob], f.name.replace(/\.\w+$/, '') + '.webp', { type: 'image/webp' });
+    const avif = /\.avif$/i.test(f.name) || f.type === 'image/avif';
+    if (f.size <= KEEP_BYTES && !avif) {
+      const img = await openImage(f).catch(() => null);
+      const side = img ? Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height) : 0;
+      if (img && img.close) img.close();
+      if (!img || side <= KEEP_SIDE) return f;    // sent as it is: no quality lost at all
+    }
+    const img = await openImage(f);
+    const w0 = img.naturalWidth || img.width, h0 = img.naturalHeight || img.height;
+    if (!w0 || !h0) throw new Error('This picture could not be read.');
+    for (const side of [3840, 3200, 2560]) {
+      const k = Math.min(1, side / Math.max(w0, h0)), c = resample(img, Math.round(w0 * k), Math.round(h0 * k));
+      for (const q of [0.92, 0.88, 0.84]) {
+        let blob = await encode(c, 'image/webp', q);
+        if (!blob || blob.type !== 'image/webp') blob = await encode(c, 'image/jpeg', q);   // Safari writes PNG when asked for WebP
+        if (blob && blob.size <= KEEP_BYTES) {
+          if (img.close) img.close();
+          const ext = blob.type === 'image/webp' ? '.webp' : '.jpg';
+          return new File([blob], f.name.replace(/\.\w+$/, '') + ext, { type: blob.type });
+        }
+      }
+    }
+    if (img.close) img.close();
+    throw new Error('This picture is too large even at 2560 px. Use a JPG or WebP under 2.8 MB.');
   }
   async function upload(tid, key) {
     let f = await pick(); if (!f) return;
     if (!/\.(png|jpe?g|webp|avif)$/i.test(f.name)) return toast('Use a JPG, PNG or WebP picture.', true);
+    const orig = f;
+    toast('Preparing ' + f.name + ' …');
     try { f = await prepare(f); } catch (e) { return fail(e); }
     if (f.size > 3 * 1024 * 1024) return toast('The picture is larger than 3 MB. Make it smaller and try again.', true);
-    busy++; render(); toast('Uploading ' + f.name + ' …');
+    busy++; render(); toast(f === orig ? 'Uploading ' + f.name + ' as it is (full quality) …' : 'Uploading ' + f.name + ' (' + (f.size / 1048576).toFixed(1) + ' MB, high quality) …');
     try {
       const fd = new FormData(); fd.append('type', 'image'); fd.append('file', f, f.name);
       const t = theme(tid); if (t) t[key] = (await api('/api/admin/uploads', { method: 'POST', body: fd })).url;
@@ -166,7 +245,10 @@
     try {
       const d = (await api('/api/admin/design', { method: 'POST', body: JSON.stringify(cfg) })).design;
       cfg = fromServer(d); saved = plain(cfg);
-      try { localStorage.setItem('ix-design-site', JSON.stringify({ ...d, t: Date.now() })); } catch (e) { /* blocked */ }
+      // the list the website keeps in this browser: the one the server makes for this account (what this admin may see)
+      api('/api/design').then((v) => { try { localStorage.setItem('ix-design-site', JSON.stringify({ ...v, t: Date.now() })); } catch (e) { /* blocked */ } }).catch(() => {
+        try { localStorage.removeItem('ix-design-site'); } catch (e) { /* blocked */ }
+      });
       toast('Saved — the website shows the new design settings');
     } catch (e) { fail(e); } finally { busy--; render(); }
   }
@@ -185,7 +267,7 @@
       if (th) th[t.dataset.key] = ''; else cfg.colors[t.dataset.key] = '';
       render(); syncSave();
     } else if (a === 'add-theme') {
-      cfg.themes.push({ id: newId(), name: 'New design', bgLight: '', bgDark: '', colorLight: '', colorDark: '', accent: '', stars: false, veil: 20, visible: true });
+      cfg.themes.push({ id: newId(), name: 'New design', bgLight: '', bgDark: '', colorLight: '', colorDark: '', accent: '', stars: false, veil: 0, access: 'hidden', plan: 'standard' });   // hidden until you have tried it
       render(); syncSave();
       const last = document.querySelector('[data-theme-card]:last-of-type input[data-ds-tf="name"]'); if (last) { last.focus(); last.select(); }
     } else if (a === 'delete-theme' && th) {
@@ -217,7 +299,8 @@
     const el = e.target; if (!cfg || !el.closest || !el.closest('#content-design')) return;
     const th = el.dataset.tid && theme(el.dataset.tid);
     if (el.hasAttribute('data-ds-default')) cfg.default = el.value;
-    else if (el.hasAttribute('data-ds-cosmic')) cfg.cosmicVisible = el.checked;
+    else if (el.hasAttribute('data-ds-default-fx')) cfg.defaultEffect = el.value;
+    else if (el.dataset.dsAccess) { const r = cfg.builtins[el.dataset.dsAccess] || th; if (!r) return; setAccess(r, el.value); }
     else if (el.dataset.dsTb && th) th[el.dataset.dsTb] = el.checked;
     else if (el.dataset.dsUrl && th) {
       const v = el.value.trim();
