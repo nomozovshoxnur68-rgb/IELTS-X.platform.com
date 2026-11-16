@@ -70,6 +70,26 @@
 .ixs-prev.is-dark:not(.ixs-prev-classic) .ixs-mini .ixs-mini-head { background: transparent; border: 0; border-bottom: 1px solid rgba(140,165,255,.2); }
 .ixs-prev-image .ixs-mini i { background: rgba(255,255,255,.82); }
 
+/* locked (for a plan) and hidden (only admins see it) */
+.ixs-design.is-locked .ixs-prev { filter: saturate(.55) brightness(.92); }
+.ixs-design.is-locked:hover { transform: none; }
+.ixs-lock { position: absolute; top: 0.55rem; right: 0.55rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; display: grid; place-items: center; background: rgba(15,23,42,.72); color: #fff; }
+.ixs-lock svg { width: 14px; height: 14px; }
+.ixs-design-text strong em.ixs-tag-lock, .ixs-design-text strong em.ixs-tag-plan { display: inline-flex; align-items: center; gap: 3px; background: hsl(38 92% 50% / .16); color: hsl(32 90% 38%); }
+.dark-mode .ixs-design-text strong em.ixs-tag-lock, .dark-mode .ixs-design-text strong em.ixs-tag-plan { color: hsl(40 95% 62%); }
+.ixs-design-text strong em.ixs-tag-lock svg { width: 10px; height: 10px; }
+.ixs-design-text strong em.ixs-tag-hidden { background: hsl(var(--muted-foreground) / .18); }
+
+/* the animations: small still pictures */
+.ixs-prev-fx { background: linear-gradient(180deg, #eef2fb, #dfe6f5); }
+.ixs-prev-fx.is-dark { background: linear-gradient(180deg, #0b1226, #121c38); }
+.ixs-prev-fx .ixs-mini i { background: rgba(255,255,255,.9); }
+.ixs-prev-fx.is-dark .ixs-mini i { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); box-shadow: none; }
+.ixs-flake { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(118,148,210,.45), 0 0 4px rgba(255,255,255,.9); }
+.is-dark .ixs-flake { box-shadow: 0 0 5px rgba(255,255,255,.85); }
+.ixs-garland { position: absolute; left: 0; top: 0; width: 100%; height: auto; overflow: visible; }
+.is-dark .ixs-garland path { stroke: #4f7a5c; }
+
 /* accent colours */
 .ixs-accents { display: flex; flex-wrap: wrap; gap: 0.9rem 1.1rem; }
 .ixs-swatch { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; min-width: 3rem; }
@@ -106,6 +126,7 @@
     .ixs { padding: 1rem; }
     .ixs-designs { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
     .ixs-prev { height: 6rem; }
+    .ixs-fx .ixs-design-text > span { display: none; }
     .ixs-design-text > span { display: none; }
     .ixs-modes button span { font-size: 0.82rem; }
 }

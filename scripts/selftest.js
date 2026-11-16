@@ -250,7 +250,8 @@ server.listen(0, async () => {
 
     // --- site design (Admin -> Design, the Settings page, assets/js/site-design.js)
     r = await call('GET', '/api/design');
-    assert.equal(r.status, 200); assert.equal(r.json.default, 'classic'); assert.equal(r.json.cosmicVisible, true); assert.deepEqual(r.json.themes, []);
+    assert.equal(r.status, 200); assert.equal(r.json.default, 'classic'); assert.equal(r.json.defaultEffect, ''); assert.deepEqual(r.json.themes, []);
+    assert.deepEqual(Object.keys(r.json.builtins), ['cosmic', 'snow', 'garland']); assert.ok(Object.values(r.json.builtins).every((b) => b.access === 'free' && b.allowed), 'all free by default');
     assert.equal(r.json.accents.length, 6, 'the standard accent colours'); assert.ok(/no-cache/.test(r.headers.get('cache-control')));
     assert.equal((await call('POST', '/api/admin/design', { body: { default: 'cosmic' } })).status, 401);
     assert.equal((await call('POST', '/api/admin/design', { jar: user, body: { default: 'cosmic' } })).status, 403);
@@ -259,7 +260,7 @@ server.listen(0, async () => {
       themes: [{ id: 't-ocean1', name: '<b>Ocean</b>', bgLight: 'javascript:alert(1)', bgDark: 'https://cdn.example.com/night.jpg', accent: '#0EA5E9', veil: 500, stars: 1 }, { id: 'bad id', name: '' }],
       accents: [{ name: 'Sky', color: '#38bdf8' }, { name: 'Same', color: '#38BDF8' }, { name: 'Bad', color: 'blue' }] } });
     assert.equal(r.status, 200); const ds = r.json.design;
-    assert.equal(ds.default, 't-ocean1'); assert.equal(ds.cosmicVisible, false);
+    assert.equal(ds.default, 't-ocean1'); assert.equal(ds.builtins.cosmic.access, 'hidden', 'cosmicVisible: false of the first version = hidden');
     assert.deepEqual(ds.colors, { accent: '#11aa22', sidebarLight: '', sidebarDark: '', cardLight: '', cardDark: '#1a1a1a', bgLight: '', bgDark: '' }, 'colours: hex only');
     assert.equal(ds.themes.length, 2); assert.equal(ds.themes[0].name, 'bOcean/b'); assert.equal(ds.themes[0].bgLight, '', 'no javascript: picture');
     assert.equal(ds.themes[0].bgDark, 'https://cdn.example.com/night.jpg'); assert.equal(ds.themes[0].accent, '#0ea5e9'); assert.equal(ds.themes[0].veil, 80); assert.equal(ds.themes[0].stars, true);
@@ -269,7 +270,7 @@ server.listen(0, async () => {
     r = await call('POST', '/api/admin/design', { jar: boss, body: { default: 't-gone99', themes: [] } }); assert.equal(r.json.design.default, 'classic', 'a default that is not there falls back to classic');
     assert.equal((await call('GET', '/api/account/design')).status, 401);
     r = await call('POST', '/api/account/design', { jar: user, body: { design: 'cosmic', accent: '#ABCDEF', motion: false, at: 1234 } });
-    assert.equal(r.status, 200); assert.deepEqual(r.json.pref, { design: 'cosmic', accent: '#abcdef', motion: false, at: 1234 });
+    assert.equal(r.status, 200); assert.deepEqual(r.json.pref, { design: 'cosmic', effect: '', accent: '#abcdef', motion: false, at: 1234 });
     assert.equal((await call('POST', '/api/account/design', { jar: user, body: { design: '"><script>', accent: 'red' } })).json.pref.design, '');
     await call('POST', '/api/account/design', { jar: user, body: { design: 'cosmic', at: 99 } });
     r = await call('GET', '/api/account/design', { jar: user }); assert.equal(r.json.pref.design, 'cosmic'); assert.equal(r.json.pref.at, 99);
@@ -278,6 +279,105 @@ server.listen(0, async () => {
     r = await call('GET', '/settings'); assert.equal(r.status, 200); assert.ok(r.text.includes('site-design.js') && r.text.includes('settings-page.js') && r.text.includes('id="ixs-designs"'));
     assert.equal((await call('GET', '/assets/js/site-design.js')).status, 200);
     ok('site design: admin only, colours and pictures checked, public read, each visitor\'s own choice with the account, Settings page');
+    {
+      // --- designs and animations: free / locked (a plan) / hidden, kept by the server (not only by the Settings page)
+      const mkU = async (name, email, plan) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); assert.equal((await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j })).status, 200, 'login ' + email);
+        if (plan) await call('POST', `/api/admin/users/${row.id}/premium`, { body: { plan, days: 30 }, jar: boss });
+        return { j, id: row.id };
+      };
+      const free = await mkU('Dee', 'dee@example.com'), std = await mkU('Sid', 'sid@example.com', 'Standard'), mx = await mkU('Mia', 'mia@example.com', 'Max');
+      // a choice made while everything was free
+      assert.equal((await call('POST', '/api/account/design', { jar: free.j, body: { design: 'cosmic', effect: 'snow', at: 5 } })).status, 200);
+      assert.equal((await call('POST', '/api/account/design', { jar: std.j, body: { design: 'cosmic', at: 5 } })).status, 200);
+      const setup = { default: 'cosmic', defaultEffect: 'garland',
+        builtins: { cosmic: { access: 'locked', plan: 'standard' }, snow: { access: 'hidden' }, garland: { access: 'free' } },
+        themes: [{ id: 't-gold01', name: 'Gold', bgLight: '/uploads/images/gold.webp', bgDark: '/uploads/images/gold-night.webp', accent: '#d97706', access: 'locked', plan: 'max' },
+          { id: 't-draft1', name: 'Draft', bgLight: '/uploads/images/draft.webp', access: 'hidden' },
+          { id: 't-free01', name: 'Open', bgLight: '/uploads/images/open.webp', access: 'free' },
+          { id: 't-old001', name: 'Old', visible: false }] };
+      assert.equal((await call('POST', '/api/admin/design', { jar: user, body: setup })).status, 403, 'only admins set who may use what');
+      r = await call('POST', '/api/admin/design', { jar: boss, body: setup });
+      assert.equal(r.status, 200); const sd = r.json.design;
+      assert.deepEqual(sd.builtins, { cosmic: { access: 'locked', plan: 'standard' }, snow: { access: 'hidden', plan: 'standard' }, garland: { access: 'free', plan: 'standard' } });
+      assert.deepEqual(sd.themes.map((t) => t.access), ['locked', 'hidden', 'free', 'hidden'], '"visible: false" of the first version = hidden');
+      assert.equal(sd.themes[0].plan, 'max'); assert.equal(sd.default, 'cosmic'); assert.equal(sd.defaultEffect, 'garland');
+
+      // what a visitor without a plan is sent
+      r = await call('GET', '/api/design'); let v = r.json;
+      assert.ok(/private/.test(r.headers.get('cache-control')) && /cookie/i.test(r.headers.get('vary') || ''), 'one answer per visitor, never shared by a cache');
+      assert.equal(v.default, 'classic', 'a locked default design: a visitor without the plan gets Classic');
+      assert.equal(v.defaultEffect, 'garland');
+      assert.deepEqual(Object.keys(v.builtins), ['cosmic', 'garland'], 'a hidden animation is not even named');
+      assert.equal(v.builtins.cosmic.allowed, false); assert.equal(v.builtins.cosmic.plan, 'standard'); assert.equal(v.builtins.garland.allowed, true);
+      assert.deepEqual(v.themes.map((t) => t.id), ['t-gold01', 't-free01'], 'hidden designs are not listed');
+      assert.equal(v.themes[0].allowed, false); assert.equal(v.themes[0].bgLight + v.themes[0].bgDark, '', 'a locked design comes without its pictures');
+      assert.equal(v.themes[1].allowed, true); assert.equal(v.themes[1].bgLight, '/uploads/images/open.webp');
+      assert.ok(!/gold\.webp|gold-night|draft/.test(JSON.stringify(v)), 'nothing of a locked or hidden design leaks');
+      // the code of Cosmic and of the animations: only for who may use it
+      const fx = (id, j) => call('GET', '/api/design/fx/' + id + '.js', { jar: j });
+      r = await fx('cosmic'); assert.equal(r.status, 403); assert.ok(!r.text.includes('defineFx') && r.json.price.includes('plan=standard')); assert.ok(/no-store/.test(r.headers.get('cache-control')));
+      assert.equal((await fx('cosmic', free.j)).status, 403);
+      r = await fx('cosmic', std.j); assert.equal(r.status, 200); assert.ok(/javascript/.test(r.headers.get('content-type')) && r.text.includes("defineFx('cosmic'"), 'Standard member gets Cosmic');
+      assert.ok(/private/.test(r.headers.get('cache-control')));
+      assert.equal((await fx('snow', mx.j)).status, 404, 'hidden: not even for a paying member');
+      r = await fx('snow', boss); assert.equal(r.status, 200, 'an admin can try a hidden one'); assert.ok(r.text.includes("defineFx('snow'"));
+      r = await fx('garland'); assert.equal(r.status, 200, 'a free animation for everybody'); assert.ok(r.text.includes("defineFx('garland'"));
+      assert.equal((await fx('nothing', boss)).status, 404); assert.equal((await fx('../server', boss)).status, 404);
+      for (const pth of ['/design-src/snow.js', '/design-src/cosmic.js', '/design-src/garland.js', '/DESIGN-SRC/snow.js']) assert.ok([403, 404].includes((await call('GET', pth)).status), pth + ' is not a public file');
+      // the choice kept with the account
+      r = await call('GET', '/api/account/design', { jar: free.j }); assert.equal(r.json.pref.design, '', 'a choice that is locked now is not handed back'); assert.equal(r.json.pref.effect, '', 'nor a hidden animation');
+      r = await call('POST', '/api/account/design', { jar: free.j, body: { design: 'cosmic' } }); assert.equal(r.status, 403, 'a locked design is refused'); assert.ok(r.json.price.includes('plan=standard'));
+      assert.equal((await call('POST', '/api/account/design', { jar: free.j, body: { design: 't-gold01' } })).status, 403);
+      assert.equal((await call('POST', '/api/account/design', { jar: free.j, body: { design: 't-draft1' } })).status, 404, 'a hidden design cannot be chosen');
+      assert.equal((await call('POST', '/api/account/design', { jar: free.j, body: { effect: 'snow' } })).status, 404, 'nor a hidden animation');
+      r = await call('POST', '/api/account/design', { jar: free.j, body: { design: 't-free01', effect: 'garland' } }); assert.equal(r.status, 200); assert.equal(r.json.pref.effect, 'garland');
+      assert.equal((await call('POST', '/api/account/design', { jar: free.j, body: { design: 'classic', effect: 'none' } })).json.pref.effect, 'none');
+      // Standard and Max members
+      v = (await call('GET', '/api/design', { jar: std.j })).json;
+      assert.equal(v.default, 'cosmic'); assert.equal(v.builtins.cosmic.allowed, true); assert.equal(v.themes[0].allowed, false); assert.equal(v.themes[0].bgLight, '', 'a Max design for a Standard member: no pictures');
+      assert.equal((await call('GET', '/api/account/design', { jar: std.j })).json.pref.design, 'cosmic');
+      assert.equal((await call('POST', '/api/account/design', { jar: std.j, body: { design: 't-gold01' } })).status, 403, 'Max design, Standard member');
+      v = (await call('GET', '/api/design', { jar: mx.j })).json;
+      assert.equal(v.themes[0].allowed, true); assert.equal(v.themes[0].bgLight, '/uploads/images/gold.webp', 'a Max member gets the pictures');
+      assert.equal((await call('POST', '/api/account/design', { jar: mx.j, body: { design: 't-gold01' } })).status, 200);
+      // admins see the hidden ones too (to try them), marked as hidden
+      v = (await call('GET', '/api/design', { jar: boss })).json;
+      assert.deepEqual(Object.keys(v.builtins), ['cosmic', 'snow', 'garland']); assert.equal(v.builtins.snow.access, 'hidden'); assert.equal(v.builtins.snow.allowed, true);
+      assert.deepEqual(v.themes.map((t) => t.id), ['t-gold01', 't-draft1', 't-free01', 't-old001']);
+      // made free: at once for everybody; a plan that ends: locked again at once
+      await call('POST', '/api/admin/design', { jar: boss, body: { ...sd, builtins: { ...sd.builtins, cosmic: { access: 'free' } } } });
+      assert.equal((await fx('cosmic', free.j)).status, 200, 'made free: sent at once');
+      await call('POST', '/api/admin/design', { jar: boss, body: sd });
+      await call('DELETE', `/api/admin/users/${std.id}/premium`, { jar: boss });
+      assert.equal((await fx('cosmic', std.j)).status, 403, 'the plan ended: no more Cosmic');
+      assert.equal((await call('GET', '/api/account/design', { jar: std.j })).json.pref.design, '', 'nor the choice');
+      // bad values from the admin panel
+      r = await call('POST', '/api/admin/design', { jar: boss, body: { default: 't-draft1', defaultEffect: 'snow', builtins: { cosmic: { access: 'public', plan: 'gold' }, snow: { access: 'hidden' } }, themes: [{ id: 't-draft1', access: 'hidden' }] } });
+      assert.equal(r.json.design.default, 'classic', 'a hidden default design: Classic'); assert.equal(r.json.design.defaultEffect, '', 'a hidden default animation: none');
+      assert.deepEqual(r.json.design.builtins.cosmic, { access: 'free', plan: 'standard' }, 'unknown access / plan -> free / standard');
+      await call('POST', '/api/admin/design', { jar: boss, body: {} });
+      ok('designs and animations: free / locked for a plan / hidden, kept by the server (list per visitor, no pictures or code when locked, choices refused, plan ends, admins try hidden ones)');
+
+      // the speed rules of the moving designs (assets/js/site-design.js and design-src/)
+      const code = (f) => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+      const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+      const sdc = strip(code('assets/js/site-design.js'));
+      assert.ok(!/backdrop-filter/.test(sdc), 'no blur under the glass cards (it made scrolling over a moving background slow)');
+      assert.equal((sdc.match(/requestAnimationFrame\(/g) || []).length, 2, 'one animation loop');
+      assert.ok(/visibilitychange/.test(sdc) && /prefers-reduced-motion/.test(sdc) && /saveData|deviceMemory/.test(sdc), 'asleep in a hidden tab, still with reduced motion, lighter on a slow device');
+      assert.ok(!/class="ixd-sp"|ixd-shoot/.test(sdc), 'no DOM node per twinkle');
+      assert.ok(!/clusters|ellipse\(/.test(sdc), 'the picture of Cosmic is not in the public file');
+      assert.ok(/new Worker\(/.test(sdc) && /OffscreenCanvas/.test(sdc) && /caches\.open/.test(sdc), 'the picture of Cosmic is drawn off the page\'s thread and kept for the next pages');
+      for (const id of ['cosmic', 'snow', 'garland']) {
+        const c = code('design-src/' + id + '.js'); assert.ok(c.includes("defineFx('" + id + "'"));
+        const fps = (c.match(/fps:\s*(\d+)/) || [])[1]; assert.ok(id === 'cosmic' || (fps && Number(fps) <= 30), id + ': at most 30 frames a second');
+      }
+      assert.ok(/design-src/.test(code('middleware.js')) && /design-src\/\*\*/.test(code('vercel.json')), 'design-src: private on Vercel, but in the function');
+      ok('moving designs: one loop, at most 30 fps, asleep when hidden, no backdrop blur, art and animations outside the public file');
+    }
     {
       // the design is on the ordinary pages only: never on a test or exam page (it would move behind the test)
       const ROOT = path.join(__dirname, '..'), pages = [];

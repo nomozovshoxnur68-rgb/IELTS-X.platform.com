@@ -655,8 +655,21 @@ async function getBranding() {
 /* ---- site design (admin panel -> Design, the Settings page): kept in settings like the logo; assets/js/site-design.js
    draws it on the ordinary pages only (never on a test or exam page). Built-in designs: "classic" (the site as it was)
    and "cosmic" (the animated space background). The admin adds designs (a background picture or colour for light and
-   dark, an accent colour), the accent colours offered in Settings, and the colours of the classic site. ---- */
+   dark, an accent colour), the accent colours offered in Settings, and the colours of the classic site.
+   Animations (over any design): "snow" (Snowfall) and "garland" (New Year lights).
+   Who may use each one is set in the admin panel, like the tests: free, locked (a plan: standard / max / ultra) or hidden.
+   The server keeps to it: /api/design lists for each visitor only what they may see (a locked design without its
+   pictures, a hidden one not at all), the drawing code of Cosmic and of the animations (design-src/, never a static
+   file) is sent by /api/design/fx/<id>.js only to a visitor who may use it, and a visitor's choice is refused when it
+   is locked or hidden for them. ---- */
 const DESIGN_IDS = /^(classic|cosmic|t-[a-z0-9]{4,16})$/;
+const DESIGN_FX = ['snow', 'garland'];
+const DESIGN_BUILTINS = { cosmic: 'Cosmic', snow: 'Snowfall', garland: 'New Year lights' };   // the ones with code in design-src/
+const DESIGN_ACCESS = ['free', 'locked', 'hidden'];
+const cleanDesignAccess = (r, fallback) => {
+  r = r && typeof r === 'object' ? r : {};
+  return { access: DESIGN_ACCESS.includes(r.access) ? r.access : fallback, plan: PLAN_ORDER[r.plan] ? r.plan : 'standard' };
+};
 const cleanHex = (v) => { const s = String(v || '').trim().toLowerCase(); return /^#[0-9a-f]{6}$/.test(s) ? s : /^#[0-9a-f]{3}$/.test(s) ? '#' + s.slice(1).split('').map((c) => c + c).join('') : ''; };
 const DESIGN_COLOR_KEYS = ['accent', 'sidebarLight', 'sidebarDark', 'cardLight', 'cardDark', 'bgLight', 'bgDark'];
 const DEFAULT_ACCENTS = [{ name: 'Blue', color: '#2563eb' }, { name: 'Violet', color: '#7c3aed' }, { name: 'Emerald', color: '#059669' }, { name: 'Rose', color: '#e11d48' }, { name: 'Amber', color: '#d97706' }, { name: 'Teal', color: '#0d9488' }];
@@ -673,24 +686,68 @@ function cleanDesign(d) {
     const veil = Math.round(Number(t.veil));
     return { id, name: cut(String(t.name || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim(), 40) || 'Custom design',
       bgLight: cleanUrl(t.bgLight), bgDark: cleanUrl(t.bgDark), colorLight: cleanHex(t.colorLight), colorDark: cleanHex(t.colorDark),
-      accent: cleanHex(t.accent), stars: !!t.stars, veil: Number.isFinite(veil) ? Math.max(0, Math.min(80, veil)) : 20, visible: t.visible !== false };
+      accent: cleanHex(t.accent), stars: !!t.stars, veil: Number.isFinite(veil) ? Math.max(0, Math.min(80, veil)) : 0,
+      ...cleanDesignAccess(t, t.visible === false ? 'hidden' : 'free') };   // "visible: false" of the first version = hidden
   });
+  const b = d.builtins && typeof d.builtins === 'object' ? d.builtins : {};
+  const builtins = {};
+  Object.keys(DESIGN_BUILTINS).forEach((id) => { builtins[id] = cleanDesignAccess(b[id], id === 'cosmic' && d.cosmicVisible === false ? 'hidden' : 'free'); });
   const accents = (Array.isArray(d.accents) ? d.accents : DEFAULT_ACCENTS).slice(0, 24)
     .map((a) => ({ name: cut(String((a && a.name) || '').replace(/[<>]/g, '').trim(), 24), color: cleanHex(a && a.color) }))
     .filter((a, i, all) => a.color && all.findIndex((x) => x.color === a.color) === i).map((a) => ({ ...a, name: a.name || a.color }));
   let def = String(d.default || 'classic').toLowerCase();
-  if (!DESIGN_IDS.test(def) || (def.startsWith('t-') && !themes.some((t) => t.id === def))) def = 'classic';
-  return { default: def, cosmicVisible: d.cosmicVisible !== false, colors, themes, accents };
+  const defItem = def === 'cosmic' ? builtins.cosmic : themes.find((t) => t.id === def);
+  if (!DESIGN_IDS.test(def) || (def !== 'classic' && (!defItem || defItem.access === 'hidden'))) def = 'classic';
+  let fx = String(d.defaultEffect || '').toLowerCase();
+  if (!DESIGN_FX.includes(fx) || builtins[fx].access === 'hidden') fx = '';
+  return { default: def, defaultEffect: fx, builtins, colors, themes, accents };
 }
 async function getDesign() {
   let s = null; try { s = await store.getSetting('design'); } catch (e) { /* the built-in designs */ }
   return { ...cleanDesign(s), updatedAt: (s && s.updatedAt) || '' };
 }
-/* one visitor's own choice (Settings page), kept with the account so it follows them to another browser */
+/* what one visitor may see and use. Hidden: only admins (to try it before it goes out). Locked: the plan or higher.
+   A locked design the visitor may not use is listed (so Settings can show it with a lock) without its pictures. */
+function designFor(d, u) {
+  const level = userLevel(u), admin = isAdmin(u);
+  const seen = (r) => r.access !== 'hidden' || admin;
+  const may = (r) => admin || r.access === 'free' || (r.access === 'locked' && level >= (PLAN_ORDER[r.plan] || 1));
+  const builtins = {};
+  Object.keys(DESIGN_BUILTINS).forEach((id) => { const r = d.builtins[id]; if (seen(r)) builtins[id] = { name: DESIGN_BUILTINS[id], access: r.access, plan: r.plan, allowed: may(r) }; });
+  const themes = d.themes.filter(seen).map((t) => (may(t) ? { ...t, allowed: true }
+    : { id: t.id, name: t.name, access: t.access, plan: t.plan, allowed: false, bgLight: '', bgDark: '', colorLight: t.colorLight, colorDark: t.colorDark, accent: t.accent, stars: false, veil: t.veil }));
+  const view = { builtins, themes };
+  return { default: designUsable(view, 'design', d.default) ? d.default : 'classic', defaultEffect: designUsable(view, 'effect', d.defaultEffect) ? d.defaultEffect : '',
+    builtins, themes, colors: d.colors, accents: d.accents, level: levelName(level), uid: u ? u.id : '', fxVersion: designFxVersion(), updatedAt: d.updatedAt };
+}
+/* the item behind a design or animation id in a visitor's view (null: there is none for them) */
+function designItem(view, kind, id) {
+  if (kind === 'effect') return DESIGN_FX.includes(id) ? view.builtins[id] || null : null;
+  if (id === 'classic') return { access: 'free', allowed: true };
+  return id === 'cosmic' ? view.builtins.cosmic || null : view.themes.find((t) => t.id === id) || null;
+}
+const designUsable = (view, kind, id) => { const it = id ? designItem(view, kind, id) : null; return !!(it && it.allowed); };
+/* the drawing code of Cosmic and the animations, kept out of the public files (design-src/ is never sent as it is) */
+const DESIGN_FX_CODE = new Map(); let DESIGN_FX_VER = '';
+function designFxCode(id) {
+  if (!DESIGN_FX_CODE.has(id)) DESIGN_FX_CODE.set(id, fs.readFileSync(path.join(ROOT, 'design-src', id + '.js'), 'utf8'));
+  return DESIGN_FX_CODE.get(id);
+}
+function designFxVersion() {
+  if (!DESIGN_FX_VER) {
+    const h = crypto.createHash('sha1');
+    Object.keys(DESIGN_BUILTINS).forEach((id) => { try { h.update(designFxCode(id)); } catch (e) { /* missing: reported when it is asked for */ } });
+    DESIGN_FX_VER = h.digest('hex').slice(0, 10);
+  }
+  return DESIGN_FX_VER;
+}
+/* one visitor's own choice (Settings page), kept with the account so it follows them to another browser.
+   effect: "" = the default animation of the site, "none" = no animation, or one of DESIGN_FX */
 function cleanDesignPref(b) {
   b = b && typeof b === 'object' ? b : {};
-  const id = String(b.design || '').toLowerCase();
-  return { design: DESIGN_IDS.test(id) ? id : '', accent: cleanHex(b.accent), motion: b.motion !== false, at: Math.max(0, Math.min(Date.now() + 60000, Math.floor(Number(b.at) || Date.now()))) };
+  const id = String(b.design || '').toLowerCase(), fx = String(b.effect || '').toLowerCase();
+  return { design: DESIGN_IDS.test(id) ? id : '', effect: fx === 'none' || DESIGN_FX.includes(fx) ? fx : '', accent: cleanHex(b.accent), motion: b.motion !== false,
+    at: Math.max(0, Math.min(Date.now() + 60000, Math.floor(Number(b.at) || Date.now()))) };
 }
 async function getPricing() {
   let s = null; try { s = await store.getSetting('pricing-config'); } catch (e) { /* defaults */ }
@@ -1491,12 +1548,36 @@ async function api(req, res, url) {
   // no-cache: a browser that kept the old (empty) answer used to take a just-saved logo off the next page it opened
   if (method === 'GET' && p === '/api/branding') return send(res, 200, await getBranding(), { 'Cache-Control': 'no-cache' });
   // the designs of the Settings page (assets/js/site-design.js) and a signed-in visitor's own choice
-  if (method === 'GET' && p === '/api/design') return send(res, 200, await getDesign(), { 'Cache-Control': 'no-cache' });
+  // (each visitor gets their own list: what is locked or hidden for them depends on the account)
+  if (method === 'GET' && p === '/api/design') return send(res, 200, designFor(await getDesign(), await currentUser(req)), { 'Cache-Control': 'private, no-cache', Vary: 'Cookie' });
+  // the drawing code of Cosmic, Snowfall and New Year lights: only for a visitor who may use it
+  const fxm = method === 'GET' && p.match(/^\/api\/design\/fx\/([a-z]+)\.js$/);
+  if (fxm) {
+    const it = DESIGN_BUILTINS[fxm[1]] ? designFor(await getDesign(), await currentUser(req)).builtins[fxm[1]] : null;
+    if (!it) return send(res, 404, { error: 'Not found.' });
+    if (!it.allowed) return send(res, 403, { error: `${it.name} is for the ${it.plan.charAt(0).toUpperCase() + it.plan.slice(1)} plan.`, plan: it.plan, price: priceUrl(it.plan, '/settings') }, { 'Cache-Control': 'no-store, private' });
+    res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'private, max-age=600', Vary: 'Cookie', ...SECURITY_HEADERS });
+    return res.end(designFxCode(fxm[1]));
+  }
   if (p === '/api/account/design' && (method === 'GET' || method === 'POST')) {
     const u = await requireUser(req);
-    if (method === 'GET') { let v = null; try { v = await store.getSetting('ui:' + u.id); } catch (e) { /* none yet */ } return send(res, 200, { pref: v ? cleanDesignPref(v) : null }, { 'Cache-Control': 'no-store' }); }
+    const view = designFor(await getDesign(), u);
+    if (method === 'GET') {
+      let v = null; try { v = await store.getSetting('ui:' + u.id); } catch (e) { /* none yet */ }
+      v = v ? cleanDesignPref(v) : null;
+      // a choice that was locked or hidden since (or a plan that ended) is not handed back
+      if (v && v.design && !designUsable(view, 'design', v.design)) v.design = '';
+      if (v && v.effect && v.effect !== 'none' && !designUsable(view, 'effect', v.effect)) v.effect = '';
+      return send(res, 200, { pref: v }, { 'Cache-Control': 'no-store' });
+    }
     rateLimit('design:' + u.id, 60, 10 * 60000);
     const pref = cleanDesignPref(await readJson(req, 4 * 1024));
+    for (const [kind, id] of [['design', pref.design], ['effect', pref.effect === 'none' ? '' : pref.effect]]) {
+      if (!id) continue;
+      const it = designItem(view, kind, id);
+      if (!it) throw new HttpError(404, kind === 'design' ? 'This design is not available.' : 'This animation is not available.');
+      if (!it.allowed) return send(res, 403, { error: `${it.name || 'This design'} is for the ${it.plan.charAt(0).toUpperCase() + it.plan.slice(1)} plan.`, plan: it.plan, price: priceUrl(it.plan, '/settings') });
+    }
     await store.setSetting('ui:' + u.id, pref, { minimal: true });
     return send(res, 200, { pref });
   }
@@ -1713,7 +1794,8 @@ async function api(req, res, url) {
     if (method === 'POST' && p === '/api/admin/design') {
       const d = cleanDesign(await readJson(req, 64 * 1024));
       await store.setSetting('design', { ...d, updatedAt: new Date().toISOString() });
-      await audit(admin, 'design.save', 'design', { default: d.default, themes: d.themes.length, accents: d.accents.length });
+      const acc = Object.fromEntries([...Object.entries(d.builtins), ...d.themes.map((t) => [t.id, t])].map(([id, r]) => [id, r.access === 'locked' ? r.plan : r.access]));
+      await audit(admin, 'design.save', 'design', { default: d.default, effect: d.defaultEffect, themes: d.themes.length, accents: d.accents.length, access: acc });
       return send(res, 200, { design: await getDesign() });
     }
     if (method === 'GET' && p === '/api/admin/site-check') {   // Website check (site-check.js): read only
@@ -1987,7 +2069,7 @@ const MIME = {
   '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.txt': 'text/plain; charset=utf-8', '.map': 'application/json'
 };
 // never served: server code, data, docs, secrets, config
-const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers
+const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', 'design-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers; design-src: sent by /api/design/fx/ to who may use it
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
   'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js']);
