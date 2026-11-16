@@ -32,8 +32,10 @@ The **Finish** button on the reading results screen returns to `/full-tests/read
 
 * Everybody signs in with **their own** account (`/login.html`: e-mail + password, or Google).
 * **Forgot password** (`/forgot.html`) and **e-mail verification** (`/verify.html`) send real e-mails through
-  [Resend](https://resend.com) when `RESEND_API_KEY` + `MAIL_FROM` are set. Without them the links are printed in
-  the server console, so you can still test locally. Reset links work once and for one hour.
+  SMTP when `SMTP_USER` + `SMTP_PASS` are set (a Gmail address + its app password, no domain needed), or through
+  [Resend](https://resend.com) when `RESEND_API_KEY` + `MAIL_FROM` are set (needs your own verified domain).
+  Without them the links are printed in the server console, so you can still test locally. `/api/health` shows
+  `"mail": "smtp" | "resend" | false`. Reset links work once and for one hour.
 * Admin is a role: set `ADMIN_EMAILS=you@example.com`, or `node scripts/make-admin.js you@example.com`,
   or promote someone in the panel. Admin panel: `/admin.html` (users, premium, roles, **orders**, **activity log**,
   reading/listening materials, uploads).
@@ -165,8 +167,9 @@ On **Vercel** the locked test pages are static files, so `middleware.js` (Vercel
 
 See `.env.example`. Needed in production: `ADMIN_EMAILS`, `SESSION_SECRET`, `PUBLIC_URL`, mail keys, Supabase keys
 (run `supabase-schema.sql`, it also contains the new tables). **Real keys go only into `.env` (ignored by git) and the
-Vercel dashboard, never into `.env.example`: the repository is public.** Without `RESEND_API_KEY` + `MAIL_FROM` the
-"Forgot password" page tells students to write to `PAYMENT_CONTACT` instead of waiting for an email.
+Vercel dashboard, never into `.env.example`: the repository is public.** Without mail keys (`SMTP_USER` + `SMTP_PASS`,
+or `RESEND_API_KEY` + `MAIL_FROM`) the "Forgot password" page tells students to write to `PAYMENT_CONTACT` instead of
+waiting for an email.
 
 ## Deploying
 

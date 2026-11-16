@@ -16,6 +16,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const net = require('net');
+const tls = require('tls');
 const { URL } = require('url');
 
 /* ───────────────────────── configuration ───────────────────────── */
@@ -42,8 +44,14 @@ const USE_SUPABASE = !!(SUPABASE_URL && SUPABASE_KEY);
 const GOOGLE_CLIENT_ID = String(process.env.GOOGLE_CLIENT_ID || '765308680607-798gsgusqetuaa543vgjkcc63qg8a03t.apps.googleusercontent.com').trim();
 const TRUST_PROXY = IS_VERCEL || process.env.TRUST_PROXY === '1';
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
-const RESEND_API_KEY = String(process.env.RESEND_API_KEY || '');
-const MAIL_FROM = String(process.env.MAIL_FROM || '');
+const RESEND_API_KEY = String(process.env.RESEND_API_KEY || '').trim();
+// SMTP (no own domain needed): a Gmail address + its "app password" is enough, see .env.example
+const SMTP_USER = String(process.env.SMTP_USER || '').trim();
+const SMTP_HOST = String(process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+// Google shows an app password as "abcd efgh ijkl mnop": the spaces are not part of it
+const SMTP_PASS = /(^|\.)gmail\.com$/i.test(SMTP_HOST) ? String(process.env.SMTP_PASS || '').replace(/\s+/g, '') : String(process.env.SMTP_PASS || '');
+const MAIL_FROM = String(process.env.MAIL_FROM || (SMTP_USER.includes('@') ? `IELTS X <${SMTP_USER}>` : '')).trim();
 const PUBLIC_URL = String(process.env.PUBLIC_URL || '').replace(/\/$/, '');
 const PAYMENT_WEBHOOK_SECRET = String(process.env.PAYMENT_WEBHOOK_SECRET || '');
 const PAYMENT_CONTACT = String(process.env.PAYMENT_CONTACT || 'https://t.me/sh7595');
@@ -471,23 +479,91 @@ function siteUrl(req) {
   if (PUBLIC_URL) return PUBLIC_URL;
   return `${isHttps(req) ? 'https' : 'http'}://${req.headers.host || 'localhost:' + PORT}`;
 }
-// Sends through Resend (https://resend.com) when RESEND_API_KEY + MAIL_FROM are set; otherwise prints the mail
-// to the server console so the links can still be used while developing.
-const MAIL_READY = !!(RESEND_API_KEY && MAIL_FROM);
+// Sends through Resend (https://resend.com) when RESEND_API_KEY + MAIL_FROM are set (needs your own domain), else
+// through SMTP when SMTP_USER + SMTP_PASS are set (e.g. Gmail); otherwise prints the mail to the server console so
+// the links can still be used while developing.
+const MAIL_PROVIDER = RESEND_API_KEY && MAIL_FROM ? 'resend' : (SMTP_USER && SMTP_PASS ? 'smtp' : '');
+const MAIL_READY = !!MAIL_PROVIDER;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /* On Vercel the function may be frozen as soon as the answer is sent, so a mail is awaited (for at most `ms`) before answering */
-const mailWithin = (work, ms = 6000) => Promise.race([work.catch((e) => { console.error('mail failed:', e.message); return false; }), sleep(ms).then(() => false)]);
+const mailWithin = (work, ms = 8000) => Promise.race([work.catch((e) => { console.error('mail failed:', e.message); return false; }), sleep(ms).then(() => false)]);
 async function sendMail({ to, subject, text }) {
-  if (MAIL_READY) {
+  if (MAIL_PROVIDER === 'resend') {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST', headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ from: MAIL_FROM, to: [to], subject, text })
     });
-    if (!r.ok) throw new Error('Mail provider error ' + r.status);
+    // Resend says why (e.g. "verify a domain": without one it only sends to your own address), keep that in the log
+    if (!r.ok) throw new Error(`Resend refused the mail (${r.status}): ${(await r.text().catch(() => '')).slice(0, 300)}`);
     return true;
   }
+  if (MAIL_PROVIDER === 'smtp') return smtpSend({ host: SMTP_HOST, port: SMTP_PORT, user: SMTP_USER, pass: SMTP_PASS, from: MAIL_FROM }, { to, subject, text });
   console.log(`\n[mail not configured] To: ${to}\nSubject: ${subject}\n${text}\n`);
   return false;
+}
+/* A small SMTP client (no packages). Port 465: TLS from the start; other ports: STARTTLS, required except on this
+   computer (a local mail catcher such as Mailpit on 127.0.0.1:1025). The password never goes out unencrypted. */
+async function smtpSend({ host, port, user, pass, from, secure = port === 465, tlsOptions = {}, timeoutMs = 15000 }, { to, subject, text }) {
+  if (/[\r\n]/.test(String(to) + subject + from)) throw new Error('A mail header contains a line break.');
+  const b64 = (s) => Buffer.from(String(s), 'utf8').toString('base64');
+  const word = (s) => (/^[\x20-\x7e]*$/.test(s) ? s : `=?UTF-8?B?${b64(s)}?=`);   // non-ASCII header text (RFC 2047)
+  const fm = String(from).match(/^\s*"?([^"<]*?)"?\s*<([^<>\s]+@[^<>\s]+)>\s*$/);
+  const fromAddr = fm ? fm[2] : String(from).trim();
+  const fromHeader = fm && fm[1] ? `${word(fm[1])} <${fromAddr}>` : fromAddr;
+  const sender = user.includes('@') ? user : fromAddr;   // the envelope sender is the signed-in account
+  const local = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  let ehloName = 'localhost'; try { if (PUBLIC_URL) ehloName = new URL(PUBLIC_URL).hostname; } catch (e) { /* keep localhost */ }
+  // the body is base64: no line is too long and no line starts with "." (which SMTP would read as the end)
+  const message = [
+    `From: ${fromHeader}`, `To: ${to}`, `Subject: ${word(subject)}`, `Date: ${new Date().toUTCString()}`,
+    `Message-ID: <${crypto.randomUUID()}@${sender.split('@')[1] || ehloName}>`, 'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: base64', '',
+    b64(String(text).replace(/\r?\n/g, '\r\n')).replace(/.{1,76}/g, '$&\r\n') + '.'
+  ].join('\r\n');
+
+  const replies = []; let waiter = null, failure = null, buf = '', part = [], sock = null;
+  const onData = (d) => {
+    buf += d.toString('latin1');
+    for (let i; (i = buf.indexOf('\n')) >= 0;) {
+      const line = buf.slice(0, i).replace(/\r$/, ''); buf = buf.slice(i + 1); part.push(line);
+      if (/^\d{3}-/.test(line)) continue;   // "250-..." : more lines of the same reply follow
+      const reply = { code: parseInt(line, 10) || 0, text: part.join(' / ') }; part = [];
+      if (waiter) { const w = waiter; waiter = null; w.resolve(reply); } else replies.push(reply);
+    }
+  };
+  const onFail = (e) => { failure = failure || e; if (waiter) { const w = waiter; waiter = null; w.reject(failure); } };
+  const watch = (s) => { sock = s; s.on('data', onData); s.on('error', onFail); s.on('close', () => onFail(new Error('SMTP server closed the connection.'))); };
+  const next = () => (replies.length ? Promise.resolve(replies.shift()) : failure ? Promise.reject(failure) : new Promise((resolve, reject) => { waiter = { resolve, reject }; }));
+  const step = async (line, want, label) => {
+    if (line !== null) sock.write(line + '\r\n');
+    const r = await next();
+    if (Math.floor(r.code / 100) !== want) throw new Error(`SMTP ${label} failed: ${r.text.slice(0, 300)}`);
+    return r;
+  };
+  const timer = setTimeout(() => { onFail(new Error(`SMTP server ${host}:${port} did not answer in time.`)); if (sock) sock.destroy(); }, timeoutMs);
+  try {
+    watch(secure ? tls.connect({ host, port, servername: host, ...tlsOptions }) : net.connect({ host, port }));
+    await step(null, 2, 'greeting');
+    let ehlo = await step('EHLO ' + ehloName, 2, 'EHLO');
+    if (!secure) {
+      if (/\bSTARTTLS\b/i.test(ehlo.text)) {
+        await step('STARTTLS', 2, 'STARTTLS');
+        const plain = sock; plain.removeAllListeners(); plain.on('error', () => { /* reported by the TLS socket */ });
+        watch(tls.connect({ socket: plain, servername: host, ...tlsOptions }));
+        ehlo = await step('EHLO ' + ehloName, 2, 'EHLO');
+      } else if (!local) throw new Error(`SMTP server ${host}:${port} offers no encryption (STARTTLS): use port 465.`);
+    }
+    const authHint = 'sign-in (check SMTP_USER / SMTP_PASS; Gmail needs an app password, not the normal one)';
+    if (local && !/\bAUTH\b/i.test(ehlo.text)) { /* a local mail catcher without sign-in */ }
+    else if (/\bAUTH\b[^/]*\bPLAIN\b/i.test(ehlo.text)) await step('AUTH PLAIN ' + b64(`\0${user}\0${pass}`), 2, authHint);
+    else { await step('AUTH LOGIN', 3, authHint); await step(b64(user), 3, authHint); await step(b64(pass), 2, authHint); }
+    await step(`MAIL FROM:<${sender}>`, 2, 'MAIL FROM');
+    await step(`RCPT TO:<${to}>`, 2, 'RCPT TO');
+    await step('DATA', 3, 'DATA');
+    await step(message, 2, 'message');
+    await step('QUIT', 2, 'QUIT').catch(() => { /* the mail is already accepted */ });
+    return true;
+  } finally { clearTimeout(timer); if (sock) sock.destroy(); }
 }
 async function audit(actor, action, target, meta) {
   try { await store.insertAudit({ id: newId(), actorId: actor && actor.id, actorEmail: actor && actor.email, action, target: String(target || ''), meta: meta || {}, createdAt: new Date().toISOString() }); }
@@ -1228,7 +1304,7 @@ async function api(req, res, url) {
     }
     return send(res, 200, {
       ok: true, time: new Date().toISOString(), storage: USE_SUPABASE ? 'supabase' : 'file',
-      vercel: IS_VERCEL, sessionSecret: !!SESSION_SECRET, google: !!GOOGLE_CLIENT_ID, database,
+      vercel: IS_VERCEL, sessionSecret: !!SESSION_SECRET, google: !!GOOGLE_CLIENT_ID, database, mail: MAIL_PROVIDER || false,
       problems: [
         IS_VERCEL && !USE_SUPABASE ? 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set: accounts cannot be saved on Vercel.' : null,
         USE_SUPABASE && database !== 'ok' ? database : null,
@@ -1254,7 +1330,7 @@ async function api(req, res, url) {
     if (await store.findUserByEmail(email)) throw new HttpError(409, 'An account with this email already exists. Try signing in.');
     const hp = hashPassword(password);
     const u = await createUser({ name, email, passwordHash: hp.hash, passwordSalt: hp.salt });
-    await mailWithin(sendVerification(req, u), 4000);
+    await mailWithin(sendVerification(req, u));
     return send(res, 201, { user: publicUser(u) }, secureHeaders(u));
   }
   if (method === 'POST' && p === '/api/auth/login') {
@@ -1332,8 +1408,8 @@ async function api(req, res, url) {
   if (method === 'POST' && p === '/api/auth/verify/send') {
     const u = await requireUser(req); rateLimit('vsend:' + u.id, 3, 60 * 60000);
     if (u.emailVerified) return send(res, 200, { ok: true, alreadyVerified: true });
-    const sent = await sendVerification(req, u).catch(() => false);
-    return send(res, 200, { ok: true, sent });
+    const sent = await sendVerification(req, u).catch((e) => { console.error('mail failed:', e.message); return false; });
+    return send(res, 200, { ok: true, sent, mail: MAIL_READY });
   }
   if (method === 'POST' && p === '/api/auth/verify') {
     rateLimit('verify:' + clientIp(req), 20, 15 * 60000);
@@ -2215,3 +2291,4 @@ if (require.main === module) {
 module.exports = requestHandler;
 module.exports.store = store;
 module.exports.hashPassword = hashPassword;
+module.exports.smtpSend = smtpSend;
