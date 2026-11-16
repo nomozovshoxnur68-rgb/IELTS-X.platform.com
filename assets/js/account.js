@@ -85,7 +85,8 @@ $('#acc-verify-send')?.addEventListener('click', async (e) => {
     try {
         const r = await resendVerification();
         if (r.alreadyVerified) { toast('Your e-mail address is already confirmed.'); await window.IELTSXSiteAccess?.refresh(); }
-        else toast(r.sent === false ? 'E-mail is not set up on this server yet. Please write to us to confirm your address.' : 'We sent the link again. Check your inbox (and the spam folder).', r.sent === false);
+        else if (r.sent === false) toast(r.mail ? 'Could not send the e-mail right now. Please try again in a few minutes.' : 'E-mail is not set up on this server yet. Please write to us to confirm your address.', true);
+        else toast('We sent the link again. Check your inbox (and the spam folder).');
     } catch (err) { toast(err.message || 'Could not send the link. Try again later.', true); }
     finally { setTimeout(() => { btn.disabled = false; }, 4000); }
 });

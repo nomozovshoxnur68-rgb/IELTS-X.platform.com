@@ -5,6 +5,7 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ieltsx-'));
 process.env.DATA_DIR = tmp; process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
 process.env.ADMIN_EMAILS = 'boss@example.com'; process.env.SESSION_SECRET = 'test-secret-test-secret-test-secret-123456';
 process.env.PAYMENT_WEBHOOK_SECRET = 'hook-secret';
+for (const k of ['RESEND_API_KEY', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']) process.env[k] = '';   // set before server.js reads .env: the tests never send a real mail
 const mails = []; const realLog = console.log;
 console.log = (...a) => { const t = a.join(' '); if (t.includes('[mail not configured]')) mails.push(t); else realLog(...a); };
 const handler = require('../server');
@@ -1556,6 +1557,50 @@ server.listen(0, async () => {
       assert.equal((await call('GET', '/api/predictions/' + maxId, { jar: boss })).status, 404, 'deleted');
       assert.equal((await call('GET', '/Predictions')).status, 200);
       ok('predictions: admin only, links checked, locked by plan on the server (no questions sent), drafts hidden, edit, order, publish, delete');
+    }
+
+    // --- mail over SMTP (Gmail app password), against a fake mail server on this computer
+    {
+      const net = require('net');
+      const seen = []; let refuseAuth = false;
+      const fake = net.createServer((c) => {
+        let inData = false, buf = '', body = '';
+        c.on('error', () => { /* the client may hang up first */ });
+        c.write('220 fake ESMTP\r\n');
+        c.on('data', (d) => {
+          buf += d.toString('latin1');
+          for (let i; (i = buf.indexOf('\r\n')) >= 0;) {
+            const line = buf.slice(0, i); buf = buf.slice(i + 2);
+            if (inData) { if (line === '.') { inData = false; seen.push({ body }); c.write('250 2.0.0 queued\r\n'); } else body += line + '\r\n'; continue; }
+            seen.push({ cmd: line });
+            if (/^EHLO /.test(line)) c.write('250-fake\r\n250-AUTH LOGIN PLAIN\r\n250 8BITMIME\r\n');
+            else if (/^AUTH PLAIN /.test(line)) c.write(refuseAuth ? '535-5.7.8 Username and Password not accepted.\r\n535 5.7.8 Learn more\r\n' : '235 2.7.0 Accepted\r\n');
+            else if (/^(MAIL FROM|RCPT TO):/.test(line)) c.write('250 OK\r\n');
+            else if (line === 'DATA') { inData = true; body = ''; c.write('354 Go ahead\r\n'); }
+            else if (line === 'QUIT') c.end('221 bye\r\n');
+            else c.write('502 unknown\r\n');
+          }
+        });
+      });
+      await new Promise((resolve) => fake.listen(0, '127.0.0.1', resolve));
+      const conf = { host: '127.0.0.1', port: fake.address().port, user: 'sender@gmail.com', pass: 'app-pass-123', from: 'IELTS X <sender@gmail.com>' };
+      const mail = { to: 'student@example.com', subject: 'Parolni tiklash — IELTS X', text: 'Hi\n.\nLink: https://x/reset?token=a.b' };
+      try {
+        assert.equal(await handler.smtpSend(conf, mail), true);
+        const cmds = seen.filter((s) => s.cmd).map((s) => s.cmd);
+        const auth = cmds.find((c) => c.startsWith('AUTH PLAIN '));
+        assert.equal(Buffer.from(auth.slice(11), 'base64').toString(), '\0sender@gmail.com\0app-pass-123');
+        assert.ok(cmds.includes('MAIL FROM:<sender@gmail.com>') && cmds.includes('RCPT TO:<student@example.com>') && cmds.at(-1) === 'QUIT', cmds.join(' | '));
+        const raw = seen.find((s) => s.body).body; const cut = raw.indexOf('\r\n\r\n');
+        const head = raw.slice(0, cut), text = Buffer.from(raw.slice(cut + 4).replace(/\r\n/g, ''), 'base64').toString();
+        assert.ok(/^From: IELTS X <sender@gmail\.com>$/m.test(head) && /^To: student@example\.com$/m.test(head) && /^Message-ID: </m.test(head), head);
+        assert.equal(Buffer.from(head.match(/^Subject: =\?UTF-8\?B\?(.+)\?=$/m)[1], 'base64').toString(), mail.subject);
+        assert.equal(text, 'Hi\r\n.\r\nLink: https://x/reset?token=a.b');
+        refuseAuth = true;
+        await assert.rejects(handler.smtpSend(conf, mail), (e) => /SMTP sign-in/.test(e.message) && /535/.test(e.message) && !e.message.includes('app-pass-123'));
+        await assert.rejects(handler.smtpSend(conf, { ...mail, to: 'a@x.com\r\nBcc: z@x.com' }), /line break/);
+        ok('mail over SMTP (Gmail app password): sign-in, sender, recipient, encoded subject + body; a refused password is reported without the password');
+      } finally { fake.close(); }
     }
 
     // --- rate limit
