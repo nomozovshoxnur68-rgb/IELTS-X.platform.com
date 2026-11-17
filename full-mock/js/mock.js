@@ -120,7 +120,17 @@
     ['pcName', 'wName', 'aName'].forEach(id => { const el = $(id); if (el) el.textContent = S.name; });
     const label = S.mode === 'real' ? 'Real Exam' : 'Practice';
     ['pcMode', 'rMode'].forEach(id => { const el = $(id); if (el) { el.textContent = label; el.dataset.mode = S.mode; } });
+    qsa('[data-mk-title]').forEach(el => { el.textContent = CONFIG.title; });
     document.documentElement.setAttribute('data-exam-mode', S.mode);
+    paintSteps();
+  }
+  /* the Listening — Reading — Writing progress in the bars of the shell (the papers draw theirs in js/bridge.js) */
+  function paintSteps(cur) {
+    const now = cur || running || (KINDS.find(k => !S.done[k]) || '');
+    qsa('[data-mk-steps] li').forEach(li => {
+      const k = li.dataset.k, done = !!S.done[k];
+      li.classList.toggle('done', done); li.classList.toggle('cur', !done && k === now);
+    });
   }
 
   /* -------------------------------------------------------------- full screen */
@@ -262,6 +272,7 @@
       return `<div class="chk${isCur ? ' cur' : ''}${done ? ' done' : ''}${locked ? ' locked' : ''}">
         <div class="cn">${done ? I_TICK : i + 1}</div><div class="ct">${s.title}</div><div class="cm">${s.meta}</div><div class="cbtns">${btns}</div></div>`;
     }).join('');
+    paintSteps();
   }
 
   /* ------------------------------------------------------------- guide videos */
@@ -374,8 +385,9 @@
     switch (m.type) {
       case 'ready':
         f.ready = true;
-        if (f.mode === 'review') f.fr.contentWindow.postMessage({ mock: 1, type: 'review', name: S.name, ans: answerMap(S.res[f.k].rows) }, '*');
-        else f.fr.contentWindow.postMessage({ mock: 1, type: 'start', name: S.name, mode: S.mode }, '*');
+        /* k and done: the paper draws the same header as Writing (its name, the candidate, Listening — Reading — Writing) */
+        if (f.mode === 'review') f.fr.contentWindow.postMessage({ mock: 1, type: 'review', name: S.name, k: f.k, done: S.done, ans: answerMap(S.res[f.k].rows) }, '*');
+        else f.fr.contentWindow.postMessage({ mock: 1, type: 'start', name: S.name, mode: S.mode, k: f.k, done: S.done }, '*');
         break;
       case 'done':      if (f.mode === 'run' && m.k === f.k) sectionDone(m.k, m.res); break;
       case 'exit-review': exitReview(); break;
@@ -784,7 +796,7 @@
     get running() { return running; }, set running(v) { running = v; paintGuard(); },
     attach(name, api) { writingApi[name] = api; },
     get writing() { return writingApi.writing; },
-    completeSession, paintIdentity, renderChecks,
+    completeSession, paintIdentity, renderChecks, paintSteps,
     answerMap
   };
   Object.freeze(Mock);

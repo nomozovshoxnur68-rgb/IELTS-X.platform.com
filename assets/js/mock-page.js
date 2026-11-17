@@ -29,7 +29,7 @@
   /* ── page shell bits ── */
   (function shell() {
     var nav = document.getElementById('ft-crumbs');
-    if (nav) nav.innerHTML = '<a class="ft-crumb" href="/">Home</a><span class="ft-crumb-sep" aria-hidden="true">›</span><span class="ft-crumb-current" aria-current="page">Mock Tests</span>';
+    if (nav) nav.innerHTML = '<a class="ft-crumb" href="/dashboard">Home</a><span class="ft-crumb-sep" aria-hidden="true">›</span><span class="ft-crumb-current" aria-current="page">Mock Tests</span>';
     document.querySelectorAll('[data-sidebar="menu-button"][data-active]').forEach(function (a) { a.setAttribute('data-active', 'false'); a.removeAttribute('aria-current'); });
     var a = document.querySelector('a[data-link="mock-tests"]');
     if (a) { a.setAttribute('data-active', 'true'); a.setAttribute('aria-current', 'page'); }

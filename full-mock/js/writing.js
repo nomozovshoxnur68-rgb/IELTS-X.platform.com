@@ -12,6 +12,7 @@
   const WRITING_MINUTES = 60;
   const state = () => Mock.S;
   let current = 1, timer = null;
+  const MIN = { 1: 150, 2: 250 };                    // the fewest words of each task (set by renderPrompts)
 
   /* ---------------------------------------------------------------- start */
   function start() {
@@ -29,7 +30,7 @@
     if (!s.wEndsAt) { s.wEndsAt = Date.now() + WRITING_MINUTES * 60000; save(); }
     $('wText1').value = s.w.t1 || ''; $('wText2').value = s.w.t2 || '';
     applyMode(); renderPrompts();
-    show('scWriting'); showTask(1); paintCounts();
+    show('scWriting'); Mock.paintSteps('writing'); showTask(1); paintCounts();
     clearInterval(timer); tick(); timer = setInterval(tick, 1000);
     setTimeout(() => $('wText1').focus(), 50);
   }
@@ -46,7 +47,7 @@
   }
   function renderPrompts() {
     const w = Mock.test.writing, lines = a => (a || []).map(l => '<p>' + esc(l) + '</p>').join('');
-    const min1 = Number(w.task1.minWords) || 150, min2 = Number(w.task2.minWords) || 250, img = safeImg(w.task1.img);
+    const min1 = MIN[1] = Number(w.task1.minWords) || 150, min2 = MIN[2] = Number(w.task2.minWords) || 250, img = safeImg(w.task1.img);
     $('wPrompt1').innerHTML = '<h3>WRITING TASK 1</h3><p>You should spend about <b>20 minutes</b> on this task.</p>'
       + '<div class="tbox">' + lines(w.task1.lines) + '</div><p><b>Write at least ' + min1 + ' words.</b></p>'
       + (img ? '<figure><img alt="' + esc(w.task1.alt || '') + '" src="' + esc(img) + '"></figure>' : chartTable(w.task1.chart));
@@ -63,7 +64,8 @@
   function tick() {
     const left = Math.max(0, Math.round((state().wEndsAt - Date.now()) / 1000));
     const m = Math.ceil(left / 60);
-    $('wClock').textContent = left <= 0 ? 'Time is up' : (left < 60 ? left + ' seconds left' : m + (m === 1 ? ' minute left' : ' minutes left'));
+    // worded like the clock of the Listening and Reading papers
+    $('wClock').textContent = left <= 0 ? 'Time is up' : (left < 60 ? left + (left === 1 ? ' second remaining' : ' seconds remaining') : m + (m === 1 ? ' minute remaining' : ' minutes remaining'));
     $('wClockBox').classList.toggle('warn', left <= 300);
     if (left <= 0) { clearInterval(timer); submit(true); }            // the clock submits the paper
   }
@@ -75,8 +77,8 @@
     $('wText1').classList.toggle('hidden', n !== 1);   $('wText2').classList.toggle('hidden', n !== 2);
     $('wTab1').classList.toggle('sel', n === 1);       $('wTab2').classList.toggle('sel', n === 2);
     $('wTitle').textContent = 'Task ' + n;
-    $('wSub').textContent = n === 1 ? 'You should spend about 20 minutes on this task. Write at least 150 words.'
-                                    : 'You should spend about 40 minutes on this task. Write at least 250 words.';
+    $('wSub').textContent = n === 1 ? 'You should spend about 20 minutes on this task. Write at least ' + MIN[1] + ' words.'
+                                    : 'You should spend about 40 minutes on this task. Write at least ' + MIN[2] + ' words.';
     $('wLeft').scrollTop = 0;
     $('wText' + n).focus();
   }
@@ -84,6 +86,8 @@
     const a = words($('wText1').value), b = words($('wText2').value);
     $('wWc1').textContent = a + (a === 1 ? ' word' : ' words');
     $('wWc2').textContent = b + (b === 1 ? ' word' : ' words');
+    // the dash over the task turns green once the task has enough words, like a fully answered part of the papers
+    [[1, a], [2, b]].forEach(([n, c]) => { const ok = c >= MIN[n]; $('wWc' + n).classList.toggle('ok', ok); $('wTab' + n).classList.toggle('enough', ok); });
     $('wCount').textContent = 'Task 1: ' + a + ' words · Task 2: ' + b + ' words';
   }
   ['wText1', 'wText2'].forEach((id, i) => {
@@ -158,7 +162,8 @@
     'w-submit': () => submit(false),
     'menu-open': openMenu, 'menu-close': closeMenu, 'menu-root': menuRoot,
     'menu-view': el => menuView(el.dataset.v),
-    'menu-submit': () => { closeMenu(); submit(false); }
+    'menu-submit': () => { closeMenu(); submit(false); },
+    'w-full': () => goFull()
   };
   document.addEventListener('click', e => {
     const el = e.target.closest('[data-action]');

@@ -10,6 +10,7 @@
 <title>Full Mock Test</title>
 <link rel="stylesheet" href="css/mock.css">
 <link rel="stylesheet" href="css/writing.css">
+<link rel="stylesheet" href="css/exam-unify.css">
 <script src="/assets/js/no-context-menu.js"></script>
 </head>
 <body oncontextmenu="return false">
@@ -18,7 +19,7 @@
 <section id="scLogin" class="screen">
   <main class="lg-page">
     <form class="lg-card" id="loginForm" autocomplete="off" novalidate>
-      <div class="lg-logo"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
+      <div class="lg-logo"><img class="mk-mark" src="/icon.png" alt="IELTS-X" width="52" height="52"></div>
       <h1>Full Mock Test</h1>
       <p class="lg-sub">Listening, Reading and Writing &middot; about 2 hours 40 minutes</p>
 
@@ -47,12 +48,11 @@
 
 <!-- ======================= PRE-TEST CHECKS ======================= -->
 <section id="scChecks" class="screen hidden">
-  <div class="topbar">
-    <div style="display:flex;align-items:center;">
-      <div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
-      <div class="ttblock"><div class="ttid-label">Test taker ID</div><div class="ttid-sub" id="pcName">Candidate</div></div>
-    </div>
-    <span class="modebadge" id="pcMode"></span>
+  <div class="mk-bar">
+    <div class="mk-bar-left"><img class="mk-logo" src="/icon.png" alt="IELTS-X" width="32" height="32">
+      <div class="mk-status"><div class="mk-title" data-mk-title>Full Mock Test</div><div class="mk-sub" id="pcName">Candidate</div></div></div>
+    <ol class="mk-steps" data-mk-steps aria-label="Mock test progress"><li data-k="listening"><i><b>1</b></i><span>Listening</span></li><li data-k="reading"><i><b>2</b></i><span>Reading</span></li><li data-k="writing"><i><b>3</b></i><span>Writing</span></li></ol>
+    <div class="mk-bar-right"><span class="mk-badge" id="pcMode"></span></div>
   </div>
   <main class="pc-wrap">
     <div class="today"><h2>Today</h2><span class="rule"></span></div>
@@ -68,18 +68,14 @@
 
 <!-- =========================== WRITING =========================== -->
 <section id="scWriting" class="hidden">
-  <div class="hdr">
-    <div class="hdr-left">
-      <div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
-      <div class="ttblock"><div class="ttid-label">Test taker ID</div><div class="ttid-sub" id="wName">Candidate</div></div>
-      <div class="ttblock timer" id="wClockBox"><div class="ttid-label">&nbsp;</div><div class="ttid-sub" id="wClock">60 minutes left</div></div>
-    </div>
-    <div class="hdr-right">
-      
-      <button class="icon" data-ico="signal" title="Connection"></button>
-      <button class="icon" data-ico="bell" title="Messages"></button>
-      <button class="icon" data-ico="menu" title="Options" data-action="menu-open"></button>
-      
+  <div class="mk-bar">
+    <div class="mk-bar-left"><img class="mk-logo" src="/icon.png" alt="IELTS-X" width="32" height="32">
+      <div class="mk-status"><div class="mk-title">Writing test<span class="mk-who" id="wName">Candidate</span></div><div class="mk-sub" id="wClockBox"><span id="wClock">60 minutes remaining</span></div></div></div>
+    <ol class="mk-steps" data-mk-steps aria-label="Mock test progress"><li data-k="listening"><i><b>1</b></i><span>Listening</span></li><li data-k="reading"><i><b>2</b></i><span>Reading</span></li><li data-k="writing"><i><b>3</b></i><span>Writing</span></li></ol>
+    <div class="mk-bar-right">
+      <span class="mk-ic" title="Connected"><svg width="27.4" height="24" viewBox="0 0 2048 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1024 13q-20 0 -93 73.5t-73 93.5q0 32 62.5 54t103.5 22t103.5 -22t62.5 -54q0 -20 -73 -93.5t-93 -73.5zM1294 284q-2 0 -40 25t-101.5 50t-128.5 25t-128.5 -25t-101 -50t-40.5 -25q-18 0 -93.5 75t-75.5 93q0 13 10 23q78 77 196 121t233 44t233 -44t196 -121 q10 -10 10 -23q0 -18 -75.5 -93t-93.5 -75zM1567 556q-11 0 -23 8q-136 105 -252 154.5t-268 49.5q-85 0 -170.5 -22t-149 -53t-113.5 -62t-79 -53t-31 -22q-17 0 -92 75t-75 93q0 12 10 22q132 132 320 205t380 73t380 -73t320 -205q10 -10 10 -22q0 -18 -75 -93t-92 -75z M1838 827q-11 0 -22 9q-179 157 -371.5 236.5t-420.5 79.5t-420.5 -79.5t-371.5 -236.5q-11 -9 -22 -9q-17 0 -92.5 75t-75.5 93q0 13 10 23q187 186 445 288t527 102t527 -102t445 -288q10 -10 10 -23q0 -18 -75.5 -93t-92.5 -75z"/></svg></span>
+      <button class="mk-ic" type="button" title="Full screen" aria-label="Full screen" data-action="w-full"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      <button class="mk-ic" type="button" title="Options" aria-label="Options" data-action="menu-open"><svg width="20.58" height="24" viewBox="0 0 1536 1792" fill="currentColor" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1536 192v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 704v-128q0 -26 -19 -45t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45zM1536 1216v-128q0 -26 -19 -45 t-45 -19h-1408q-26 0 -45 19t-19 45v128q0 26 19 45t45 19h1408q26 0 45 -19t19 -45z"/></svg></button>
     </div>
   </div>
   <div class="pbar"><div class="pbar-inner"><h2 id="wTitle">Task 1</h2><p id="wSub"></p></div></div>
@@ -96,9 +92,9 @@
     </div>
   </div>
   <div class="wnav">
-    <div class="wtab sel" id="wTab1" data-action="task" data-n="1"><span>Task</span><span class="n">1</span><span class="wc" id="wWc1">0 words</span></div>
-    <div class="wtab" id="wTab2" data-action="task" data-n="2"><span>Task</span><span class="n">2</span><span class="wc" id="wWc2">0 words</span></div>
-    <button class="submit" id="wSubmit" data-action="w-submit" title="Submit the Writing test">&#10003;</button>
+    <div class="wtab sel" id="wTab1" data-action="task" data-n="1"><span class="lbl"><span>Task <span class="n">1</span></span><span class="wc" id="wWc1">0 words</span></span></div>
+    <div class="wtab" id="wTab2" data-action="task" data-n="2"><span class="lbl"><span>Task <span class="n">2</span></span><span class="wc" id="wWc2">0 words</span></span></div>
+    <button class="submit" id="wSubmit" data-action="w-submit" title="Submit the Writing test" aria-label="Submit"><svg viewBox="0 0 1792 1792" aria-hidden="true" focusable="false"><path transform="translate(0,1536) scale(1,-1)" d="M1671 566q0 -40 -28 -68l-724 -724q-28 -28 -68 -28t-68 28l-420 420q-28 28 -28 68t28 68l152 152q28 28 68 28t68 -28l200 -200l504 504q28 28 68 28t68 -28l152 -152q28 -28 28 -68z"/></svg></button>
   </div>
 </section>
 
@@ -129,7 +125,7 @@
 
 <!-- ======================= ANALYSE MISTAKES ======================= -->
 <section id="scAnalyse" class="screen hidden">
-  <div class="hdr"><div class="hdr-left"><div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div>
+  <div class="hdr"><div class="hdr-left"><div class="mark mk-markbox"><img class="mk-mark" src="/icon.png" alt="IELTS-X" width="32" height="32"></div>
       <div class="ttblock"><div class="ttid-label">Test taker ID</div><div class="ttid-sub" id="aName">Candidate</div></div></div>
       <div class="hdr-right"></div></div>
   <div class="rep" id="anaBody"></div>
@@ -137,7 +133,7 @@
 
 <!-- =========================== RESULTS =========================== -->
 <section id="scReport" class="screen hidden">
-  <div class="rx-top"><div class="mark"><img src="assets/img/ielts-logo.svg" alt="IELTS" width="93" height="27"></div><div class="rx-title" id="rName">Full Mock Test</div><div class="rx-right"><span class="modebadge" id="rMode"></span></div></div>
+  <div class="rx-top"><div class="mark mk-markbox"><img class="mk-mark" src="/icon.png" alt="IELTS-X" width="32" height="32"></div><div class="rx-title" id="rName">Full Mock Test</div><div class="rx-right"><span class="modebadge" id="rMode"></span></div></div>
   <div class="rx-bar">Exam Results</div>
   <div class="rx-scroll"><div class="rx-page" id="repBody"></div></div>
 </section>

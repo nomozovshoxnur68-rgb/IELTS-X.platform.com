@@ -1,0 +1,118 @@
+/* ============================================================
+   FULL MOCK · one look for the three papers  (css/exam-unify.css)
+
+   Listening and Reading come from two separate engines (js/listening.js,
+   js/reading.js and, for papers made in the admin panel, the site's own
+   engines) and each drew its header and bottom bar a little differently;
+   Writing (in the shell) had a third design with another logo, other icons
+   and other wording. This file gives all three the same frame:
+
+     [logo]  Reading test | Candidate        1 Listening — 2 Reading — 3 Writing        wifi  full screen  menu
+             52 minutes remaining
+
+   and the same bottom bar (part / task cells, the grey-to-green dash, the
+   tick button). It is loaded by the shell (index.html) and, only inside the
+   mock (?embed=1), by js/bridge.js into the Listening and Reading papers,
+   which then carry html.mk-unified.
+   ============================================================ */
+
+:root{
+  --mk-ink:#10122b; --mk-text:#000; --mk-soft:#5b616e; --mk-line:#C1C1C1;
+  --mk-panel:#f1f2ec; --mk-panel-line:#d5d5d5; --mk-green:#358E14; --mk-red:#c41230;
+  --mk-font:Arial,Helvetica,sans-serif;
+}
+
+/* ── the header bar (Writing and the shell screens use it directly) ─────── */
+.mk-bar{position:relative;z-index:60;flex:0 0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;
+  background:#fff;color:var(--mk-text);font-family:var(--mk-font);}
+.mk-bar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--mk-line);pointer-events:none;}
+.mk-bar-left{display:flex;align-items:center;height:100%;min-width:0;}
+.mk-logo{display:block;flex:0 0 auto;width:32px;height:32px;margin-left:12px;object-fit:contain;border-radius:4px;}
+.mk-status{display:flex;flex-direction:column;justify-content:center;min-width:0;padding-left:12px;}
+.mk-title{font:700 16px/20px var(--mk-font);color:var(--mk-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mk-sub{font:400 13px/17px var(--mk-font);color:var(--mk-text);white-space:nowrap;}
+.mk-sub.warn{color:var(--mk-red);font-weight:700;animation:mkFlash 1s step-end 6;}
+@keyframes mkFlash{0%,100%{opacity:1}50%{opacity:.2}}
+.mk-bar-right{display:flex;align-items:center;height:100%;padding-right:8px;}
+.mk-ic{display:flex;align-items:center;justify-content:center;height:56px;padding:0 16px;margin:0;border:0;border-radius:0;
+  background:transparent;color:#333;cursor:pointer;transition:background-color .1s linear;}
+.mk-ic:hover{background:rgba(0,0,0,.055);}
+.mk-ic svg{display:block;}
+.mk-badge{display:inline-flex;align-items:center;height:26px;padding:0 12px;margin-right:8px;border:1px solid #d7d7d7;border-radius:999px;
+  font:700 11px/1 var(--mk-font);letter-spacing:.08em;text-transform:uppercase;color:#333;background:#f6f6f6;}
+.mk-badge[data-mode="real"]{border-color:#f3b7c1;background:#fff5f7;color:#b0102a;}
+
+/* the candidate's name after the title */
+.mk-who{font-weight:400;color:var(--mk-soft);margin-left:10px;padding-left:10px;border-left:1px solid #cfd2d8;}
+
+/* ── progress through the mock: Listening — Reading — Writing ──────────── */
+.mk-steps{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:0;
+  margin:0;padding:0;list-style:none;font:400 13px/1 var(--mk-font);color:#6b7078;white-space:nowrap;pointer-events:none;}
+.mk-steps li{display:flex;align-items:center;gap:7px;}
+.mk-steps li+li::before{content:"";display:block;width:34px;height:2px;margin:0 10px;border-radius:2px;background:#dcdfe5;}
+.mk-steps li.done+li::before{background:var(--mk-green);}
+.mk-steps i{display:grid;place-items:center;width:20px;height:20px;border:1.5px solid #cfd2d8;border-radius:50%;background:#fff;
+  font:700 11px/1 var(--mk-font);font-style:normal;color:#8a8f99;box-sizing:border-box;}
+.mk-steps li.cur{color:var(--mk-ink);font-weight:700;}
+.mk-steps li.cur i{border-color:var(--mk-ink);background:var(--mk-ink);color:#fff;}
+.mk-steps li.done{color:var(--mk-green);}
+.mk-steps li.done i{border-color:var(--mk-green);background:var(--mk-green);color:#fff;}
+.mk-steps li.done i::before{content:"";width:8px;height:4px;margin-top:-2px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg);}
+.mk-steps li.done i b{display:none;}
+@media (max-width:1180px){.mk-steps{display:none;}}
+
+/* ── the Listening and Reading papers inside the mock ───────────────────── */
+/* header: the same 56 px bar, 32 px logo, 16 px title and 13 px clock line in both engines */
+html.mk-unified #hdr{height:56px!important;min-height:56px!important;}
+html.mk-unified #hdr::after{top:auto!important;bottom:0!important;background:var(--mk-line)!important;}
+html.mk-unified #hdr-left{padding-left:0!important;align-items:center!important;}
+html.mk-unified #hdr .ex-logo{padding:0 0 0 12px!important;}
+html.mk-unified #hdr .ex-logo svg,html.mk-unified #hdr .ex-logo img,
+html.mk-unified #hdr-left>.hdr-logo{width:32px!important;height:32px!important;}
+html.mk-unified #hdr-left>.hdr-logo{margin-left:12px!important;}
+html.mk-unified #hdr .ex-status{padding-left:12px!important;}
+html.mk-unified #hdr .hdr-titleblock{margin-left:12px!important;line-height:normal!important;}
+html.mk-unified #hdr-title:not(.mk-title),html.mk-unified #hdr-name:not(.mk-title){display:none!important;}
+html.mk-unified #hdr .mk-title{display:block!important;max-width:min(46vw,560px);font:700 16px/20px var(--mk-font)!important;color:var(--mk-ink)!important;}
+html.mk-unified #hdr .ex-status .timer,html.mk-unified #hdr .hdr-subline,html.mk-unified #hdr #hdr-clock,
+html.mk-unified #hdr #timer-listening{font:400 13px/17px var(--mk-font)!important;color:var(--mk-text);}
+html.mk-unified #hdr .hdr-subline{margin-top:0!important;}
+html.mk-unified #hdr-right .hdr-icon-btn,html.mk-unified #hdr-right .ex-icbtn{height:56px!important;color:#333!important;}
+html.mk-unified #mock-exit{font-family:var(--mk-font);}
+
+/* ── Writing (the shell): bar under the header, panes, bottom bar ──────── */
+#scWriting{font-family:var(--mk-font);}
+#scWriting .pbar{margin:16px 16px 12px;}
+#scWriting .pbar-inner{background:var(--mk-panel);border:1px solid var(--mk-panel-line);border-radius:4px;padding:12px 20px;}
+#scWriting .pbar-inner h2,#scWriting .pbar-inner p{font-size:16px;line-height:1.4;}
+#scWriting .wleft .tbox{background:var(--mk-panel);border-color:var(--mk-panel-line);}
+
+/* the bottom bar: the same cells as the papers' part navigator */
+#scWriting .wnav{height:53px;border-top:0;background:#fff;box-shadow:0 -1px 0 #e4e4e4;}
+#scWriting .wtab{gap:0;margin:0 1px;font:400 16px/1 var(--mk-font);color:#333;border-top:3px solid #fff;}
+#scWriting .wtab .lbl{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 20px;position:relative;}
+#scWriting .wtab .n{margin:0;}
+#scWriting .wtab.sel{padding-left:0;font-weight:600;}
+#scWriting .wtab.sel::before{display:none;}
+#scWriting .wtab.sel .lbl::before{content:"";position:absolute;top:-3px;left:1px;right:1px;height:3px;background:#D7D7D7;transition:background .2s ease-in;}
+#scWriting .wtab.enough .lbl::before{background:var(--mk-green);}
+#scWriting .wtab .wc{margin-left:6px;font-weight:400;color:#757575;}
+#scWriting .wtab .wc.ok{color:var(--mk-green);}
+#scWriting .wtab:not(.sel):hover{background:#efefef;}
+#scWriting .submit{flex:0 0 76.8px;width:76.8px;height:53px;padding:16px;border:0;border-left:0;background:#efefef;color:#535353;}
+#scWriting .submit svg{display:block;width:19.2px;height:19.2px;fill:currentColor;}
+#scWriting .submit:hover{background:#262626;color:#fff;}
+#scWriting .wcount{font-size:14px;color:#757575;}
+
+/* high-contrast options of Writing keep working with the new bar */
+body.c-wb .mk-bar,body.c-yb .mk-bar{background:#000;}
+body.c-wb .mk-bar,body.c-wb .mk-title,body.c-wb .mk-sub,body.c-wb .mk-ic{color:#fff;}
+body.c-yb .mk-bar,body.c-yb .mk-title,body.c-yb .mk-sub,body.c-yb .mk-ic{color:#f2d70a;}
+body.c-wb #scWriting .wtab,body.c-yb #scWriting .wtab{border-top-color:#000;color:inherit;}
+body.c-wb #scWriting .wnav,body.c-yb #scWriting .wnav{box-shadow:0 -1px 0 #333;}
+body.c-wb .mk-steps,body.c-yb .mk-steps{display:none;}
+
+/* ── the shell screens: the same logo as the papers ─────────────────────── */
+.mark .mk-mark{display:block;width:32px;height:32px;object-fit:contain;border-radius:4px;}
+.mark.mk-markbox{width:auto;height:32px;padding:12px 4px 12px 12px;align-items:center;}
+.lg-logo .mk-mark{width:52px;height:52px;border-radius:12px;box-shadow:0 6px 18px rgba(184,0,0,.18);}

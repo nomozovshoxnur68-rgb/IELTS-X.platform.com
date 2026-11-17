@@ -16,7 +16,7 @@
 
     var LINKS = {
         // ── brand (logo, top of the sidebar) ──
-        "brand": "/",
+        "brand": "/dashboard",
 
         // ── full tests ──
         "listening": "/full-tests/listening/",

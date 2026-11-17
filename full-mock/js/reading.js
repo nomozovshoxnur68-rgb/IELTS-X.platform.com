@@ -1225,7 +1225,10 @@ const READING_EXPLANATIONS = __T.READING_EXPLANATIONS;
 const SYNONYMS = __T.SYNONYMS || {};   // optional (only some tests have a synonym table)
 const PONLY  = parseInt(__T.PONLY, 10)  || 1;     // which passage this page holds
 const QTOTAL = parseInt(__T.QTOTAL, 10) || 40;    // how many questions it has
-const MINUTES = parseInt(__T.MINUTES, 10) || 20;  // clock for this page
+// A page that holds two or three passages is a full 60-minute paper (every paper of the Full Mock is). The papers never
+// set MINUTES, so the mock's Reading used to run on the 20-minute clock of a single passage (the same fix as /reading.js).
+const MINUTES = parseInt(__T.MINUTES, 10) ||
+  ([1,2,3].filter(function(p){ return (__T.SECTIONS && __T.SECTIONS[p] || []).length; }).length >= 2 ? 60 : 20);
 const PARTS = [1,2,3].filter(function(p){ return (SECTIONS[p] || []).length; });
 
 function synSectionHTML() {
