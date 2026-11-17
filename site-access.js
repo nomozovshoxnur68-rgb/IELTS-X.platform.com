@@ -84,7 +84,7 @@ async function onLogoutClick(e) {
     return;
   }
   await logout();
-  location.href = '/login';
+  location.href = '/';   // the landing page
 }
 document.addEventListener('click', onLogoutClick, true);
 
@@ -189,8 +189,8 @@ function ensureUserMenu() {
 
 window.IELTSXSiteAccess = { currentUser: loadUser, requireLogin, refresh, logout };
 
-/* A visitor who has never been here before (no account on this browser, never sent to the sign-in page) is shown the
-   sign-in page first, once, and comes back to the same page afterwards. Later visits are not interrupted. Search engine
+/* A visitor who has never been here before (no account on this browser, never sent to the landing page) is shown the
+   landing page first, once, and comes back to the same page after signing in. Later visits are not interrupted. Search engine
    robots are left alone, and a browser that blocks storage is never sent (it could not remember the first time).
    So are browsers driven by a program (navigator.webdriver): PageSpeed Insights / Lighthouse runs a headless Chrome with
    an ordinary phone user agent (no "Lighthouse" in it), and was measuring the sign-in page instead of the page asked for. */
@@ -202,7 +202,8 @@ function sendFirstVisitToLogin() {
     localStorage.setItem(FIRST_VISIT_KEY, String(Date.now()));
     if (!localStorage.getItem(FIRST_VISIT_KEY)) return false;
   } catch (e) { return false; }
-  location.replace('/login?next=' + encodeURIComponent(safeNext(location.pathname + location.search + location.hash)));
+  // the landing page first: its Sign in / Get started buttons bring the visitor back to this page
+  location.replace('/?next=' + encodeURIComponent(safeNext(location.pathname + location.search + location.hash)));
   return true;
 }
 

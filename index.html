@@ -1,732 +1,348 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <script src="/assets/js/loading.js"></script>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>IELTS-X — IELTS Practice Tests, Mock Exams and AI Feedback</title>
+<meta name="description" content="Free IELTS Reading and Listening practice with answers, full mock tests timed like the computer exam, and AI band feedback for Writing and Speaking.">
+<meta property="og:title" content="IELTS-X — IELTS practice tests, mock exams and AI feedback">
+<meta property="og:description" content="Free IELTS Reading and Listening practice with answers, full mock tests timed like the computer exam, and AI band feedback for Writing and Speaking.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ielts-x.uz/">
+<meta property="og:site_name" content="IELTS-X">
+<meta property="og:image" content="https://ielts-x.uz/logo.png">
+<meta property="og:image:alt" content="IELTS-X logo">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://ielts-x.uz/">
+<link rel="icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>IELTS-X — IELTS Practice Tests, Mock Exams and AI Feedback</title>
-    <meta name="description" content="Free IELTS Reading and Listening practice with answers, full mock tests timed like the computer exam, and AI band feedback for Writing and Speaking.">
-    <meta property="og:title" content="IELTS-X — IELTS practice tests, mock exams and AI feedback">
-    <meta property="og:description" content="Free IELTS Reading and Listening practice with answers, full mock tests timed like the computer exam, and AI band feedback for Writing and Speaking.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ielts-x.uz/">
-    <meta property="og:site_name" content="IELTS-X">
-    <meta property="og:image" content="https://ielts-x.uz/logo.png">
-    <meta property="og:image:alt" content="IELTS-X logo">
-    <meta name="twitter:card" content="summary">
-    <link rel="canonical" href="https://ielts-x.uz/">
-    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://ielts-x.uz/#website","name":"IELTS-X","alternateName":["IELTSX","IELTS X"],"url":"https://ielts-x.uz/","inLanguage":"en","publisher":{"@id":"https://ielts-x.uz/#organization"}},{"@type":"Organization","@id":"https://ielts-x.uz/#organization","name":"IELTS-X","alternateName":"IELTSX","url":"https://ielts-x.uz/","logo":{"@type":"ImageObject","url":"https://ielts-x.uz/logo.png"},"description":"Online IELTS preparation: practice tests, full mock exams and AI feedback for Writing and Speaking."}]}</script>
-    <script src="assets/js/theme-init.js"></script>
-    <link rel="stylesheet" href="assets/index-BxgEAFAf.css" />
-    <link rel="stylesheet" href="assets/index-DNLr8-et.css" />
-    <link rel="stylesheet" href="assets/css/index.css">
-    <script src="auth-bridge.js"></script>
-    <link rel="stylesheet" href="assets/unlock-cards.css" />
-    <link rel="stylesheet" href="assets/css/ui.css">
-    <script src="assets/js/img-fallback.js" defer></script>
-    <script src="assets/js/mobile-nav.js" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://ielts-x.uz/#website","name":"IELTS-X","alternateName":["IELTSX","IELTS X"],"url":"https://ielts-x.uz/","inLanguage":"en","publisher":{"@id":"https://ielts-x.uz/#organization"}},{"@type":"Organization","@id":"https://ielts-x.uz/#organization","name":"IELTS-X","alternateName":"IELTSX","url":"https://ielts-x.uz/","logo":{"@type":"ImageObject","url":"https://ielts-x.uz/logo.png"},"description":"Online IELTS preparation: practice tests, full mock exams and AI feedback for Writing and Speaking."}]}</script>
+<!-- A visitor who is already signed in goes straight to the dashboard (or the page that sent them here), before
+     the landing page is painted. The e-mail in localStorage is only a hint written by site-access.js: if the session
+     has ended, /dashboard sends them to the sign-in page. Search engines have no storage and always get this page. -->
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.has('stay')) return;
+    var n = q.get('next') || '';
+    var next = /^\/(?!\/)[^\r\n\\]*$/.test(n) && !/^\/(login|admin-login)(\.html)?(\?|$)/i.test(n) && n !== '/' ? n : '/dashboard';
+    if (localStorage.getItem('ieltsx_logged_in_email')) { document.documentElement.style.visibility = 'hidden'; location.replace(next); }
+  } catch (e) { /* storage blocked: stay on the landing page */ }
+})();
+</script>
+<script src="assets/js/theme-init.js"></script>
 <link rel="stylesheet" href="assets/css/ix-unified.css">
-<script src="/assets/js/site-design.js"></script>
+<link rel="stylesheet" href="assets/css/landing.css">
+<script src="/assets/js/branding.js" defer></script>
+<script src="/assets/js/landing.js" defer></script>
 </head>
+<body class="lp">
 
-<body class="antialiased bg-background text-foreground">
+<!-- icons (lucide), drawn with <use href="#i-…"> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-vocab" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="M8 7h6"/><path d="M8 11h8"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+  <symbol id="i-news" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><path d="M6 11h4"/><path d="M8 9v4"/><path d="M15 12h.01"/><path d="M18 10h.01"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+</svg>
 
-    <div class="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar"
-        style="--sidebar-width:16rem; --sidebar-width-icon:3rem;">
+<a class="lp-skip" href="#main">Skip to content</a>
 
-        <!-- ==== -->
-        <!-- SIDEBAR — new modern sidebar                                  -->
-        <!-- ==== -->
-        <div id="main-sidebar-root" class="group peer hidden md:block text-sidebar-foreground" data-state="expanded"
-        data-collapsible="" data-variant="sidebar" data-side="left">
-        <div
-        class="duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear group-data-[collapsible=offcanvas]:w-0 group-data-[side=right]:rotate-180 group-data-[collapsible=icon]:w-[--sidebar-width-icon]">
+<!-- ============================== NAV ============================== -->
+<header class="lp-nav" id="lp-nav">
+  <div class="lp-wrap lp-nav-in">
+    <a class="lp-brand" href="/" aria-label="IELTS-X home">
+      <img src="/icon.png" alt="" width="32" height="32">
+      <span>IELTS-X</span>
+    </a>
+    <nav class="lp-links" aria-label="Main">
+      <a href="#skills">Skills</a>
+      <a href="#mock">Mock test</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="lp-nav-actions">
+      <button type="button" class="lp-icon-btn" id="lp-theme" aria-label="Switch to dark mode" title="Theme">
+        <svg class="ic ic-sun"><use href="#i-sun"/></svg><svg class="ic ic-moon"><use href="#i-moon"/></svg>
+      </button>
+      <a class="lp-btn lp-btn-ghost lp-hide-sm" data-auth="login" href="/login?next=%2Fdashboard">Sign in</a>
+      <a class="lp-btn lp-btn-primary lp-hide-sm" data-auth="register" href="/login?mode=register&amp;next=%2Fdashboard">Get started</a>
+      <button type="button" class="lp-icon-btn lp-menu-btn" id="lp-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="lp-sheet">
+        <svg class="ic"><use href="#i-menu"/></svg>
+      </button>
     </div>
-    <div
-    class="duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l overflow-hidden [&amp;&gt;[data-sidebar=sidebar]]:flex-row">
-    <div data-sidebar="sidebar"
-    class="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow">
-    <div
-    class="flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground border-r">
-    <div data-sidebar="header" class="flex flex-col gap-2 p-2">
-        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
-            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="brand"
-                data-sidebar="menu-button" data-size="lg" data-active="false"
-                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:!p-0 md:h-8 md:p-0"
-                href="./" data-discover="true">
-                <div class="flex aspect-square size-8 items-center justify-center rounded-lg p-1">
-                    <img src="/icon.png" alt="IELTSX" class="size-6">
-                </div>
-                <div class="grid flex-1 text-left text-sm leading-tight">
-                    <span class="truncate font-semibold">IELTSX</span>
-                    <span class="truncate text-xs capitalize" data-plan-label>DEMO</span>
-                </div>
-            </a></li>
-        </ul>
+  </div>
+  <div class="lp-sheet" id="lp-sheet" hidden>
+    <a href="#skills">Skills</a>
+    <a href="#mock">Mock test</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <div class="lp-sheet-btns">
+      <a class="lp-btn lp-btn-outline" data-auth="login" href="/login?next=%2Fdashboard">Sign in</a>
+      <a class="lp-btn lp-btn-primary" data-auth="register" href="/login?mode=register&amp;next=%2Fdashboard">Get started</a>
     </div>
-    <div data-sidebar="content"
-    class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden">
-    <div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
-        <div data-sidebar="group-label"
-        class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
-        Full Tests</div>
-        <div data-sidebar="group-content" class="w-full text-sm">
-            <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
-                <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="listening"
-                    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-                    data-sidebar="menu-button" data-size="default" data-active="false"
-                    href="/full-tests/listening/" data-discover="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-headphones">
-                    <path
-                    d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3">
-                </path>
-            </svg>
-            <span class="flex-1">Listening</span>
-        </a></li>
-        <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="reading"
-            class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-            data-sidebar="menu-button" data-size="default" data-active="false"
-            href="/full-tests/reading/" data-discover="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-book-open">
-            <path d="M12 7v14"></path>
-            <path
-            d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z">
-        </path>
-    </svg>
-    <span class="flex-1">Reading</span>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="writing"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/full-tests/writing/" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-pencil">
-    <path
-    d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
-</path>
-<path d="m15 5 4 4"></path>
-</svg>
-<span class="flex-1">Writing</span>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="speaking"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/full-tests/speaking/" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-mic">
-    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z">
-    </path>
-    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-    <line x1="12" x2="12" y1="19" y2="22"></line>
-</svg>
-<span class="flex-1">Speaking</span>
-</a></li>
-</ul>
-</div>
-</div>
-<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
-    <div data-sidebar="group-label"
-    class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
-    Part Practice</div>
-    <div data-sidebar="group-content" class="w-full text-sm">
-        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
-            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="listening-sections"
-                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-                data-sidebar="menu-button" data-size="default" data-active="false"
-                href="/part/practice/listening" data-discover="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="lucide lucide-headphones">
-                <path
-                d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3">
-            </path>
-        </svg>
-        <span class="flex-1">Listening Sections</span>
-    </a></li>
-    <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="reading-passages"
-        class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-        data-sidebar="menu-button" data-size="default" data-active="false"
-        href="/part/practice/reading" data-discover="true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-        class="lucide lucide-book-open">
-        <path d="M12 7v14"></path>
-        <path
-        d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z">
-    </path>
-</svg>
-<span class="flex-1">Reading Passages</span>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="writing-tasks"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/part/practice/writing" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-pencil">
-    <path
-    d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
-</path>
-<path d="m15 5 4 4"></path>
-</svg>
-<span class="flex-1">Writing Tasks</span>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="speaking-topics"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/part/practice/speaking" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-message-square">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z">
-    </path>
-</svg>
-<span class="flex-1">Speaking Topics</span>
-</a></li>
-</ul>
-</div>
-</div>
-<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
-    <div data-sidebar="group-label"
-    class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
-    Collections</div>
-    <div data-sidebar="group-content" class="w-full text-sm">
-        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
-            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="predictions"
-                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-                data-sidebar="menu-button" data-size="default" data-active="false"
-                href="Predictions" data-discover="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="lucide lucide-layers">
-                <path
-                d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z">
-            </path>
-            <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path>
-            <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path>
-        </svg>
-        <span class="flex-1">Predictions</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-        class="lucide lucide-crown size-4">
-        <path
-        d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
-    </path>
-    <path d="M5 21h14"></path>
-</svg>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="mock-tests"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="Mock tests" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-target">
-    <circle cx="12" cy="12" r="10"></circle>
-    <circle cx="12" cy="12" r="6"></circle>
-    <circle cx="12" cy="12" r="2"></circle>
-</svg>
-<span class="flex-1">Mock Tests</span>
-</a></li>
-</ul>
-</div>
-</div>
-<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2">
-    <div data-sidebar="group-label"
-    class="duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0">
-    Study Tools</div>
-    <div data-sidebar="group-content" class="w-full text-sm">
-        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
-            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="performance"
-                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-                data-sidebar="menu-button" data-size="default" data-active="false"
-                href="/study/Tools/Performance" data-discover="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="lucide lucide-chart-line">
-                <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
-                <path d="m19 9-5 5-4-4-3 3"></path>
-            </svg>
-            <span class="flex-1">Performance</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-crown size-4">
-            <path
-            d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
-        </path>
-        <path d="M5 21h14"></path>
-    </svg>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="pdf-materials"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/study/Tools/Pdf%20materials" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-graduation-cap">
-    <path
-    d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z">
-</path>
-<path d="M22 10v6"></path>
-<path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
-</svg>
-<span class="flex-1">Pdf materials</span>
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-viewBox="0 0 24 24" fill="none" stroke="currentColor"
-stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-class="lucide lucide-crown size-4">
-<path
-d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
-</path>
-<path d="M5 21h14"></path>
-</svg>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="articles"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/study/Tools/Articles" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="lucide lucide-bot">
-    <path d="M12 8V4H8"></path>
-    <rect width="16" height="12" x="4" y="8" rx="2"></rect>
-    <path d="M2 14h2"></path>
-    <path d="M20 14h2"></path>
-    <path d="M15 13v2"></path>
-    <path d="M9 13v2"></path>
-</svg>
-<span class="flex-1">Articles</span>
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-viewBox="0 0 24 24" fill="none" stroke="currentColor"
-stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-class="lucide lucide-crown size-4">
-<path
-d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
-</path>
-<path d="M5 21h14"></path>
-</svg>
-</a></li>
-<li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="vocabulary"
-    class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm flex w-full items-center gap-2"
-    data-sidebar="menu-button" data-size="default" data-active="false"
-    href="/vocabulary" data-discover="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-a"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="m8 13 4-7 4 7"/><path d="M9.1 11h5.7"/></svg>
-<span class="flex-1">Vocabularies</span>
+  </div>
+</header>
 
-</a></li>
-</ul>
-</div>
-</div>
-<div data-sidebar="group" class="relative flex w-full min-w-0 flex-col p-2 mt-auto">
-    <div data-sidebar="group-content" class="w-full text-sm">
-        <ul data-sidebar="menu" class="flex w-full min-w-0 flex-col gap-1">
-            <li data-sidebar="menu-item" class="group/menu-item relative"><a data-link="pricing"
-                class="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 text-xs flex w-full items-center gap-2"
-                data-sidebar="menu-button" data-size="sm" data-active="false"
-                href="Price" data-discover="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="lucide lucide-credit-card">
-                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-                <line x1="2" x2="22" y1="10" y2="10"></line>
-            </svg>
-            <span class="flex-1">Pricing</span>
-        </a></li>
-</ul>
-</div>
-</div>
-</div>
-<button data-sidebar="rail" aria-label="Toggle Sidebar" tabindex="-1"
-title="Toggle Sidebar"
-class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex [[data-side=left]_&amp;]:cursor-w-resize [[data-side=right]_&amp;]:cursor-e-resize [[data-side=left][data-state=collapsed]_&amp;]:cursor-e-resize [[data-side=right][data-state=collapsed]_&amp;]:cursor-w-resize group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar [[data-side=left][data-collapsible=offcanvas]_&amp;]:-right-2 [[data-side=right][data-collapsible=offcanvas]_&amp;]:-left-2">
-</button>
-</div>
-</div>
-</div>
-</div>
+<main id="main">
 
-<!-- MAIN CONTENT -->
-
-        <!-- ==== -->
-        <!-- MAIN CONTENT                                                 -->
-        <!-- ==== -->
-        <main class="relative flex min-h-svh flex-col bg-background flex-1">
-
-            <!-- HEADER -->
-            <header
-                class="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 backdrop-blur md:pr-10 lg:pr-20">
-                <div class="flex items-center gap-2 pl-2">
-                    <button id="sidebar-toggle-btn"
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent h-7 w-7"
-                        data-sidebar="trigger">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                            <path d="M9 3v18"></path>
-                        </svg>
-                        <span class="sr-only">Toggle Sidebar</span>
-                    </button>
-
-                    <div data-orientation="vertical" class="shrink-0 bg-border w-[1px] h-4 mr-2"></div>
-                    <h1 class="text-sm font-medium">Home</h1>
-                </div>
-
-                <div class="flex items-center gap-3 pr-4 relative" id="avatar-container">
-                    <div class="theme-switch" role="radiogroup" aria-label="Theme">
-                        <button type="button" role="radio" aria-checked="false" data-theme-mode="light" aria-label="Light" title="Light"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg></button>
-                        <button type="button" role="radio" aria-checked="false" data-theme-mode="dark" aria-label="Dark" title="Dark"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
-                        <button type="button" role="radio" aria-checked="false" data-theme-mode="system" aria-label="System" title="System"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></button>
-                    </div>
-                    <button id="avatar-dropdown-trigger"
-                        class="flex h-8 w-8 items-center justify-center rounded-md border bg-background focus:outline-none">
-                        <span class="relative flex shrink-0 overflow-hidden h-7 w-7 rounded-md">
-                            <span data-user-avatar aria-hidden="true" style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;background:#1e293b;color:#fff;font-size:12px;font-weight:600;border-radius:inherit">?</span>
-                        </span>
-                    </button>
-
-                    <div id="user-dropdown"
-                        class="hidden absolute right-0 top-full mt-2 z-50 min-w-[12rem] w-56 rounded-lg border bg-popover shadow-md origin-top-right">
-                        <div class="px-2 py-1.5 text-sm">
-                            <div class="flex flex-col space-y-1">
-                                <p class="text-sm font-medium leading-none" data-user-name>Guest</p>
-                                <p class="text-xs leading-none text-muted-foreground" data-user-email>Not signed in</p>
-                            </div>
-                        </div>
-
-                        <div role="separator" class="-mx-1 my-1 h-px bg-muted"></div>
-
-                        <a role="menuitem"
-                            class="relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent"
-                            id="dropdown-account" href="account">
-                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-                                <path d="m9 12 2 2 4-4" />
-                            </svg>
-                            <span>Account</span>
-                        </a>
-
-                        <div role="separator" class="-mx-1 my-1 h-px bg-muted"></div>
-
-                        <div role="menuitem"
-                            class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent"
-                            id="dropdown-logout">
-                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                                <polyline points="16 17 21 12 16 7" />
-                                <line x1="21" x2="9" y1="12" y2="12" />
-                            </svg>
-                            <span>Log out</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- PAGE CONTENT -->
-            <main class="flex-1 overflow-auto">
-                <div class="container max-w-7xl mx-auto p-6">
-
-                    <!-- Test Packs -->
-                    <section class="mb-16">
-                        <h2 class="text-2xl font-bold mb-8">Test Packs</h2>
-
-                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                            <!-- Listening Card -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Listening</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">Complete listening test with full timing.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        30 min
-                                    </div>
-                                    <a href="/full-tests/listening/"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        View Tests
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Reading Card -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Reading</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 7v14" />
-                                        <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">Practice reading passages and questions.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        60 min
-                                    </div>
-                                    <a href="/full-tests/reading/"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        View Tests
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Writing Card -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Writing</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                        <path d="m15 5 4 4" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">Improve your writing with timed tasks.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        60 min
-                                    </div>
-                                    <a href="/full-tests/writing/"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        View Tests
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Speaking Card (added to complete the set) -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Speaking</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                                        <line x1="12" x2="12" y1="19" y2="22" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">Practice speaking with timed parts and topics.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        15 min
-                                    </div>
-                                    <a href="/full-tests/speaking/"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        View Tests
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Part Practice -->
-                    <section class="mb-16">
-                        <h2 class="text-2xl font-bold mb-8">Part Practice</h2>
-
-                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <!-- Listening Part Practice -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Listening</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">One part at a time: forms, maps, multiple choice and more.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        10 min
-                                    </div>
-                                    <a href="/part/practice/listening"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        Practice
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Reading Part Practice -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Reading</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 7v14" />
-                                        <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">One passage with its questions, timed like the real exam.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        20 min
-                                    </div>
-                                    <a href="/part/practice/reading"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        Practice
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Writing Part Practice -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Writing</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                        <path d="m15 5 4 4" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">Task 1 or Task 2 on its own, with a word counter.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        40 min
-                                    </div>
-                                    <a href="/part/practice/writing"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        Practice
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Speaking Part Practice -->
-                            <div class="test-pack-card p-6 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="font-medium text-lg">Speaking</div>
-                                    </div>
-                                    <svg class="h-5 w-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                                        <line x1="12" x2="12" y1="19" y2="22" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm text-muted-foreground mb-4 flex-1">Part 1, 2 or 3 with timers and model answers.</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="border px-2.5 py-0.5 rounded text-xs bg-secondary flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <polyline points="12 6 12 12 16 14" />
-                                        </svg>
-                                        5 min
-                                    </div>
-                                    <a href="/part/practice/speaking"
-                                        class="border text-xs h-8 px-3 rounded-md inline-flex items-center gap-1 hover:bg-accent transition-colors">
-                                        Practice
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="m9 18 6-6-6-6" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                </div>
-            </main>
-        </main>
+<!-- ============================== HERO ============================== -->
+<section class="lp-hero">
+  <div class="lp-hero-bg" aria-hidden="true"></div>
+  <div class="lp-wrap lp-hero-in">
+    <div class="lp-hero-copy">
+      <span class="lp-pill"><span class="lp-dot"></span>Computer-delivered IELTS practice</span>
+      <h1>Get exam-ready on the screen you'll <span class="lp-hl">sit IELTS on</span>.</h1>
+      <p class="lp-lead">Full Listening, Reading, Writing and Speaking tests, timed like the computer exam. Your bands are marked on our server, and your Writing and Speaking get AI feedback on the four criteria.</p>
+      <div class="lp-cta">
+        <a class="lp-btn lp-btn-primary lp-btn-lg" data-auth="register" href="/login?mode=register&amp;next=%2Fdashboard">Create a free account<svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a class="lp-btn lp-btn-outline lp-btn-lg" data-auth="login" href="/login?next=%2Fdashboard">Sign in</a>
+      </div>
+      <ul class="lp-ticks">
+        <li><svg class="ic"><use href="#i-check"/></svg>Free to start</li>
+        <li><svg class="ic"><use href="#i-check"/></svg>No card needed</li>
+        <li><svg class="ic"><use href="#i-check"/></svg>Results saved to your account</li>
+      </ul>
     </div>
 
-    <!-- ==== -->
-    <!-- SIDEBAR LOADER — uses new modern sidebar as fallback          -->
-    <!-- ==== -->
-<script src="assets/js/sidebar-links.js"></script>
-    <script src="assets/js/app.js" data-page-script></script>
+    <!-- a picture of the dashboard, drawn with the same cards as the real one -->
+    <div class="lp-hero-art" aria-hidden="true">
+      <div class="lp-window">
+        <div class="lp-window-bar"><i></i><i></i><i></i><span>ielts-x.uz/dashboard</span></div>
+        <div class="lp-window-body">
+          <div class="lp-mini-side">
+            <div class="lp-mini-brand"><img src="/icon.png" alt="" width="18" height="18"><b>IELTSX</b></div>
+            <p>Full Tests</p>
+            <span class="on"><svg class="ic"><use href="#i-headphones"/></svg>Listening</span>
+            <span><svg class="ic"><use href="#i-book"/></svg>Reading</span>
+            <span><svg class="ic"><use href="#i-pencil"/></svg>Writing</span>
+            <span><svg class="ic"><use href="#i-mic"/></svg>Speaking</span>
+            <p>Collections</p>
+            <span><svg class="ic"><use href="#i-target"/></svg>Predictions</span>
+            <span><svg class="ic"><use href="#i-monitor"/></svg>Mock Tests</span>
+          </div>
+          <div class="lp-mini-main">
+            <b class="lp-mini-h">Test Packs</b>
+            <div class="lp-mini-grid">
+              <div class="lp-mini-card"><div><b>Listening</b><svg class="ic c-listen"><use href="#i-headphones"/></svg></div><small>Complete listening test with full timing.</small><em><svg class="ic"><use href="#i-clock"/></svg>30 min</em></div>
+              <div class="lp-mini-card"><div><b>Reading</b><svg class="ic c-read"><use href="#i-book"/></svg></div><small>Practice reading passages and questions.</small><em><svg class="ic"><use href="#i-clock"/></svg>60 min</em></div>
+              <div class="lp-mini-card"><div><b>Writing</b><svg class="ic c-write"><use href="#i-pencil"/></svg></div><small>Improve your writing with timed tasks.</small><em><svg class="ic"><use href="#i-clock"/></svg>60 min</em></div>
+              <div class="lp-mini-card"><div><b>Speaking</b><svg class="ic c-speak"><use href="#i-mic"/></svg></div><small>Practice speaking with timed parts.</small><em><svg class="ic"><use href="#i-clock"/></svg>15 min</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lp-float lp-float-band">
+        <div class="lp-float-h"><svg class="ic"><use href="#i-award"/></svg>Band report <small>sample</small></div>
+        <div class="lp-band-row"><span>Listening</span><i style="--w:83%"></i><b>7.5</b></div>
+        <div class="lp-band-row"><span>Reading</span><i style="--w:78%"></i><b>7.0</b></div>
+        <div class="lp-band-row"><span>Writing</span><i style="--w:72%"></i><b>6.5</b></div>
+        <div class="lp-band-row"><span>Speaking</span><i style="--w:78%"></i><b>7.0</b></div>
+        <div class="lp-band-total"><span>Overall</span><b>7.0</b></div>
+      </div>
+      <div class="lp-float lp-float-ai"><svg class="ic"><use href="#i-sparkles"/></svg><div><b>AI feedback ready</b><small>Task 2 · four criteria</small></div></div>
+    </div>
+  </div>
+</section>
 
-    <!-- ==== -->
-    <!-- SCRIPTS: dropdown + other functionality                      -->
-    <!-- ==== -->
+<!-- ============================== FACTS ============================== -->
+<section class="lp-facts" aria-label="What you get">
+  <div class="lp-wrap lp-facts-in">
+    <div><b>4</b><span>skills: Listening, Reading, Writing, Speaking</span></div>
+    <div><b>2 h 40 min</b><span>full mock test in one sitting</span></div>
+    <div><b>2 modes</b><span>Real exam or Practice</span></div>
+    <div><b>AI</b><span>feedback for Writing and Speaking</span></div>
+  </div>
+</section>
 
-    <script type="module" src="site-access.js"></script>
+<!-- ============================== SKILLS ============================== -->
+<section class="lp-section" id="skills">
+  <div class="lp-wrap">
+    <div class="lp-head lp-reveal">
+      <span class="lp-eyebrow">Four skills</span>
+      <h2>Every part of the test, in one place</h2>
+      <p>Take a full test when you want the real thing, or practise one part at a time when you want to fix a weak spot.</p>
+    </div>
+    <div class="lp-skills">
+      <article class="lp-card lp-skill lp-reveal" style="--c:var(--lp-listen)">
+        <div class="lp-skill-top"><span class="lp-skill-ic"><svg class="ic"><use href="#i-headphones"/></svg></span><span class="lp-chip"><svg class="ic"><use href="#i-clock"/></svg>30 min</span></div>
+        <h3>Listening</h3>
+        <p>Four parts and 40 questions with the recording played once, just like on test day.</p>
+        <ul><li>Full tests with transcripts</li><li>Practice part by part: forms, maps, multiple choice</li></ul>
+      </article>
+      <article class="lp-card lp-skill lp-reveal" style="--c:var(--lp-read)">
+        <div class="lp-skill-top"><span class="lp-skill-ic"><svg class="ic"><use href="#i-book"/></svg></span><span class="lp-chip"><svg class="ic"><use href="#i-clock"/></svg>60 min</span></div>
+        <h3>Reading</h3>
+        <p>Three passages and 40 questions in the split-screen layout of the computer exam.</p>
+        <ul><li>Answer locations and explanations</li><li>Vocabulary from every passage</li></ul>
+      </article>
+      <article class="lp-card lp-skill lp-reveal" style="--c:var(--lp-write)">
+        <div class="lp-skill-top"><span class="lp-skill-ic"><svg class="ic"><use href="#i-pencil"/></svg></span><span class="lp-chip"><svg class="ic"><use href="#i-clock"/></svg>60 min</span></div>
+        <h3>Writing</h3>
+        <p>Task 1 and Task 2 with a live word counter, then a band for each of the four criteria.</p>
+        <ul><li>Charts, graphs, diagrams and essays</li><li>AI feedback on your own answer</li></ul>
+      </article>
+      <article class="lp-card lp-skill lp-reveal" style="--c:var(--lp-speak)">
+        <div class="lp-skill-top"><span class="lp-skill-ic"><svg class="ic"><use href="#i-mic"/></svg></span><span class="lp-chip"><svg class="ic"><use href="#i-clock"/></svg>15 min</span></div>
+        <h3>Speaking</h3>
+        <p>Parts 1, 2 and 3 with timers, so you get used to speaking against the clock.</p>
+        <ul><li>Topics with model answers</li><li>AI feedback on your recording</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
 
-    <a hidden data-admin-only href="/admin" class="sidebar-link" data-admin-link><span aria-hidden="true">⚙</span><span class="flex-1">Admin Panel</span></a>
-    <script src="assets/unlock-cards.js"></script>
+<!-- ============================== MOCK ============================== -->
+<section class="lp-section lp-mock" id="mock">
+  <div class="lp-wrap lp-mock-in">
+    <div class="lp-mock-copy lp-reveal">
+      <span class="lp-eyebrow lp-eyebrow-light">Full mock test</span>
+      <h2>The whole exam in one sitting</h2>
+      <p>Listening, Reading and Writing back to back in full screen, with a guide video before each paper. Every attempt gets new papers.</p>
+      <div class="lp-modes">
+        <div class="lp-mode"><svg class="ic"><use href="#i-shield"/></svg><div><b>Real exam mode</b><span>No submit button. Each paper ends by itself when its time is up.</span></div></div>
+        <div class="lp-mode"><svg class="ic"><use href="#i-list"/></svg><div><b>Practice mode</b><span>Submit each paper yourself whenever you are ready.</span></div></div>
+      </div>
+      <a class="lp-btn lp-btn-light lp-btn-lg" data-auth="login" data-next="/Mock%20tests" href="/login?next=%2FMock%2520tests">Try a mock test<svg class="ic"><use href="#i-arrow"/></svg></a>
+    </div>
+    <ol class="lp-timeline lp-reveal">
+      <li style="--c:var(--lp-listen)"><span class="lp-tl-ic"><svg class="ic"><use href="#i-headphones"/></svg></span><div><b>Listening</b><span>4 parts · 40 questions</span></div><em>40 min</em></li>
+      <li style="--c:var(--lp-read)"><span class="lp-tl-ic"><svg class="ic"><use href="#i-book"/></svg></span><div><b>Reading</b><span>3 passages · 40 questions</span></div><em>60 min</em></li>
+      <li style="--c:var(--lp-write)"><span class="lp-tl-ic"><svg class="ic"><use href="#i-pencil"/></svg></span><div><b>Writing</b><span>Task 1 + Task 2</span></div><em>60 min</em></li>
+      <li style="--c:#fbbf24"><span class="lp-tl-ic"><svg class="ic"><use href="#i-award"/></svg></span><div><b>Your bands</b><span>Listening and Reading at once, Writing with AI feedback</span></div><em>instant</em></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== HOW ============================== -->
+<section class="lp-section" id="how">
+  <div class="lp-wrap">
+    <div class="lp-head lp-reveal">
+      <span class="lp-eyebrow">How it works</span>
+      <h2>From sign-up to your band in three steps</h2>
+    </div>
+    <ol class="lp-steps">
+      <li class="lp-card lp-reveal"><span class="lp-step-n">1</span><svg class="ic lp-step-ic"><use href="#i-user"/></svg><h3>Create your account</h3><p>Sign up with your e-mail or Google. Your results stay with your account on every device.</p></li>
+      <li class="lp-card lp-reveal"><span class="lp-step-n">2</span><svg class="ic lp-step-ic"><use href="#i-monitor"/></svg><h3>Pick a test</h3><p>Start with a single part, a full test of one skill, or the full mock test.</p></li>
+      <li class="lp-card lp-reveal"><span class="lp-step-n">3</span><svg class="ic lp-step-ic"><use href="#i-trend"/></svg><h3>Get your band and improve</h3><p>Review every mistake with explanations, and follow your progress on the Performance page.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== TOOLS ============================== -->
+<section class="lp-section lp-section-muted" id="tools">
+  <div class="lp-wrap">
+    <div class="lp-head lp-reveal">
+      <span class="lp-eyebrow">Study tools</span>
+      <h2>Everything around the tests, too</h2>
+    </div>
+    <div class="lp-tools">
+      <div class="lp-tool lp-reveal"><span><svg class="ic"><use href="#i-target"/></svg></span><div><b>Predictions</b><p>Collections of the topics expected in coming exams.</p></div></div>
+      <div class="lp-tool lp-reveal"><span><svg class="ic"><use href="#i-trend"/></svg></span><div><b>Performance</b><p>Your bands over time and your weak question types.</p></div></div>
+      <div class="lp-tool lp-reveal"><span><svg class="ic"><use href="#i-vocab"/></svg></span><div><b>Vocabulary</b><p>Word lists with a study mode to learn them.</p></div></div>
+      <div class="lp-tool lp-reveal"><span><svg class="ic"><use href="#i-file"/></svg></span><div><b>PDF materials</b><p>Study materials to download as PDF files.</p></div></div>
+      <div class="lp-tool lp-reveal"><span><svg class="ic"><use href="#i-news"/></svg></span><div><b>Articles</b><p>Weekly reading lists to build your vocabulary.</p></div></div>
+      <div class="lp-tool lp-reveal"><span><svg class="ic"><use href="#i-game"/></svg></span><div><b>Live quiz game</b><p>Quiz games to play live with your class.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PRICING ============================== -->
+<section class="lp-section" id="pricing">
+  <div class="lp-wrap">
+    <div class="lp-head lp-reveal">
+      <span class="lp-eyebrow">Pricing</span>
+      <h2>Start free, upgrade when you're ready</h2>
+      <p>The free plan opens the sample tests. A paid plan opens the full library, the mock tests and AI feedback.</p>
+    </div>
+    <!-- filled from /api/plans by landing.js; this card stays if the plans cannot be loaded -->
+    <div class="lp-plans" id="lp-plans">
+      <div class="lp-card lp-plan lp-reveal">
+        <div class="lp-plan-h"><b>Free</b></div>
+        <div class="lp-price"><b>0</b><span>UZS</span></div>
+        <ul><li><svg class="ic"><use href="#i-check"/></svg>Free sample tests</li><li><svg class="ic"><use href="#i-check"/></svg>Results saved to your account</li></ul>
+        <a class="lp-btn lp-btn-outline" data-auth="register" href="/login?mode=register&amp;next=%2Fdashboard">Create account</a>
+      </div>
+    </div>
+    <p class="lp-plans-more"><a href="/Price">Compare all plans<svg class="ic"><use href="#i-chev"/></svg></a></p>
+  </div>
+</section>
+
+<!-- ============================== FAQ ============================== -->
+<section class="lp-section lp-section-muted" id="faq">
+  <div class="lp-wrap lp-faq-in">
+    <div class="lp-head lp-head-left lp-reveal">
+      <span class="lp-eyebrow">FAQ</span>
+      <h2>Questions, answered</h2>
+      <p>Something else? Sign in and use <b>Report Issue</b> inside any test.</p>
+    </div>
+    <div class="lp-faq lp-reveal">
+      <details><summary>Is IELTS-X free?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Yes, you can create an account and take the free tests without paying. The full library, the mock tests and AI feedback come with a Standard, Max or Ultra plan.</p></details>
+      <details><summary>How is my band worked out?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Listening and Reading are marked again against the answer key on our server, so the band you see is the band that is saved. Writing and Speaking get a band and feedback on each of the four criteria from our AI examiner.</p></details>
+      <details><summary>What is the difference between Real exam and Practice mode?<svg class="ic"><use href="#i-plus"/></svg></summary><p>In Real exam mode there is no submit button: each paper ends when its time is up, like on test day. In Practice mode you can submit each paper yourself before the time runs out.</p></details>
+      <details><summary>Can I use it on my phone?<svg class="ic"><use href="#i-plus"/></svg></summary><p>The practice pages work on a phone. For the full mock test use a computer: it runs in full screen, the way the computer-delivered exam does.</p></details>
+      <details><summary>Will my results be saved?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Yes. Every band is saved to your account and shows on your Performance page, so you can see how you improve.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CTA ============================== -->
+<section class="lp-final">
+  <div class="lp-wrap lp-final-in lp-reveal">
+    <h2>Ready for your next practice test?</h2>
+    <p>Create a free account and take your first test today.</p>
+    <div class="lp-cta lp-cta-center">
+      <a class="lp-btn lp-btn-light lp-btn-lg" data-auth="register" href="/login?mode=register&amp;next=%2Fdashboard">Get started free<svg class="ic"><use href="#i-arrow"/></svg></a>
+      <a class="lp-btn lp-btn-glass lp-btn-lg" data-auth="login" href="/login?next=%2Fdashboard">I already have an account</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="lp-foot">
+  <div class="lp-wrap lp-foot-in">
+    <div class="lp-foot-brand">
+      <a class="lp-brand" href="/"><img src="/icon.png" alt="" width="28" height="28"><span>IELTS-X</span></a>
+      <p>Online IELTS preparation: practice tests, full mock exams and AI feedback for Writing and Speaking.</p>
+    </div>
+    <nav class="lp-foot-links" aria-label="Footer">
+      <div><b>Practice</b><a href="/part/practice/listening">Listening</a><a href="/part/practice/reading">Reading</a><a href="/part/practice/writing">Writing</a><a href="/part/practice/speaking">Speaking</a></div>
+      <div><b>IELTS-X</b><a href="/Mock%20tests">Mock tests</a><a href="/Predictions">Predictions</a><a href="/Price">Pricing</a><a data-auth="login" href="/login?next=%2Fdashboard">Sign in</a></div>
+      <div><b>Legal</b><a href="/terms-of-service">Terms of Service</a><a href="/privacy-policy">Privacy Policy</a></div>
+    </nav>
+  </div>
+  <div class="lp-wrap lp-foot-legal">
+    <span>&copy; <span id="lp-year">2026</span> IELTS-X</span>
+    <span>IELTS is a registered trademark of the University of Cambridge, the British Council and IDP Education. IELTS-X is not affiliated with them.</span>
+  </div>
+</footer>
+
 </body>
-
 </html>
-
-

@@ -46,6 +46,48 @@
   window.MockBridge = MockBridge;
   if (!embedded) return;
 
+  /* ---------- one look with Writing: the shared frame of css/exam-unify.css ---------- */
+  try {
+    var css = document.createElement('link'); css.rel = 'stylesheet';
+    css.href = location.protocol === 'file:' ? 'css/exam-unify.css' : '/full-mock/css/exam-unify.css';
+    document.head.appendChild(css);
+  } catch (e) { /* the paper keeps its own header */ }
+  var NAMES = { listening: 'Listening', reading: 'Reading', writing: 'Writing' };
+  function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  /* "Reading test | Candidate" in place of the paper's own title, and Listening — Reading — Writing in the middle */
+  /* some papers draw their header only once the test starts, and a paper may draw it again: wait for it, keep it */
+  var unifyObs = null;
+  function unifyHeader(m, review) {
+    if (!NAMES[m.k]) return;
+    var tries = 0;
+    (function attempt() { if (!applyHeader(m, review) && ++tries < 150) setTimeout(attempt, 100); })();
+    if (!unifyObs && window.MutationObserver) {
+      unifyObs = new MutationObserver(function () { if (document.getElementById('hdr') && !document.getElementById('mk-title')) applyHeader(m, review); });
+      unifyObs.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+  function applyHeader(m, review) {
+    var hdr = document.getElementById('hdr'), k = m.k;
+    if (!hdr) return false;
+    document.documentElement.classList.add('mk-unified');
+    var own = document.getElementById('hdr-title') || document.getElementById('hdr-name');
+    var title = document.getElementById('mk-title');
+    if (!title && own && own.parentNode) {
+      title = document.createElement('div'); title.id = 'mk-title'; title.className = own.className + ' mk-title';
+      own.parentNode.insertBefore(title, own);
+    }
+    if (title) title.innerHTML = escHtml(NAMES[k] + (review ? ' review' : ' test')) + (m.name ? '<span class="mk-who">' + escHtml(m.name) + '</span>' : '');
+    if (review || document.getElementById('mk-steps')) return !!title;
+    var done = m.done || {}, html = '';
+    ['listening', 'reading', 'writing'].forEach(function (s, i) {
+      var cls = done[s] ? 'done' : (s === k ? 'cur' : '');
+      html += '<li class="' + cls + '"><i><b>' + (i + 1) + '</b></i><span>' + NAMES[s] + '</span></li>';
+    });
+    var ol = document.createElement('ol'); ol.id = 'mk-steps'; ol.className = 'mk-steps'; ol.setAttribute('aria-label', 'Mock test progress');
+    ol.innerHTML = html; hdr.appendChild(ol);
+    return !!title;
+  }
+
   /* ---------- the shell keeps the browser in full screen from login to result ---------- */
   try {
     var keep = function () { return Promise.resolve(); };
@@ -83,10 +125,12 @@
     if (m.type === 'start') {
       applyMode(m.mode);
       if (typeof window.__mockStart === 'function') window.__mockStart(m.name);
+      try { unifyHeader(m, false); } catch (e) { /* the paper keeps its own header */ }
     }
     if (m.type === 'review') {
       applyMode('practice');
       if (typeof window.__mockReview === 'function') window.__mockReview(m.name, m.ans);
+      try { unifyHeader(m, true); } catch (e) { /* the paper keeps its own header */ }
     }
   });
 

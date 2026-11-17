@@ -11,7 +11,8 @@ import {
 
 const $ = (sel) => document.querySelector(sel);
 const params = new URLSearchParams(location.search);
-const next = safeNext(params.get('next'));
+// after signing in: the page that sent the visitor here, or the dashboard (the landing page '/' sends signed-in visitors there too)
+const next = ((n) => (n === '/' ? '/dashboard' : n))(safeNext(params.get('next'), '/dashboard'));
 
 const form = $('#auth-form'), nameField = $('#name-field'), nameInput = $('#name');
 const emailInput = $('#email'), passwordInput = $('#password');

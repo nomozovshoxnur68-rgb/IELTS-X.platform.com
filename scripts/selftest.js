@@ -389,7 +389,8 @@ server.listen(0, async () => {
       const TEST = /^(full-tests\/[^/]+\/test-|pessages?\/|sections\/|full-mock\/|exam\/|writing\/|listening\/|test\.html$|game|speaking|reading with Answers\/)/i;
       const withDesign = pages.filter((p) => fs.readFileSync(path.join(ROOT, p), 'utf8').includes('site-design.js'));
       const onTests = withDesign.filter((p) => TEST.test(p)); assert.deepEqual(onTests, [], 'no test page loads the design');
-      for (const p of ['index.html', 'settings.html', 'Predictions.html', 'Mock tests.html', 'Price.html', 'account.html', 'vocabulary.html', 'part/practice/reading.html', 'full-tests/reading/index.html', 'study/Tools/Articles.html', 'study/Tools/Performance.html', 'study/Tools/Pdf materials.html'])
+      // the dashboard (dashboard.html) carries the design; the landing page (index.html) keeps its own look
+      for (const p of ['dashboard.html', 'settings.html', 'Predictions.html', 'Mock tests.html', 'Price.html', 'account.html', 'vocabulary.html', 'part/practice/reading.html', 'full-tests/reading/index.html', 'study/Tools/Articles.html', 'study/Tools/Performance.html', 'study/Tools/Pdf materials.html'])
         assert.ok(withDesign.includes(p), p + ' loads the design');
       ok('the design is on ' + withDesign.length + ' ordinary pages and on no test or exam page');
     }

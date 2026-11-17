@@ -249,7 +249,7 @@
     function renderList(packs) {
         var groups = groupPacks(packs);
         var total = packs.length;
-        setCrumbs([{ label: 'Home', href: '/' }, { label: info.crumb }]);
+        setCrumbs([{ label: 'Home', href: '/dashboard' }, { label: info.crumb }]);
         root.innerHTML =
             '<div class="ft-wrap">' +
             '<div class="ft-title"><span class="ft-icon ft-' + info.color + '">' + ICON.skill(24) + '</span>' +
@@ -303,12 +303,12 @@
     function renderPack(packs) {
         var pack = packs.filter(function (p) { return p.slug === packSlug || slugify(p.title) === packSlug; })[0];
         if (!pack) {
-            setCrumbs([{ label: 'Home', href: '/' }, { label: info.crumb, href: '/full-tests/' + SKILL + '/' }, { label: 'Not found' }]);
+            setCrumbs([{ label: 'Home', href: '/dashboard' }, { label: info.crumb, href: '/full-tests/' + SKILL + '/' }, { label: 'Not found' }]);
             root.innerHTML = '<div class="ft-wrap">' + notFound('This pack does not exist.', '/full-tests/' + SKILL + '/') + '</div>';
             return;
         }
         document.title = 'IELTSX — ' + pack.title + ' · ' + info.crumb;
-        setCrumbs([{ label: 'Home', href: '/' }, { label: info.crumb, href: '/full-tests/' + SKILL + '/' }, { label: pack.title }]);
+        setCrumbs([{ label: 'Home', href: '/dashboard' }, { label: info.crumb, href: '/full-tests/' + SKILL + '/' }, { label: pack.title }]);
 
         var done = doneSet();
         pack.tests.forEach(function (t) { t.done = isDone(t, done); });
