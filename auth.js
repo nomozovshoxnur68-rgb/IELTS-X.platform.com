@@ -60,6 +60,7 @@ export function removeKnownAccount(uid) {
 /* the lists of tests kept by the pages (assets/js/app.js, cachedJson) say which cards this account may open: drop them when the account changes */
 function forgetPageCopies() {
   try { for (let i = sessionStorage.length - 1; i >= 0; i--) { const k = sessionStorage.key(i); if (k && k.startsWith('ix-cache:')) sessionStorage.removeItem(k); } } catch (e) { /* blocked */ }
+  try { localStorage.removeItem('ix-sidebar-cfg'); } catch (e) { /* blocked */ }   // the menu of the last account (assets/js/sidebar-links.js)
 }
 
 /* ---- session ---- */

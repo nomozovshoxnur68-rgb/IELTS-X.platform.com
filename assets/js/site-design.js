@@ -598,7 +598,9 @@
     /* ───────── the "Settings" item of the sidebar (under Study Tools, on every page that loads this file) ───────── */
     var GEAR = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
     function addSettingsLink() {
-        var href = (window.IELTSXLinks && window.IELTSXLinks.links && window.IELTSXLinks.links.settings) || '/settings';
+        // a menu made in Admin → Sidebar has its own Settings item (or hides it on purpose): sidebar-links.js draws it
+        if (window.IELTSXLinks && window.IELTSXLinks.managed) return;
+        var href =(window.IELTSXLinks && window.IELTSXLinks.links && window.IELTSXLinks.links.settings) || '/settings';
         var here = /^\/settings(\.html)?\/?$/i.test(location.pathname);
         var labels = doc.querySelectorAll('[data-sidebar="group-label"], .group-label');
         for (var i = 0; i < labels.length; i++) {

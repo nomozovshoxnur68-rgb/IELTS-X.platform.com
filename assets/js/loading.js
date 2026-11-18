@@ -41,6 +41,54 @@
         var pc = JSON.parse(localStorage.getItem('ix-promo') || 'null');
         if (pc && pc.code && (!pc.endsAt || Date.parse(pc.endsAt) > Date.now())) document.documentElement.classList.add('ix-promo-on');
     } catch (e) { /* blocked: promo.js decides after its check */ }
+    /* errors in the visitor's browser go to Admin → Site Guard (POST /api/client-errors, site-watch.js): a script that
+       fails, a promise nobody caught, a picture / script / style of this site that does not load. At most five per page,
+       only this site's own files (not browser extensions or other sites), and nothing about the person. */
+    (function () {
+        var sent = 0, seen = {};
+        function report(o) {
+            if (sent >= 5 || !window.fetch && !navigator.sendBeacon) return;
+            var key = o.kind + '|' + o.message + '|' + (o.source || '') + '|' + (o.line || 0);
+            if (seen[key]) return; seen[key] = 1; sent++;
+            try {
+                var body = JSON.stringify({ kind: o.kind, message: String(o.message || '').slice(0, 300), source: String(o.source || '').slice(0, 300), line: o.line || 0, col: o.col || 0,
+                    stack: String(o.stack || '').slice(0, 1500), page: location.pathname });
+                if (navigator.sendBeacon) navigator.sendBeacon('/api/client-errors', new Blob([body], { type: 'application/json' }));
+                else fetch('/api/client-errors', { method: 'POST', body: body, headers: { 'content-type': 'application/json' }, keepalive: true, credentials: 'same-origin' });
+            } catch (e) { /* never break the page */ }
+        }
+        var own = function (u) { return !!u && String(u).indexOf(location.origin + '/') === 0; };
+        window.addEventListener('error', function (e) {
+            var t = e.target;
+            if (t && t !== window && t.tagName) {   // a file that did not load
+                var u = t.currentSrc || t.src || t.href || '';
+                if (own(u) && /^(IMG|SCRIPT|LINK|AUDIO|VIDEO|SOURCE)$/.test(t.tagName)) report({ kind: 'resource', message: t.tagName.toLowerCase() + ' did not load', source: u.split(/[?#]/)[0] });
+                return;
+            }
+            if (!e.message || /^Script error\.?$/i.test(e.message) || (e.filename && !own(e.filename))) return;
+            report({ kind: 'error', message: e.message, source: (e.filename || '').split(/[?#]/)[0], line: e.lineno, col: e.colno, stack: e.error && e.error.stack });
+        }, true);
+        window.addEventListener('unhandledrejection', function (e) {
+            var r = e.reason, m = r && (r.message || (typeof r === 'string' ? r : ''));
+            if (!m || /AbortError|aborted|NetworkError|Failed to fetch|Load failed/i.test(m + ' ' + (r && r.name))) return;   // a request the visitor's network cut, or the page left
+            if (r && r.stack && /extension:\/\//.test(r.stack)) return;
+            report({ kind: 'promise', message: m, stack: r && r.stack });
+        });
+    })();
+    // the menu made in Admin → Sidebar (assets/js/sidebar-links.js): the items it left out are hidden from the first paint
+    try {
+        var sb = JSON.parse(localStorage.getItem('ix-sidebar-cfg') || 'null');
+        if (sb && sb.managed && sb.items) {
+            var keep = {}; for (var si = 0; si < sb.items.length; si++) keep[sb.items[si].key] = 1;
+            var gone = ['listening', 'reading', 'writing', 'speaking', 'listening-sections', 'reading-passages', 'writing-tasks', 'speaking-topics', 'predictions', 'mock-tests', 'game', 'performance', 'pdf-materials', 'articles', 'vocabulary', 'settings']
+                .filter(function (k) { return !keep[k]; });
+            if (gone.length) {
+                var pre = document.createElement('style'); pre.id = 'ix-sb-pre';
+                pre.textContent = gone.map(function (k) { return '[data-sidebar="content"] li:has(> a[data-link="' + k + '"])'; }).join(',') + '{display:none!important}';
+                (document.head || document.documentElement).appendChild(pre);
+            }
+        }
+    } catch (e) { /* blocked: sidebar-links.js draws the menu */ }
 
     var bar = null, fill = null, busy = 0, width = 0, tick = null, hideT = null, showT = null;
     function el() {

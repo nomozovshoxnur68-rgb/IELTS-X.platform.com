@@ -1661,6 +1661,90 @@ server.listen(0, async () => {
       assert.equal((await call('GET', '/api/predictions/' + maxId, { jar: boss })).status, 404, 'deleted');
       assert.equal((await call('GET', '/Predictions')).status, 200);
       ok('predictions: admin only, links checked, locked by plan on the server (no questions sent), drafts hidden, edit, order, publish, delete');
+      // where and when an item came up in the real exam
+      r = await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'Speaking Nov', skill: 'speaking', plan: 'free', items: [
+        { kind: 'question', part: 'Part 1', text: 'Do you like rain?', date: '12.11.2026', place: 'Tashkent, IDP', module: 'academic', format: 'computer', seen: '7', note: 'asked twice' },
+        { kind: 'question', part: 'Part 2', text: 'Describe a park.', date: '2026-02-30', place: 'Samarkand', module: 'sometimes', format: 'x', seen: -3 }] } } });
+      assert.equal(r.status, 201); const nov = r.json.collection;
+      assert.deepEqual([nov.items[0].date, nov.items[0].place, nov.items[0].module, nov.items[0].format, nov.items[0].seen], ['2026-11-12', 'Tashkent, IDP', 'academic', 'computer', 7], 'a typed date is understood');
+      assert.deepEqual([nov.items[1].date, nov.items[1].module, nov.items[1].format, nov.items[1].seen], ['', '', '', 0], 'a day that does not exist and unknown values are dropped');
+      r = await call('GET', '/api/predictions'); const novL = r.json.collections.find((c) => c.id === nov.id);
+      assert.equal(novL.lastSeen, '2026-11-12'); assert.deepEqual(novL.places.slice().sort(), ['Samarkand', 'Tashkent, IDP']);
+      r = await call('GET', '/api/predictions/' + nov.id); assert.equal(r.json.collection.items[0].note, 'asked twice');
+      await call('DELETE', '/api/admin/predictions/' + nov.id, { jar: boss });
+      ok('predictions: the day, the place, Academic / General, computer / paper and how often each question was reported');
+    }
+
+    // --- the sidebar of every page, managed in the admin panel (sidebar.js)
+    {
+      assert.ok([403, 404].includes((await call('GET', '/sidebar.js')).status), 'the server module is private');
+      let r = await call('GET', '/api/sidebar'); assert.equal(r.status, 200); assert.equal(r.json.managed, false, 'nothing saved: the pages keep their own menu');
+      assert.ok(r.json.items.some((i) => i.key === 'predictions') && r.json.items.length === 16);
+      assert.equal((await call('GET', '/api/admin/sidebar')).status, 401); assert.equal((await call('GET', '/api/admin/sidebar', { jar: user })).status, 403);
+      const sb = (await call('GET', '/api/admin/sidebar', { jar: boss })).json.sidebar;
+      sb.groups.push({ id: 'g-0a1b2c3d', title: 'Courses' });
+      sb.items.find((i) => i.key === 'game').visible = 'hidden';
+      Object.assign(sb.items.find((i) => i.key === 'predictions'), { access: 'locked', plan: 'max', label: 'Exam Predictions' });
+      sb.items.find((i) => i.key === 'vocabulary').visible = 'signed-in';
+      sb.items.push({ key: 'c-00aa11bb', label: 'IELTS Course', href: '/Price', icon: 'graduation', group: 'g-0a1b2c3d', visible: 'all', access: 'free', badge: 'new' });
+      sb.items.push({ key: 'c-00aa22cc', label: 'Team notes', href: '/admin', icon: 'lock', group: 'g-0a1b2c3d', visible: 'admins' });
+      assert.equal((await call('POST', '/api/admin/sidebar', { jar: boss, body: { groups: sb.groups, items: sb.items.concat([{ key: 'c-00aa33dd', label: 'Bad', href: 'javascript:alert(1)', group: 'tools' }]) } })).status, 400, 'a link must be a page of the site or https');
+      r = await call('POST', '/api/admin/sidebar', { jar: boss, body: { groups: sb.groups, items: sb.items } }); assert.equal(r.status, 200, JSON.stringify(r.json));
+      const guest = (await call('GET', '/api/sidebar')).json, free = (await call('GET', '/api/sidebar', { jar: user })).json, adm = (await call('GET', '/api/sidebar', { jar: boss })).json;
+      const has = (d, k) => d.items.some((i) => i.key === k); const it = (d, k) => d.items.find((i) => i.key === k);
+      assert.ok(guest.managed && !has(guest, 'game') && !has(adm, 'game'), 'a hidden item is sent to nobody');
+      assert.ok(!has(guest, 'vocabulary') && has(free, 'vocabulary'), 'signed-in only');
+      assert.ok(!has(guest, 'c-00aa22cc') && !has(free, 'c-00aa22cc') && has(adm, 'c-00aa22cc'), 'admins only');
+      assert.ok(it(free, 'predictions').locked && it(free, 'predictions').plan === 'max' && !it(adm, 'predictions').locked, 'locked for a Free student, open for an admin');
+      assert.equal(it(guest, 'predictions').label, 'Exam Predictions'); assert.equal(it(guest, 'c-00aa11bb').badge, 'new');
+      assert.ok(guest.groups.some((g) => g.title === 'Courses'));
+      r = await call('POST', '/api/admin/sidebar/reset', { jar: boss }); assert.equal(r.status, 200);
+      assert.equal((await call('GET', '/api/sidebar')).json.managed, false, 'reset: back to the menu of the pages');
+      const sl = fs.readFileSync(path.join(__dirname, '..', 'assets/js/sidebar-links.js'), 'utf8');
+      assert.ok(sl.includes("'/api/sidebar'") && sl.includes('ix-sidebar-cfg') && fs.readFileSync(path.join(__dirname, '..', 'auth.js'), 'utf8').includes("removeItem('ix-sidebar-cfg')"), 'the pages draw it, and forget it when the account changes');
+      ok('sidebar: admin only, groups, new items, hidden / signed-in / admins only, free / locked by plan (worked out per visitor on the server), safe links, reset');
+    }
+
+    // --- Site Guard (site-watch.js): checks, browser errors, changes, notifications settings, cron
+    {
+      assert.ok([403, 404].includes((await call('GET', '/site-watch.js')).status), 'the server module is private');
+      assert.equal((await call('GET', '/api/admin/guard')).status, 401); assert.equal((await call('GET', '/api/admin/guard', { jar: user })).status, 403);
+      let r = await call('POST', '/api/client-errors', { body: { kind: 'error', message: 'Uncaught TypeError: x is null', source: base + '/assets/js/app.js?v=1', line: 10, page: '/dashboard?x=1' } });
+      assert.equal(r.status, 204);
+      await call('POST', '/api/client-errors', { body: { kind: 'error', message: 'Uncaught TypeError: x is null', source: base + '/assets/js/app.js?v=2', line: 10, page: '/Predictions' } });
+      await call('POST', '/api/client-errors', { body: { kind: 'error', message: 'Script error.' } });
+      await call('POST', '/api/client-errors', { body: { kind: 'error', message: 'boom', source: 'chrome-extension://abc/x.js' } });
+      r = await call('GET', '/api/admin/guard', { jar: boss }); assert.equal(r.status, 200, JSON.stringify(r.json));
+      assert.equal(r.json.errors.length, 1, 'the same error is counted, not repeated; extensions and "Script error." are left out');
+      const g = r.json.errors[0]; assert.equal(g.count, 2); assert.deepEqual(g.pages, ['/dashboard', '/Predictions']); assert.ok(!g.source.includes('?'), 'no query strings kept');
+      assert.ok(r.json.last && r.json.last.score >= 0 && Array.isArray(r.json.last.probes), 'the first check runs when the panel opens');
+      assert.ok(r.json.last.issues.some((i) => i.area === 'Browser errors'), 'a browser error is a finding');
+      assert.ok(r.json.last.probes.length && r.json.last.probes.every((p) => p.ok), 'the live pages open: ' + JSON.stringify(r.json.last.probes.filter((p) => !p.ok)));
+      // a change of the site is listed at the next check
+      await call('POST', '/api/admin/predictions', { jar: boss, body: { collection: { title: 'Guard change', skill: 'reading', plan: 'free' } } });
+      r = await call('POST', '/api/admin/guard/run', { jar: boss }); assert.equal(r.status, 200);
+      assert.ok(r.json.last.changes.some((c) => /Predictions changed/.test(c.text)), 'what changed: ' + JSON.stringify(r.json.last.changes));
+      r = await call('POST', '/api/admin/guard/errors/' + g.id, { jar: boss, body: { status: 'fixed' } }); assert.equal(r.json.errors[0].status, 'fixed');
+      await call('POST', '/api/client-errors', { body: { kind: 'error', message: 'Uncaught TypeError: x is null', source: base + '/assets/js/app.js', line: 10, page: '/dashboard' } });
+      r = await call('GET', '/api/admin/guard', { jar: boss }); assert.equal(r.json.errors[0].status, 'open', 'it comes back: open again');
+      // settings: a bad token is refused, a good one is kept and never sent back in full
+      assert.equal((await call('POST', '/api/admin/guard/config', { jar: boss, body: { telegramToken: 'nope' } })).status, 400);
+      r = await call('POST', '/api/admin/guard/config', { jar: boss, body: { telegramToken: '123456789:AAH_abcdefghijklmnopqrstuvwxyz012', telegramChat: '-100123', intervalMin: 30, emails: 'a@b.uz, bad', lang: 'en' } });
+      assert.equal(r.status, 200); assert.ok(!r.text.includes('abcdefghijklmnop'), 'the token never goes back to the browser'); assert.equal(r.json.config.telegramToken, '••••••z012');
+      assert.equal(r.json.config.intervalMin, 30); assert.equal(r.json.config.emails, 'a@b.uz'); assert.ok(r.json.config.telegramReady);
+      r = await call('POST', '/api/admin/guard/config', { jar: boss, body: { telegramToken: '••••••z012', notifyTelegram: false } }); assert.ok(r.json.config.telegramReady, 'the masked copy does not replace the token');
+      // the cron address needs CRON_SECRET
+      assert.equal((await call('GET', '/api/cron/site-watch')).status, 503);
+      process.env.CRON_SECRET = 'cron-secret-1234567890';
+      assert.equal((await call('GET', '/api/cron/site-watch?key=wrong')).status, 401);
+      r = await call('GET', '/api/cron/site-watch', { headers: { authorization: 'Bearer cron-secret-1234567890' } }); assert.equal(r.status, 200); assert.ok(r.json.ok && typeof r.json.score === 'number');
+      delete process.env.CRON_SECRET;
+      const W = require('../site-watch');
+      const msg = W.messageOf({ lang: 'uz' }, { score: 50, issues: [], newIssues: [{ level: 'fail', title: 'Home does not open (500)', fix: 'Look at the log' }], resolved: [], fixes: ['Hidden x'], changes: [], ai: null }, 'new', 'https://ielts-x.uz');
+      assert.ok(msg.includes('Yangi muammo') && msg.includes('Home does not open') && msg.includes('https://ielts-x.uz/admin#guard'));
+      const lc = fs.readFileSync(path.join(__dirname, '..', 'assets/js/loading.js'), 'utf8'); assert.ok(lc.includes("'/api/client-errors'") && lc.includes('unhandledrejection'), 'every page reports its errors');
+      assert.ok(/"\/api\/cron\/site-watch"/.test(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8')), 'Vercel runs it every day');
+      ok('Site Guard: admin only, browser errors grouped (no extensions, no query strings, back when they return), live pages, what changed, settings with a hidden token, cron with CRON_SECRET, messages');
     }
 
     // --- mail over SMTP (Gmail app password), against a fake mail server on this computer

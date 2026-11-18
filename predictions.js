@@ -10,10 +10,15 @@
  *     skill  reading | listening | writing | speaking
  *     plan   free | standard | max | ultra  (who may open it; Free = everybody, even without an account)
  *     status updating (questions are still being added) | complete
- *   item: { id, kind, title, part, text, href, image, hot }
+ *   item: { id, kind, title, part, text, href, image, hot, date, place, module, format, seen, note }
  *     kind "test"     a link to a test of this website (href) — Reading and Listening
  *     kind "question" a question, cue card or task written out (text, optional picture) — Speaking and Writing
  *     hot  marked as "very likely" by the admin
+ *     where and when it came up in the real exam (all optional):
+ *       date    the exam day it was reported for (YYYY-MM-DD)
+ *       place   the city / country / test centre ("Tashkent, IDP")
+ *       module  academic | general       format  computer | paper
+ *       seen    how many times students reported it (a number)        note  a short remark ("asked as Part 3 too")
  *
  * The server decides access: a locked collection is listed with its name and size only, never with its questions or links.
  */
@@ -25,6 +30,16 @@ const PLANS = ['free', 'standard', 'max', 'ultra'];
 const LEVEL = { free: 0, standard: 1, max: 2, ultra: 3 };
 const STATUSES = ['updating', 'complete'];
 const KINDS = ['test', 'question'];
+const MODULES = ['academic', 'general'];
+const FORMATS = ['computer', 'paper'];
+/* a real calendar day between 2000 and next year, written YYYY-MM-DD (a date typed as 12.11.2026 or 12/11/2026 is understood) */
+function okDate(v) {
+  let s = String(v || '').trim(); if (!s) return '';
+  const m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/); if (m) s = m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return '';
+  const d = new Date(s + 'T00:00:00Z'); const y = d.getUTCFullYear();
+  return !isNaN(d) && d.toISOString().slice(0, 10) === s && y >= 2000 && y <= new Date().getUTCFullYear() + 1 ? s : '';
+}
 const MAX_COLLECTIONS = 120;
 const MAX_ITEMS = 400;
 
@@ -59,7 +74,10 @@ function cleanItem(it, skill) {
     title: oneLine(it.title, 160), part: oneLine(it.part, 24),
     text: kind === 'question' ? clean(it.text, 4000) : '',
     href: kind === 'test' ? okHref(it.href) : '',
-    image: okImage(it.image), hot: !!it.hot
+    image: okImage(it.image), hot: !!it.hot,
+    date: okDate(it.date), place: oneLine(it.place, 80),
+    module: MODULES.includes(it.module) ? it.module : '', format: FORMATS.includes(it.format) ? it.format : '',
+    seen: Math.max(0, Math.min(9999, parseInt(it.seen, 10) || 0)), note: oneLine(it.note, 160)
   };
   if (kind === 'test' && !out.href) return { error: `"${out.title || 'A test'}" needs a link (a page of this website, starting with /).` };
   if (!out.title && !out.text) return null;   // an empty row of the form
@@ -107,7 +125,11 @@ async function save(ctx, data) {
 
 const counts = (c) => {
   const items = c.items || [];
-  return { count: items.length, tests: items.filter((i) => i.kind === 'test').length, questions: items.filter((i) => i.kind === 'question').length, hot: items.filter((i) => i.hot).length };
+  const dates = items.map((i) => i.date).filter(Boolean).sort();
+  const places = new Map(); items.forEach((i) => { if (i.place) places.set(i.place, (places.get(i.place) || 0) + 1); });
+  return { count: items.length, tests: items.filter((i) => i.kind === 'test').length, questions: items.filter((i) => i.kind === 'question').length, hot: items.filter((i) => i.hot).length,
+    lastSeen: dates.length ? dates[dates.length - 1] : '', firstSeen: dates.length ? dates[0] : '',
+    places: [...places].sort((a, b) => b[1] - a[1]).map((x) => x[0]).slice(0, 6), reports: items.reduce((a, i) => a + (i.seen || 0), 0) };
 };
 /* what a visitor may see of a collection: the name and the size always; the questions and links only with the plan */
 function view(c, level, full) {
@@ -115,7 +137,7 @@ function view(c, level, full) {
   const out = { id: c.id, title: c.title, skill: c.skill, period: c.period || '', description: c.description || '', plan: c.plan, status: c.status,
     published: c.published !== false, updatedAt: c.updatedAt || null, locked, ...counts(c) };
   out.parts = [...new Set((c.items || []).map((i) => i.part).filter(Boolean))].slice(0, 12);
-  if (full && !locked) out.items = (c.items || []).map(({ id, kind, title, part, text, href, image, hot }) => ({ id, kind, title, part, text, href, image, hot }));
+  if (full && !locked) out.items = (c.items || []).map(({ id, kind, title, part, text, href, image, hot, date, place, module, format, seen, note }) => ({ id, kind, title, part, text, href, image, hot, date: date || '', place: place || '', module: module || '', format: format || '', seen: seen || 0, note: note || '' }));
   return out;
 }
 const priceLink = (c) => '/Price?premium=required&plan=' + encodeURIComponent(c.plan) + '&next=' + encodeURIComponent('/Predictions#' + c.id);
