@@ -153,6 +153,8 @@ async function run(ctx, opts = {}) {
     ? { level: 'ok', title: plural(live.length, 'promo code') + ' working', detail: live.map((p) => `${p.code} −${p.percent}%${p.endsAt ? ' until ' + new Date(p.endsAt).toLocaleDateString('en-GB') : ''}${p.banner ? ' (in the promo strip)' : ''}`).join(' · ') + (strip ? '' : ' · no code is shown in the promo strip, so the strip is hidden.') }
     : { level: 'info', title: 'No promo code is active', detail: 'The promo strip at the top of the pages is hidden.' + (promos.length ? ' ' + plural(promos.length, 'code') + ' switched off or ended.' : ''), fix: 'Add one in Price control → Promo codes.' });
   setup.push(c.paymentWebhook ? { level: 'ok', title: 'Payment webhook secret is set', detail: 'Payments can be confirmed automatically.' } : { level: 'info', title: 'Payments are confirmed by hand', detail: 'PAYMENT_WEBHOOK_SECRET is not set: an admin confirms every order.' });
+  if (c.vercel) setup.push(c.cronSecret ? { level: 'ok', title: 'Site Guard runs by itself', detail: 'CRON_SECRET is set: Vercel runs the automatic check every day (vercel.json → crons).' }
+    : { level: 'warn', title: 'Site Guard cannot run by itself', detail: 'CRON_SECRET is not set, so Vercel cannot start the daily automatic check (it still runs when an admin opens Site Guard).', fix: 'Set CRON_SECRET (any long random text) in Vercel → Settings → Environment Variables, then redeploy.' });
   setup.push({ level: 'info', title: 'Server', detail: `Node ${process.version} · up ${Math.round(process.uptime() / 3600 * 10) / 10} h · memory ${kb(process.memoryUsage().rss)}${c.workers > 1 ? ' · ' + c.workers + ' workers' : ''}` });
   sections.push({ id: 'setup', title: 'Setup and security', items: setup });
 

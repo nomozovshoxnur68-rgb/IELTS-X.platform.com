@@ -35,19 +35,21 @@
     if (a) { a.setAttribute('data-active', 'true'); a.setAttribute('aria-current', 'page'); }
   })();
 
-  /* ── the parts of the page ── */
-  function hero() {
+  /* ── the parts of the page: the look of the other pages (title with its icon, stat cards, cards with a picture on top) ── */
+  var TIMER = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>';
+  var BIG = TIMER.replace('width="22" height="22"', 'width="32" height="32"');
+  function head() {
     var mine = (state.mocks || []).reduce(function (o, m) { o.n += m.attempts || 0; if (typeof m.best === 'number') o.best = Math.max(o.best, m.best); if (m.last && (!o.last || m.last.at > o.last.at)) o.last = m.last; return o; }, { n: 0, best: -1, last: null });
-    var me = !state.signedIn
-      ? '<div class="mt-me"><h2>Your results stay with you</h2><p>Sign in to take a mock, keep every band on your Performance page and get AI feedback on your Writing.</p><a class="mt-btn mt-btn-light" href="/login?next=' + next + '">Sign in</a></div>'
-      : '<div class="mt-me"><h2>Your mock results</h2><div class="mt-stats">' +
-        '<div class="mt-stat"><b>' + mine.n + '</b><span>mocks taken</span></div>' +
-        '<div class="mt-stat"><b>' + (mine.best >= 0 ? mine.best.toFixed(1) : '—') + '</b><span>best band</span></div>' +
-        '<div class="mt-stat"><b>' + (mine.last && typeof mine.last.band === 'number' ? mine.last.band.toFixed(1) : '—') + '</b><span>last band</span></div></div>' +
-        '<p>' + (mine.n ? 'Every Listening, Reading and Writing band is on your <a href="/study/Tools/Performance">Performance page</a>.' : 'Your first mock shows where you stand on all three papers at once.') + '</p></div>';
-    return '<section class="mt-hero"><div style="position:relative;z-index:1"><span class="mt-kicker">' + ICON.screen + ' Computer-delivered IELTS</span>' +
-      '<h1>Full Mock Tests</h1><p>The whole exam in one sitting: Listening, Reading and Writing in full screen, timed like the real test. Bands are marked on the server; Writing gets AI feedback on the four criteria.</p>' +
-      '<div class="mt-papers"><span class="mt-paper" style="--c:var(--mt-l)"><i></i><b>Listening</b> 4 parts · 40 questions</span><span class="mt-paper" style="--c:var(--mt-r)"><i></i><b>Reading</b> 3 passages · 60 min</span><span class="mt-paper" style="--c:var(--mt-w)"><i></i><b>Writing</b> Task 1 + Task 2 · 60 min</span></div></div>' + me + '</section>';
+    var stat = function (label, value, icon) { return '<div class="mt-stat"><div><div class="mt-stat-label">' + label + '</div><div class="mt-stat-value">' + value + '</div></div><span class="mt-stat-ic">' + icon + '</span></div>'; };
+    var title = '<header class="mt-head"><div class="mt-title-row"><span class="mt-title-ic">' + TIMER + '</span><div><h1>Full Mock Tests</h1>' +
+      '<p>The whole exam in one sitting: Listening, Reading and Writing in full screen, timed like the real computer-delivered test.</p></div></div>' +
+      (state.signedIn ? '' : '<a class="mt-btn mt-btn-main mt-btn-sm" href="/login?next=' + next + '">Sign in to start</a>') + '</header>';
+    var stats = '<div class="mt-statrow">' +
+      stat('Mock tests', state.mocks ? state.mocks.length : '—', ICON.list) +
+      stat('Mocks taken', state.signedIn ? mine.n : '—', ICON.screen) +
+      stat('Best band', state.signedIn && mine.best >= 0 ? mine.best.toFixed(1) : '—', ICON.crown.replace('width="11" height="11"', 'width="16" height="16"')) +
+      stat('Last band', state.signedIn && mine.last && typeof mine.last.band === 'number' ? mine.last.band.toFixed(1) : '—', ICON.clock) + '</div>';
+    return title + stats;
   }
   function steps() {
     var list = [['Choose a mock', 'Pick a card below and press Start. Each mock opens in full screen.'], ['Watch the guides', 'A short video before each paper shows the computer test screen.'],
@@ -55,11 +57,10 @@
     return '<section class="mt-steps" aria-label="How a mock works">' + list.map(function (s, i) { return '<div class="mt-step"><span class="mt-step-n">' + (i + 1) + '</span><div><h3>' + s[0] + '</h3><p>' + s[1] + '</p></div></div>'; }).join('') + '</section>';
   }
   function cover(m, i) {
-    var img = safeImg(m.coverUrl), pal = PALETTE[hashOf(m.id) % PALETTE.length];
-    var plan = m.plan === 'free' ? '<span class="mt-badge mt-badge-free">Free</span>' : '<span class="mt-badge mt-badge-plan">' + ICON.crown + esc(PLAN[m.plan] || 'Premium') + '</span>';
-    return '<div class="mt-cover' + (img ? ' has-img' : '') + '" style="--a:' + pal[0] + ';--b:' + pal[1] + '">' + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : '') +
-      '<div class="mt-cover-tags">' + (m.tier ? '<span class="mt-badge mt-badge-glass">' + esc(m.tier) + '</span>' : '<span></span>') + plan + '</div>' +
-      (img ? '' : '<div class="mt-mark"><b>IELTS</b><span>Full mock · ' + String(i + 1).padStart(2, '0') + '</span></div><div class="mt-bars" aria-hidden="true"><i style="height:14px"></i><i style="height:22px"></i><i style="height:30px"></i></div>') + '</div>';
+    var img = safeImg(m.coverUrl);
+    var plan = m.plan === 'free' ? '<span class="mt-pill mt-pill-free">Free</span>' : '<span class="mt-pill mt-pill-plan">' + ICON.crown + esc(PLAN[m.plan] || 'Premium') + '</span>';
+    return '<div class="mt-cover' + (img ? ' has-img' : '') + '">' + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"><div class="mt-cover-shade"></div>' : '<div class="mt-cover-in">' + BIG + '<span>IELTS Full Mock · ' + String(i + 1).padStart(2, '0') + '</span></div>') +
+      '<div class="mt-tl">' + plan + '</div><div class="mt-tr"><span class="mt-pill mt-pill-dark">' + esc(m.tier || 'L · R · W') + '</span></div></div>';
   }
   function actions(m) {
     var open = '/full-mock/?mock=' + encodeURIComponent(m.id);
@@ -73,9 +74,9 @@
     var status = m.inProgress ? '<span class="mt-badge mt-badge-live">In progress</span>' : m.attempts ? '<span class="mt-badge mt-badge-done">' + ICON.check + ' Done</span>' : '';
     return '<article class="mt-card">' + cover(m, i) + '<div class="mt-body">' +
       '<div class="mt-title"><h3>' + esc(m.title) + '</h3>' + status + '</div>' +
-      (m.description ? '<p class="mt-desc">' + esc(m.description) + '</p>' : '') +
-      '<div class="mt-sections"><div class="mt-sec" style="--c:var(--mt-l)"><b>Listening</b><span>~30 min</span></div><div class="mt-sec" style="--c:var(--mt-r)"><b>Reading</b><span>60 min</span></div><div class="mt-sec" style="--c:var(--mt-w)"><b>Writing</b><span>60 min</span></div></div>' +
-      '<div class="mt-meta"><span>' + ICON.clock + ' About 2 h 40 min</span><span>' + ICON.list + ' 80 questions + 2 tasks</span><span>' + ICON.shuffle + ' ' + fresh + '</span>' +
+      '<div class="mt-line">' + ICON.clock + '<span>' + (m.description ? esc(m.description) : 'About 2 h 40 min · 80 questions + 2 tasks') + '</span></div>' +
+      '<div class="mt-chips"><span class="mt-chip" style="--c:var(--mt-l)"><i></i>Listening · 30 min</span><span class="mt-chip" style="--c:var(--mt-r)"><i></i>Reading · 60 min</span><span class="mt-chip" style="--c:var(--mt-w)"><i></i>Writing · 60 min</span></div>' +
+      '<div class="mt-meta"><span>' + ICON.shuffle + ' ' + fresh + '</span>' +
       (m.modes === 'real' ? '<span>' + ICON.screen + ' Real exam mode</span>' : m.modes === 'practice' ? '<span>' + ICON.screen + ' Practice mode</span>' : '') + '</div>' +
       (m.attempts ? '<div class="mt-result"><span>' + m.attempts + (m.attempts === 1 ? ' attempt' : ' attempts') + (m.last && m.last.at ? ' · last ' + esc(when(m.last.at)) : '') + '</span><span>Best <b>' + band(m.best) + '</b></span></div>' : '') +
       '<div class="mt-actions">' + actions(m) + '</div></div></article>';
@@ -93,8 +94,8 @@
     else if (!list.length) body = '<div class="mt-empty">' + (state.mocks.length ? 'No mock test matches this filter.' : 'New mock tests are coming soon.') + '</div>';
     else body = '<div class="mt-grid">' + list.map(function (m) { return card(m, state.mocks.indexOf(m)); }).join('') + '</div>';
     var seg = [['all', 'All'], ['open', 'Available to me'], ['new', 'Not taken'], ['done', 'Completed']].map(function (x) { return '<button type="button" data-mt="filter" data-v="' + x[0] + '" aria-pressed="' + (state.filter === x[0]) + '">' + x[1] + '</button>'; }).join('');
-    root.innerHTML = '<div class="mt">' + hero() + steps() +
-      '<div class="mt-bar"><h2>Mock tests<small>' + (state.mocks ? state.mocks.length + (state.mocks.length === 1 ? ' test' : ' tests') : '') + '</small></h2>' + (state.signedIn ? '<div class="mt-seg" role="group" aria-label="Show">' + seg + '</div>' : '') + '</div>' + body +
+    root.innerHTML = '<div class="mt">' + head() + steps() +
+      '<div class="mt-bar"><span class="mt-count">' + (state.mocks ? 'Showing ' + list.length + ' of ' + state.mocks.length + (state.mocks.length === 1 ? ' mock test' : ' mock tests') : '') + '</span>' + (state.signedIn ? '<div class="mt-seg" role="group" aria-label="Show">' + seg + '</div>' : '') + '</div>' + body +
       '<section class="mt-rules" aria-label="Rules"><div><b>Full screen, start to finish</b><span>Leaving full screen or switching tabs is recorded in the integrity log of your result.</span></div>' +
       '<div><b>Real exam or Practice</b><span>Real exam mode has no submit button: each paper ends when its time is up. Practice lets you submit early.</span></div>' +
       '<div><b>Fair marking</b><span>Your answers are marked again on our server, and each paper opens only inside your own attempt.</span></div></section></div>';

@@ -89,6 +89,7 @@
           <span class="badge ${c.status === 'complete' ? 'badge-ok' : 'badge-warn'}">${c.status === 'complete' ? 'Complete' : 'Updating'}</span>
           ${c.published === false ? '<span class="badge">Hidden</span>' : ''}</div>
         <div class="muted sm">${esc(s.name)}${c.period ? ' · ' + esc(c.period) : ''} · ${esc(sizeText(c))}${c.hot ? ` · <span class="pd-hot-text">${c.hot} very likely</span>` : ''} · updated ${esc(ago(c.updatedAt))}</div>
+        ${c.lastSeen || (c.places && c.places.length) ? `<div class="muted sm">${c.lastSeen ? '📅 last seen ' + esc(fmtDay(c.lastSeen)) : ''}${c.lastSeen && c.places && c.places.length ? ' · ' : ''}${c.places && c.places.length ? '📍 ' + esc(c.places.slice(0, 4).join(', ')) : ''}</div>` : ''}
       </div>
       <div class="actions pd-actions">
         <button class="btn btn-sm btn-icon" data-pd="up" data-id="${esc(c.id)}" type="button" title="Move up" ${i === 0 || skillFilter || query ? 'disabled' : ''}>↑</button>
@@ -101,7 +102,11 @@
   }
 
   /* ───────── the editor ───────── */
-  const blankItem = (kind, part) => ({ id: '', kind, title: '', part: part || '', text: '', href: '', image: '', hot: false });
+  const blankItem = (kind, part) => ({ id: '', kind, title: '', part: part || '', text: '', href: '', image: '', hot: false, date: '', place: '', module: '', format: '', seen: 0, note: '' });
+  /* where students sit the exam most often: offered while typing "Where" (any other place can be typed) */
+  const PLACES = ['Tashkent', 'Samarkand', 'Bukhara', 'Andijan', 'Namangan', 'Fergana', 'Nukus', 'Karshi', 'Urgench', 'Termez', 'Jizzakh', 'Navoi', 'Gulistan', 'Kokand',
+    'Tashkent, IDP', 'Tashkent, British Council', 'Samarkand, IDP', 'Uzbekistan', 'Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Russia', 'Turkey', 'UAE', 'India', 'Pakistan', 'UK', 'Online report'];
+  const fmtDay = (v) => { if (!v) return ''; const d = new Date(v + 'T00:00:00'); return isNaN(d) ? v : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); };
   function openEditor(c) {
     draft = c ? JSON.parse(JSON.stringify({ id: c.id, title: c.title, skill: c.skill, period: c.period || '', description: c.description || '', plan: c.plan, status: c.status, published: c.published !== false, items: c.items || [] }))
       : { id: '', title: '', skill: skillFilter || 'speaking', period: '', description: '', plan: 'max', status: 'updating', published: true, items: [] };
@@ -137,6 +142,14 @@
           : `<textarea class="field" data-f="text" rows="${Math.min(8, Math.max(2, String(it.text || '').split('\n').length + 1))}" placeholder="${draft.skill === 'speaking' ? 'The question, or the whole cue card (Describe a … You should say: …)' : 'The task as students will see it'}">${esc(it.text)}</textarea>
              <div class="pd-item-top"><input class="field" data-f="image" value="${esc(it.image)}" placeholder="Picture (optional): link or upload — e.g. a Writing Task 1 chart" style="flex:1 1 260px"><button class="btn btn-sm" data-pd="img" data-i="${n}" type="button">⬆ Upload</button></div>
              ${it.image ? `<img class="pd-item-img" src="${esc(it.image)}" alt="">` : ''}`}
+        <div class="pd-item-top pd-exam" title="Where and when this came up in the real exam (optional)">
+          <label class="pd-mini">📅 Exam date<input type="date" class="field" data-f="date" value="${esc(it.date || '')}"></label>
+          <label class="pd-mini pd-mini-wide">📍 Where<input class="field" data-f="place" list="pd-places" value="${esc(it.place || '')}" maxlength="80" placeholder="Tashkent, IDP"></label>
+          <label class="pd-mini">Module<select class="field" data-f="module"><option value="">Both</option><option value="academic" ${it.module === 'academic' ? 'selected' : ''}>Academic</option><option value="general" ${it.module === 'general' ? 'selected' : ''}>General</option></select></label>
+          <label class="pd-mini">Test<select class="field" data-f="format"><option value="">Any</option><option value="computer" ${it.format === 'computer' ? 'selected' : ''}>Computer</option><option value="paper" ${it.format === 'paper' ? 'selected' : ''}>Paper</option></select></label>
+          <label class="pd-mini pd-mini-num">Reported ×<input type="number" min="0" max="9999" class="field" data-f="seen" value="${it.seen ? esc(it.seen) : ''}" placeholder="0"></label>
+          <label class="pd-mini pd-mini-grow">Note<input class="field" data-f="note" value="${esc(it.note || '')}" maxlength="160" placeholder="e.g. also asked in Part 3"></label>
+        </div>
       </div>
       <div class="pd-item-act">
         <button class="btn btn-sm btn-icon" data-pd="iup" data-i="${n}" type="button" title="Move up" ${n === 0 ? 'disabled' : ''}>↑</button>
@@ -176,6 +189,7 @@
         </div>
         ${bulkOpen ? bulkHtml() : ''}
         <datalist id="pd-parts">${(PARTS[draft.skill] || []).map((p) => `<option value="${esc(p)}">`).join('')}</datalist>
+        <datalist id="pd-places">${[...new Set(draft.items.map((i) => i.place).filter(Boolean).concat(PLACES))].map((p) => `<option value="${esc(p)}">`).join('')}</datalist>
         <div class="pd-items">${draft.items.map(itemHtml).join('') || `<div class="empty">No items yet. Add ${s.item === 'test' ? 'a test link' : 'a question'} above.</div>`}</div>
         ${draft.items.length > 4 ? '<div class="btn-row" style="margin-top:12px"><button class="btn btn-sm" data-pd="add-test" type="button">+ Test link</button><button class="btn btn-sm" data-pd="add-q" type="button">+ Question</button><span style="flex:1"></span><button class="btn btn-primary" data-pd="save" type="button">Save</button></div>' : ''}
       </div>`;
@@ -184,6 +198,7 @@
     const sp = draft.skill === 'speaking';
     return `<div class="pd-bulk">
       <div class="muted sm"><strong>One question per line.</strong> A line that is only “Part 1”, “Part 2” or “Task 1” sets the part of the lines under it. To keep several lines together (a whole ${sp ? 'cue card' : 'task'}), put an empty line before and after them. A line starting with 🔥 or * is marked very likely.</div>
+      <div class="pd-item-top"><label class="pd-mini">📅 Exam date for all of them<input type="date" class="field" data-bulk-date></label><label class="pd-mini pd-mini-wide">📍 Where<input class="field" data-bulk-place list="pd-places" maxlength="80" placeholder="Tashkent, IDP"></label></div>
       <textarea class="field cb-mono" data-bulk rows="8" placeholder="${sp ? 'Part 1\nDo you work or are you a student?\n* What do you like about your hometown?\n\nPart 2\nDescribe a place you would like to visit.\nYou should say: where it is …' : 'Task 2\nSome people think … To what extent do you agree or disagree?'}"></textarea>
       <div class="btn-row"><button class="btn btn-sm btn-primary" data-pd="bulk-add" type="button">Add these</button><button class="btn btn-sm" data-pd="bulk" type="button">Close</button></div></div>`;
   }
@@ -293,7 +308,7 @@
       const lastPart = draft.items.length ? draft.items[draft.items.length - 1].part : part;
       if (a === 'add-test' || a === 'add-q') { draft.items.push(blankItem(a === 'add-test' ? 'test' : 'question', lastPart)); renderEditor(); const rows = document.querySelectorAll('.pd-item'); const last = rows[rows.length - 1]; if (last) { last.scrollIntoView({ block: 'center', behavior: 'smooth' }); const f = last.querySelector(a === 'add-test' ? '[data-pick]' : '[data-f="text"]'); if (f) f.focus(); } return; }
       if (a === 'bulk') { bulkOpen = !bulkOpen; renderEditor(); if (bulkOpen) { const b = $('[data-bulk]'); if (b) b.focus(); } return; }
-      if (a === 'bulk-add') { const items = parseBulk(($('[data-bulk]') || {}).value || ''); if (!items.length) return toast('Paste at least one question.', true); draft.items.push(...items); bulkOpen = false; renderEditor(); return toast(items.length + ' item' + (items.length === 1 ? '' : 's') + ' added — press Save'); }
+      if (a === 'bulk-add') { const items = parseBulk(($('[data-bulk]') || {}).value || ''); const bd = ($('[data-bulk-date]') || {}).value || '', bp = (($('[data-bulk-place]') || {}).value || '').trim(); items.forEach((i) => { i.date = bd; i.place = bp; }); if (!items.length) return toast('Paste at least one question.', true); draft.items.push(...items); bulkOpen = false; renderEditor(); return toast(items.length + ' item' + (items.length === 1 ? '' : 's') + ' added — press Save'); }
       if (a === 'iup' || a === 'idown') { const j = n + (a === 'iup' ? -1 : 1); if (j < 0 || j >= draft.items.length) return; [draft.items[n], draft.items[j]] = [draft.items[j], draft.items[n]]; return renderEditor(); }
       if (a === 'idel') { const it = draft.items[n]; if ((it.text || it.title || it.href) && !confirm('Remove this item?')) return; draft.items.splice(n, 1); return renderEditor(); }
       if (a === 'img') return uploadImage(n);
@@ -327,6 +342,7 @@
     }
     if (el.dataset.f === 'hot') { it.hot = el.checked; row.classList.toggle('is-hot', el.checked); return; }
     if (el.dataset.f === 'kind') { it.kind = el.value; return renderEditor(); }
+    if (el.dataset.f === 'module' || el.dataset.f === 'format') { it[el.dataset.f] = el.value; return; }
     if (el.dataset.f === 'image') { it.image = el.value.trim(); return renderEditor(); }
   });
   window.addEventListener('beforeunload', (e) => { if (dirty()) { e.preventDefault(); e.returnValue = ''; } });

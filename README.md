@@ -681,3 +681,56 @@ section, quick actions, the newest students and the latest results. Every colour
 * No e-mail service (`RESEND_API_KEY`) means "Forgot password" cannot send a link: an admin can now **set a new
   password** in the user's drawer (*Sign-in help*). The person is signed out everywhere; it is in the Activity log.
 * The sign-in page explains that Google sign-in does not work inside the Telegram / Instagram browser.
+
+## Site Guard, the sidebar in the admin panel, exam details in Predictions (November 2026)
+
+**Site Guard** (`/admin#guard`, `admin-guard.js` + server module `site-watch.js`): a small AI watchman of the website.
+Every run it
+1. runs the Website check (`site-check.js`),
+2. opens the main pages and API answers of the live site and times them (a page that does not open is a problem),
+3. reads the **errors visitors' browsers met**: every page reports a script that fails, a promise nobody caught and a
+   file of this site that does not load (`assets/js/loading.js` → `POST /api/client-errors`; at most five per page, only
+   this site's own files, no personal data, grouped and counted on the server, setting `site-errors`),
+4. lists **what changed**: new / edited / hidden / deleted tests, settings saved in the admin panel (prices, menu,
+   predictions, design, access, packs, mocks), new accounts, orders and results, the website's files (a new deploy),
+5. **fixes what is safe** (each one can be switched off): hides published tests that cannot work (no questions, no
+   passage, Listening without audio — off by default), hides menu items you added whose page answers 404, closes browser
+   errors not seen for 7 days (they open again if they come back). Nothing is deleted; every fix is in the Activity log,
+6. asks the **AI** (the same `OPENAI_API_KEY`) for a short report in Uzbek, English or Russian: what is wrong, how
+   urgent, where to click to fix it,
+7. **tells you** when something new goes wrong — Telegram bot and / or e-mail — and once a day sends a short summary.
+
+**Copy for Claude** copies the problems, the browser errors with their stacks and the recent changes as text: paste it
+into Claude Code (or send it to a developer) to fix the code itself.
+
+When it runs: on the Node server every 1 h by default (15 min … 24 h in the panel; `GUARD_TIMER=off` stops the timer);
+on Vercel the cron job of `vercel.json` (`/api/cron/site-watch`, every day at 08:00 Tashkent) — set **`CRON_SECRET`**
+in Vercel's environment; it also runs when an admin opens Site Guard after the interval. For a check every hour on
+Vercel, give `https://<site>/api/cron/site-watch?key=<CRON_SECRET>` to a free pinger such as cron-job.org.
+Telegram: make a bot with @BotFather, press Start in it, take your Chat ID from @userinfobot, paste both in Site Guard
+(or set `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`), then **Send test message**. The token never goes back to a browser.
+
+**Sidebar (menu)** (`/admin#sidebar`, `admin-sidebar.js` + `sidebar.js`): the menu on the left of every page.
+Groups (rename, add, remove, order) and items (rename, icon, group, order, a badge NEW / HOT / FREE / BETA / SOON),
+**+ Item** adds a page of the site or an https link, **Hide** removes one from the menu. For every item: **who sees it**
+(everybody, signed-in students, guests only, paid plans only, admins only, nobody) and **Free / Locked** for Standard,
+Max or Ultra. The server works out the menu per visitor (`GET /api/sidebar`): hidden items and items for other people
+are never sent, a locked item shows a crown and leads to the Price page (also when the page is opened directly). The
+preview shows the menu as a guest, a Free / Standard / Max / Ultra student or an admin. **Reset to default** = the menu
+of the pages. `assets/js/sidebar-links.js` draws it, keeps the last answer for a minute (`ix-sidebar-cfg`, dropped on
+sign-in / sign-out) and `loading.js` hides removed items from the first paint. As long as nothing is saved the pages keep
+their own menu.
+
+**Predictions**: every question / test can carry where and when it came up in the real exam — the **exam date**, the
+**place** (city / centre, with suggestions), **Academic / General**, **computer / paper**, **reported N×** and a note.
+"Paste many" can give one date and place to all pasted questions. Students see them as chips, a collection shows
+"Seen <first> – <last>" and its places, and can be filtered by place and month or sorted newest exam first.
+
+**One look for the whole site**: the Predictions and Mock Tests pages now look like the Part Practice pages (a title with
+its icon, stat cards, one filter card, "Showing …", cards with the picture on top, the blue Start button).
+The Reading practice cards without a cover all get the Listening card's picture (green, with the book icon) instead of a
+random photo from picsum.photos.
+
+**Speed**: no picture of the practice cards comes from another site any more; on Supabase the signed-in account is read
+once per page (kept 3 s on the server, cleared by every change of the account) instead of once per API call; the menu is
+asked at most once a minute.

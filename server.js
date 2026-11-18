@@ -159,15 +159,15 @@ const jsonHeaders = { 'Content-Type': 'application/json' };
    does not wait for the database again and again. A change made on this server clears them at once; another server
    (several workers, Vercel) sees it within MEMO_MS. */
 const memo = new Map(); const MEMO_MS = 5000;
-function memoGet(key, load) {
+function memoGet(key, load, ms) {
   const hit = memo.get(key);
-  if (hit && Date.now() - hit.t < MEMO_MS) return hit.p;
+  if (hit && Date.now() - hit.t < (ms || MEMO_MS)) return hit.p;
   const p = Promise.resolve().then(load); memo.set(key, { t: Date.now(), p });
   p.catch(() => { if (memo.get(key) && memo.get(key).p === p) memo.delete(key); });
   return p;
 }
 const memoClear = (prefix) => { for (const k of [...memo.keys()]) if (k.startsWith(prefix)) memo.delete(k); };
-const MEMO_SETTINGS = new Set(['branding', 'design', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions']);
+const MEMO_SETTINGS = new Set(['branding', 'design', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions', 'sidebar', 'site-watch-config']);
 
 const store = {
   async listUsers() { return USE_SUPABASE ? ((await sb('ieltsx_users?select=*&order=createdAt.desc')) || []) : loadDb().users; },
@@ -186,7 +186,9 @@ const store = {
   },
   async findUserById(id) {
     if (!id) return null;
-    if (USE_SUPABASE) { if (!isUuid(id)) return null; return ((await sb(`ieltsx_users?id=eq.${eq(id)}&limit=1`)) || [])[0] || null; }
+    // Speed: one page asks the server 5-7 things at once (who is signed in, access, progress …): the account is read from
+    // Supabase once and kept for 3 s on this server (every change of the account through the store clears it at once)
+    if (USE_SUPABASE) { if (!isUuid(id)) return null; const u = await memoGet('user:' + id, async () => ((await sb(`ieltsx_users?id=eq.${eq(id)}&limit=1`)) || [])[0] || null, 3000); return u ? { ...u } : null; }
     return loadDb().users.find((u) => u.id === id) || null;
   },
   async insertUser(u) {
@@ -195,11 +197,17 @@ const store = {
   },
   async updateUser(id, patch) {
     if (USE_SUPABASE && !isUuid(id)) return null;
-    if (USE_SUPABASE) return ((await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0] || store.findUserById(id);
+    memoClear('user:' + id);
+    if (USE_SUPABASE) {
+      const row = ((await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'PATCH', headers: jsonHeaders, body: JSON.stringify(patch) })) || [])[0];
+      memoClear('user:' + id);   // a read made while it was being saved kept the old account
+      return row || store.findUserById(id);
+    }
     const db = loadDb(); const u = db.users.find((x) => x.id === id);
     if (!u) return null; Object.assign(u, patch); saveDb(db); return u;
   },
   async deleteUser(id) {
+    memoClear('user:' + id);
     if (USE_SUPABASE) { if (!isUuid(id)) return false; await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'DELETE' }); return true; }
     const db = loadDb(); const n = db.users.length; db.users = db.users.filter((u) => u.id !== id); saveDb(db); return db.users.length < n;
   },
@@ -811,6 +819,30 @@ let gameCtxInst = null;
 const gameCtx = (extra) => ({ ...(gameCtxInst || (gameCtxInst = { store, currentUser, isAdmin, send, readJson, rateLimit, HttpError, purposeToken, readPurposeToken, audit, cleanUrl, clientIp, USE_SUPABASE })), ...(extra || {}) });
 /* Predictions (predictions.js): the collections of the Predictions page and of the admin panel */
 const predCtx = (extra) => ({ store, currentUser, isAdmin, userLevel, send, readJson, rateLimit, HttpError, audit, clientIp, ...(extra || {}) });
+/* the Website check (site-check.js): used by Admin -> Website check and by Site Guard (site-watch.js) */
+async function runSiteCheck(fresh) {
+  let dbSize = 0; if (!USE_SUPABASE) { try { dbSize = fs.statSync(DB_FILE).size; } catch (e) { /* no file yet */ } }
+  const want = String(process.env.WEB_CONCURRENCY || process.env.WORKERS || '').trim().toLowerCase();
+  let ai = false; try { ai = !!require('./ai-provider').configured().ok; } catch (e) { ai = false; }
+  let promoColumns = true; if (USE_SUPABASE) { try { await sb('ieltsx_orders?select=promoCode,discount,fullAmount&limit=1'); } catch (e) { promoColumns = false; } }
+  const aiReports = await aiStore().ready();
+  return require('./site-check').run({
+    root: ROOT, uploadDir: UPLOAD_DIR, aliasMap, store, isPremium, isAdmin, publicPages: publicUrls(),
+    config: { storage: USE_SUPABASE ? 'supabase' : 'file', vercel: IS_VERCEL, dbSize, sessionSecretFromEnv: !!process.env.SESSION_SECRET,
+      production: IS_VERCEL || process.env.NODE_ENV === 'production' || /^https:\/\//.test(PUBLIC_URL), adminEmails: ADMIN_EMAILS.size, mail: MAIL_READY,
+      publicUrl: PUBLIC_URL, google: !!GOOGLE_CLIENT_ID, ai, paymentWebhook: !!PAYMENT_WEBHOOK_SECRET, promoColumns, aiReports, pricing: await getPricing(),
+      cronSecret: !!process.env.CRON_SECRET,
+      workers: USE_SUPABASE ? (want === 'auto' ? require('os').cpus().length : Math.max(1, parseInt(want, 10) || 1)) : 1 }
+  }, { fresh: !!fresh });
+}
+/* Site Guard (site-watch.js): the address the live pages are opened at — PUBLIC_URL, else this request's own site, else this server */
+function guardOrigin(req) {
+  if (PUBLIC_URL) return PUBLIC_URL;
+  if (req && req.headers && req.headers.host) return siteUrl(req);
+  return IS_VERCEL ? '' : `http://127.0.0.1:${PORT}`;
+}
+const guardCtx = (req, extra) => ({ store, send, readJson, rateLimit, clientIp, HttpError, audit, sendMail, mailReady: MAIL_READY, adminEmails: ADMIN_EMAILS,
+  isVercel: IS_VERCEL, root: ROOT, origin: guardOrigin(req), siteCheck: () => runSiteCheck(true), ...(extra || {}) });
 const aiStore = () => aiStoreInst || (aiStoreInst = require('./ai-store').createAiStore({ USE_SUPABASE, sb, eq, DATA_DIR, HttpError }));
 
 function readBody(req, limit = 100 * 1024) {
@@ -1738,6 +1770,9 @@ async function api(req, res, url) {
 
   /* ---- Predictions (predictions.js): the published collections; questions and links only with the plan ---- */
   if (p === '/api/predictions' || p.startsWith('/api/predictions/')) return require('./predictions').route(req, res, p, method, predCtx());
+  if (p === '/api/sidebar') return require('./sidebar').route(req, res, p, method, predCtx());   // the menu of every page, managed in Admin -> Sidebar
+  if (p === '/api/client-errors' && method === 'POST') return require('./site-watch').clientError(req, res, guardCtx(req));   // errors in visitors' browsers (assets/js/loading.js) -> Site Guard
+  if (p === '/api/cron/site-watch' && (method === 'GET' || method === 'POST')) return require('./site-watch').cron(req, res, url, guardCtx(req));   // Vercel cron / an outside pinger (CRON_SECRET)
 
   /* ---- Full Mock Tests (mock-tests.js): the cards, starting / resuming / finishing an attempt ---- */
   if (p === '/api/mocks' || p.startsWith('/api/mocks/') || p.startsWith('/api/mock/')) return require('./mock-tests').route(req, res, p, method, url, mockCtx());
@@ -1758,6 +1793,7 @@ async function api(req, res, url) {
     if (p === '/api/admin/mocks' || p.startsWith('/api/admin/mocks/')) return require('./mock-tests').adminRoute(req, res, p, method, url, mockCtx({ admin }));
     if (p === '/api/admin/games' || p.startsWith('/api/admin/games/')) return require('./quiz-game').adminRoute(req, res, p, method, url, gameCtx({ admin }));
     if (p === '/api/admin/predictions' || p.startsWith('/api/admin/predictions/')) return require('./predictions').adminRoute(req, res, p, method, predCtx({ admin }));
+    if (p === '/api/admin/sidebar' || p.startsWith('/api/admin/sidebar/')) return require('./sidebar').adminRoute(req, res, p, method, predCtx({ admin }));
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {
@@ -1801,20 +1837,10 @@ async function api(req, res, url) {
       return send(res, 200, { design: await getDesign() });
     }
     if (method === 'GET' && p === '/api/admin/site-check') {   // Website check (site-check.js): read only
-      let dbSize = 0; if (!USE_SUPABASE) { try { dbSize = fs.statSync(DB_FILE).size; } catch (e) { /* no file yet */ } }
-      const want = String(process.env.WEB_CONCURRENCY || process.env.WORKERS || '').trim().toLowerCase();
-      let ai = false; try { ai = !!require('./ai-provider').configured().ok; } catch (e) { ai = false; }
-      let promoColumns = true; if (USE_SUPABASE) { try { await sb('ieltsx_orders?select=promoCode,discount,fullAmount&limit=1'); } catch (e) { promoColumns = false; } }
-      const aiReports = await aiStore().ready();
-      const report = await require('./site-check').run({
-        root: ROOT, uploadDir: UPLOAD_DIR, aliasMap, store, isPremium, isAdmin, publicPages: publicUrls(),
-        config: { storage: USE_SUPABASE ? 'supabase' : 'file', vercel: IS_VERCEL, dbSize, sessionSecretFromEnv: !!process.env.SESSION_SECRET,
-          production: IS_VERCEL || process.env.NODE_ENV === 'production' || /^https:\/\//.test(PUBLIC_URL), adminEmails: ADMIN_EMAILS.size, mail: MAIL_READY,
-          publicUrl: PUBLIC_URL, google: !!GOOGLE_CLIENT_ID, ai, paymentWebhook: !!PAYMENT_WEBHOOK_SECRET, promoColumns, aiReports, pricing: await getPricing(),
-          workers: USE_SUPABASE ? (want === 'auto' ? require('os').cpus().length : Math.max(1, parseInt(want, 10) || 1)) : 1 }
-      }, { fresh: url.searchParams.get('fresh') === '1' });
+      const report = await runSiteCheck(url.searchParams.get('fresh') === '1');
       return send(res, 200, report, { 'Cache-Control': 'no-store' });
     }
+    if (p === '/api/admin/guard' || p.startsWith('/api/admin/guard/')) return require('./site-watch').adminRoute(req, res, p, method, guardCtx(req, { admin }));   // Site Guard (site-watch.js)
     if (method === 'GET' && p === '/api/admin/audit') return send(res, 200, { entries: await store.listAudit(Math.min(500, Number(url.searchParams.get('limit')) || 100)) });
     if (method === 'GET' && p === '/api/admin/users') {
       const [users, results] = await Promise.all([store.listUsers(), store.listAllResults()]);
@@ -2074,7 +2100,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', 'design-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers; design-src: sent by /api/design/fx/ to who may use it
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
@@ -2361,7 +2387,7 @@ async function sitemap(origin) {
    it sees those pages empty; the rest of /api/, the admin panel and uploaded files stay closed. Sign-in, account and
    test pages are not listed here on purpose: they say "noindex" themselves, and Google can only see that if it may open them. */
 function robotsTxt(req) {
-  const open = ['/api/branding', '/api/materials', '/api/packs', '/api/plans', '/api/predictions', '/api/mocks', '/api/access', '/api/media/'];
+  const open = ['/api/branding', '/api/materials', '/api/packs', '/api/plans', '/api/predictions', '/api/mocks', '/api/access', '/api/sidebar', '/api/media/'];
   return ['User-agent: *', 'Allow: /', 'Disallow: /admin', 'Disallow: /api/', ...open.map((p) => 'Allow: ' + p), 'Disallow: /uploads/', '', `Sitemap: ${seoOrigin(req)}/sitemap.xml`, ''].join('\n');
 }
 /* the public pages: the sitemap, and the search-engine check of the admin Website check (site-check.js) */
@@ -2448,6 +2474,13 @@ if (require.main === module) {
       console.log(ADMIN_EMAILS.size ? `Admins: ${[...ADMIN_EMAILS].join(', ')}` : 'No ADMIN_EMAILS set: register an account, then run  node scripts/make-admin.js <email>');
       if (!GOOGLE_CLIENT_ID) console.log('Google sign-in is off (set GOOGLE_CLIENT_ID to enable it).');
     });
+    /* Site Guard (site-watch.js): one worker looks at the site every few minutes and runs the check when its interval
+       (Admin -> Site Guard) has passed. On Vercel there is no long-running server: vercel.json's cron job does it. */
+    if (!(cluster.isWorker && cluster.worker.id > 1) && process.env.GUARD_TIMER !== 'off') {
+      const guardTick = () => require('./site-watch').tick(guardCtx(null));
+      setTimeout(guardTick, 90 * 1000).unref();
+      setInterval(guardTick, 5 * 60 * 1000).unref();
+    }
   }
 }
 module.exports = requestHandler;
