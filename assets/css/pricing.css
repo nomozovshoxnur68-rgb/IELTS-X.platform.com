@@ -92,6 +92,22 @@ html.dark-mode .ixp-yes { color: #4ade80; }
 .ixp-btn:disabled { opacity: .6; cursor: wait; }
 .ixp-code { margin: 0 0 12px; padding: 12px; border-radius: 12px; background: hsl(var(--muted)); font: 700 24px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; text-align: center; }
 .ixp-err { min-height: 0; margin: 0 0 10px; color: #dc2626; }
+html.dark-mode .ixp-err { color: #fca5a5; }
+
+/* Payme (assets/js/payme-pay.js): the order summary, the main button and the manual way folded below it */
+.ixp-summary { margin: 0 0 14px; padding: 4px 14px; border: 1px solid hsl(var(--border)); border-radius: 12px; }
+.ixp-summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 14px; }
+.ixp-summary-row + .ixp-summary-row { border-top: 1px dashed hsl(var(--border)); }
+.ixp-summary-row span { color: hsl(var(--muted-foreground)); }
+.ixp-summary-row:last-child b { font-size: 16px; }
+.ixp-btn.ixp-payme { margin-bottom: 8px; padding: 13px 14px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-size: 15px; }
+.ixp-btn.ixp-payme:hover:not(:disabled) { filter: brightness(1.06); }
+.ixp-btn.ixp-payme:focus-visible { outline: 3px solid hsl(var(--primary) / .35); outline-offset: 2px; }
+.ixp-dlg .ixp-payme-note { margin-bottom: 12px; }
+.ixp-other { margin: 0 0 4px; border-top: 1px solid hsl(var(--border)); padding-top: 10px; }
+.ixp-other > summary { cursor: pointer; font-weight: 600; font-size: 13px; color: hsl(var(--muted-foreground)); list-style-position: inside; }
+.ixp-other[open] > summary { margin-bottom: 10px; }
+.ixp-other > p { font-size: 13px; }
 
 /* promo code (order window + the note above the plans) */
 .ixp-promo { display: flex; gap: 8px; margin: 2px 0 6px; }

@@ -1,0 +1,46 @@
+/* IELTSX — study music (assets/js/site-music.js): the small player of the ordinary pages and the list on the Settings
+   page. Site tokens only (ix-unified.css), so light and dark (html.dark-mode) follow the website. */
+.ixm-mini{position:fixed;left:16px;bottom:16px;z-index:9990;display:flex;align-items:center;gap:6px;max-width:min(360px,calc(100vw - 32px));padding:6px 6px 6px 8px;
+  border:1px solid hsl(var(--border));border-radius:14px;background:hsl(var(--card) / .96);color:hsl(var(--card-foreground));box-shadow:0 12px 30px -10px rgba(15,23,42,.35);
+  backdrop-filter:blur(8px);font:500 13px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;animation:ixm-in .2s ease both}
+@keyframes ixm-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ixm-mini svg{width:16px;height:16px}
+.ixm-mini-ic{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:hsl(var(--muted));color:hsl(var(--primary))}
+.ixm-mini-ic.on{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.ixm-mini-t{flex:1;min-width:0;display:grid;color:inherit;text-decoration:none;padding:0 4px}
+.ixm-mini-t b,.ixm-mini-t small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ixm-mini-t small{color:hsl(var(--muted-foreground));font-size:11.5px;font-weight:400}
+.ixm-mini button{flex:none;display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:inherit;cursor:pointer}
+.ixm-mini button:hover{background:hsl(var(--muted))}
+.ixm-mini button:focus-visible,.ixm-play:focus-visible{outline:2px solid hsl(var(--primary));outline-offset:2px}
+@media (max-width:640px){.ixm-mini{left:10px;right:10px;bottom:10px;max-width:none}}
+@media print{.ixm-mini{display:none}}
+
+/* the Settings page */
+.ixm-list{margin-top:1rem}
+.ixm-empty{margin:0;font-size:.86rem;color:hsl(var(--muted-foreground))}
+.ixm-tracks{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.ixm-track{display:flex;align-items:center;gap:.75rem;padding:.55rem .65rem;border:1px solid hsl(var(--border));border-radius:.75rem;background:hsl(var(--background));transition:border-color .15s,background .15s}
+.ixm-track.cur{border-color:hsl(var(--primary));background:hsl(var(--primary) / .06)}
+.ixm-track.locked{opacity:.75}
+.ixm-cover{position:relative;flex:none;display:grid;place-items:center;width:2.6rem;height:2.6rem;border-radius:.6rem;overflow:hidden;background:hsl(var(--muted));color:hsl(var(--primary))}
+.ixm-cover img{width:100%;height:100%;object-fit:cover}
+.ixm-cover svg{width:1.1rem;height:1.1rem}
+.ixm-eq{position:absolute;inset:auto 0 0 0;display:flex;align-items:flex-end;justify-content:center;gap:2px;height:60%;padding-bottom:4px;background:linear-gradient(transparent,rgba(0,0,0,.45))}
+.ixm-eq b{width:3px;border-radius:2px;background:#fff;animation:ixm-eq .9s ease-in-out infinite alternate}
+.ixm-eq b:nth-child(2){animation-delay:.3s}.ixm-eq b:nth-child(3){animation-delay:.6s}
+@keyframes ixm-eq{from{height:20%}to{height:90%}}
+.ixm-meta{flex:1;min-width:0;display:grid}
+.ixm-meta b{font-size:.9rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ixm-meta small{font-size:.78rem;color:hsl(var(--muted-foreground));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ixm-play{flex:none;display:grid;place-items:center;width:2.25rem;height:2.25rem;border:0;border-radius:50%;background:hsl(var(--primary));color:hsl(var(--primary-foreground));cursor:pointer}
+.ixm-play svg{width:1rem;height:1rem}
+.ixm-play:hover{filter:brightness(1.08)}
+.ixm-get{flex:none;display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .6rem;border-radius:.5rem;background:linear-gradient(90deg,#f59e0b,#ea580c);color:#fff;font-size:.75rem;font-weight:600;text-decoration:none}
+.ixm-get svg{width:.8rem;height:.8rem}
+.ixm-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin-top:.85rem}
+.ixm-vol{display:inline-flex;align-items:center;gap:.5rem;color:hsl(var(--muted-foreground))}
+.ixm-vol svg{width:1.1rem;height:1.1rem}
+.ixm-vol input{width:9rem;accent-color:hsl(var(--primary))}
+.ixm-msg{font-size:.82rem;color:hsl(var(--muted-foreground))}
+@media (prefers-reduced-motion:reduce){.ixm-mini{animation:none}.ixm-eq b{animation:none;height:60%}}

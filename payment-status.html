@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-require-login>
+
+<head>
+<script src="/assets/js/loading.js"></script>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Payment status — IELTSX</title>
+    <script src="assets/js/theme-init.js"></script>
+    <link rel="stylesheet" href="assets/index-BxgEAFAf.css" />
+    <link rel="stylesheet" href="assets/css/tw-fallback.css">
+    <link rel="stylesheet" href="assets/css/ui.css">
+    <link rel="stylesheet" href="assets/css/ix-unified.css">
+    <link rel="stylesheet" href="assets/css/payment-status.css">
+    <script src="/assets/js/site-design.js"></script>
+</head>
+
+<!-- Payment status (assets/js/payment-status.js): Payme sends the student back here after paying. The page only READS the
+     order from the server (GET /api/orders/<code>); the plan is switched on when Payme tells the server the payment is
+     complete (payme.js), never by this page or by the address it was opened with. -->
+<body class="antialiased bg-background text-foreground">
+    <div id="root">
+        <div class="flex min-h-screen flex-col">
+            <nav class="fixed left-1/2 transform -translate-x-1/2 z-40 w-full max-w-7xl mx-auto px-4" style="top: 20px;">
+                <div class="bg-background/80 backdrop-blur-md border border-border rounded-2xl shadow-lg">
+                    <div class="flex h-14 items-center px-3 sm:px-6 gap-2">
+                        <a class="flex items-center shrink-0" href="/"><img class="h-6 sm:h-8" src="/logo.png" alt="IELTS Logo"></a>
+                        <div class="flex-1"></div>
+                        <a class="pst-navlink" href="/Price">Pricing</a>
+                        <a class="pst-navlink pst-navlink-main" href="/account#subscription">My orders</a>
+                    </div>
+                </div>
+            </nav>
+            <main class="flex-1">
+                <section class="pst-wrap" aria-label="Payment status">
+                    <div class="pst-card" id="pst-card">
+                        <div class="pst-icon pst-wait" aria-hidden="true"><span class="pst-spin"></span></div>
+                        <h1 class="pst-title" id="pst-title">Checking your payment…</h1>
+                        <p class="pst-text" id="pst-text" role="status" aria-live="polite">One moment, please.</p>
+                        <dl class="pst-summary" id="pst-summary" hidden></dl>
+                        <p class="pst-err" id="pst-err" role="alert"></p>
+                        <div class="pst-actions" id="pst-actions"></div>
+                    </div>
+                    <noscript><p class="pst-text" style="text-align:center">Turn on JavaScript to see your payment, or open <a href="/account#subscription">My orders</a>.</p></noscript>
+                </section>
+            </main>
+        </div>
+    </div>
+<script src="assets/js/payme-pay.js"></script>
+<script src="assets/js/payment-status.js"></script>
+<script type="module" src="site-access.js"></script>
+</body>
+
+</html>

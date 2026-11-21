@@ -35,6 +35,8 @@
     var doc = document, html = doc.documentElement;
     var TEST_PAGE = /^\/(full-tests\/[^/]+\/test-|pessages?\/|sections\/test-|full-mock\/|exam\/|writing\/|listening\/|test(\.html)?(\/|$)|game)/i;
     if (TEST_PAGE.test(location.pathname)) return;
+    // the study music (Settings -> Music, assets/js/site-music.js): on the ordinary pages only, like the designs
+    try { var sm = doc.createElement('script'); sm.src = '/assets/js/site-music.js'; sm.defer = true; (doc.head || html).appendChild(sm); } catch (e) { /* no music */ }
 
     var PREF_KEY = 'ix-design', SITE_KEY = 'ix-design-site', REFRESH_MS = 2 * 60 * 1000;
     var DEFAULT_ACCENTS = [{ name: 'Blue', color: '#2563eb' }, { name: 'Violet', color: '#7c3aed' }, { name: 'Emerald', color: '#059669' },

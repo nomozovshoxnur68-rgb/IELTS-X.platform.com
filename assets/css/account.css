@@ -111,6 +111,9 @@ a.acc-item:hover { background: hsl(var(--accent)); }
 .acc-order-actions { display: flex; gap: 10px; align-items: center; }
 .acc-order-actions a, .acc-order-actions button { font: 500 12.5px var(--ix-font); background: none; border: 0; padding: 0; cursor: pointer; color: hsl(var(--primary)); text-decoration: none; }
 .acc-order-actions button { color: hsl(var(--muted-foreground)); }
+.acc-order-actions .acc-order-pay { padding: 5px 11px; border-radius: 8px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-weight: 600; }
+.acc-order-actions .acc-order-pay:hover { text-decoration: none; filter: brightness(1.06); }
+.acc-order-actions .acc-order-pay:disabled { opacity: .6; cursor: wait; }
 .acc-order-actions a:hover, .acc-order-actions button:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* devices */

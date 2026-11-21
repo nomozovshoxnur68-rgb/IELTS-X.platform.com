@@ -5,6 +5,9 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ieltsx-'));
 process.env.DATA_DIR = tmp; process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
 process.env.ADMIN_EMAILS = 'boss@example.com'; process.env.SESSION_SECRET = 'test-secret-test-secret-test-secret-123456';
 process.env.PAYMENT_WEBHOOK_SECRET = 'hook-secret';
+// Payme (payme.js) in test mode with made-up merchant settings; the optional ones start empty (a real .env never leaks in)
+process.env.PAYME_MERCHANT_ID = 'test-merchant-5e0f'; process.env.PAYME_MERCHANT_KEY = 'TestKey-' + require('crypto').randomBytes(12).toString('hex'); process.env.PAYME_TEST_MODE = 'true';
+for (const k of ['PAYME_ALLOWED_IPS', 'PAYME_IKPU', 'PAYME_PACKAGE_CODE', 'PAYME_CHECKOUT_URL', 'PAYME_ACCOUNT_FIELD', 'PAYME_VAT_PERCENT']) process.env[k] = '';
 for (const k of ['RESEND_API_KEY', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']) process.env[k] = '';   // set before server.js reads .env: the tests never send a real mail
 const mails = []; const realLog = console.log;
 console.log = (...a) => { const t = a.join(' '); if (t.includes('[mail not configured]')) mails.push(t); else realLog(...a); };
@@ -1679,7 +1682,7 @@ server.listen(0, async () => {
     {
       assert.ok([403, 404].includes((await call('GET', '/sidebar.js')).status), 'the server module is private');
       let r = await call('GET', '/api/sidebar'); assert.equal(r.status, 200); assert.equal(r.json.managed, false, 'nothing saved: the pages keep their own menu');
-      assert.ok(r.json.items.some((i) => i.key === 'predictions') && r.json.items.length === 16);
+      assert.ok(r.json.items.some((i) => i.key === 'predictions') && r.json.items.length === 19, 'the built-in items, with Videos, Books, Grammar');
       assert.equal((await call('GET', '/api/admin/sidebar')).status, 401); assert.equal((await call('GET', '/api/admin/sidebar', { jar: user })).status, 403);
       const sb = (await call('GET', '/api/admin/sidebar', { jar: boss })).json.sidebar;
       sb.groups.push({ id: 'g-0a1b2c3d', title: 'Courses' });
@@ -1789,6 +1792,270 @@ server.listen(0, async () => {
         await assert.rejects(handler.smtpSend(conf, { ...mail, to: 'a@x.com\r\nBcc: z@x.com' }), /line break/);
         ok('mail over SMTP (Gmail app password): sign-in, sender, recipient, encoded subject + body; a refused password is reported without the password');
       } finally { fake.close(); }
+    }
+
+    // --- Payme Merchant API (payme.js): every payment scenario, server to server, the way Payme calls it
+    {
+      const KEY = process.env.PAYME_MERCHANT_KEY; let rpcId = 0;
+      const basic = (s) => 'Basic ' + Buffer.from(s).toString('base64');
+      const rpc = (method, params, opt = {}) => call('POST', '/api/payme', { raw: opt.raw !== undefined ? opt.raw : JSON.stringify({ jsonrpc: '2.0', id: opt.id || ++rpcId, method, params }),
+        headers: { 'content-type': 'application/json', ...(opt.auth === null ? {} : { authorization: basic(opt.auth || 'Paycom:' + KEY) }), ...(opt.headers || {}) } });
+      const errOf = (r) => (r.json && r.json.error ? r.json.error.code : null);
+      const mkP = async (name, email) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); assert.equal((await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j })).status, 200); return { j, id: row.id };
+      };
+      const buyer = await mkP('Payer', 'payer@example.com'), stranger = await mkP('Other', 'other-payer@example.com');
+      const status = async () => (await call('GET', '/api/premium/status', { jar: buyer.j })).json;
+      const audio = async () => (await call('GET', '/api/access/check?page=' + encodeURIComponent('/premium-audio/x.mp3'), { jar: buyer.j })).json.allowed;
+      const order = async (plan, months) => { const x = await call('POST', '/api/orders', { jar: buyer.j, body: { plan, months } }); assert.ok([200, 201].includes(x.status), JSON.stringify(x.json)); return x.json.order; };
+      const acc = (o) => ({ order_id: o.ref });
+
+      // the site offers Payme; the checkout form is made on the server, for the owner of an unpaid order only
+      assert.equal((await call('GET', '/api/plans')).json.payme, true);
+      const o1 = await order('max', 3); const t1amount = o1.amount * 100;
+      assert.equal((await call('POST', `/api/orders/${o1.id}/payme`, { body: {} })).status, 401);
+      assert.equal((await call('POST', `/api/orders/${o1.id}/payme`, { body: {}, jar: stranger.j })).status, 404, 'not your order');
+      r = await call('POST', `/api/orders/${o1.id}/payme`, { body: { lang: 'ru' }, jar: buyer.j }); assert.equal(r.status, 200);
+      const ck = r.json.checkout; assert.equal(ck.action, 'https://checkout.test.paycom.uz'); assert.equal(ck.fields.merchant, process.env.PAYME_MERCHANT_ID);
+      assert.equal(ck.fields.amount, String(t1amount)); assert.equal(ck.fields['account[order_id]'], o1.ref); assert.equal(ck.fields.lang, 'ru');
+      assert.ok(ck.fields.callback.endsWith('/payment-status?order=' + o1.ref));
+      assert.equal((await call('GET', '/payment-status.html')).status, 200, 'the status page exists');
+      ok('Payme: checkout form for the owner\'s unpaid order only (test checkout, amount in tiyin, order code, return page)');
+
+      // unauthorized callers, broken requests: always HTTP 200 + a JSON-RPC error, never "allowed"
+      r = await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }, { auth: null }); assert.equal(r.status, 200); assert.equal(errOf(r), -32504); assert.equal(r.json.id, rpcId);
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }, { auth: 'Paycom:wrong-key' })), -32504);
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }, { auth: 'Payme:' + KEY })), -32504, 'login must be Paycom');
+      assert.equal(errOf(await rpc('PerformTransaction', { id: 'x' }, { auth: null, headers: { cookie: buyer.j.get() } })), -32504, 'a student\'s own session cannot call Payme methods');
+      assert.equal(errOf(await call('GET', '/api/payme')), -32300);
+      assert.equal(errOf(await rpc(null, null, { raw: '{bad json' })), -32700);
+      assert.equal(errOf(await rpc(null, null, { raw: JSON.stringify({ id: 1, params: {} }) })), -32600);
+      for (const m of ['NoSuchMethod', '__proto__', 'constructor', 'toString']) assert.equal(errOf(await rpc(m, {})), -32601, m);
+      assert.ok(r.json.error.message.ru && r.json.error.message.uz && r.json.error.message.en, 'messages in ru / uz / en');
+      ok('Payme: unauthorized callback, wrong login / key, student session, bad JSON, unknown method -> JSON-RPC errors');
+
+      // CheckPerformTransaction: wrong order, wrong amount, then allowed
+      r = await rpc('CheckPerformTransaction', { amount: t1amount, account: { order_id: 'IX-000000' } }); assert.equal(errOf(r), -31050); assert.equal(r.json.error.data, 'order_id');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: {} })), -31050);
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount - 100, account: acc(o1) })), -31001, 'incorrect amount');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: o1.amount, account: acc(o1) })), -31001, 'so\'m instead of tiyin');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: String(t1amount), account: acc(o1) })), -31001);
+      r = await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }); assert.deepEqual(r.json.result, { allow: true });
+      ok('Payme: CheckPerformTransaction (unknown order -31050, incorrect amount -31001, allowed)');
+
+      // CreateTransaction: created once; the same id again answers the same; a second payment for the order is refused
+      const T1 = 'pm' + crypto.randomBytes(11).toString('hex');
+      r = await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount, account: acc(o1) }); assert.equal(r.json.result.state, 1);
+      const created = r.json.result; assert.ok(typeof created.transaction === 'string' && created.create_time > 0);
+      assert.deepEqual((await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount, account: acc(o1) })).json.result, created, 'repeated CreateTransaction');
+      assert.equal(errOf(await rpc('CreateTransaction', { id: 'pm-other', time: Date.now(), amount: t1amount, account: acc(o1) })), -31052, 'second transaction for the same order');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) })), -31052);
+      assert.equal(errOf(await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount - 100, account: acc(o1) })), -31008, 'same id, other amount');
+      assert.equal((await call('POST', `/api/orders/${o1.id}/cancel`, { jar: buyer.j })).status, 409, 'cannot cancel while Payme holds it');
+      assert.equal((await call('POST', `/api/admin/orders/${o1.id}/approve`, { jar: boss })).status, 409, 'not confirmed by hand meanwhile');
+      // not paid yet: no access, whatever the browser says
+      assert.equal((await status()).premium, false); assert.equal(await audio(), false);
+      r = await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: buyer.j }); assert.equal(r.json.order.status, 'pending'); assert.equal(r.json.payment.state, 1);
+      assert.equal((await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: stranger.j })).status, 404, 'another account cannot read the order');
+      ok('Payme: CreateTransaction (idempotent, one live transaction per order, the order is locked, still no access)');
+
+      // PerformTransaction: the plan turns on; a repeated (duplicate) callback changes nothing
+      r = await rpc('PerformTransaction', { id: T1 }); assert.equal(r.json.result.state, 2); assert.equal(r.json.result.transaction, created.transaction);
+      const performTime = r.json.result.perform_time; assert.ok(performTime >= created.create_time);
+      let st = await status(); assert.equal(st.premium, true); assert.equal(st.level, 2); assert.equal(st.plan, 'Max'); assert.equal(await audio(), true, 'paid content opens');
+      const expA = Date.parse(st.expiresAt); assert.ok(Math.abs(expA - Date.now() - 90 * 86400000) < 120000, 'Max for 3 months');
+      r = await rpc('PerformTransaction', { id: T1 }); assert.equal(r.json.result.perform_time, performTime, 'duplicate PerformTransaction');
+      assert.equal(Date.parse((await status()).expiresAt), expA, 'no double activation');
+      r = await rpc('CheckTransaction', { id: T1 }); assert.equal(r.json.result.state, 2); assert.equal(r.json.result.reason, null); assert.equal(r.json.result.perform_time, performTime); assert.equal(r.json.result.cancel_time, 0);
+      assert.equal(errOf(await rpc('CheckTransaction', { id: 'pm-unknown' })), -31003);
+      assert.equal(errOf(await rpc('PerformTransaction', { id: 'pm-unknown' })), -31003);
+      assert.equal(errOf(await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount, account: acc(o1) })), -31008, 'already processed transaction');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) })), -31051, 'already paid order');
+      assert.equal(errOf(await rpc('CreateTransaction', { id: 'pm-late', time: Date.now(), amount: t1amount, account: acc(o1) })), -31051);
+      r = await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: buyer.j }); assert.equal(r.json.order.status, 'paid'); assert.equal(r.json.order.paidVia, 'payme'); assert.equal(r.json.payment.state, 2);
+      assert.equal((await call('POST', `/api/orders/${o1.id}/payme`, { body: {}, jar: buyer.j })).status, 400, 'no checkout for a paid order');
+      r = await call('GET', '/api/admin/audit', { jar: boss }); assert.ok(r.json.entries.some((a) => a.action === 'payme.paid' && a.target === o1.ref));
+      assert.ok(!JSON.stringify(r.json.entries).includes(KEY), 'the key is never logged');
+      ok('Payme: PerformTransaction switches Max on once (duplicate callback, already processed, paid order refused), CheckTransaction');
+
+      // CancelTransaction after completion = refund: the time it added is taken back; repeated cancel answers the same
+      r = await rpc('CancelTransaction', { id: T1, reason: 5 }); assert.equal(r.json.result.state, -2); const cancelTime = r.json.result.cancel_time; assert.ok(cancelTime > 0);
+      st = await status(); assert.equal(st.premium, false, 'refund takes the plan back'); assert.equal(await audio(), false);
+      assert.equal((await rpc('CancelTransaction', { id: T1, reason: 5 })).json.result.cancel_time, cancelTime, 'repeated CancelTransaction');
+      assert.equal(errOf(await rpc('PerformTransaction', { id: T1 })), -31008, 'a refunded transaction cannot be performed');
+      r = await rpc('CheckTransaction', { id: T1 }); assert.equal(r.json.result.state, -2); assert.equal(r.json.result.reason, 5);
+      assert.equal((await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: buyer.j })).json.order.status, 'refunded');
+      assert.equal(errOf(await rpc('CancelTransaction', { id: 'pm-unknown', reason: 1 })), -31003);
+      ok('Payme: refund (CancelTransaction after Perform) takes the plan time back; repeated cancel is idempotent');
+
+      // failed / cancelled payment before completion: the order stays open and can be paid again
+      const o2 = await order('standard', 1); const a2 = o2.amount * 100;
+      const T2 = 'pm2-' + crypto.randomBytes(8).toString('hex'), T3 = 'pm3-' + crypto.randomBytes(8).toString('hex');
+      assert.equal((await rpc('CreateTransaction', { id: T2, time: Date.now(), amount: a2, account: acc(o2) })).json.result.state, 1);
+      r = await rpc('CancelTransaction', { id: T2, reason: 3 }); assert.equal(r.json.result.state, -1);
+      assert.equal((await status()).premium, false, 'a failed payment gives nothing');
+      r = await call('GET', `/api/orders/${encodeURIComponent(o2.ref)}`, { jar: buyer.j }); assert.equal(r.json.order.status, 'pending'); assert.equal(r.json.payment.state, -1); assert.equal(r.json.payment.reason, 3);
+      assert.equal(errOf(await rpc('PerformTransaction', { id: T2 })), -31008, 'a cancelled transaction cannot be performed');
+      assert.equal((await rpc('CreateTransaction', { id: T3, time: Date.now(), amount: a2, account: acc(o2) })).json.result.state, 1, 'paying again after a failed try');
+      assert.equal((await rpc('PerformTransaction', { id: T3 })).json.result.state, 2);
+      st = await status(); assert.equal(st.level, 1); assert.equal(st.plan, 'Standard'); const expB = Date.parse(st.expiresAt);
+      ok('Payme: failed / cancelled payment (state -1) keeps the order open; paying again works');
+
+      // parallel duplicate callbacks: two PerformTransaction at once extend the plan once; two CreateTransaction for one order -> one wins
+      const o3 = await order('standard', 1); const a3 = o3.amount * 100; const T4 = 'pm4-' + crypto.randomBytes(8).toString('hex');
+      const both = await Promise.all([rpc('CreateTransaction', { id: T4, time: Date.now(), amount: a3, account: acc(o3) }), rpc('CreateTransaction', { id: 'pm4-rival', time: Date.now(), amount: a3, account: acc(o3) })]);
+      assert.equal(both.filter((x) => x.json.result && x.json.result.state === 1).length, 1, 'one CreateTransaction wins'); assert.equal(both.filter((x) => errOf(x) === -31052).length, 1);
+      const winner = both[0].json.result ? T4 : 'pm4-rival';
+      const perf = await Promise.all([rpc('PerformTransaction', { id: winner }), rpc('PerformTransaction', { id: winner }), rpc('PerformTransaction', { id: winner })]);
+      assert.ok(perf.every((x) => x.json.result && x.json.result.state === 2)); assert.equal(new Set(perf.map((x) => x.json.result.perform_time)).size, 1);
+      const expC = Date.parse((await status()).expiresAt); assert.ok(Math.abs(expC - expB - 30 * 86400000) < 5000, 'extended by exactly one month');
+      ok('Payme: parallel duplicate callbacks (Create x2, Perform x3) -> one transaction, one activation');
+
+      // 12-hour timeout: an old CreateTransaction is refused; a created one left too long is cancelled with reason 4
+      const o4 = await order('standard', 3); const a4 = o4.amount * 100;
+      assert.equal(errOf(await rpc('CreateTransaction', { id: 'pm-old', time: Date.now() - 13 * 3600000, amount: a4, account: acc(o4) })), -31008);
+      const T5 = 'pm5-' + crypto.randomBytes(8).toString('hex');
+      assert.equal((await rpc('CreateTransaction', { id: T5, time: Date.now(), amount: a4, account: acc(o4) })).json.result.state, 1);
+      { const f = path.join(tmp, 'db.json'); const db = JSON.parse(fs.readFileSync(f, 'utf8')); const t = db.payme.find((x) => x.paymeId === T5); t.createTime -= 13 * 3600000; t.testMoved = true; fs.writeFileSync(f, JSON.stringify(db, null, 2)); }
+      assert.equal(errOf(await rpc('PerformTransaction', { id: T5 })), -31008, 'timed out');
+      r = await rpc('CheckTransaction', { id: T5 }); assert.equal(r.json.result.state, -1); assert.equal(r.json.result.reason, 4);
+      assert.equal(Date.parse((await status()).expiresAt), expC, 'nothing granted');
+      ok('Payme: 12-hour timeout (old CreateTransaction refused, an expired one cancelled with reason 4)');
+
+      // fiscal receipt detail, GetStatement
+      process.env.PAYME_IKPU = '10899002001000000'; process.env.PAYME_PACKAGE_CODE = '1500537';
+      r = await rpc('CheckPerformTransaction', { amount: a4, account: acc(o4) }); assert.equal(r.json.result.allow, true);
+      assert.deepEqual(r.json.result.detail.items.map((x) => [x.price, x.count, x.code, x.package_code]), [[a4, 1, '10899002001000000', '1500537']]);
+      delete process.env.PAYME_IKPU; delete process.env.PAYME_PACKAGE_CODE;
+      r = await rpc('GetStatement', { from: Date.now() - 3600000, to: Date.now() + 1000 });
+      const ids = r.json.result.transactions.map((x) => x.id); assert.ok([T1, T2, T3, T5].every((x) => ids.includes(x)), ids.join());
+      assert.ok(r.json.result.transactions.every((x, i, a) => !i || a[i - 1].time <= x.time), 'sorted by time');
+      const s1 = r.json.result.transactions.find((x) => x.id === T1); assert.equal(s1.state, -2); assert.equal(s1.account.order_id, o1.ref); assert.equal(s1.amount, t1amount);
+      assert.equal((await rpc('GetStatement', { from: Date.now() + 3600000, to: Date.now() + 7200000 })).json.result.transactions.length, 0);
+      assert.equal(errOf(await rpc('GetStatement', { from: 10, to: 5 })), -32600);
+      ok('Payme: fiscal receipt detail (MXIK / package code), GetStatement (period, sorted, account)');
+
+      // optional IP allow-list; Payme switched off -> never "allowed"
+      process.env.PAYME_ALLOWED_IPS = '185.234.113.0/28'; assert.equal(errOf(await rpc('CheckTransaction', { id: T1 })), -32504, 'address not allowed');
+      process.env.PAYME_ALLOWED_IPS = '185.234.113.0/28, 127.0.0.0/8, ::1'; assert.equal((await rpc('CheckTransaction', { id: T1 })).json.result.state, -2);
+      delete process.env.PAYME_ALLOWED_IPS;
+      const savedId = process.env.PAYME_MERCHANT_ID; delete process.env.PAYME_MERCHANT_ID;
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: a4, account: acc(o4) })), -32400);
+      assert.equal((await call('GET', '/api/plans')).json.payme, false); assert.equal((await call('POST', `/api/orders/${o4.id}/payme`, { body: {}, jar: buyer.j })).status, 501);
+      process.env.PAYME_MERCHANT_ID = savedId;
+      ok('Payme: IP allow-list, switched off without the merchant settings');
+
+      // ChangePassword: the new key works at once, the old one stops; a new key in the environment wins again
+      const NEW = 'NewKey-' + crypto.randomBytes(12).toString('hex');
+      assert.equal(errOf(await rpc('ChangePassword', { password: KEY })), -32504, 'same key');
+      assert.deepEqual((await rpc('ChangePassword', { password: NEW })).json.result, { success: true });
+      assert.equal(errOf(await rpc('CheckTransaction', { id: T1 })), -32504, 'old key refused');
+      assert.equal((await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + NEW })).json.result.state, -2, 'new key works');
+      process.env.PAYME_MERCHANT_KEY = 'ThirdKey-' + crypto.randomBytes(12).toString('hex');
+      assert.equal(errOf(await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + NEW })), -32504);
+      assert.equal((await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + process.env.PAYME_MERCHANT_KEY })).json.result.state, -2, 'environment key wins');
+      for (const p of ['/payme.js', '/PAYME_SETUP.md']) assert.ok([403, 404].includes((await call('GET', p)).status), p);
+      ok('Payme: ChangePassword, payme.js and its notes are not downloadable');
+    }
+
+    // --- Videos, Books, Grammar, Music, Links (panels.js) and the Reading page fixes (reading-exam.js)
+    {
+      const mkU = async (name, email) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); assert.equal((await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j })).status, 200); return { j, id: row.id };
+      };
+      const freeU = await mkU('Panel Free', 'panel-free@example.com'), maxP = await mkU('Panel Max', 'panel-max@example.com');
+      await call('POST', `/api/admin/users/${maxP.id}/premium`, { body: { plan: 'Max', days: 30 }, jar: boss });
+      const save = (kind, item, j) => call('POST', '/api/admin/panels/' + kind, { jar: j || boss, body: { item } });
+      assert.equal((await call('GET', '/api/admin/panels/videos')).status, 401);
+      assert.equal((await call('GET', '/api/admin/panels/videos', { jar: freeU.j })).status, 403);
+      assert.equal((await call('GET', '/api/admin/panels/videos', { jar: boss })).json.items.length, 0);
+      assert.equal((await save('videos', { title: 'Bad', url: 'https://example.com/x' })).status, 400, 'not a YouTube / Vimeo link');
+      assert.equal((await save('videos', { title: '', url: 'https://youtu.be/dQw4w9WgXcQ' })).status, 400, 'title needed');
+      let r = await save('videos', { title: 'Listening Part 1 tips', url: 'https://youtu.be/dQw4w9WgXcQ?t=10', category: 'Listening', level: 'b1', duration: '12:30' });
+      assert.equal(r.status, 201); const v1 = r.json.item; assert.equal(v1.provider, 'youtube'); assert.equal(v1.videoId, 'dQw4w9WgXcQ'); assert.equal(v1.level, 'B1');
+      const v2 = (await save('videos', { title: 'Writing Task 2 masterclass', url: 'https://www.youtube.com/watch?v=abcdefghijk&list=x', plan: 'max' })).json.item;
+      assert.equal((await save('videos', { title: 'Vimeo one', url: 'https://vimeo.com/123456789', published: false })).json.item.provider, 'vimeo');
+      r = await call('GET', '/api/panels/videos');
+      assert.equal(r.json.items.length, 2, 'a hidden video is not listed');
+      const pubV1 = r.json.items.find((x) => x.id === v1.id), pubV2 = r.json.items.find((x) => x.id === v2.id);
+      assert.equal(pubV1.videoId, 'dQw4w9WgXcQ'); assert.ok(/i\.ytimg\.com\/vi\/dQw4w9WgXcQ/.test(pubV1.cover));
+      assert.equal(pubV2.locked, true); assert.equal(pubV2.videoId, undefined); assert.ok(!JSON.stringify(pubV2).includes('abcdefghijk'), 'a locked video never sends its id');
+      assert.equal((await call('GET', '/api/panels/videos', { jar: freeU.j })).json.items.find((x) => x.id === v2.id).locked, true);
+      assert.equal((await call('GET', '/api/panels/videos', { jar: maxP.j })).json.items.find((x) => x.id === v2.id).videoId, 'abcdefghijk', 'Max opens the Max video');
+      ok('Videos: admin only, YouTube / Vimeo links checked, hidden ones not listed, a locked video comes without its id');
+
+      assert.equal((await save('books', { title: 'Bad book', file: 'javascript:alert(1)' })).status, 400);
+      const b1 = (await save('books', { title: 'Cambridge IELTS 18', author: 'CUP', file: '/uploads/pdf/c18.pdf', cover: 'https://example.com/c.jpg', plan: 'standard', pages: 140 })).json.item;
+      r = await call('GET', '/api/panels/books'); const pb = r.json.items[0];
+      assert.equal(pb.locked, true); assert.equal(pb.file, undefined); assert.equal(pb.hasFile, true); assert.equal(pb.cover, 'https://example.com/c.jpg');
+      assert.equal((await call('GET', '/api/panels/books', { jar: maxP.j })).json.items[0].file, '/uploads/pdf/c18.pdf');
+      ok('Books: safe file and cover links only, a locked book shows its cover but not its file');
+
+      assert.equal((await save('grammar', { title: 'No answer', content: 'x', exercises: [{ q: 'She ____ here.', options: ['live', 'lives'], answer: 'living' }] })).status, 400, 'the answer must be one of the options');
+      const g1 = (await save('grammar', { title: 'Present Perfect', summary: 'have + past participle', content: '## Use\n- experiences\n> I have been to Rome.', level: 'B1',
+        exercises: [{ q: 'She ____ (live) here since 2015.', options: [], answer: 'has lived|’s lived' }, { q: 'I ____ him yesterday.', options: ['have seen', 'saw'], answer: 1, explain: 'finished time' }] })).json.item;
+      assert.equal(g1.exercises[1].answer, 'saw', 'an option chosen by its number');
+      const g2 = (await save('grammar', { title: 'Mixed conditionals', content: 'secret text', plan: 'ultra' })).json.item;
+      r = await call('GET', '/api/panels/grammar'); assert.ok(r.json.items.every((x) => x.content === undefined), 'the list has no lesson text');
+      assert.equal(r.json.items.find((x) => x.id === g1.id).exercises, 2);
+      r = await call('GET', '/api/panels/grammar/' + g1.id); assert.equal(r.status, 200); assert.ok(r.json.item.content.includes('## Use')); assert.equal(r.json.item.exercises.length, 2);
+      r = await call('GET', '/api/panels/grammar/' + g2.id, { jar: maxP.j }); assert.equal(r.status, 403); assert.equal(r.json.locked, true); assert.ok(!JSON.stringify(r.json).includes('secret text'));
+      assert.equal((await call('GET', '/api/panels/grammar/g-00000000')).status, 404);
+      ok('Grammar: lessons and exercises checked, a locked lesson is never sent (403, no text)');
+
+      assert.equal((await save('music', { title: 'No file' })).status, 400);
+      const m1 = (await save('music', { title: 'Calm piano', artist: 'Studio', url: 'https://example.com/calm.mp3' })).json.item;
+      const m2 = (await save('music', { title: 'Focus beats', url: '/uploads/audio/focus.mp3', plan: 'max' })).json.item;
+      r = await call('GET', '/api/panels/music', { jar: freeU.j });
+      assert.equal(r.json.items.find((x) => x.id === m1.id).url, 'https://example.com/calm.mp3'); assert.equal(r.json.items.find((x) => x.id === m2.id).url, undefined);
+      r = await call('POST', '/api/admin/panels/music/order', { jar: boss, body: { ids: [m2.id, m1.id] } }); assert.deepEqual(r.json.items.map((x) => x.id), [m2.id, m1.id]);
+      r = await call('DELETE', '/api/admin/panels/music/' + m2.id, { jar: boss }); assert.deepEqual(r.json.items.map((x) => x.id), [m1.id]);
+      assert.equal((await call('GET', '/api/panels/music')).json.items.length, 1);
+      ok('Music: tracks with a file, a locked track has no file, order and delete');
+
+      // links: "old link -> new link" for every page
+      const putLinks = (rules) => call('POST', '/api/admin/links', { jar: boss, body: { rules } });
+      assert.equal((await call('POST', '/api/admin/links', { jar: freeU.j, body: { rules: [] } })).status, 403);
+      assert.equal((await putLinks([{ from: 'javascript:alert(1)', to: '/x' }])).status, 400);
+      assert.equal((await putLinks([{ from: '/admin', to: '/x' }])).status, 400, 'the admin panel cannot be moved');
+      assert.equal((await putLinks([{ from: '/Price', to: '/price/' }])).status, 400, 'old = new');
+      assert.equal((await putLinks([{ from: 'https://t.me/a', to: 'https://t.me/b' }, { from: 'https://t.me/a/', to: 'https://t.me/c' }])).status, 400, 'twice');
+      r = await putLinks([{ from: 'https://t.me/sh7595', to: 'https://t.me/ieltsx_support', note: 'Telegram' }, { from: '/old-page', to: '/Price' }, { from: 'mailto:support@ieltsx.com', to: 'mailto:help@ielts-x.uz', active: false }, { from: '', to: '', note: '' }]);
+      assert.equal(r.status, 200); assert.equal(r.json.rules.length, 3, 'an empty row is dropped');
+      r = await call('GET', '/api/links'); assert.deepEqual(r.json.rules, [{ from: 'https://t.me/sh7595', to: 'https://t.me/ieltsx_support' }, { from: '/old-page', to: '/Price' }]);
+      assert.ok(/public/.test(r.headers.get('cache-control')), 'cached by the CDN');
+      ok('Links: admin only, safe links only, no /admin, no duplicates, the active ones for every page');
+
+      for (const pg of ['/videos', '/books', '/grammar']) { const x = await call('GET', pg); assert.equal(x.status, 200, pg); assert.ok(x.text.includes('data-panel="' + pg.slice(1) + '"'), pg); }
+      for (const f of ['/panels.js', '/assets/js/panels-page.js', '/assets/js/site-music.js', '/assets/js/site-links.js', '/assets/css/panels.css', '/assets/css/site-music.css']) assert.equal((await call('GET', f)).status, f === '/panels.js' ? 404 : 200, f);
+      assert.ok((await call('GET', '/settings.html')).text.includes('id="ixs-music"'), 'Settings has the music section');
+      const side = (await call('GET', '/api/sidebar')).json.items.map((x) => x.key);
+      assert.ok(['videos', 'books', 'grammar'].every((k) => side.includes(k)), 'the menu has Videos, Books, Grammar');
+      ok('Videos / Books / Grammar pages, Settings music, sidebar items; panels.js is not downloadable');
+
+      // Reading: paragraph letters, the line under the title, flow-charts typed with arrows or kept as old single questions
+      const { buildExamHtml } = require('../reading-exam');
+      const tpl = fs.readFileSync(path.join(__dirname, '..', 'pessages', 'test-19.html'), 'utf8');
+      const mat = { id: crypto.randomUUID(), type: 'reading', title: 'Ahead of its time', data: { mode: 'part', passageLabel: 'Passage 1',
+        passage: 'A short history of a strange skull found in a New Zealand river.\n\nA When the river flooded in 2004, a farmer named Tobin walked along its banks.\n\nB The police were called at once, but they found nothing.\n\nC Later the scientists sent a bone sample to a laboratory.',
+        questions: [
+          { type: 'completion', gi: 1, passage: 1, group: 'Complete the flow-chart below. Choose NO MORE THAN TWO WORDS from the passage.', blockTitle: 'After the flood', prompt: 'Tobin found a human skull ↓ The ____ were called.', answer: 'police' },
+          { type: 'completion', gi: 1, passage: 1, group: 'Complete the flow-chart below. Choose NO MORE THAN TWO WORDS from the passage.', blockTitle: 'After the flood', prompt: '↓ A ____ sample was sent to a laboratory.', answer: 'bone' },
+          { type: 'flowchart', gi: 2, passage: 1, group: 'Complete the flow-chart below.', text: 'The river flooded\n↓\n____ walked along the banks\n↓\nThe skull was found → it was sent to the ____', answer: 'Tobin' },
+          { type: 'flowchart', gi: 2, passage: 1, group: 'Complete the flow-chart below.', text: '', answer: 'laboratory' }
+        ] } };
+      const html = buildExamHtml(mat, tpl);
+      assert.ok(html.includes('pass-lead') && html.includes('A short history'), 'the line under the title is set apart');
+      assert.equal((html.match(/para-lettered/g) || []).length, 3, 'paragraph letters A, B, C');
+      const boxes = [...html.matchAll(/"boxes": \[([\s\S]*?)\]/g)].map((m) => JSON.parse('[' + m[1] + ']'));
+      assert.deepEqual(boxes[0], ['Tobin found a human skull', 'The {{1}} were called.', 'A {{2}} sample was sent to a laboratory.'], 'old single questions -> one box per step');
+      assert.deepEqual(boxes[1], ['The river flooded', '{{3}} walked along the banks', 'The skull was found', 'it was sent to the {{4}}'], 'typed arrows only separate the boxes');
+      assert.ok(!/"boxes": \[[^\]]*[↓→]/.test(html), 'no arrow is left inside a box');
+      ok('Reading: paragraph letters on their own line, the line under the title set apart, flow-chart boxes split at the arrows');
     }
 
     // --- rate limit

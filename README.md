@@ -143,9 +143,15 @@ and the red placeholder mark of the test pages for them. It is loaded by `site-a
 * **Buying**: on `Price.html` the buttons open a dialog (plan + months) -> an **order with a code** (e.g. `IX-4F2A91`) ->
   the student pays and sends the code to Telegram -> an admin presses **Confirm payment** in the panel and the plan
   turns on (an active plan is extended). Prices are in `plans.json`.
+* **Payme** (`payme.js`, setup and testing in `PAYME_SETUP.md`): with `PAYME_MERCHANT_ID` + `PAYME_MERCHANT_KEY` set,
+  the order window shows **Pay with Payme**. Payme calls the Merchant API at `POST /api/payme` (Basic auth with the
+  merchant key; CheckPerformTransaction, CreateTransaction, PerformTransaction, CancelTransaction, CheckTransaction,
+  GetStatement, ChangePassword) and the plan turns on in `PerformTransaction` — never from the browser. The student comes
+  back to `/payment-status?order=IX-…`, which only reads the order. Supabase: the **v10** part of `supabase-schema.sql`.
+  Without the variables nothing changes: the manual payment below works as before (and stays as the second option).
 * **Automatic confirmation**: a payment provider or a Telegram bot can `POST /api/payments/webhook` with the header
   `X-Signature` = hex HMAC-SHA256 of the body using `PAYMENT_WEBHOOK_SECRET`, body `{"reference":"IX-...","status":"paid","amount":264000}`.
-  (Payme / Click / Uzum need their own merchant agreement and protocol; the webhook is the place to connect them.)
+  (Click / Uzum need their own merchant agreement and protocol; the webhook is the place to connect them.)
 
 ## Safety built in
 
@@ -734,3 +740,39 @@ random photo from picsum.photos.
 **Speed**: no picture of the practice cards comes from another site any more; on Supabase the signed-in account is read
 once per page (kept 3 s on the server, cleared by every change of the account) instead of once per API call; the menu is
 asked at most once a minute.
+
+## Videos, Books, Grammar, Music, Links; Reading passage and flow-chart fixes (November 2026)
+
+* **New pages** `/videos`, `/books`, `/grammar` (`videos.html`, `books.html`, `grammar.html`, `assets/js/panels-page.js`,
+  `assets/css/panels.css` on top of the Predictions look). They are in the sidebar under Study Tools (Videos, Books,
+  Grammar; `sidebar.js` built-ins, so Admin → Sidebar can rename, move, hide or lock them like the other items).
+  * **Videos**: YouTube (watch, youtu.be, Shorts, embed, live) or Vimeo links; the student watches in the site's own
+    player window (`youtube-nocookie.com`). Use *Unlisted* YouTube videos for paid lessons: whoever has the YouTube link
+    itself can watch it on YouTube.
+  * **Books**: a PDF uploaded in the panel (Supabase Storage on Vercel, `uploads/` locally) or an https link, a cover,
+    author, pages.
+  * **Grammar**: a topic = an explanation with simple formatting (`## heading`, `- bullet`, `1. numbered`, `> example`,
+    `! tip`, `| table |`, `**bold**`, `*italic*`, `==marked==`) + exercises (choice or typed answers, `a|b` = several right
+    answers), checked on the page. `/grammar#<id>` opens one topic.
+  * Each item: category, CEFR level, plan (Free / Standard / Max / Ultra), shown or hidden. The server (`panels.js`) never
+    sends a locked item's video id, book file, lesson text or music file.
+* **Music** (Settings → Music, `assets/js/site-music.js` + `assets/css/site-music.css`, loaded by `site-design.js`): tracks
+  uploaded in Admin → Music. The student picks one on the Settings page; a small player at the bottom left keeps it
+  playing on the ordinary pages (it continues where it was after a page change; a browser may want one click first) and it
+  never loads on a test or exam page. It pauses when a video starts. The choice stays on the device (`ix-music`).
+* **Links** (Admin → Links, `assets/js/site-links.js`, loaded by `assets/js/loading.js` on every page): "old link → new
+  link". Every `<a href>` of every page that points at the old link gets the new one (the query and `#part` are kept, a
+  link whose text is the old address shows the new one), and an old page address of the site (`/old-page`) opens the new
+  one. `https://t.me/old*` (a star) changes every link that starts like that. `/admin` and `/api` cannot be changed.
+  The rules reach visitors within a minute (`GET /api/links`, cached by the CDN for 60 s).
+* **Admin**: Content → Videos, Books, Grammar, Music (Settings); Settings → Links (`admin-panels.js`). Everything is kept in
+  `ieltsx_settings` (`panel-videos`, `panel-books`, `panel-grammar`, `panel-music`, `link-rules`): no Supabase change needed.
+* **Reading passages** (tests made in the admin panel and the hand-made ones, `reading-exam.js` + `reading.css`): the
+  paragraph letter (A, B, C …) stands on its own line above its paragraph, and the short line under the passage title is
+  set apart from the passage by a rule (it is also found when it ends with a full stop, as long as it comes before
+  paragraph A).
+* **Flow-charts**: the arrows typed or pasted with a flow-chart (`↓` on its own line, or `step ↓ step`) only separate the
+  boxes — before, every `↓` line became a box and `step ↓ step` stayed in one box; a box that starts with the gap (`____ is
+  added`) is no longer glued to the box before it when pasted. Older tests that kept a flow-chart as single questions with
+  arrows in them ("Tobin found a skull ↓ The ____ were called") are shown as a real flow-chart, one box per step. The admin
+  preview shows the same boxes.

@@ -43,6 +43,9 @@
         "pdf-materials": "/study/Tools/Pdf%20materials",
         "articles": "/study/Tools/Articles",
         "vocabulary": "/vocabulary",
+        "videos": "/videos",             // Videos, Books and Grammar: added under Vocabularies below (addExtras)
+        "books": "/books",
+        "grammar": "/grammar",
         "settings": "/settings",        // added under Study Tools by assets/js/site-design.js
 
         // ── account ──
@@ -111,6 +114,33 @@
             var label = a.querySelector('span.flex-1') || a.querySelector('span:last-of-type');
             if (label) label.textContent = 'Game';
             li.parentNode.insertBefore(copy, li.nextSibling);
+        }
+    }
+
+    /* Videos, Books and Grammar (videos.html, books.html, grammar.html) are added the same way, under "Vocabularies",
+       on the pages whose menu was written before they existed */
+    var EXTRAS = [['videos', 'Videos', 'video'], ['books', 'Books', 'book'], ['grammar', 'Grammar', 'graduation']];
+    function addExtras(root) {
+        var vocab = (root || document).querySelectorAll('a[data-link="vocabulary"]');
+        for (var i = 0; i < vocab.length; i++) {
+            var li = vocab[i].closest('li');
+            if (!li || !li.parentNode) continue;
+            var after = li;
+            EXTRAS.forEach(function (x) {
+                if (li.parentNode.querySelector('a[data-link="' + x[0] + '"]')) return;
+                var copy = li.cloneNode(true); var a = copy.querySelector('a');
+                if (!a) return;
+                a.setAttribute('data-link', x[0]); a.setAttribute('href', LINKS[x[0]]); a.removeAttribute('id'); a.removeAttribute('target');
+                var here = new RegExp('^/' + x[0] + '(\\.html)?/?$', 'i').test(location.pathname);
+                a.setAttribute('data-active', here ? 'true' : 'false');
+                if (here) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+                var svgs = a.querySelectorAll('svg');
+                for (var k = svgs.length - 1; k > 0; k--) svgs[k].remove();   // no crown: the pages lock each item themselves
+                if (svgs[0]) svgs[0].parentNode.replaceChild(node(svg(x[2], ICONS[x[2]])), svgs[0]);
+                var label = a.querySelector('span.flex-1') || a.querySelector('span:last-of-type');
+                if (label) label.textContent = x[1];
+                after.parentNode.insertBefore(copy, after.nextSibling); after = copy;
+            });
         }
     }
 
@@ -218,12 +248,12 @@
         }
     }
 
-    var api = { links: LINKS, icons: ICONS, apply: apply, addGame: addGame, build: build, managed: false };
+    var api = { links: LINKS, icons: ICONS, apply: apply, addGame: addGame, addExtras: addExtras, build: build, managed: false };
     window.IELTSXLinks = api;
 
     var hasSidebar = !!document.querySelector('[data-sidebar="content"]');
     var cached = hasSidebar ? readCache() : null;
-    try { if (cached && cached.managed) build(cached); else addGame(); } catch (e) { /* the menu still works without it */ }
+    try { if (cached && cached.managed) build(cached); else { addGame(); addExtras(); } } catch (e) { /* the menu still works without it */ }
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () { apply(); });

@@ -53,6 +53,9 @@ const BUILTIN = [
   { key: 'pdf-materials', label: 'Pdf materials', href: '/study/Tools/Pdf%20materials', icon: 'file', group: 'tools' },
   { key: 'articles', label: 'Articles', href: '/study/Tools/Articles', icon: 'newspaper', group: 'tools' },
   { key: 'vocabulary', label: 'Vocabularies', href: '/vocabulary', icon: 'languages', group: 'tools' },
+  { key: 'videos', label: 'Videos', href: '/videos', icon: 'video', group: 'tools' },
+  { key: 'books', label: 'Books', href: '/books', icon: 'book', group: 'tools' },
+  { key: 'grammar', label: 'Grammar', href: '/grammar', icon: 'graduation', group: 'tools' },
   { key: 'settings', label: 'Settings', href: '/settings', icon: 'settings', group: 'tools' }
 ];
 const BUILTIN_KEYS = new Set(BUILTIN.map((b) => b.key));

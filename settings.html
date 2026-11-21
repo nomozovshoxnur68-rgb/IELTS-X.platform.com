@@ -452,6 +452,15 @@ class="absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-l
                 </div>
             </section>
 
+            <!-- Music (assets/js/site-music.js; the tracks are added in the admin panel: admin.html#music) -->
+            <section class="ixs-card" aria-labelledby="ixs-music-title" id="ixs-music-card">
+                <div class="ixs-row">
+                    <div class="ixs-head"><h2 id="ixs-music-title">Music</h2><p id="ixs-music-help">Calm music while you study. It keeps playing as you move between pages and stops by itself in tests and exams.</p></div>
+                    <label class="ixs-switch"><input type="checkbox" id="ixs-music-on" aria-labelledby="ixs-music-title" aria-describedby="ixs-music-help"><span aria-hidden="true"></span></label>
+                </div>
+                <div id="ixs-music" class="ixm-list" aria-live="polite"><div class="ix-skel" style="height:56px;margin-top:1rem"></div></div>
+            </section>
+
             <div class="ixs-foot">
                 <span class="ixs-saved" id="ixs-saved" role="status" aria-live="polite"></span>
                 <button type="button" class="ixs-btn" id="ixs-reset">Reset to default</button>
