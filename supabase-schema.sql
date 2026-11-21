@@ -153,3 +153,142 @@ alter table public.ieltsx_ai_reports enable row level security;
 -- ever added by mistake.
 revoke all on public.ieltsx_users, public.ieltsx_materials, public.ieltsx_results, public.ieltsx_orders,
   public.ieltsx_audit, public.ieltsx_settings, public.ieltsx_ai_reports from anon, authenticated;
+
+-- ───────────── v10: Payme (automatic payments through the Payme Merchant API, see payme.js and PAYME_SETUP.md) ─────────────
+-- Run this part once on an existing database (safe to run again). Nothing existing is dropped or rewritten: two columns
+-- and one more allowed status on ieltsx_orders, one new table, two functions. Without it the site keeps working with
+-- orders confirmed by hand; /api/payme answers Payme with "system error" and Admin -> Website check says what is missing.
+
+-- 1. orders: how an order was paid ('' = by an admin, 'payme' = automatically), and "refunded" (a Payme payment that was
+--    cancelled after it was completed: the plan time it added is taken back)
+alter table public.ieltsx_orders add column if not exists "paidVia" text not null default '';
+alter table public.ieltsx_orders add column if not exists "refundedAt" timestamptz null;
+alter table public.ieltsx_orders drop constraint if exists ieltsx_orders_status_check;
+alter table public.ieltsx_orders add constraint ieltsx_orders_status_check
+  check (status in ('pending','paid','rejected','cancelled','refunded'));
+
+-- 2. one row per Payme transaction (Payme's own id). Times are milliseconds, the amount is in tiyin (1 so'm = 100 tiyin),
+--    exactly as the Merchant API sends and expects them. The rows are kept when an account is deleted (payment history,
+--    GetStatement); the order code stays in "orderRef".
+create table if not exists public.ieltsx_payme_transactions (
+  id uuid primary key default gen_random_uuid(),
+  "paymeId" text unique not null check (char_length("paymeId") between 1 and 64),
+  "orderId" uuid null references public.ieltsx_orders(id) on delete set null,
+  "orderRef" text not null,
+  "userId" uuid null references public.ieltsx_users(id) on delete set null,
+  amount bigint not null check (amount > 0),
+  state smallint not null default 1 check (state in (1, 2, -1, -2)),
+  reason smallint null,
+  "paymeTime" bigint not null,
+  "createTime" bigint not null,
+  "performTime" bigint not null default 0,
+  "cancelTime" bigint not null default 0,
+  -- what the payment switched on, and the account as it was before (so a refund can put it back)
+  "grantPlan" text not null default '',
+  "grantDays" integer not null default 0,
+  "prevPlan" text null,
+  "prevActive" boolean null,
+  "prevExpiresAt" timestamptz null,
+  "grantedExpiresAt" timestamptz null,
+  "createdAt" timestamptz not null default now(),
+  "updatedAt" timestamptz not null default now()
+);
+-- at most ONE live (created or completed) Payme transaction per order: a second payment for the same order is refused
+-- by the database itself, even when two requests arrive at the same moment on two Vercel instances
+create unique index if not exists ieltsx_payme_one_live on public.ieltsx_payme_transactions ("orderId") where state in (1, 2);
+create index if not exists ieltsx_payme_time on public.ieltsx_payme_transactions ("paymeTime");
+create index if not exists ieltsx_payme_order on public.ieltsx_payme_transactions ("orderId", "createdAt" desc);
+alter table public.ieltsx_payme_transactions enable row level security;
+revoke all on public.ieltsx_payme_transactions from anon, authenticated;
+
+-- 3. PerformTransaction in ONE database transaction: the Payme transaction, the order and the account change together
+--    or not at all (rows locked, so a repeated or parallel call can never switch a plan on twice). The plan time is worked
+--    out like grantPremium() in server.js: an active plan is extended from its end date, otherwise from now.
+create or replace function public.ieltsx_payme_perform(p_payme_id text, p_now bigint, p_timeout bigint)
+returns jsonb language plpgsql set search_path = public as $$
+declare
+  t public.ieltsx_payme_transactions%rowtype;
+  o public.ieltsx_orders%rowtype;
+  u public.ieltsx_users%rowtype;
+  v_days integer;
+  v_base timestamptz;
+  v_exp timestamptz;
+begin
+  select * into t from public.ieltsx_payme_transactions where "paymeId" = p_payme_id for update;
+  if not found then return jsonb_build_object('code', -31003); end if;
+  if t.state = 2 then return jsonb_build_object('tx', to_jsonb(t)); end if;
+  if t.state <> 1 then return jsonb_build_object('code', -31008, 'tx', to_jsonb(t)); end if;
+  if p_now - t."createTime" > p_timeout then
+    update public.ieltsx_payme_transactions set state = -1, reason = 4, "cancelTime" = p_now, "updatedAt" = now()
+      where id = t.id returning * into t;
+    return jsonb_build_object('code', -31008, 'expired', true, 'tx', to_jsonb(t));
+  end if;
+  select * into o from public.ieltsx_orders where id = t."orderId" for update;
+  if not found or o.status <> 'pending' or o.amount::bigint * 100 <> t.amount then
+    return jsonb_build_object('code', -31008, 'tx', to_jsonb(t), 'orderStatus', coalesce(o.status, 'missing'));
+  end if;
+  select * into u from public.ieltsx_users where id = o."userId" for update;
+  if not found then return jsonb_build_object('code', -31008, 'tx', to_jsonb(t), 'orderStatus', 'no-account'); end if;
+  v_days := greatest(o.months, 1) * 30;
+  v_base := case when u.role <> 'admin' and u."premiumActive" and u."premiumExpiresAt" is not null and u."premiumExpiresAt" > now()
+                 then u."premiumExpiresAt" else now() end;
+  v_exp := v_base + make_interval(days => v_days);
+  update public.ieltsx_users set "premiumActive" = true, plan = o."planName", "premiumExpiresAt" = v_exp where id = u.id;
+  update public.ieltsx_orders set status = 'paid', "paidAt" = now(), "paidVia" = 'payme' where id = o.id;
+  update public.ieltsx_payme_transactions set state = 2, "performTime" = p_now, "updatedAt" = now(),
+      "grantPlan" = o."planName", "grantDays" = v_days, "prevPlan" = u.plan, "prevActive" = u."premiumActive",
+      "prevExpiresAt" = u."premiumExpiresAt", "grantedExpiresAt" = v_exp
+    where id = t.id returning * into t;
+  return jsonb_build_object('tx', to_jsonb(t), 'performed', true, 'userId', u.id,
+    'prev', jsonb_build_object('plan', u.plan, 'premiumActive', u."premiumActive", 'premiumExpiresAt', u."premiumExpiresAt"));
+end $$;
+
+-- 4. CancelTransaction in ONE database transaction. A created payment is cancelled (the order stays open, so the student
+--    can pay again). A completed payment is a refund: the order becomes "refunded" and the time it added is taken back
+--    (the account is put back exactly as it was, or, when it changed since, the days are subtracted).
+create or replace function public.ieltsx_payme_cancel(p_payme_id text, p_reason integer, p_now bigint, p_allow_refund boolean)
+returns jsonb language plpgsql set search_path = public as $$
+declare
+  t public.ieltsx_payme_transactions%rowtype;
+  o public.ieltsx_orders%rowtype;
+  u public.ieltsx_users%rowtype;
+  v_exp timestamptz;
+begin
+  select * into t from public.ieltsx_payme_transactions where "paymeId" = p_payme_id for update;
+  if not found then return jsonb_build_object('code', -31003); end if;
+  if t.state < 0 then return jsonb_build_object('tx', to_jsonb(t)); end if;
+  if t.state = 1 then
+    update public.ieltsx_payme_transactions set state = -1, reason = p_reason, "cancelTime" = p_now, "updatedAt" = now()
+      where id = t.id returning * into t;
+    return jsonb_build_object('tx', to_jsonb(t), 'cancelled', true);
+  end if;
+  if not p_allow_refund then return jsonb_build_object('code', -31007, 'tx', to_jsonb(t)); end if;
+  select * into o from public.ieltsx_orders where id = t."orderId" for update;
+  select * into u from public.ieltsx_users where id = t."userId" for update;
+  if found then
+    if u."premiumExpiresAt" is not distinct from t."grantedExpiresAt" and u.plan is not distinct from t."grantPlan" then
+      update public.ieltsx_users set plan = coalesce(t."prevPlan", 'Free'), "premiumActive" = coalesce(t."prevActive", false),
+        "premiumExpiresAt" = t."prevExpiresAt" where id = u.id;
+    elsif u."premiumExpiresAt" is not null and t."grantDays" > 0 then
+      v_exp := u."premiumExpiresAt" - make_interval(days => t."grantDays");
+      if v_exp > now() then
+        update public.ieltsx_users set "premiumExpiresAt" = v_exp where id = u.id;
+      else
+        update public.ieltsx_users set "premiumActive" = false, plan = 'Free', "premiumExpiresAt" = null where id = u.id;
+      end if;
+    end if;
+  end if;
+  if o.id is not null then
+    update public.ieltsx_orders set status = 'refunded', "refundedAt" = now() where id = o.id and status = 'paid';
+  end if;
+  update public.ieltsx_payme_transactions set state = -2, reason = p_reason, "cancelTime" = p_now, "updatedAt" = now()
+    where id = t.id returning * into t;
+  return jsonb_build_object('tx', to_jsonb(t), 'refunded', true, 'userId', t."userId");
+end $$;
+
+-- only the server (service_role key) may run them: Supabase lets the public anon key call new functions by default
+revoke all on function public.ieltsx_payme_perform(text, bigint, bigint) from public, anon, authenticated;
+revoke all on function public.ieltsx_payme_cancel(text, integer, bigint, boolean) from public, anon, authenticated;
+grant execute on function public.ieltsx_payme_perform(text, bigint, bigint) to service_role;
+grant execute on function public.ieltsx_payme_cancel(text, integer, bigint, boolean) to service_role;
+notify pgrst, 'reload schema';

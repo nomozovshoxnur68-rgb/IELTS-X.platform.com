@@ -4,7 +4,8 @@
  * panel (Price control) edits. Nothing about prices is written in the HTML any more.
  *
  * Buying: "Get <plan>" opens a small dialog (plan + duration + promo code) -> an order with a code is created -> the
- * student pays (Uzcard / Humo / ...) and sends the code to the admin on Telegram -> the admin confirms and the plan turns on.
+ * student pays with Payme (assets/js/payme-pay.js; the plan turns on when Payme confirms the payment to the server) or,
+ * the other way, pays (Uzcard / Humo / ...) and sends the code to the admin on Telegram -> the admin confirms.
  * Promo codes are made in Price control; the server checks the code (/api/promo/check) and makes the order with the
  * discount. A link from the promo strip (/Price?promo=CODE) fills the code in.
  */
@@ -97,11 +98,14 @@
     list.forEach(function (p) { grid.appendChild(card(p, m, d)); });
     mount.appendChild(grid);
 
-    var note = el('div', 'ixp-note'); note.appendChild(el('span', null, '💬'));
+    var note = el('div', 'ixp-note'); note.appendChild(el('span', null, d.payme ? '💳' : '💬'));
     var t = el('p'); t.style.margin = '0';
-    t.appendChild(el('strong', null, '🇺🇿 Uzcard / Humo: '));
+    if (d.payme) {
+      t.appendChild(el('strong', null, 'Payme: '));
+      t.appendChild(document.createTextNode('pay online with Uzcard / Humo, your plan turns on automatically. Or send the receipt to '));
+    } else t.appendChild(el('strong', null, '🇺🇿 Uzcard / Humo: '));
     var a = el('a', null, handle(d.contact)); a.href = d.contact; a.target = '_blank'; a.rel = 'noopener noreferrer'; t.appendChild(a);
-    t.appendChild(document.createTextNode(' — send your order code and the receipt, your plan turns on right after.'));
+    t.appendChild(document.createTextNode(d.payme ? '.' : ' — send your order code and the receipt, your plan turns on right after.'));
     note.appendChild(t); mount.appendChild(note);
     renderCompare(d);
   }
@@ -233,12 +237,30 @@
         head('Your order', order.planName + ' · ' + monthWord(order.months) + ' · ' + money(order.amount, order.currency) +
           (order.promoCode ? ' (' + order.promoCode + ', you save ' + money(order.discount, order.currency) + ')' : ''));
         box.appendChild(el('div', 'ixp-code', order.ref));
-        box.appendChild(el('p', null, payment.instructions));
+        // Payme (when the server has it set up): the main way. The plan turns on when Payme confirms the payment to the server.
+        var online = d.payme && window.IXPayme;
+        var target = box;
+        if (online) {
+          var sum = el('div', 'ixp-summary');
+          [['Plan', order.planName], ['Duration', monthWord(order.months)], ['Total', money(order.amount, order.currency)]].forEach(function (r) {
+            var row = el('div', 'ixp-summary-row'); row.appendChild(el('span', null, r[0])); row.appendChild(el('b', null, r[1])); sum.appendChild(row);
+          });
+          box.appendChild(sum);
+          var perr = el('p', 'ixp-err'); perr.setAttribute('role', 'alert');
+          var pay = el('button', 'ixp-btn ixp-payme', 'Pay ' + money(order.amount, order.currency) + ' with Payme'); pay.type = 'button';
+          pay.onclick = function () { perr.textContent = ''; pay.textContent = 'Opening Payme…'; window.IXPayme.pay(order.id, pay).catch(function (e) { pay.textContent = 'Pay ' + money(order.amount, order.currency) + ' with Payme'; perr.textContent = e.message; }); };
+          box.appendChild(pay); box.appendChild(perr);
+          box.appendChild(el('p', 'ixp-facts ixp-payme-note', 'Uzcard, Humo and other cards in Payme. Your plan turns on automatically as soon as Payme confirms the payment.'));
+          var other = el('details', 'ixp-other'); other.appendChild(el('summary', null, 'Other way to pay (card transfer + receipt)'));
+          box.appendChild(other); target = other;
+          pay.focus();
+        }
+        target.appendChild(el('p', null, payment.instructions));
         var text = 'IELTSX order ' + order.ref + ' - ' + order.planName + ' ' + order.months + 'm - ' + money(order.amount, order.currency) + (order.promoCode ? ' (' + order.promoCode + ')' : '') + ' - ' + who.email;
-        var tg = el('a', 'ixp-btn', 'Message ' + handle(payment.contact) + ' on Telegram'); tg.href = payment.contact + '?text=' + encodeURIComponent(text); tg.target = '_blank'; tg.rel = 'noopener noreferrer'; box.appendChild(tg);
+        var tg = el('a', online ? 'ixp-btn alt' : 'ixp-btn', 'Message ' + handle(payment.contact) + ' on Telegram'); tg.href = payment.contact + '?text=' + encodeURIComponent(text); tg.target = '_blank'; tg.rel = 'noopener noreferrer'; target.appendChild(tg);
         var copy = el('button', 'ixp-btn alt', 'Copy order code'); copy.type = 'button';
         copy.onclick = function () { (navigator.clipboard ? navigator.clipboard.writeText(order.ref) : Promise.reject()).then(function () { copy.textContent = 'Copied'; }, function () { copy.textContent = order.ref; }); };
-        box.appendChild(copy);
+        target.appendChild(copy);
         var acc = el('a', 'ixp-btn alt', 'See my orders'); acc.href = '/account#subscription'; box.appendChild(acc);
       }
       choose();

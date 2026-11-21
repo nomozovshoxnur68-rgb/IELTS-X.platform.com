@@ -145,7 +145,7 @@ label.lbl{display:block;margin:12px 0 6px;font-size:12px;font-weight:650;color:v
 .badge-ok,.badge-active,.badge-paid{background:var(--ok-bg);color:var(--ok)}
 .badge-bad,.badge-rejected,.badge-blocked{background:var(--bad-bg);color:var(--bad)}
 .badge-info,.badge-admin{background:var(--info-bg);color:var(--info)}
-.badge-free,.badge-pending,.badge-cancelled{background:var(--chip);color:var(--ink-2)}
+.badge-free,.badge-pending,.badge-cancelled,.badge-refunded{background:var(--chip);color:var(--ink-2)}
 .badge-pending{background:var(--warn-bg);color:var(--warn)}
 
 /* ── charts (simple bars, still used by other views) ── */

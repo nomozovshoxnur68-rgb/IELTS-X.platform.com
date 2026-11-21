@@ -1,0 +1,51 @@
+/* IELTS X — payment status page (payment-status.html). Colours come from the site tokens (assets/css/ix-unified.css),
+   so light and dark mode (html.dark-mode) follow the rest of the site. */
+body { background: hsl(var(--background)); }
+.pst-navlink { display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 8px; font: 500 14px var(--ix-font, system-ui, sans-serif); color: hsl(var(--foreground)); text-decoration: none; }
+.pst-navlink:hover { background: hsl(var(--accent)); }
+.pst-navlink-main { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.pst-navlink-main:hover { background: hsl(var(--primary)); filter: brightness(1.06); }
+
+.pst-wrap { display: grid; place-items: center; min-height: 100vh; padding: 104px 16px 48px; }
+.pst-card { width: 100%; max-width: 480px; padding: 32px 24px 24px; border: 1px solid hsl(var(--border)); border-radius: 20px; background: hsl(var(--card)); color: hsl(var(--card-foreground));
+  box-shadow: 0 20px 50px -20px rgba(15, 23, 42, .25); text-align: center; font: 15px/1.55 var(--ix-font, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif); }
+html.dark-mode .pst-card { box-shadow: 0 20px 50px -20px rgba(0, 0, 0, .7); }
+
+.pst-icon { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; font-size: 30px; font-weight: 700; line-height: 1; }
+.pst-icon svg { width: 32px; height: 32px; }
+.pst-ok { background: var(--ix-success-bg, #dcfce7); color: var(--ix-success-fg, #166534); }
+.pst-bad { background: var(--ix-danger-bg, #fee2e2); color: var(--ix-danger-fg, #991b1b); }
+.pst-warn { background: var(--ix-warn-bg, #fef3c7); color: var(--ix-warn-fg, #92400e); }
+.pst-wait { background: hsl(var(--muted)); color: hsl(var(--primary)); }
+.pst-spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid currentColor; border-right-color: transparent; animation: pst-spin .8s linear infinite; }
+@keyframes pst-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .pst-spin { animation-duration: 2.4s; } }
+
+.pst-title { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.pst-text { margin: 0 0 18px; color: hsl(var(--muted-foreground)); }
+.pst-text b { color: hsl(var(--foreground)); }
+.pst-err { margin: 0 0 12px; color: #dc2626; font-size: 14px; }
+.pst-err:empty { display: none; }
+html.dark-mode .pst-err { color: #fca5a5; }
+
+.pst-summary { margin: 0 0 20px; padding: 4px 16px; border: 1px solid hsl(var(--border)); border-radius: 14px; text-align: left; }
+.pst-summary div { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; font-size: 14px; }
+.pst-summary div + div { border-top: 1px dashed hsl(var(--border)); }
+.pst-summary dt { color: hsl(var(--muted-foreground)); }
+.pst-summary dd { margin: 0; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+.pst-summary .pst-ref { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .04em; }
+
+.pst-actions { display: grid; gap: 8px; }
+.pst-btn { display: block; width: 100%; padding: 12px 14px; border: 1px solid transparent; border-radius: 12px; background: hsl(var(--foreground)); color: hsl(var(--background));
+  font: 600 14px var(--ix-font, system-ui, sans-serif); text-align: center; text-decoration: none; cursor: pointer; }
+.pst-btn.primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.pst-btn.alt { background: transparent; color: hsl(var(--foreground)); border-color: hsl(var(--border)); }
+.pst-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.pst-btn:disabled { opacity: .6; cursor: wait; }
+.pst-btn:focus-visible { outline: 3px solid hsl(var(--primary) / .35); outline-offset: 2px; }
+
+@media (max-width: 480px) {
+  .pst-wrap { padding-top: 92px; align-items: start; }
+  .pst-card { padding: 26px 18px 18px; border-radius: 16px; }
+  .pst-title { font-size: 20px; }
+}

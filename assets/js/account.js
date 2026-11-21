@@ -241,21 +241,34 @@ function set(id, text) { const el = document.getElementById(id); if (el) el.text
     const list = $('#orders-list');
     if (!list) return;
     const fmt = (n, c) => `${new Intl.NumberFormat('en-US').format(n)} ${c === 'UZS' ? 'so‘m' : c}`;
-    const badge = { pending: ['Waiting for payment', 'warn'], paid: ['Paid', 'ok'], rejected: ['Rejected', 'bad'], cancelled: ['Cancelled', ''] };
+    const badge = { pending: ['Waiting for payment', 'warn'], paid: ['Paid', 'ok'], rejected: ['Rejected', 'bad'], cancelled: ['Cancelled', ''], refunded: ['Refunded', ''] };
     async function load() {
         let data;
         try {
             data = await getJson('/api/orders');
         } catch (e) { list.innerHTML = '<div class="acc-empty">' + (e.status === 401 ? 'Sign in to see your orders.' : 'Could not load your orders.') + '</div>'; return; }
-        const all = data.orders || [], contact = data.contact || '';
+        const all = data.orders || [], contact = data.contact || '', online = !!data.payme && !!window.IXPayme;
         if (!all.length) { list.innerHTML = '<div class="acc-empty">No orders yet. <a href="/Price">Choose a plan</a></div>'; return; }
         list.replaceChildren(...all.map((o) => {
             const [label, cls] = badge[o.status] || [o.status, ''];
             const row = document.createElement('div'); row.className = 'acc-item';
+            // payment history: how and when it was paid (Payme or confirmed by an admin), or refunded
+            const how = o.status === 'paid' && o.paidAt ? ` · paid ${esc(day(o.paidAt))}${o.paidVia === 'payme' ? ' with Payme' : ''}`
+                : o.status === 'refunded' && o.refundedAt ? ` · refunded ${esc(day(o.refundedAt))}` : '';
             row.innerHTML = `<span class="acc-item-main"><span class="acc-item-title" style="display:block">${esc(o.planName)} · ${esc(o.months)} ${o.months === 1 ? 'month' : 'months'} · ${esc(fmt(o.amount, o.currency))}</span>` +
-                `<span class="acc-item-meta" style="display:block">${esc(o.ref)} · ${esc(day(o.createdAt))}${o.promoCode ? ` · ${esc(o.promoCode)}, you saved ${esc(fmt(o.discount, o.currency))}` : ''}</span></span><span class="acc-pill ${cls}">${esc(label)}</span>`;
+                `<span class="acc-item-meta" style="display:block">${esc(o.ref)} · ${esc(day(o.createdAt))}${how}${o.promoCode ? ` · ${esc(o.promoCode)}, you saved ${esc(fmt(o.discount, o.currency))}` : ''}</span></span><span class="acc-pill ${cls}">${esc(label)}</span>`;
+            const details = document.createElement('a'); details.textContent = 'Details'; details.href = '/payment-status?order=' + encodeURIComponent(o.ref);
+            if (o.status !== 'pending') {
+                const actions = document.createElement('div'); actions.className = 'acc-order-actions'; actions.appendChild(details); row.appendChild(actions);
+            }
             if (o.status === 'pending') {
                 const actions = document.createElement('div'); actions.className = 'acc-order-actions';
+                if (online) {
+                    const pay = document.createElement('button'); pay.type = 'button'; pay.className = 'acc-order-pay'; pay.textContent = 'Pay with Payme';
+                    pay.addEventListener('click', () => { window.IXPayme.pay(o.id, pay).catch((err) => toast(err.message || 'Could not open Payme.', true)); });
+                    actions.appendChild(pay);
+                }
+                actions.appendChild(details);
                 if (/^https:\/\//.test(contact)) {
                     const tg = document.createElement('a'); tg.textContent = 'Send receipt'; tg.href = `${contact}?text=${encodeURIComponent('IELTSX order ' + o.ref)}`; tg.target = '_blank'; tg.rel = 'noopener noreferrer';
                     actions.appendChild(tg);
@@ -266,7 +279,7 @@ function set(id, text) { const el = document.getElementById(id); if (el) el.text
                     cancel.disabled = true;
                     try {
                         const res = await fetch(`/api/orders/${encodeURIComponent(o.id)}/cancel`, { method: 'POST', credentials: 'same-origin' });
-                        if (!res.ok) throw new Error('Could not cancel the order.');
+                        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Could not cancel the order.');
                         toast('Order cancelled.');
                     } catch (err) { toast(err.message || 'Could not cancel the order.', true); cancel.disabled = false; return; }
                     load();

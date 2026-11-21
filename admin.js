@@ -384,12 +384,12 @@
   /* ───────── orders ───────── */
   function renderOrders() {
     const counts = { all: orders.length }; for (const o of orders) counts[o.status] = (counts[o.status] || 0) + 1;
-    $('#order-tabs').innerHTML = ['all', 'pending', 'paid', 'rejected', 'cancelled'].map((s) => `<button class="tab${orderFilter === s ? ' active' : ''}" data-order-tab="${s}" type="button">${s[0].toUpperCase() + s.slice(1)}<span class="n">${counts[s] || 0}</span></button>`).join('');
+    $('#order-tabs').innerHTML = ['all', 'pending', 'paid', 'refunded', 'rejected', 'cancelled'].map((s) => `<button class="tab${orderFilter === s ? ' active' : ''}" data-order-tab="${s}" type="button">${s[0].toUpperCase() + s.slice(1)}<span class="n">${counts[s] || 0}</span></button>`).join('');
     const list = orders.filter((o) => orderFilter === 'all' || o.status === orderFilter);
     $('#orders-body').innerHTML = list.map((o) =>
       `<tr><td><strong>${esc(o.ref)}</strong></td><td>${esc(o.userEmail)}</td><td>${esc(o.planName)} · ${o.months} mo</td><td class="nowrap">${money(o.amount, o.currency)}${o.promoCode ? `<div class="muted sm">${esc(o.promoCode)} · −${money(o.discount, o.currency)}</div>` : ''}</td>` +
-      `<td><span class="badge badge-${esc(o.status)}">${esc(o.status)}</span></td><td class="nowrap">${fmtDateTime(o.createdAt)}</td>` +
-      `<td>${o.status === 'pending' ? `<div class="actions"><button class="btn btn-sm btn-primary" data-order-approve="${esc(o.id)}" type="button">Confirm payment</button><button class="btn btn-sm btn-danger" data-order-reject="${esc(o.id)}" type="button">Reject</button></div>` : (o.paidAt ? '<span class="muted sm">paid ' + esc(fmtDate(o.paidAt)) + '</span>' : '—')}</td></tr>`).join('')
+      `<td><span class="badge badge-${esc(o.status)}">${esc(o.status)}</span>${o.paidVia === 'payme' ? ' <span class="badge badge-info" title="Paid and confirmed automatically by Payme">Payme</span>' : ''}</td><td class="nowrap">${fmtDateTime(o.createdAt)}</td>` +
+      `<td>${o.status === 'pending' ? `<div class="actions"><button class="btn btn-sm btn-primary" data-order-approve="${esc(o.id)}" type="button">Confirm payment</button><button class="btn btn-sm btn-danger" data-order-reject="${esc(o.id)}" type="button">Reject</button></div>` : (o.refundedAt ? '<span class="muted sm">refunded ' + esc(fmtDate(o.refundedAt)) + '</span>' : o.paidAt ? '<span class="muted sm">paid ' + esc(fmtDate(o.paidAt)) + '</span>' : '—')}</td></tr>`).join('')
       || '<tr><td colspan="7" class="empty">No orders here.</td></tr>';
   }
 

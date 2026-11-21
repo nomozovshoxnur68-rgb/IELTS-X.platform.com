@@ -143,9 +143,15 @@ and the red placeholder mark of the test pages for them. It is loaded by `site-a
 * **Buying**: on `Price.html` the buttons open a dialog (plan + months) -> an **order with a code** (e.g. `IX-4F2A91`) ->
   the student pays and sends the code to Telegram -> an admin presses **Confirm payment** in the panel and the plan
   turns on (an active plan is extended). Prices are in `plans.json`.
+* **Payme** (`payme.js`, setup and testing in `PAYME_SETUP.md`): with `PAYME_MERCHANT_ID` + `PAYME_MERCHANT_KEY` set,
+  the order window shows **Pay with Payme**. Payme calls the Merchant API at `POST /api/payme` (Basic auth with the
+  merchant key; CheckPerformTransaction, CreateTransaction, PerformTransaction, CancelTransaction, CheckTransaction,
+  GetStatement, ChangePassword) and the plan turns on in `PerformTransaction` — never from the browser. The student comes
+  back to `/payment-status?order=IX-…`, which only reads the order. Supabase: the **v10** part of `supabase-schema.sql`.
+  Without the variables nothing changes: the manual payment below works as before (and stays as the second option).
 * **Automatic confirmation**: a payment provider or a Telegram bot can `POST /api/payments/webhook` with the header
   `X-Signature` = hex HMAC-SHA256 of the body using `PAYMENT_WEBHOOK_SECRET`, body `{"reference":"IX-...","status":"paid","amount":264000}`.
-  (Payme / Click / Uzum need their own merchant agreement and protocol; the webhook is the place to connect them.)
+  (Click / Uzum need their own merchant agreement and protocol; the webhook is the place to connect them.)
 
 ## Safety built in
 

@@ -576,7 +576,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
+          "value": "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https://*.paycom.uz https://*.payme.uz"
         },
         {
           "key": "Cross-Origin-Opener-Policy",

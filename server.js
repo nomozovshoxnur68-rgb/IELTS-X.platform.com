@@ -793,7 +793,8 @@ const SECURITY_HEADERS = {
   'X-Permitted-Cross-Domain-Policies': 'none',
   // a page opened from another site cannot reach this window (Google sign-in still works: it is a popup this page opens)
   'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-  'Content-Security-Policy': "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
+  // form-action: forms post to this site only, and the "Pay with Payme" form to the Payme checkout (payme.js)
+  'Content-Security-Policy': "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https://*.paycom.uz https://*.payme.uz"
 };
 // admin pages may only load their own scripts/styles and talk to this server
 let SUPA_ORIGIN = ''; try { SUPA_ORIGIN = SUPABASE_URL ? new URL(SUPABASE_URL).origin : ''; } catch (e) { /* bad URL is reported by /api/health */ }
@@ -831,6 +832,7 @@ async function runSiteCheck(fresh) {
     config: { storage: USE_SUPABASE ? 'supabase' : 'file', vercel: IS_VERCEL, dbSize, sessionSecretFromEnv: !!process.env.SESSION_SECRET,
       production: IS_VERCEL || process.env.NODE_ENV === 'production' || /^https:\/\//.test(PUBLIC_URL), adminEmails: ADMIN_EMAILS.size, mail: MAIL_READY,
       publicUrl: PUBLIC_URL, google: !!GOOGLE_CLIENT_ID, ai, paymentWebhook: !!PAYMENT_WEBHOOK_SECRET, promoColumns, aiReports, pricing: await getPricing(),
+      payme: await payme().status(paymeCtx()).catch(() => null),
       cronSecret: !!process.env.CRON_SECRET,
       workers: USE_SUPABASE ? (want === 'auto' ? require('os').cpus().length : Math.max(1, parseInt(want, 10) || 1)) : 1 }
   }, { fresh: !!fresh });
@@ -844,6 +846,9 @@ function guardOrigin(req) {
 const guardCtx = (req, extra) => ({ store, send, readJson, rateLimit, clientIp, HttpError, audit, sendMail, mailReady: MAIL_READY, adminEmails: ADMIN_EMAILS,
   isVercel: IS_VERCEL, root: ROOT, origin: guardOrigin(req), siteCheck: () => runSiteCheck(true), ...(extra || {}) });
 const aiStore = () => aiStoreInst || (aiStoreInst = require('./ai-store').createAiStore({ USE_SUPABASE, sb, eq, DATA_DIR, HttpError }));
+/* Payme (payme.js): the Merchant API Payme calls at /api/payme, the checkout form, the payment of an order */
+const payme = () => require('./payme');
+const paymeCtx = () => ({ store, sb, eq, jsonHeaders, isUuid, USE_SUPABASE, loadDb, saveDb, memoClear, audit, readBody, clientIp, isAdmin, grantQuota, newId, SECURITY_HEADERS });
 
 function readBody(req, limit = 100 * 1024) {
   // Vercel's Node runtime reads JSON bodies before the handler runs (req.body); the stream is then already finished.
@@ -1404,6 +1409,10 @@ async function api(req, res, url) {
   const method = req.method;
   const secureHeaders = (u) => ({ 'Set-Cookie': sessionCookie(req, u) });
 
+  // Payme's own server calls this (no browser, no cookie): it is checked by the merchant key inside payme.js and always
+  // answers in JSON-RPC, so it comes before the browser-only checks below
+  if (p === '/api/payme') return payme().route(req, res, paymeCtx());
+
   if (method !== 'GET' && method !== 'HEAD' && req.headers.origin) {
     let ok = false;
     try { ok = new URL(req.headers.origin).host === req.headers.host || (PUBLIC_URL && req.headers.origin === PUBLIC_URL); } catch (e) { /* bad origin */ }
@@ -1615,7 +1624,7 @@ async function api(req, res, url) {
     await store.setSetting('ui:' + u.id, pref, { minimal: true });
     return send(res, 200, { pref });
   }
-  if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions, promo: promoPublic(bannerPromo(cfg)) }, { 'Cache-Control': 'no-store' }); }
+  if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions, promo: promoPublic(bannerPromo(cfg)), payme: payme().enabled() }, { 'Cache-Control': 'no-store' }); }
   // a promo code typed on the Price page: is it valid (and for which plans)? Only the code in the promo strip is public.
   if (method === 'POST' && p === '/api/promo/check') {
     rateLimit('promo:' + clientIp(req), 30, 15 * 60000);
@@ -1638,6 +1647,7 @@ async function api(req, res, url) {
     let open = (await store.listOrders({ userId: u.id, status: 'pending', limit: 20 }));
     const same = open.find((o) => o.plan === plan.id && o.months === months);
     if (same && same.amount === amount && (same.promoCode || '') === (promo ? promo.code : '')) return send(res, 200, { order: same, payment });
+    if (same && await payme().busy(same.id, paymeCtx())) throw new HttpError(409, `Order ${same.ref} is being paid in Payme right now. Finish or cancel that payment first.`);
     if (same) { await store.updateOrder(same.id, { status: 'cancelled' }); open = open.filter((o) => o.id !== same.id); }   // the same plan with another code: the new order replaces it
     if (open.length >= 5) throw new HttpError(429, 'You already have several unpaid orders. Cancel or finish them first.');
     const ref = 'IX-' + crypto.randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
@@ -1654,14 +1664,35 @@ async function api(req, res, url) {
   }
   if (p === '/api/orders' && method === 'GET') {
     const u = await requireUser(req);
-    return send(res, 200, { orders: await store.listOrders({ userId: u.id, limit: 20 }), contact: (await getPricing()).contact });
+    return send(res, 200, { orders: await store.listOrders({ userId: u.id, limit: 20 }), contact: (await getPricing()).contact, payme: payme().enabled() });
   }
   let om = p.match(/^\/api\/orders\/([^/]+)\/cancel$/);
   if (om && method === 'POST') {
     const u = await requireUser(req); const o = await store.findOrder(decodeURIComponent(om[1]));
     if (!o || o.userId !== u.id) throw new HttpError(404, 'Order not found.');
     if (o.status !== 'pending') throw new HttpError(400, 'Only unpaid orders can be cancelled.');
+    if (await payme().busy(o.id, paymeCtx())) throw new HttpError(409, 'This order is being paid in Payme right now. Finish or cancel the payment in Payme first.');
     return send(res, 200, { order: await store.updateOrder(o.id, { status: 'cancelled' }) });
+  }
+  /* one order of the signed-in student, with its Payme payment: the payment status page reads only this (the plan is
+     switched on by Payme's PerformTransaction call, never by the page or the address Payme sends the student back to) */
+  om = p.match(/^\/api\/orders\/([^/]+)$/);
+  if (om && method === 'GET') {
+    const u = await requireUser(req); rateLimit('order-status:' + u.id, 240, 10 * 60000);
+    const o = await store.findOrder(decodeURIComponent(om[1]));
+    if (!o || o.userId !== u.id) throw new HttpError(404, 'Order not found.');
+    return send(res, 200, { order: o, payment: await payme().orderPayment(o, paymeCtx()), payme: payme().enabled(), premium: { active: isPremium(u), plan: publicUser(u).plan, expiresAt: u.premiumExpiresAt || null } });
+  }
+  /* "Pay with Payme": the checkout form for one unpaid order of the signed-in student (the amount comes from the order) */
+  om = p.match(/^\/api\/orders\/([^/]+)\/payme$/);
+  if (om && method === 'POST') {
+    const u = await requireUser(req); rateLimit('payme-checkout:' + u.id, 30, 60 * 60000);
+    if (!payme().enabled()) throw new HttpError(501, 'Online payment is not available right now. Please use the other payment option.');
+    const o = await store.findOrder(decodeURIComponent(om[1]));
+    if (!o || o.userId !== u.id) throw new HttpError(404, 'Order not found.');
+    if (o.status !== 'pending') throw new HttpError(400, o.status === 'paid' ? 'This order is already paid.' : 'This order is closed. Make a new order on the Price page.');
+    const b = await readJson(req, 4 * 1024);
+    return send(res, 200, { checkout: payme().checkoutForm(o, { origin: siteUrl(req), lang: String(b.lang || '') }) });
   }
   if (method === 'POST' && p === '/api/payments/webhook') {
     if (!PAYMENT_WEBHOOK_SECRET) throw new HttpError(501, 'Payment webhook is not configured.');
@@ -1799,6 +1830,7 @@ async function api(req, res, url) {
     if (am && method === 'POST') {
       const o = await store.findOrder(decodeURIComponent(am[1])); if (!o) throw new HttpError(404, 'Order not found.');
       if (o.status !== 'pending') throw new HttpError(400, 'This order is already ' + o.status + '.');
+      if (await payme().busy(o.id, paymeCtx())) throw new HttpError(409, 'The student is paying this order in Payme right now: it is confirmed automatically when the payment completes.');
       if (am[2] === 'approve') {
         const u = await store.findUserById(o.userId); if (!u) throw new HttpError(404, 'The buyer account no longer exists.');
         const updatedUser = await grantPremium(u, o.planName, o.months * 30);
@@ -2100,7 +2132,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', 'design-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers; design-src: sent by /api/design/fx/ to who may use it
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;

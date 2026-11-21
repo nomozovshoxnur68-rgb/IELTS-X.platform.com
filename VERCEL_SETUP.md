@@ -14,6 +14,8 @@ Vercelda disk faqat o'qish uchun, shuning uchun foydalanuvchilar Supabase'da saq
        da "app password" yarating, keyin `SMTP_USER` = Gmail manzilingiz, `SMTP_PASS` = o'sha 16 harfli parol (oddiy parol emas).
      - yoki Resend: `RESEND_API_KEY` + `MAIL_FROM` (Resend'da o'z domeningizni tasdiqlagan bo'lishingiz kerak, vercel.app bo'lmaydi).
    - `OPENAI_API_KEY` (AI tekshiruvi uchun: https://platform.openai.com/api-keys). Hisobga kredit ham kerak: https://platform.openai.com/settings/organization/billing (ChatGPT obunasi API'ni o'z ichiga olmaydi). `AI_PROVIDER` qo'yilgan bo'lsa, qiymati `openai` bo'lsin.
+   - Payme (avtomatik to'lov, ixtiyoriy): `PAYME_MERCHANT_ID`, `PAYME_MERCHANT_KEY`, `PAYME_TEST_MODE` (sinovda `true`).
+     Supabase'da `supabase-schema.sql` ning **v10** qismini ishga tushiring. To'liq qo'llanma: `PAYME_SETUP.md`.
 3. Redeploy qiling.
 4. `https://SAYTINGIZ/api/health` ni oching: `problems` bo'sh bo'lishi kerak, `"mail"` esa `"smtp"` yoki `"resend"` (false emas). `https://SAYTINGIZ/api/ai/status` da `"configured":true` chiqsa, AI ulangan.
 5. Google: Cloud Console -> Credentials -> Authorized JavaScript origins ga `https://SAYTINGIZ` (oxirida `/` siz) qo'shing.

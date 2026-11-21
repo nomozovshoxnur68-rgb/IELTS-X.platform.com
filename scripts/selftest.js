@@ -5,6 +5,9 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ieltsx-'));
 process.env.DATA_DIR = tmp; process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
 process.env.ADMIN_EMAILS = 'boss@example.com'; process.env.SESSION_SECRET = 'test-secret-test-secret-test-secret-123456';
 process.env.PAYMENT_WEBHOOK_SECRET = 'hook-secret';
+// Payme (payme.js) in test mode with made-up merchant settings; the optional ones start empty (a real .env never leaks in)
+process.env.PAYME_MERCHANT_ID = 'test-merchant-5e0f'; process.env.PAYME_MERCHANT_KEY = 'TestKey-' + require('crypto').randomBytes(12).toString('hex'); process.env.PAYME_TEST_MODE = 'true';
+for (const k of ['PAYME_ALLOWED_IPS', 'PAYME_IKPU', 'PAYME_PACKAGE_CODE', 'PAYME_CHECKOUT_URL', 'PAYME_ACCOUNT_FIELD', 'PAYME_VAT_PERCENT']) process.env[k] = '';
 for (const k of ['RESEND_API_KEY', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']) process.env[k] = '';   // set before server.js reads .env: the tests never send a real mail
 const mails = []; const realLog = console.log;
 console.log = (...a) => { const t = a.join(' '); if (t.includes('[mail not configured]')) mails.push(t); else realLog(...a); };
@@ -1789,6 +1792,172 @@ server.listen(0, async () => {
         await assert.rejects(handler.smtpSend(conf, { ...mail, to: 'a@x.com\r\nBcc: z@x.com' }), /line break/);
         ok('mail over SMTP (Gmail app password): sign-in, sender, recipient, encoded subject + body; a refused password is reported without the password');
       } finally { fake.close(); }
+    }
+
+    // --- Payme Merchant API (payme.js): every payment scenario, server to server, the way Payme calls it
+    {
+      const KEY = process.env.PAYME_MERCHANT_KEY; let rpcId = 0;
+      const basic = (s) => 'Basic ' + Buffer.from(s).toString('base64');
+      const rpc = (method, params, opt = {}) => call('POST', '/api/payme', { raw: opt.raw !== undefined ? opt.raw : JSON.stringify({ jsonrpc: '2.0', id: opt.id || ++rpcId, method, params }),
+        headers: { 'content-type': 'application/json', ...(opt.auth === null ? {} : { authorization: basic(opt.auth || 'Paycom:' + KEY) }), ...(opt.headers || {}) } });
+      const errOf = (r) => (r.json && r.json.error ? r.json.error.code : null);
+      const mkP = async (name, email) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); assert.equal((await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j })).status, 200); return { j, id: row.id };
+      };
+      const buyer = await mkP('Payer', 'payer@example.com'), stranger = await mkP('Other', 'other-payer@example.com');
+      const status = async () => (await call('GET', '/api/premium/status', { jar: buyer.j })).json;
+      const audio = async () => (await call('GET', '/api/access/check?page=' + encodeURIComponent('/premium-audio/x.mp3'), { jar: buyer.j })).json.allowed;
+      const order = async (plan, months) => { const x = await call('POST', '/api/orders', { jar: buyer.j, body: { plan, months } }); assert.ok([200, 201].includes(x.status), JSON.stringify(x.json)); return x.json.order; };
+      const acc = (o) => ({ order_id: o.ref });
+
+      // the site offers Payme; the checkout form is made on the server, for the owner of an unpaid order only
+      assert.equal((await call('GET', '/api/plans')).json.payme, true);
+      const o1 = await order('max', 3); const t1amount = o1.amount * 100;
+      assert.equal((await call('POST', `/api/orders/${o1.id}/payme`, { body: {} })).status, 401);
+      assert.equal((await call('POST', `/api/orders/${o1.id}/payme`, { body: {}, jar: stranger.j })).status, 404, 'not your order');
+      r = await call('POST', `/api/orders/${o1.id}/payme`, { body: { lang: 'ru' }, jar: buyer.j }); assert.equal(r.status, 200);
+      const ck = r.json.checkout; assert.equal(ck.action, 'https://checkout.test.paycom.uz'); assert.equal(ck.fields.merchant, process.env.PAYME_MERCHANT_ID);
+      assert.equal(ck.fields.amount, String(t1amount)); assert.equal(ck.fields['account[order_id]'], o1.ref); assert.equal(ck.fields.lang, 'ru');
+      assert.ok(ck.fields.callback.endsWith('/payment-status?order=' + o1.ref));
+      assert.equal((await call('GET', '/payment-status.html')).status, 200, 'the status page exists');
+      ok('Payme: checkout form for the owner\'s unpaid order only (test checkout, amount in tiyin, order code, return page)');
+
+      // unauthorized callers, broken requests: always HTTP 200 + a JSON-RPC error, never "allowed"
+      r = await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }, { auth: null }); assert.equal(r.status, 200); assert.equal(errOf(r), -32504); assert.equal(r.json.id, rpcId);
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }, { auth: 'Paycom:wrong-key' })), -32504);
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }, { auth: 'Payme:' + KEY })), -32504, 'login must be Paycom');
+      assert.equal(errOf(await rpc('PerformTransaction', { id: 'x' }, { auth: null, headers: { cookie: buyer.j.get() } })), -32504, 'a student\'s own session cannot call Payme methods');
+      assert.equal(errOf(await call('GET', '/api/payme')), -32300);
+      assert.equal(errOf(await rpc(null, null, { raw: '{bad json' })), -32700);
+      assert.equal(errOf(await rpc(null, null, { raw: JSON.stringify({ id: 1, params: {} }) })), -32600);
+      for (const m of ['NoSuchMethod', '__proto__', 'constructor', 'toString']) assert.equal(errOf(await rpc(m, {})), -32601, m);
+      assert.ok(r.json.error.message.ru && r.json.error.message.uz && r.json.error.message.en, 'messages in ru / uz / en');
+      ok('Payme: unauthorized callback, wrong login / key, student session, bad JSON, unknown method -> JSON-RPC errors');
+
+      // CheckPerformTransaction: wrong order, wrong amount, then allowed
+      r = await rpc('CheckPerformTransaction', { amount: t1amount, account: { order_id: 'IX-000000' } }); assert.equal(errOf(r), -31050); assert.equal(r.json.error.data, 'order_id');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: {} })), -31050);
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount - 100, account: acc(o1) })), -31001, 'incorrect amount');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: o1.amount, account: acc(o1) })), -31001, 'so\'m instead of tiyin');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: String(t1amount), account: acc(o1) })), -31001);
+      r = await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) }); assert.deepEqual(r.json.result, { allow: true });
+      ok('Payme: CheckPerformTransaction (unknown order -31050, incorrect amount -31001, allowed)');
+
+      // CreateTransaction: created once; the same id again answers the same; a second payment for the order is refused
+      const T1 = 'pm' + crypto.randomBytes(11).toString('hex');
+      r = await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount, account: acc(o1) }); assert.equal(r.json.result.state, 1);
+      const created = r.json.result; assert.ok(typeof created.transaction === 'string' && created.create_time > 0);
+      assert.deepEqual((await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount, account: acc(o1) })).json.result, created, 'repeated CreateTransaction');
+      assert.equal(errOf(await rpc('CreateTransaction', { id: 'pm-other', time: Date.now(), amount: t1amount, account: acc(o1) })), -31052, 'second transaction for the same order');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) })), -31052);
+      assert.equal(errOf(await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount - 100, account: acc(o1) })), -31008, 'same id, other amount');
+      assert.equal((await call('POST', `/api/orders/${o1.id}/cancel`, { jar: buyer.j })).status, 409, 'cannot cancel while Payme holds it');
+      assert.equal((await call('POST', `/api/admin/orders/${o1.id}/approve`, { jar: boss })).status, 409, 'not confirmed by hand meanwhile');
+      // not paid yet: no access, whatever the browser says
+      assert.equal((await status()).premium, false); assert.equal(await audio(), false);
+      r = await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: buyer.j }); assert.equal(r.json.order.status, 'pending'); assert.equal(r.json.payment.state, 1);
+      assert.equal((await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: stranger.j })).status, 404, 'another account cannot read the order');
+      ok('Payme: CreateTransaction (idempotent, one live transaction per order, the order is locked, still no access)');
+
+      // PerformTransaction: the plan turns on; a repeated (duplicate) callback changes nothing
+      r = await rpc('PerformTransaction', { id: T1 }); assert.equal(r.json.result.state, 2); assert.equal(r.json.result.transaction, created.transaction);
+      const performTime = r.json.result.perform_time; assert.ok(performTime >= created.create_time);
+      let st = await status(); assert.equal(st.premium, true); assert.equal(st.level, 2); assert.equal(st.plan, 'Max'); assert.equal(await audio(), true, 'paid content opens');
+      const expA = Date.parse(st.expiresAt); assert.ok(Math.abs(expA - Date.now() - 90 * 86400000) < 120000, 'Max for 3 months');
+      r = await rpc('PerformTransaction', { id: T1 }); assert.equal(r.json.result.perform_time, performTime, 'duplicate PerformTransaction');
+      assert.equal(Date.parse((await status()).expiresAt), expA, 'no double activation');
+      r = await rpc('CheckTransaction', { id: T1 }); assert.equal(r.json.result.state, 2); assert.equal(r.json.result.reason, null); assert.equal(r.json.result.perform_time, performTime); assert.equal(r.json.result.cancel_time, 0);
+      assert.equal(errOf(await rpc('CheckTransaction', { id: 'pm-unknown' })), -31003);
+      assert.equal(errOf(await rpc('PerformTransaction', { id: 'pm-unknown' })), -31003);
+      assert.equal(errOf(await rpc('CreateTransaction', { id: T1, time: Date.now(), amount: t1amount, account: acc(o1) })), -31008, 'already processed transaction');
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: t1amount, account: acc(o1) })), -31051, 'already paid order');
+      assert.equal(errOf(await rpc('CreateTransaction', { id: 'pm-late', time: Date.now(), amount: t1amount, account: acc(o1) })), -31051);
+      r = await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: buyer.j }); assert.equal(r.json.order.status, 'paid'); assert.equal(r.json.order.paidVia, 'payme'); assert.equal(r.json.payment.state, 2);
+      assert.equal((await call('POST', `/api/orders/${o1.id}/payme`, { body: {}, jar: buyer.j })).status, 400, 'no checkout for a paid order');
+      r = await call('GET', '/api/admin/audit', { jar: boss }); assert.ok(r.json.entries.some((a) => a.action === 'payme.paid' && a.target === o1.ref));
+      assert.ok(!JSON.stringify(r.json.entries).includes(KEY), 'the key is never logged');
+      ok('Payme: PerformTransaction switches Max on once (duplicate callback, already processed, paid order refused), CheckTransaction');
+
+      // CancelTransaction after completion = refund: the time it added is taken back; repeated cancel answers the same
+      r = await rpc('CancelTransaction', { id: T1, reason: 5 }); assert.equal(r.json.result.state, -2); const cancelTime = r.json.result.cancel_time; assert.ok(cancelTime > 0);
+      st = await status(); assert.equal(st.premium, false, 'refund takes the plan back'); assert.equal(await audio(), false);
+      assert.equal((await rpc('CancelTransaction', { id: T1, reason: 5 })).json.result.cancel_time, cancelTime, 'repeated CancelTransaction');
+      assert.equal(errOf(await rpc('PerformTransaction', { id: T1 })), -31008, 'a refunded transaction cannot be performed');
+      r = await rpc('CheckTransaction', { id: T1 }); assert.equal(r.json.result.state, -2); assert.equal(r.json.result.reason, 5);
+      assert.equal((await call('GET', `/api/orders/${encodeURIComponent(o1.ref)}`, { jar: buyer.j })).json.order.status, 'refunded');
+      assert.equal(errOf(await rpc('CancelTransaction', { id: 'pm-unknown', reason: 1 })), -31003);
+      ok('Payme: refund (CancelTransaction after Perform) takes the plan time back; repeated cancel is idempotent');
+
+      // failed / cancelled payment before completion: the order stays open and can be paid again
+      const o2 = await order('standard', 1); const a2 = o2.amount * 100;
+      const T2 = 'pm2-' + crypto.randomBytes(8).toString('hex'), T3 = 'pm3-' + crypto.randomBytes(8).toString('hex');
+      assert.equal((await rpc('CreateTransaction', { id: T2, time: Date.now(), amount: a2, account: acc(o2) })).json.result.state, 1);
+      r = await rpc('CancelTransaction', { id: T2, reason: 3 }); assert.equal(r.json.result.state, -1);
+      assert.equal((await status()).premium, false, 'a failed payment gives nothing');
+      r = await call('GET', `/api/orders/${encodeURIComponent(o2.ref)}`, { jar: buyer.j }); assert.equal(r.json.order.status, 'pending'); assert.equal(r.json.payment.state, -1); assert.equal(r.json.payment.reason, 3);
+      assert.equal(errOf(await rpc('PerformTransaction', { id: T2 })), -31008, 'a cancelled transaction cannot be performed');
+      assert.equal((await rpc('CreateTransaction', { id: T3, time: Date.now(), amount: a2, account: acc(o2) })).json.result.state, 1, 'paying again after a failed try');
+      assert.equal((await rpc('PerformTransaction', { id: T3 })).json.result.state, 2);
+      st = await status(); assert.equal(st.level, 1); assert.equal(st.plan, 'Standard'); const expB = Date.parse(st.expiresAt);
+      ok('Payme: failed / cancelled payment (state -1) keeps the order open; paying again works');
+
+      // parallel duplicate callbacks: two PerformTransaction at once extend the plan once; two CreateTransaction for one order -> one wins
+      const o3 = await order('standard', 1); const a3 = o3.amount * 100; const T4 = 'pm4-' + crypto.randomBytes(8).toString('hex');
+      const both = await Promise.all([rpc('CreateTransaction', { id: T4, time: Date.now(), amount: a3, account: acc(o3) }), rpc('CreateTransaction', { id: 'pm4-rival', time: Date.now(), amount: a3, account: acc(o3) })]);
+      assert.equal(both.filter((x) => x.json.result && x.json.result.state === 1).length, 1, 'one CreateTransaction wins'); assert.equal(both.filter((x) => errOf(x) === -31052).length, 1);
+      const winner = both[0].json.result ? T4 : 'pm4-rival';
+      const perf = await Promise.all([rpc('PerformTransaction', { id: winner }), rpc('PerformTransaction', { id: winner }), rpc('PerformTransaction', { id: winner })]);
+      assert.ok(perf.every((x) => x.json.result && x.json.result.state === 2)); assert.equal(new Set(perf.map((x) => x.json.result.perform_time)).size, 1);
+      const expC = Date.parse((await status()).expiresAt); assert.ok(Math.abs(expC - expB - 30 * 86400000) < 5000, 'extended by exactly one month');
+      ok('Payme: parallel duplicate callbacks (Create x2, Perform x3) -> one transaction, one activation');
+
+      // 12-hour timeout: an old CreateTransaction is refused; a created one left too long is cancelled with reason 4
+      const o4 = await order('standard', 3); const a4 = o4.amount * 100;
+      assert.equal(errOf(await rpc('CreateTransaction', { id: 'pm-old', time: Date.now() - 13 * 3600000, amount: a4, account: acc(o4) })), -31008);
+      const T5 = 'pm5-' + crypto.randomBytes(8).toString('hex');
+      assert.equal((await rpc('CreateTransaction', { id: T5, time: Date.now(), amount: a4, account: acc(o4) })).json.result.state, 1);
+      { const f = path.join(tmp, 'db.json'); const db = JSON.parse(fs.readFileSync(f, 'utf8')); const t = db.payme.find((x) => x.paymeId === T5); t.createTime -= 13 * 3600000; t.testMoved = true; fs.writeFileSync(f, JSON.stringify(db, null, 2)); }
+      assert.equal(errOf(await rpc('PerformTransaction', { id: T5 })), -31008, 'timed out');
+      r = await rpc('CheckTransaction', { id: T5 }); assert.equal(r.json.result.state, -1); assert.equal(r.json.result.reason, 4);
+      assert.equal(Date.parse((await status()).expiresAt), expC, 'nothing granted');
+      ok('Payme: 12-hour timeout (old CreateTransaction refused, an expired one cancelled with reason 4)');
+
+      // fiscal receipt detail, GetStatement
+      process.env.PAYME_IKPU = '10899002001000000'; process.env.PAYME_PACKAGE_CODE = '1500537';
+      r = await rpc('CheckPerformTransaction', { amount: a4, account: acc(o4) }); assert.equal(r.json.result.allow, true);
+      assert.deepEqual(r.json.result.detail.items.map((x) => [x.price, x.count, x.code, x.package_code]), [[a4, 1, '10899002001000000', '1500537']]);
+      delete process.env.PAYME_IKPU; delete process.env.PAYME_PACKAGE_CODE;
+      r = await rpc('GetStatement', { from: Date.now() - 3600000, to: Date.now() + 1000 });
+      const ids = r.json.result.transactions.map((x) => x.id); assert.ok([T1, T2, T3, T5].every((x) => ids.includes(x)), ids.join());
+      assert.ok(r.json.result.transactions.every((x, i, a) => !i || a[i - 1].time <= x.time), 'sorted by time');
+      const s1 = r.json.result.transactions.find((x) => x.id === T1); assert.equal(s1.state, -2); assert.equal(s1.account.order_id, o1.ref); assert.equal(s1.amount, t1amount);
+      assert.equal((await rpc('GetStatement', { from: Date.now() + 3600000, to: Date.now() + 7200000 })).json.result.transactions.length, 0);
+      assert.equal(errOf(await rpc('GetStatement', { from: 10, to: 5 })), -32600);
+      ok('Payme: fiscal receipt detail (MXIK / package code), GetStatement (period, sorted, account)');
+
+      // optional IP allow-list; Payme switched off -> never "allowed"
+      process.env.PAYME_ALLOWED_IPS = '185.234.113.0/28'; assert.equal(errOf(await rpc('CheckTransaction', { id: T1 })), -32504, 'address not allowed');
+      process.env.PAYME_ALLOWED_IPS = '185.234.113.0/28, 127.0.0.0/8, ::1'; assert.equal((await rpc('CheckTransaction', { id: T1 })).json.result.state, -2);
+      delete process.env.PAYME_ALLOWED_IPS;
+      const savedId = process.env.PAYME_MERCHANT_ID; delete process.env.PAYME_MERCHANT_ID;
+      assert.equal(errOf(await rpc('CheckPerformTransaction', { amount: a4, account: acc(o4) })), -32400);
+      assert.equal((await call('GET', '/api/plans')).json.payme, false); assert.equal((await call('POST', `/api/orders/${o4.id}/payme`, { body: {}, jar: buyer.j })).status, 501);
+      process.env.PAYME_MERCHANT_ID = savedId;
+      ok('Payme: IP allow-list, switched off without the merchant settings');
+
+      // ChangePassword: the new key works at once, the old one stops; a new key in the environment wins again
+      const NEW = 'NewKey-' + crypto.randomBytes(12).toString('hex');
+      assert.equal(errOf(await rpc('ChangePassword', { password: KEY })), -32504, 'same key');
+      assert.deepEqual((await rpc('ChangePassword', { password: NEW })).json.result, { success: true });
+      assert.equal(errOf(await rpc('CheckTransaction', { id: T1 })), -32504, 'old key refused');
+      assert.equal((await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + NEW })).json.result.state, -2, 'new key works');
+      process.env.PAYME_MERCHANT_KEY = 'ThirdKey-' + crypto.randomBytes(12).toString('hex');
+      assert.equal(errOf(await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + NEW })), -32504);
+      assert.equal((await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + process.env.PAYME_MERCHANT_KEY })).json.result.state, -2, 'environment key wins');
+      for (const p of ['/payme.js', '/PAYME_SETUP.md']) assert.ok([403, 404].includes((await call('GET', p)).status), p);
+      ok('Payme: ChangePassword, payme.js and its notes are not downloadable');
     }
 
     // --- rate limit
