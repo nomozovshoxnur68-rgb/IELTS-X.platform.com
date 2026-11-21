@@ -355,6 +355,16 @@ body.dark-mode .heading-tile.selected{background:#2a2a2a;border-color:#ccc}
 #passage-pane .passage-text p{line-height:24px;color:#000;margin:16px 0;text-align:left;font-weight:400}
 #passage-pane .passage-text p:first-child{margin-top:0}
 #passage-pane .passage-text strong.para-letter,.para-letter{font-weight:700;margin-right:6px;color:#000}
+/* the paragraph letter stands on its own line above its paragraph (A, B, C … never run into the text), and the short line
+   under the passage title is set apart from the passage by a rule (both for the tests made in the admin panel and the
+   hand-made ones, whose first paragraph is <p><em>…</em></p>) */
+#passage-pane .passage-text strong.para-letter{display:block;margin:0 0 4px;font-size:17px;line-height:22px}
+#passage-pane .passage-text p.pass-lead,
+#passage-pane .passage-text > div > p:first-child:has(> em:only-child){margin:0 0 20px;padding:0 0 14px;border-bottom:1px solid #d6d6d6;color:#333;font-size:15.5px;line-height:23px}
+body.dark-mode #passage-pane .passage-text p.pass-lead,
+body.dark-mode #passage-pane .passage-text > div > p:first-child:has(> em:only-child){border-bottom-color:#444;color:var(--ex-ink-2)}
+body.theme-sepia #passage-pane .passage-text p.pass-lead,
+body.theme-sepia #passage-pane .passage-text > div > p:first-child:has(> em:only-child){border-bottom-color:rgba(0,0,0,.18);color:var(--sp-ink-2)}
 
 /* Highlight. The real player (Hypothes.is) applies ONE colour: solid #820240
    with white text. The old yellow/green/pink set was a nice study tool but it

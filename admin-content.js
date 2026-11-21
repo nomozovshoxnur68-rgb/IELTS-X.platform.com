@@ -526,6 +526,8 @@
     const opts = pieces.map((p) => /^([A-L])[.)]?\s+(.+)$/.exec(p)).filter((m) => m && m[2].split(/\s+/).length <= 6).map((m) => m[1] + '. ' + m[2].trim());
     return opts.length === pieces.length ? opts : [];
   }
+  /* the arrows between the boxes of a flow-chart (the page draws them itself) */
+  const FLOW_ARROWS = /\s*[↓▼▾⬇→➡⇓⇩⤵]+\s*/;
   /* the printed lines -> the text of the block, in the form the type needs */
   function shapeText(lines, type) {
     const ls = lines.map((l) => String(l || '').trim());
@@ -536,11 +538,25 @@
       return paras.join('\n\n');
     }
     const out = [];
+    if (type === 'flowchart') {   // one box per step: an arrow ("↓" on its own line, or "step ↓ step") always starts a new box
+      let brk = true;
+      ls.forEach((l) => {
+        if (!l) return;
+        l.split(FLOW_ARROWS).forEach((piece, k) => {
+          if (k > 0) brk = true;
+          const t = piece.replace(BULLET, '').trim();
+          if (!t || /^[|vV]+$/.test(t)) return;
+          // a printed line broken in the middle of a sentence goes on the box before (never across an arrow)
+          if (!brk && out.length && /^(?:[a-z(]|____)/.test(t)) out[out.length - 1] += ' ' + t; else out.push(t);
+          brk = false;
+        });
+      });
+      return out.join('\n');
+    }
     ls.filter(Boolean).forEach((l) => {
       // a printed line broken in the middle of a sentence goes on the line before
       if (out.length && /^(?:[a-z(]|____)/.test(l) && !BULLET.test(l)) { out[out.length - 1] += ' ' + l; return; }
       if (type === 'sentence') { out.push(l.replace(BULLET, '').replace(/^\d{1,2}\s*[.)]?\s+(?=\S)/, '')); return; }
-      if (type === 'flowchart') { if (!/^[↓▼⬇→|]+$/.test(l)) out.push(l.replace(BULLET, '')); return; }
       if (BULLET.test(l)) out.push('- ' + l.replace(BULLET, ''));
       else if (!TABLE_GAP.test(l) && l.length < 60 && !/[.;:,?!]$/.test(l) && !/^##/.test(l)) out.push('## ' + l);
       else out.push(l);
@@ -827,7 +843,9 @@
     const fill = (s) => esc(s).replace(re, () => `<span class="cb-tgap">${n++}</span>`);
     const prose = g.type === 'summary' || g.type === 'summary-words' || (g.type === 'box' && !/^\s*-\s/m.test(g.text));
     const html = prose ? String(g.text).replace(/\r/g, '').split(/\n\s*\n/).map((p) => `<p>${fill(p.replace(/\s*\n\s*/g, ' '))}</p>`).join('')
-      : String(g.text).replace(/\r/g, '').split('\n').filter((l) => l.trim()).map((l) => { let m;
+      : String(g.text).replace(/\r/g, '').split('\n')
+        .reduce((all, l) => all.concat(g.type === 'flowchart' ? l.split(FLOW_ARROWS) : [l]), [])   // a flow-chart: one box per step, arrows dropped
+        .filter((l) => l.trim() && !(g.type === 'flowchart' && /^\s*[|vV]+\s*$/.test(l))).map((l) => { let m;
         if ((m = /^\s*##\s*(.*)$/.exec(l))) return `<div class="cb-tp-sub">${fill(m[1])}</div>`;
         if ((m = /^\s*-\s+(.*)$/.exec(l))) return `<div class="cb-tp-li">${fill(m[1])}</div>`;
         return `<div class="${g.type === 'flowchart' ? 'cb-tp-box' : 'cb-tp-line'}">${fill(l)}</div>`; }).join('');

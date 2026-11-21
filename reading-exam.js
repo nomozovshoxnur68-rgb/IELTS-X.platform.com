@@ -108,13 +108,16 @@ function passageHtml(d, title) {
   if (start >= 0) { let want = 65; for (let i = start; i < list.length; i++) { const m = LET.exec(list[i]); if (m && m[1].charCodeAt(0) === want) { lettered.add(i); want++; } } }
   const paras = list.map((p, i) => {
     const m = lettered.has(i) ? LET.exec(p) : null;
-    if (m) return `<p><strong class="para-letter">${m[1]}</strong> ${esc(m[2]).replace(/\n/g, '<br>')}</p>`;
+    // the letter stands on its own line above its paragraph (reading.css: .para-letter), as in the computer test
+    if (m) return `<p class="para-lettered"><strong class="para-letter">${m[1]}</strong> ${esc(m[2]).replace(/\n/g, '<br>')}</p>`;
     const sub = /^##\s+(.+)$/.exec(p);   // "## Coasting through history": a bold sub-heading inside the passage
     if (sub) return `<p class="pass-sub"><strong>${esc(sub[1])}</strong></p>`;
     const foot = /^\*\s+(.+)$/.exec(p);   // "* state housing: …": a small footnote under the passage
     if (foot) return `<p class="pass-foot"><small>* ${esc(foot[1])}</small></p>`;
-    // a short first line is the italic line under the title ("Could the vast towers … of the future?" too)
-    return i === 0 && p.length < 200 && !/[.!]$/.test(p) ? `<p><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
+    // the short line under the title ("Could the vast towers … of the future?"), set apart from the passage (.pass-lead):
+    // the first paragraph when it is short and does not end like a sentence, or any short paragraph before paragraph A
+    const lead = i === 0 && p.length < 200 && !/[.!]$/.test(p) || (start > 0 && i < start && p.length < 260);
+    return lead ? `<p class="pass-lead"><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
   }).join('');
   return `<div>${imgs}${paras}</div>`;
 }
@@ -127,8 +130,44 @@ const tfWord = (v, yn) => {
 };
 const optTok = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})[.):]\s+([\s\S]*)$/.exec(String(o || '')); return m ? { l: m[1], t: m[2] } : { l: String.fromCharCode(65 + i), t: String(o || '') }; };
 
+/* A flow-chart: one box per step. The arrows typed or pasted with it ("↓" on its own line, or "box ↓ box" on one line)
+   only separate the boxes; the player draws the arrows itself (before, every "↓" line became an empty-looking box and
+   "step ↓ step" stayed in one box). */
+const FLOW_SPLIT = /\s*[↓▼▾⬇→➡⇓⇩⤵]+\s*/;
+const FLOW_GAP = /_{2,}|\.{4,}|…{2,}/;
+const flowBoxes = (text) => String(text || '').replace(/\r/g, '').split('\n')
+  .reduce((all, l) => all.concat(l.split(FLOW_SPLIT)), [])
+  .map((l) => l.replace(BULLET, '').trim()).filter((l) => l && !/^[|vV]+$/.test(l));
+/* Older tests (and pasted ones) keep a flow-chart as single "completion" questions whose prompts carry the steps and the
+   arrows ("Tobin found a human skull ↓ The ____ were called"): such a run of questions becomes one flow-chart block,
+   one box per step, every question keeping its own gap and answer. */
+function legacyFlowcharts(questions) {
+  const isFlowQ = (q) => ['completion', 'short', 'notes'].includes(q.type) && (/flow-?\s?chart/i.test(String(q.group || '')) || FLOW_SPLIT.test(String(q.prompt || '')));
+  const keyOf = (q) => String(q.gi == null ? '' : q.gi) + '|' + String(q.group || '') + '|' + String(q.passage || '');
+  const out = questions.slice();
+  for (let i = 0; i < out.length; i++) {
+    if (!isFlowQ(out[i]) || String(out[i].text || '').trim()) continue;
+    let j = i; const k = keyOf(out[i]);
+    while (j + 1 < out.length && isFlowQ(out[j + 1]) && keyOf(out[j + 1]) === k) j++;
+    const run = out.slice(i, j + 1);
+    // a run is a flow-chart when the instruction says so, or its prompts carry arrows
+    if (!/flow-?\s?chart/i.test(String(out[i].group || '')) && !run.some((q) => FLOW_SPLIT.test(String(q.prompt || '')))) { i = j; continue; }
+    const lines = [];
+    run.forEach((q) => {
+      const parts = flowBoxes(q.prompt);
+      if (!parts.length) parts.push('');
+      if (!parts.some((x) => FLOW_GAP.test(x))) parts[parts.length - 1] = (parts[parts.length - 1] + ' ____').trim();   // every question has its gap
+      lines.push(...parts);
+    });
+    const text = lines.join('\n');
+    for (let n = i; n <= j; n++) out[n] = { ...out[n], type: 'flowchart', text };
+    i = j;
+  }
+  return out;
+}
+
 function buildSections(questions, startN) {
-  questions = inheritGroups(questions);
+  questions = legacyFlowcharts(inheritGroups(questions));
   const sections = []; let n = startN || 1; let cur = null; let key = ''; const built = new Set();
   const headings = []; const slots = [];
   const defaultTitle = { notes: 'Note Completion', summary: 'Summary Completion', wordbank: 'Summary Completion', sentence: 'Sentence Completion', short: 'Short Answer', flowchart: 'Flow-chart Completion', 'sentence-endings': 'Sentence Endings', table: 'Table Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
@@ -182,7 +221,7 @@ function buildSections(questions, startN) {
         built.add(sec); let g = n; const fill = (s) => esc(s).replace(TABLE_GAP, () => '{{' + (g++) + '}}');
         const text = String(q.text || '').replace(/\r/g, ''); const bt = String(q.blockTitle || '').trim(); if (bt) sec.noteTitle = esc(bt);
         if (t === 'summary' || t === 'summary-words') sec.prose = text.split(/\n\s*\n/).map((p) => fill(p.replace(/\s*\n\s*/g, ' ').trim())).filter(Boolean).join('<br><br>');
-        else if (t === 'flowchart') sec.boxes = text.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => fill(l.replace(BULLET, '')));
+        else if (t === 'flowchart') sec.boxes = flowBoxes(text).map(fill);
         else sec.lines = text.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => { const h = /^##\s*(.*)$/.exec(l); return h ? '## ' + fill(h[1]) : BULLET.test(l) ? '- ' + fill(l.replace(BULLET, '')) : fill(l); });
         // a list of words: the student moves one into each gap; the words sit under the text, as in the computer test
         if (t === 'summary-words') { sec.bank = (q.options || []).map(optTok).map((k) => ({ id: String(k.l).toUpperCase(), word: esc(k.t) })); sec.bankBelow = true; }
