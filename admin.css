@@ -810,3 +810,30 @@ input.cb-inline{display:inline-block;width:72px;padding:2px 6px;margin:0 2px}
 .gd-check span{display:grid;gap:1px}
 .gd-howto ol{margin:6px 0 0;padding-left:18px;display:grid;gap:4px}
 .gd-url{display:block;margin-top:6px;padding:8px 10px;border-radius:8px;background:var(--card-2);border:1px solid var(--line)}
+
+/* ───────── Videos, Books, Grammar, Music, Links (admin-panels.js) ───────── */
+.pn-thumb{width:64px;height:42px;flex:none;border-radius:9px;overflow:hidden;display:grid;place-items:center;color:var(--k);background:color-mix(in srgb,var(--k) 14%,transparent)}
+.pn-thumb img{width:100%;height:100%;object-fit:cover}
+.pn-thumb svg{width:20px;height:20px}
+.pn-videos{--k:var(--c1)}.pn-books{--k:var(--c2);width:42px;height:56px}.pn-grammar{--k:var(--c5);width:42px}.pn-music{--k:var(--c3);width:42px}
+.pn-warn{color:var(--warn);font-weight:650}
+.pn-form{display:grid;gap:14px}
+.pn-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pn-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pn-upload{display:flex;gap:8px}.pn-upload .field{flex:1}
+.pn-check{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer}
+.pn-check input{width:16px;height:16px;accent-color:var(--accent)}
+.pn-vprev{display:flex;align-items:center;gap:10px;min-height:0}
+.pn-vprev img{width:160px;border-radius:8px;border:1px solid var(--line)}
+.pn-cover-prev{max-width:120px;border-radius:6px;border:1px solid var(--line)}
+.pn-audio{width:100%;max-width:420px}
+.pn-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.55}
+.pn-form code,.pd-hero code{padding:1px 5px;border-radius:5px;background:var(--card-2);border:1px solid var(--line);font-size:11.5px}
+.pn-ex-head{display:grid;gap:3px;margin-top:4px}
+.pn-exs{display:grid;gap:10px}
+.pn-ex{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card-2)}
+.pn-ex-n{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:12px}
+.pn-ex-main{flex:1;min-width:0;display:grid;gap:8px}
+.pn-links td{vertical-align:middle}.pn-links .field{min-width:180px}
+.pn-links td:first-child input{width:16px;height:16px;accent-color:var(--accent)}
+@media (max-width:760px){.pn-grid2,.pn-grid3{grid-template-columns:1fr}.pn-vprev img{width:120px}}

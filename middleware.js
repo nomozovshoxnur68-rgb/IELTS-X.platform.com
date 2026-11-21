@@ -10,10 +10,10 @@
    static files (the Node server refuses them itself, see isBlocked() in server.js). design-src/ (the code of Cosmic and the
    animations) is sent only by /api/design/fx/<id>, to a visitor who may use it. */
 export const config = { matcher: ['/full-tests/:path*', '/pessages/:path*', '/sections/:path*', '/premium-audio/:path*', '/full-mock/:path*',
-  '/server.js', '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/ai-store.js', '/mock-tests.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js', '/quiz-game.js', '/predictions.js', '/sidebar.js', '/site-watch.js', '/payme.js',
+  '/server.js', '/ai-provider.js', '/ai-generator.js', '/ai-examiner.js', '/ai-store.js', '/mock-tests.js', '/reading-router.js', '/listening-router.js', '/reading-exam.js', '/listening-exam.js', '/middleware.js', '/site-check.js', '/quiz-game.js', '/predictions.js', '/sidebar.js', '/site-watch.js', '/payme.js', '/panels.js',
   '/supabase-schema.sql', '/vercel.json', '/package.json', '/README.md', '/GOOGLE_SETUP.md', '/VERCEL_SETUP.md', '/scripts/:path*', '/data/:path*', '/reading-src/:path*', '/listening-src/:path*', '/speaking-src/:path*', '/design-src/:path*'] };
 
-const PRIVATE = /^\/(?:server|ai-provider|ai-generator|ai-examiner|ai-store|mock-tests|reading-router|listening-router|reading-exam|listening-exam|middleware|site-check|quiz-game|predictions|sidebar|site-watch|payme)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src|listening-src|speaking-src|design-src)\/|^\/full-mock\/js\/tests\.js$/i;
+const PRIVATE = /^\/(?:server|ai-provider|ai-generator|ai-examiner|ai-store|mock-tests|reading-router|listening-router|reading-exam|listening-exam|middleware|site-check|quiz-game|predictions|sidebar|site-watch|payme|panels)\.js$|^\/(?:supabase-schema\.sql|vercel\.json|package\.json)$|\.md$|^\/(?:scripts|data|reading-src|listening-src|speaking-src|design-src)\/|^\/full-mock\/js\/tests\.js$/i;
 
 const GATED = [
   /^\/full-tests\/(reading|listening|writing|speaking)\/test-[^/]+?(\.html)?\/?$/i,

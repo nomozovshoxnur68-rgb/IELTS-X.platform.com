@@ -1682,7 +1682,7 @@ server.listen(0, async () => {
     {
       assert.ok([403, 404].includes((await call('GET', '/sidebar.js')).status), 'the server module is private');
       let r = await call('GET', '/api/sidebar'); assert.equal(r.status, 200); assert.equal(r.json.managed, false, 'nothing saved: the pages keep their own menu');
-      assert.ok(r.json.items.some((i) => i.key === 'predictions') && r.json.items.length === 16);
+      assert.ok(r.json.items.some((i) => i.key === 'predictions') && r.json.items.length === 19, 'the built-in items, with Videos, Books, Grammar');
       assert.equal((await call('GET', '/api/admin/sidebar')).status, 401); assert.equal((await call('GET', '/api/admin/sidebar', { jar: user })).status, 403);
       const sb = (await call('GET', '/api/admin/sidebar', { jar: boss })).json.sidebar;
       sb.groups.push({ id: 'g-0a1b2c3d', title: 'Courses' });
@@ -1958,6 +1958,104 @@ server.listen(0, async () => {
       assert.equal((await rpc('CheckTransaction', { id: T1 }, { auth: 'Paycom:' + process.env.PAYME_MERCHANT_KEY })).json.result.state, -2, 'environment key wins');
       for (const p of ['/payme.js', '/PAYME_SETUP.md']) assert.ok([403, 404].includes((await call('GET', p)).status), p);
       ok('Payme: ChangePassword, payme.js and its notes are not downloadable');
+    }
+
+    // --- Videos, Books, Grammar, Music, Links (panels.js) and the Reading page fixes (reading-exam.js)
+    {
+      const mkU = async (name, email) => {
+        const { salt, hash } = handler.hashPassword('Tr1cky-pass-77');
+        const row = await handler.store.insertUser({ id: crypto.randomUUID(), name, email, role: 'user', plan: 'Free', premiumActive: false, premiumExpiresAt: null, passwordHash: hash, passwordSalt: salt, emailVerified: true, createdAt: new Date().toISOString() });
+        const j = jar(); assert.equal((await call('POST', '/api/auth/login', { body: { email, password: 'Tr1cky-pass-77' }, jar: j })).status, 200); return { j, id: row.id };
+      };
+      const freeU = await mkU('Panel Free', 'panel-free@example.com'), maxP = await mkU('Panel Max', 'panel-max@example.com');
+      await call('POST', `/api/admin/users/${maxP.id}/premium`, { body: { plan: 'Max', days: 30 }, jar: boss });
+      const save = (kind, item, j) => call('POST', '/api/admin/panels/' + kind, { jar: j || boss, body: { item } });
+      assert.equal((await call('GET', '/api/admin/panels/videos')).status, 401);
+      assert.equal((await call('GET', '/api/admin/panels/videos', { jar: freeU.j })).status, 403);
+      assert.equal((await call('GET', '/api/admin/panels/videos', { jar: boss })).json.items.length, 0);
+      assert.equal((await save('videos', { title: 'Bad', url: 'https://example.com/x' })).status, 400, 'not a YouTube / Vimeo link');
+      assert.equal((await save('videos', { title: '', url: 'https://youtu.be/dQw4w9WgXcQ' })).status, 400, 'title needed');
+      let r = await save('videos', { title: 'Listening Part 1 tips', url: 'https://youtu.be/dQw4w9WgXcQ?t=10', category: 'Listening', level: 'b1', duration: '12:30' });
+      assert.equal(r.status, 201); const v1 = r.json.item; assert.equal(v1.provider, 'youtube'); assert.equal(v1.videoId, 'dQw4w9WgXcQ'); assert.equal(v1.level, 'B1');
+      const v2 = (await save('videos', { title: 'Writing Task 2 masterclass', url: 'https://www.youtube.com/watch?v=abcdefghijk&list=x', plan: 'max' })).json.item;
+      assert.equal((await save('videos', { title: 'Vimeo one', url: 'https://vimeo.com/123456789', published: false })).json.item.provider, 'vimeo');
+      r = await call('GET', '/api/panels/videos');
+      assert.equal(r.json.items.length, 2, 'a hidden video is not listed');
+      const pubV1 = r.json.items.find((x) => x.id === v1.id), pubV2 = r.json.items.find((x) => x.id === v2.id);
+      assert.equal(pubV1.videoId, 'dQw4w9WgXcQ'); assert.ok(/i\.ytimg\.com\/vi\/dQw4w9WgXcQ/.test(pubV1.cover));
+      assert.equal(pubV2.locked, true); assert.equal(pubV2.videoId, undefined); assert.ok(!JSON.stringify(pubV2).includes('abcdefghijk'), 'a locked video never sends its id');
+      assert.equal((await call('GET', '/api/panels/videos', { jar: freeU.j })).json.items.find((x) => x.id === v2.id).locked, true);
+      assert.equal((await call('GET', '/api/panels/videos', { jar: maxP.j })).json.items.find((x) => x.id === v2.id).videoId, 'abcdefghijk', 'Max opens the Max video');
+      ok('Videos: admin only, YouTube / Vimeo links checked, hidden ones not listed, a locked video comes without its id');
+
+      assert.equal((await save('books', { title: 'Bad book', file: 'javascript:alert(1)' })).status, 400);
+      const b1 = (await save('books', { title: 'Cambridge IELTS 18', author: 'CUP', file: '/uploads/pdf/c18.pdf', cover: 'https://example.com/c.jpg', plan: 'standard', pages: 140 })).json.item;
+      r = await call('GET', '/api/panels/books'); const pb = r.json.items[0];
+      assert.equal(pb.locked, true); assert.equal(pb.file, undefined); assert.equal(pb.hasFile, true); assert.equal(pb.cover, 'https://example.com/c.jpg');
+      assert.equal((await call('GET', '/api/panels/books', { jar: maxP.j })).json.items[0].file, '/uploads/pdf/c18.pdf');
+      ok('Books: safe file and cover links only, a locked book shows its cover but not its file');
+
+      assert.equal((await save('grammar', { title: 'No answer', content: 'x', exercises: [{ q: 'She ____ here.', options: ['live', 'lives'], answer: 'living' }] })).status, 400, 'the answer must be one of the options');
+      const g1 = (await save('grammar', { title: 'Present Perfect', summary: 'have + past participle', content: '## Use\n- experiences\n> I have been to Rome.', level: 'B1',
+        exercises: [{ q: 'She ____ (live) here since 2015.', options: [], answer: 'has lived|’s lived' }, { q: 'I ____ him yesterday.', options: ['have seen', 'saw'], answer: 1, explain: 'finished time' }] })).json.item;
+      assert.equal(g1.exercises[1].answer, 'saw', 'an option chosen by its number');
+      const g2 = (await save('grammar', { title: 'Mixed conditionals', content: 'secret text', plan: 'ultra' })).json.item;
+      r = await call('GET', '/api/panels/grammar'); assert.ok(r.json.items.every((x) => x.content === undefined), 'the list has no lesson text');
+      assert.equal(r.json.items.find((x) => x.id === g1.id).exercises, 2);
+      r = await call('GET', '/api/panels/grammar/' + g1.id); assert.equal(r.status, 200); assert.ok(r.json.item.content.includes('## Use')); assert.equal(r.json.item.exercises.length, 2);
+      r = await call('GET', '/api/panels/grammar/' + g2.id, { jar: maxP.j }); assert.equal(r.status, 403); assert.equal(r.json.locked, true); assert.ok(!JSON.stringify(r.json).includes('secret text'));
+      assert.equal((await call('GET', '/api/panels/grammar/g-00000000')).status, 404);
+      ok('Grammar: lessons and exercises checked, a locked lesson is never sent (403, no text)');
+
+      assert.equal((await save('music', { title: 'No file' })).status, 400);
+      const m1 = (await save('music', { title: 'Calm piano', artist: 'Studio', url: 'https://example.com/calm.mp3' })).json.item;
+      const m2 = (await save('music', { title: 'Focus beats', url: '/uploads/audio/focus.mp3', plan: 'max' })).json.item;
+      r = await call('GET', '/api/panels/music', { jar: freeU.j });
+      assert.equal(r.json.items.find((x) => x.id === m1.id).url, 'https://example.com/calm.mp3'); assert.equal(r.json.items.find((x) => x.id === m2.id).url, undefined);
+      r = await call('POST', '/api/admin/panels/music/order', { jar: boss, body: { ids: [m2.id, m1.id] } }); assert.deepEqual(r.json.items.map((x) => x.id), [m2.id, m1.id]);
+      r = await call('DELETE', '/api/admin/panels/music/' + m2.id, { jar: boss }); assert.deepEqual(r.json.items.map((x) => x.id), [m1.id]);
+      assert.equal((await call('GET', '/api/panels/music')).json.items.length, 1);
+      ok('Music: tracks with a file, a locked track has no file, order and delete');
+
+      // links: "old link -> new link" for every page
+      const putLinks = (rules) => call('POST', '/api/admin/links', { jar: boss, body: { rules } });
+      assert.equal((await call('POST', '/api/admin/links', { jar: freeU.j, body: { rules: [] } })).status, 403);
+      assert.equal((await putLinks([{ from: 'javascript:alert(1)', to: '/x' }])).status, 400);
+      assert.equal((await putLinks([{ from: '/admin', to: '/x' }])).status, 400, 'the admin panel cannot be moved');
+      assert.equal((await putLinks([{ from: '/Price', to: '/price/' }])).status, 400, 'old = new');
+      assert.equal((await putLinks([{ from: 'https://t.me/a', to: 'https://t.me/b' }, { from: 'https://t.me/a/', to: 'https://t.me/c' }])).status, 400, 'twice');
+      r = await putLinks([{ from: 'https://t.me/sh7595', to: 'https://t.me/ieltsx_support', note: 'Telegram' }, { from: '/old-page', to: '/Price' }, { from: 'mailto:support@ieltsx.com', to: 'mailto:help@ielts-x.uz', active: false }, { from: '', to: '', note: '' }]);
+      assert.equal(r.status, 200); assert.equal(r.json.rules.length, 3, 'an empty row is dropped');
+      r = await call('GET', '/api/links'); assert.deepEqual(r.json.rules, [{ from: 'https://t.me/sh7595', to: 'https://t.me/ieltsx_support' }, { from: '/old-page', to: '/Price' }]);
+      assert.ok(/public/.test(r.headers.get('cache-control')), 'cached by the CDN');
+      ok('Links: admin only, safe links only, no /admin, no duplicates, the active ones for every page');
+
+      for (const pg of ['/videos', '/books', '/grammar']) { const x = await call('GET', pg); assert.equal(x.status, 200, pg); assert.ok(x.text.includes('data-panel="' + pg.slice(1) + '"'), pg); }
+      for (const f of ['/panels.js', '/assets/js/panels-page.js', '/assets/js/site-music.js', '/assets/js/site-links.js', '/assets/css/panels.css', '/assets/css/site-music.css']) assert.equal((await call('GET', f)).status, f === '/panels.js' ? 404 : 200, f);
+      assert.ok((await call('GET', '/settings.html')).text.includes('id="ixs-music"'), 'Settings has the music section');
+      const side = (await call('GET', '/api/sidebar')).json.items.map((x) => x.key);
+      assert.ok(['videos', 'books', 'grammar'].every((k) => side.includes(k)), 'the menu has Videos, Books, Grammar');
+      ok('Videos / Books / Grammar pages, Settings music, sidebar items; panels.js is not downloadable');
+
+      // Reading: paragraph letters, the line under the title, flow-charts typed with arrows or kept as old single questions
+      const { buildExamHtml } = require('../reading-exam');
+      const tpl = fs.readFileSync(path.join(__dirname, '..', 'pessages', 'test-19.html'), 'utf8');
+      const mat = { id: crypto.randomUUID(), type: 'reading', title: 'Ahead of its time', data: { mode: 'part', passageLabel: 'Passage 1',
+        passage: 'A short history of a strange skull found in a New Zealand river.\n\nA When the river flooded in 2004, a farmer named Tobin walked along its banks.\n\nB The police were called at once, but they found nothing.\n\nC Later the scientists sent a bone sample to a laboratory.',
+        questions: [
+          { type: 'completion', gi: 1, passage: 1, group: 'Complete the flow-chart below. Choose NO MORE THAN TWO WORDS from the passage.', blockTitle: 'After the flood', prompt: 'Tobin found a human skull ↓ The ____ were called.', answer: 'police' },
+          { type: 'completion', gi: 1, passage: 1, group: 'Complete the flow-chart below. Choose NO MORE THAN TWO WORDS from the passage.', blockTitle: 'After the flood', prompt: '↓ A ____ sample was sent to a laboratory.', answer: 'bone' },
+          { type: 'flowchart', gi: 2, passage: 1, group: 'Complete the flow-chart below.', text: 'The river flooded\n↓\n____ walked along the banks\n↓\nThe skull was found → it was sent to the ____', answer: 'Tobin' },
+          { type: 'flowchart', gi: 2, passage: 1, group: 'Complete the flow-chart below.', text: '', answer: 'laboratory' }
+        ] } };
+      const html = buildExamHtml(mat, tpl);
+      assert.ok(html.includes('pass-lead') && html.includes('A short history'), 'the line under the title is set apart');
+      assert.equal((html.match(/para-lettered/g) || []).length, 3, 'paragraph letters A, B, C');
+      const boxes = [...html.matchAll(/"boxes": \[([\s\S]*?)\]/g)].map((m) => JSON.parse('[' + m[1] + ']'));
+      assert.deepEqual(boxes[0], ['Tobin found a human skull', 'The {{1}} were called.', 'A {{2}} sample was sent to a laboratory.'], 'old single questions -> one box per step');
+      assert.deepEqual(boxes[1], ['The river flooded', '{{3}} walked along the banks', 'The skull was found', 'it was sent to the {{4}}'], 'typed arrows only separate the boxes');
+      assert.ok(!/"boxes": \[[^\]]*[↓→]/.test(html), 'no arrow is left inside a box');
+      ok('Reading: paragraph letters on their own line, the line under the title set apart, flow-chart boxes split at the arrows');
     }
 
     // --- rate limit

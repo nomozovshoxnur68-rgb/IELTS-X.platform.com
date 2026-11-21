@@ -37,6 +37,13 @@
         'html:not(.ix-promo-on) #discount-banner{display:none!important}';
     var style = document.createElement('style'); style.id = 'ix-load-style'; style.textContent = css;
     (document.head || document.documentElement).appendChild(style);
+    // Admin → Links: "old link → new link" on every page (assets/js/site-links.js; an old page address opens the new one)
+    try {
+        if (!/^\/(?:admin|api)(?:[/.]|$)/i.test(location.pathname)) {
+            var sl = document.createElement('script'); sl.src = '/assets/js/site-links.js'; sl.async = false;
+            (document.head || document.documentElement).appendChild(sl);
+        }
+    } catch (e) { /* the links of the page stay */ }
     try {
         var pc = JSON.parse(localStorage.getItem('ix-promo') || 'null');
         if (pc && pc.code && (!pc.endsAt || Date.parse(pc.endsAt) > Date.now())) document.documentElement.classList.add('ix-promo-on');

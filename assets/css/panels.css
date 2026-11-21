@@ -1,0 +1,87 @@
+/* IELTSX — Videos, Books and Grammar pages (assets/js/panels-page.js). The page itself uses the Predictions look
+   (assets/css/predictions.css: .pdp-…); this file adds the video thumbnails and player, the book covers and the grammar
+   lesson with its exercises. Site tokens (ix-unified.css) only, so light and dark (html.dark-mode) follow the website. */
+.pnl-media{isolation:isolate}
+.pnl-m-video{background:linear-gradient(135deg,rgba(239,68,68,.85),rgba(249,115,22,.75),rgba(225,29,72,.85))}
+.pnl-m-book{background:linear-gradient(135deg,rgba(14,165,233,.8),rgba(59,130,246,.7),rgba(99,102,241,.8))}
+.pnl-m-grammar{background:linear-gradient(135deg,rgba(139,92,246,.85),rgba(168,85,247,.7),rgba(79,70,229,.85))}
+html.dark-mode .pnl-m-video{background:linear-gradient(135deg,rgba(185,28,28,.65),rgba(194,65,12,.55),rgba(190,18,60,.65))}
+html.dark-mode .pnl-m-book{background:linear-gradient(135deg,rgba(2,132,199,.6),rgba(37,99,235,.5),rgba(79,70,229,.6))}
+html.dark-mode .pnl-m-grammar{background:linear-gradient(135deg,rgba(109,40,217,.65),rgba(126,34,206,.5),rgba(67,56,202,.65))}
+.pnl-grid-videos .pdp-media{aspect-ratio:16/9}
+.pnl-thumb{position:absolute;inset:0;z-index:-1;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.pdp-card:hover .pnl-thumb{transform:scale(1.04)}
+.pnl-play{display:grid;place-items:center;width:3.25rem;height:3.25rem;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .2s,background .2s;pointer-events:none}
+.pnl-play svg{width:1.35rem;height:1.35rem;margin-left:3px;fill:currentColor}
+.pdp-card:hover .pnl-play{transform:scale(1.08);background:#ef4444}
+.pnl-cover{max-height:86%;max-width:62%;border-radius:4px;box-shadow:0 12px 28px rgba(0,0,0,.35);object-fit:cover;transition:transform .5s}
+.pdp-card:hover .pnl-cover{transform:translateY(-3px) scale(1.03)}
+.pnl-desc{margin:0;font-size:.8125rem;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pdp-dmedia.pnl-m-grammar svg{width:2rem;height:2rem}
+
+/* the video player: a window over the page */
+.pnl-ov{position:fixed;inset:0;z-index:99990;display:grid;place-items:center;padding:16px;background:rgba(2,6,23,.78);backdrop-filter:blur(3px);animation:pnl-in .18s ease both}
+@keyframes pnl-in{from{opacity:0}to{opacity:1}}
+.pnl-player{width:min(960px,100%);max-height:94vh;overflow:auto;border-radius:16px;background:hsl(var(--card));color:hsl(var(--card-foreground));box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.pnl-player-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px 12px 18px}
+.pnl-player-top h2{margin:0;font-size:1rem;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.pnl-x{flex:none;display:grid;place-items:center;width:34px;height:34px;border:1px solid hsl(var(--border));border-radius:8px;background:transparent;color:inherit;cursor:pointer}
+.pnl-x:hover{background:hsl(var(--muted))}
+.pnl-x svg{width:18px;height:18px}
+.pnl-frame{position:relative;aspect-ratio:16/9;background:#000}
+.pnl-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.pnl-player-desc{margin:0;padding:14px 18px 18px;font-size:.875rem;line-height:1.6;color:hsl(var(--muted-foreground));white-space:pre-wrap}
+
+/* a grammar lesson */
+.pnl-lesson{padding:1.4rem 1.5rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);box-shadow:0 1px 2px rgba(15,23,42,.05);font-size:.95rem;line-height:1.7;margin-bottom:1rem;overflow-wrap:anywhere}
+.pnl-lesson>:first-child{margin-top:0}.pnl-lesson>:last-child{margin-bottom:0}
+.pnl-lesson h2{margin:1.4rem 0 .5rem;font-size:1.15rem;font-weight:700}
+.pnl-lesson h3{margin:1.1rem 0 .4rem;font-size:1rem;font-weight:700}
+.pnl-lesson p{margin:.6rem 0}
+.pnl-lesson ul,.pnl-lesson ol{margin:.5rem 0;padding-left:1.4rem}
+.pnl-lesson li{margin:.25rem 0}
+.pnl-lesson code{padding:.05rem .35rem;border-radius:.3rem;background:var(--soft);font-size:.88em}
+.pnl-lesson mark{padding:0 .2rem;border-radius:.2rem;background:rgba(250,204,21,.4);color:inherit}
+.pnl-example{margin:.75rem 0;padding:.7rem 1rem;border-left:3px solid #8b5cf6;border-radius:0 .5rem .5rem 0;background:rgba(139,92,246,.08);font-style:italic}
+.pnl-tip{margin:.75rem 0;padding:.7rem 1rem;border-radius:.5rem;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3)}
+.pnl-tip::before{content:"Tip: ";font-weight:700;font-style:normal}
+.pnl-table-wrap{overflow-x:auto;margin:.75rem 0}
+.pnl-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.pnl-table th,.pnl-table td{padding:.5rem .7rem;border:1px solid var(--line);text-align:left;vertical-align:top}
+.pnl-table th{background:var(--soft);font-weight:700}
+html.dark-mode .pnl-example{background:rgba(139,92,246,.14)}
+html.dark-mode .pnl-tip{background:rgba(14,165,233,.13)}
+
+/* the exercises of a lesson */
+.pnl-exercises{padding:1.25rem 1.5rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.pnl-exercises h2{display:flex;align-items:center;gap:.5rem;margin:0 0 .9rem;font-size:1.1rem}
+.pnl-exercises h2 svg{width:18px;height:18px;color:#8b5cf6}
+.pnl-ex-list{list-style:none;margin:0;padding:0;display:grid;gap:.75rem}
+.pnl-ex{padding:.85rem 1rem;border:1px solid hsl(var(--border)/.7);border-radius:.65rem;transition:border-color .15s,background .15s}
+.pnl-ex.ok{border-color:#16a34a;background:rgba(22,163,74,.07)}
+.pnl-ex.bad{border-color:#dc2626;background:rgba(220,38,38,.06)}
+.pnl-ex-q{display:flex;gap:.6rem;align-items:flex-start;font-size:.925rem;line-height:1.55;margin-bottom:.6rem}
+.pnl-gap{font-weight:700;letter-spacing:.05em;color:#8b5cf6}
+.pnl-opts{display:grid;gap:.4rem}
+.pnl-opt{display:flex;align-items:center;gap:.6rem;padding:.45rem .7rem;border:1px solid var(--line);border-radius:.5rem;cursor:pointer;font-size:.875rem;background:hsl(var(--background))}
+.pnl-opt:hover{border-color:#8b5cf6}
+.pnl-opt input{position:absolute;opacity:0;pointer-events:none}
+.pnl-opt-l{display:grid;place-items:center;flex:none;width:1.6rem;height:1.6rem;border-radius:.4rem;background:var(--soft);font-weight:700;font-size:.78rem}
+.pnl-opt:has(input:checked){border-color:#8b5cf6;box-shadow:0 0 0 2px rgba(139,92,246,.2)}
+.pnl-opt:has(input:checked) .pnl-opt-l{background:#8b5cf6;color:#fff}
+.pnl-opt:has(input:focus-visible){outline:2px solid #8b5cf6;outline-offset:2px}
+.pnl-input{width:100%;max-width:22rem;height:2.4rem;padding:0 .75rem;border:1px solid hsl(var(--input,var(--border)));border-radius:.5rem;background:hsl(var(--background));color:var(--ink);font:inherit;font-size:.9rem}
+.pnl-input:focus{outline:0;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+.pnl-ex-fb{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem;margin-top:.55rem;font-size:.85rem}
+.pnl-ex-fb svg{width:15px;height:15px}
+.pnl-ex.ok .pnl-ex-fb{color:#15803d}.pnl-ex.bad .pnl-ex-fb{color:#b91c1c}
+.pnl-ex-fb span{color:var(--muted)}
+html.dark-mode .pnl-ex.ok .pnl-ex-fb{color:#4ade80}html.dark-mode .pnl-ex.bad .pnl-ex-fb{color:#fca5a5}
+.pnl-ex-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-top:1rem}
+.pnl-ex-actions .pdp-btn.ghost{height:2.5rem;padding:0 1.1rem;font-size:.875rem}
+.pnl-score{font-weight:700;font-size:.95rem}
+@media (max-width:640px){
+  .pnl-lesson,.pnl-exercises{padding:1rem}
+  .pnl-player-top{padding:10px 10px 10px 14px}
+}
+@media (prefers-reduced-motion:reduce){.pnl-thumb,.pnl-cover,.pnl-play,.pnl-ov{transition:none!important;animation:none!important}}

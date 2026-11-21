@@ -167,7 +167,7 @@ function memoGet(key, load, ms) {
   return p;
 }
 const memoClear = (prefix) => { for (const k of [...memo.keys()]) if (k.startsWith(prefix)) memo.delete(k); };
-const MEMO_SETTINGS = new Set(['branding', 'design', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions', 'sidebar', 'site-watch-config']);
+const MEMO_SETTINGS = new Set(['branding', 'design', 'pricing-config', 'admin-packs', 'builtin-tests', 'access-rules', 'mock-tests', 'predictions', 'sidebar', 'site-watch-config', 'panel-videos', 'panel-books', 'panel-grammar', 'panel-music', 'link-rules']);
 
 const store = {
   async listUsers() { return USE_SUPABASE ? ((await sb('ieltsx_users?select=*&order=createdAt.desc')) || []) : loadDb().users; },
@@ -1802,6 +1802,8 @@ async function api(req, res, url) {
   /* ---- Predictions (predictions.js): the published collections; questions and links only with the plan ---- */
   if (p === '/api/predictions' || p.startsWith('/api/predictions/')) return require('./predictions').route(req, res, p, method, predCtx());
   if (p === '/api/sidebar') return require('./sidebar').route(req, res, p, method, predCtx());   // the menu of every page, managed in Admin -> Sidebar
+  // Videos, Books, Grammar, Music (panels.js; locked items come without their video / file / text) and the link rules of every page
+  if (p === '/api/links' || p.startsWith('/api/panels/')) return require('./panels').route(req, res, p, method, predCtx());
   if (p === '/api/client-errors' && method === 'POST') return require('./site-watch').clientError(req, res, guardCtx(req));   // errors in visitors' browsers (assets/js/loading.js) -> Site Guard
   if (p === '/api/cron/site-watch' && (method === 'GET' || method === 'POST')) return require('./site-watch').cron(req, res, url, guardCtx(req));   // Vercel cron / an outside pinger (CRON_SECRET)
 
@@ -1825,6 +1827,7 @@ async function api(req, res, url) {
     if (p === '/api/admin/games' || p.startsWith('/api/admin/games/')) return require('./quiz-game').adminRoute(req, res, p, method, url, gameCtx({ admin }));
     if (p === '/api/admin/predictions' || p.startsWith('/api/admin/predictions/')) return require('./predictions').adminRoute(req, res, p, method, predCtx({ admin }));
     if (p === '/api/admin/sidebar' || p.startsWith('/api/admin/sidebar/')) return require('./sidebar').adminRoute(req, res, p, method, predCtx({ admin }));
+    if (p === '/api/admin/links' || p.startsWith('/api/admin/panels/')) return require('./panels').adminRoute(req, res, p, method, predCtx({ admin }));
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {
@@ -2132,7 +2135,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', 'design-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers; design-src: sent by /api/design/fx/ to who may use it
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js', 'panels.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
@@ -2426,7 +2429,7 @@ function robotsTxt(req) {
 function publicUrls() {
   const urls = new Set(['/', '/Price', '/Predictions', '/Mock%20tests', '/part/practice/listening', '/part/practice/reading', '/part/practice/writing', '/part/practice/speaking',
     '/study/Tools/Articles', '/study/Tools/Performance', '/study/Tools/Pdf%20materials', '/full-tests/reading/', '/full-tests/listening/', '/full-tests/writing/', '/full-tests/speaking/',
-    '/vocabulary', '/game', '/privacy-policy', '/terms-of-service']);
+    '/vocabulary', '/game', '/privacy-policy', '/terms-of-service', '/videos', '/books', '/grammar']);
   for (const dir of ['pessages', 'sections']) {
     try {
       for (const f of fs.readdirSync(path.join(ROOT, dir))) {
