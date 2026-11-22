@@ -89,3 +89,21 @@ html.dark-mode .eb-kind{color:color-mix(in srgb,var(--k) 55%,#fff);background:co
   .pnl-opts.eb-tf{grid-template-columns:1fr}
   .eb-nav .pdp-btn{flex:1}
 }
+
+/* a unit in the design of its book (assets/css/ebook-book.css draws the page itself) */
+.eb-reader.eb-reader-book{max-width:60rem}
+.eb-unit-bar{padding:.75rem 1rem;gap:.45rem}
+.eb-unit-foot{margin:0 0 .5rem}
+.eb-unit-foot .pnl-ex-actions{margin-top:0}
+.eb-style-pill{display:inline-flex;align-items:center;gap:.35rem}
+.eb-style-pill i{width:.6rem;height:.6rem;border-radius:50%;background:#2563eb}
+.eb-style-pill.eb-style-course i{background:#b0157f}.eb-style-pill.eb-style-workbook i{background:#55585f}.eb-style-pill.eb-style-inuse i{background:#0b5a33}
+/* the units of a book: its number in the colours of the book */
+.eb-style-course .eb-num,.eb-style-workbook .eb-num{width:2.6rem;height:2.6rem;border-radius:50%;flex-direction:column;line-height:1;color:#fff;background:#b0157f;font-size:.95rem}
+.eb-style-workbook .eb-num{background:#55585f}
+.eb-style-inuse .eb-num{width:2.6rem;height:2.6rem;border-radius:.45rem;color:#fff;background:#0b5a33;font-size:1.05rem}
+.eb-num small{display:block;font-size:.55rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;opacity:.9}
+.eb-style-inuse .eb-num small{display:none}
+.eb-num{display:grid;place-items:center;align-content:center}
+.eb-style-course .eb-unit.started .eb-num,.eb-style-workbook .eb-unit.started .eb-num,.eb-style-inuse .eb-unit.started .eb-num{box-shadow:0 0 0 3px var(--eb-warn-bg),inset 0 0 0 2px var(--eb-warn)}
+html.dark-mode .eb-style-course .eb-num{background:#c0389a}html.dark-mode .eb-style-inuse .eb-num{background:#1d7a48}
