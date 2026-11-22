@@ -232,6 +232,7 @@ async function adminRoute(req, res, p, method, ctx) {
     const it = data.items.find((x) => x.id === m[2]); if (!it) throw new HttpError(404, `This ${K.noun} was not found.`);
     data.items = data.items.filter((x) => x.id !== it.id);
     await save(ctx, kind, data);
+    if (kind === 'books') await require('./ebooks').forgetBook(ctx, it.id);   // the units of its e-book go with it
     await audit(admin, 'panel.delete', it.title, { kind });
     return out();
   }

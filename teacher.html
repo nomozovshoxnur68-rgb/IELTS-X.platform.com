@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* light / dark before the first paint: the same "theme" choice as the website (assets/js/theme-init.js) */
+(function(){try{var s=localStorage.getItem('theme');var d=s==='dark'||(s!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+<script src="/assets/js/loading.js"></script>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
+<title>IELTSX — Teacher Panel</title>
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="teacher.css">
+<script src="/assets/js/branding.js" defer></script>
+</head>
+<body class="teacher-panel">
+<div class="admin-shell">
+
+<aside class="admin-sidebar" id="sidebar" aria-label="Teacher navigation">
+  <div class="admin-brand">
+    <img src="/logo.png" onerror="this.style.display='none'" alt="">
+    <div><strong>IELTSX</strong><small>Teacher Panel</small></div>
+  </div>
+  <nav class="admin-nav">
+    <div class="nav-label">My class</div>
+    <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico" data-i="dashboard"></span><span class="grow">Dashboard</span></a>
+    <a class="nav-item" href="#students" data-nav="students"><span class="ico" data-i="users"></span><span class="grow">Students</span><span id="nav-students" class="pill" hidden>0</span></a>
+    <a class="nav-item" href="#books" data-nav="books"><span class="ico" data-i="book"></span><span class="grow">Books progress</span></a>
+    <div class="nav-label">Manage</div>
+    <a class="nav-item" href="#add" data-nav="add"><span class="ico" data-i="userplus"></span><span class="grow">Add students</span><span id="nav-invites" class="pill" hidden>0</span></a>
+    <a class="nav-item" href="#settings" data-nav="settings"><span class="ico" data-i="settings"></span><span class="grow">Class settings</span></a>
+    <div class="nav-label">Website</div>
+    <a class="nav-item" href="/books" target="_blank" rel="noopener"><span class="ico" data-i="library"></span><span class="grow">Books page</span></a>
+    <a class="nav-item" href="/dashboard" target="_blank" rel="noopener"><span class="ico" data-i="globe"></span><span class="grow">Open website</span></a>
+    <a class="nav-item" href="/admin#teachers" id="nav-admin" hidden><span class="ico" data-i="shield"></span><span class="grow">Admin panel</span></a>
+    <button class="nav-item" data-logout type="button"><span class="ico" data-i="logout"></span><span class="grow">Sign out</span></button>
+  </nav>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<main class="admin-main">
+  <header class="topbar">
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu"><span data-i="menu"></span></button>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <button class="btn btn-sm" id="refresh" type="button" title="Reload all data"><span data-i="refresh" class="ico-inline"></span><span class="lbl-txt">Refresh</span></button>
+    <button class="icon-btn theme-toggle" id="theme-toggle" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode"><span class="moon" data-i="moon"></span><span class="sun" data-i="sun"></span></button>
+    <div class="admin-user"><div><strong id="me-name" style="font-size:13px">Teacher</strong><div id="me-role" class="muted sm">&nbsp;</div></div><div id="me-avatar" class="avatar">T</div></div>
+  </header>
+
+  <div class="page">
+    <div class="tp-viewas" id="viewas" hidden></div>
+
+    <!-- ═════════ not a teacher ═════════ -->
+    <section class="view" id="view-none">
+      <div class="card tp-none">
+        <div class="tp-none-ico" data-i="graduation"></div>
+        <h1>The Teacher Panel</h1>
+        <p class="muted" id="none-text">This page is for teachers. Ask the administrator of the website to give your account the teacher role, then open this page again.</p>
+        <div class="btn-row" style="justify-content:center"><a class="btn" href="/dashboard">Back to the website</a><a class="btn btn-primary" id="none-admin" href="/admin#teachers" hidden>Admin → Teachers</a></div>
+      </div>
+    </section>
+
+    <!-- ═════════ Dashboard ═════════ -->
+    <section class="view" id="view-dashboard">
+      <div class="dash-hero">
+        <div><div class="eyebrow" id="dash-date">&nbsp;</div><h1 id="dash-hello">Welcome</h1><p id="dash-summary">Loading your class…</p></div>
+        <div class="btn-row"><a class="btn" href="#books"><span data-i="book" class="ico-inline"></span>Books progress</a><a class="btn btn-primary" href="#add"><span data-i="userplus" class="ico-inline"></span>Add students</a></div>
+      </div>
+      <div class="grid kpis" id="kpis">
+        <div class="card kpi"><div class="skeleton" style="height:96px"></div></div><div class="card kpi"><div class="skeleton" style="height:96px"></div></div>
+        <div class="card kpi"><div class="skeleton" style="height:96px"></div></div><div class="card kpi"><div class="skeleton" style="height:96px"></div></div>
+      </div>
+      <div class="dash-row r-main">
+        <div class="card">
+          <div class="section-head"><div><div class="section-title">Class activity</div><div class="muted sm">Finished tests and learned e-book units · last 14 days</div></div></div>
+          <div id="chart"><div class="skeleton" style="height:220px"></div></div>
+        </div>
+        <div class="card"><div class="section-head"><div><div class="section-title">Bands by section</div><div class="muted sm">Average band of every finished test</div></div></div><div id="sections" class="hbars"></div></div>
+      </div>
+      <div class="dash-row r-3">
+        <div class="card"><div class="section-head"><div class="section-title">Needs your attention</div></div><div id="attention"><div class="empty">Loading…</div></div></div>
+        <div class="card"><div class="section-head"><div><div class="section-title">Top students</div><div class="muted sm">Highest average band</div></div><a class="btn btn-sm" href="#students">All</a></div><div class="dash-list" id="top"></div></div>
+        <div class="card"><div class="section-head"><div><div class="section-title">Latest results</div><div class="muted sm">Your students' tests</div></div></div><div class="dash-list" id="latest"></div></div>
+      </div>
+    </section>
+
+    <!-- ═════════ Students ═════════ -->
+    <section class="view" id="view-students">
+      <div class="card">
+        <div class="section-head"><div><div class="section-title">Students</div><div class="muted sm">Everybody in your class. Open a student to see every test, every e-book unit and how much is left.</div></div>
+          <div class="btn-row"><button class="btn btn-sm" id="csv" type="button">⬇ Export CSV</button><a class="btn btn-sm btn-primary" href="#add">+ Add students</a></div></div>
+        <div class="toolbar">
+          <input id="st-search" class="field grow" type="search" placeholder="Search name or e-mail" autocomplete="off">
+          <select id="st-group" class="field" aria-label="Group"><option value="">All groups</option></select>
+          <select id="st-filter" class="field" aria-label="Filter">
+            <option value="all">Everybody</option><option value="active">Active this week</option><option value="inactive">Inactive 7+ days</option>
+            <option value="nobooks">Not started an e-book</option><option value="low">Average band below 5.5</option>
+          </select>
+          <select id="st-sort" class="field" aria-label="Sort">
+            <option value="active">Recently active</option><option value="name">Name A–Z</option><option value="band">Highest band</option>
+            <option value="books">Most e-book progress</option><option value="tests">Most tests</option><option value="new">Newest in class</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Group</th><th class="right">Tests</th><th>Avg band</th><th>E-books</th><th>Last active</th><th></th></tr></thead><tbody id="st-body"></tbody></table></div>
+        <div class="muted sm" id="st-info" style="margin-top:10px"></div>
+      </div>
+    </section>
+
+    <!-- ═════════ Books progress ═════════ -->
+    <section class="view" id="view-books">
+      <div class="card pd-hero">
+        <div class="pd-hero-text"><div class="eyebrow">E-books of the Books page</div><h2>Books progress</h2><p class="muted">How far each of your students is in every e-book: learned units, what is left and how many answers were right. A unit is learned when its exercises reach 60 %, its test is finished or it was read.</p></div>
+        <div class="btn-row"><a class="btn" href="/books" target="_blank" rel="noopener">Open the Books page ↗</a></div>
+      </div>
+      <div id="books-body"><div class="card"><div class="empty">Loading…</div></div></div>
+    </section>
+
+    <!-- ═════════ Add students ═════════ -->
+    <section class="view" id="view-add">
+      <div class="tp-add">
+        <div class="card">
+          <div class="section-head"><div><div class="section-title">Create a student account</div><div class="muted sm">For a student who has no account yet. Give them the e-mail and password; they can change the password on their Account page.</div></div></div>
+          <form id="f-create" autocomplete="off">
+            <div class="pn-grid2"><label class="lbl">Name<input class="field" name="name" maxlength="80" placeholder="e.g. Aziza Karimova" required></label>
+              <label class="lbl">E-mail<input class="field" name="email" type="email" maxlength="254" placeholder="student@example.com" required></label></div>
+            <div class="pn-grid2"><label class="lbl">Password<span class="tp-pw"><input class="field" name="password" maxlength="200" placeholder="8+ characters with a number" required><button class="btn btn-sm" type="button" data-gen-pw>Generate</button></span></label>
+              <label class="lbl">Group (optional)<input class="field" name="group" list="dl-groups" maxlength="40" placeholder="e.g. Morning B2"></label></div>
+            <div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" type="submit">Create and add to my class</button></div>
+          </form>
+          <div id="created" class="tp-created" hidden></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><div><div class="section-title">Invite students who have an account</div><div class="muted sm">Write their e-mails (one per line or separated by commas). They accept the invitation on <b id="join-path">/join</b> after signing in.</div></div></div>
+          <form id="f-invite">
+            <label class="lbl">E-mails<textarea class="field" name="emails" rows="4" placeholder="ali@example.com&#10;malika@example.com"></textarea></label>
+            <label class="lbl">Group (optional)<input class="field" name="group" list="dl-groups" maxlength="40" placeholder="e.g. Evening IELTS 6.5"></label>
+            <div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" type="submit">Send invitations</button></div>
+          </form>
+          <div class="tp-invites" id="invites"></div>
+        </div>
+        <div class="card tp-code-card">
+          <div class="section-head"><div><div class="section-title">Class link and code</div><div class="muted sm">Share the link (Telegram, the board in your classroom…). A signed-in student who opens it joins your class.</div></div></div>
+          <div class="tp-code" id="code">——————</div>
+          <div class="tp-link"><input class="field" id="join-link" readonly><button class="btn btn-sm btn-primary" type="button" data-copy="link">Copy link</button><button class="btn btn-sm" type="button" data-copy="code">Copy code</button></div>
+          <p class="muted sm">A student can also open <b>/join</b> and type the code. <button class="link-btn" type="button" id="new-code">Make a new code</button> (the old link stops working).</p>
+        </div>
+      </div>
+      <datalist id="dl-groups"></datalist>
+    </section>
+
+    <!-- ═════════ Class settings ═════════ -->
+    <section class="view" id="view-settings">
+      <div class="card" style="max-width:760px">
+        <div class="section-head"><div><div class="section-title">Class settings</div><div class="muted sm">Your students see the class name on their /join page.</div></div></div>
+        <label class="lbl" for="set-title">Class name</label>
+        <input class="field" id="set-title" maxlength="80" placeholder="e.g. IELTS 7.0 — evening group">
+        <label class="lbl">Groups</label>
+        <div class="tp-groups" id="set-groups"></div>
+        <div class="btn-row" style="margin-top:8px"><input class="field" id="set-newgroup" maxlength="40" placeholder="New group, e.g. Morning B1" style="flex:1 1 220px"><button class="btn btn-sm" id="set-addgroup" type="button">+ Add group</button></div>
+        <div class="kv" style="margin-top:18px"><div><small>Students</small><b id="set-count">—</b></div><div><small>Most students (set by the admin)</small><b id="set-max">—</b></div></div>
+        <div class="btn-row"><button class="btn btn-primary" id="set-save" type="button">Save</button></div>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+
+<!-- student drawer -->
+<div id="drawer-backdrop" class="drawer-backdrop"><aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Student details"></aside></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="teacher.js"></script>
+</body>
+</html>

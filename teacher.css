@@ -1,0 +1,92 @@
+/* IELTSX — the Teacher Panel (teacher.html). The panel uses the admin panel's look (admin.css: tokens, sidebar, cards,
+   tables, KPIs, light / dark); this file adds only what the teacher pages need. Admin → Teachers (admin-teachers.js) uses
+   the same .tp-… classes, so it is loaded there too. */
+.tp-viewas{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 14px;margin-bottom:18px;border:1px solid var(--accent-line);border-radius:12px;background:var(--accent-soft);color:var(--ink-2);font-size:13px}
+.tp-viewas svg{width:18px;height:18px;color:var(--accent-text);flex:none}
+.tp-viewas span{flex:1;min-width:220px}
+.tp-none{max-width:560px;margin:40px auto;text-align:center;padding:36px 28px}
+.tp-none h1{margin:12px 0 6px;font-size:22px;letter-spacing:-.02em}
+.tp-none p{margin:0 auto 18px;max-width:440px}
+.tp-none-ico{width:56px;height:56px;margin:0 auto;border-radius:16px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text)}
+.tp-none-ico svg{width:26px;height:26px}
+
+/* progress bars and small pieces */
+.tp-bar{height:7px;border-radius:99px;background:var(--chip);overflow:hidden;min-width:60px}
+.tp-bar i{display:block;height:100%;border-radius:inherit;background:var(--k,var(--c3));transition:width .6s ease}
+.tp-pct{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px}
+.tp-pct b{font-variant-numeric:tabular-nums}
+.tp-pct .tp-bar{flex:1;align-self:center}
+.tp-who{display:flex;align-items:center;gap:10px;min-width:0}
+.tp-who .avatar{width:34px;height:34px;font-size:13px}
+.tp-who strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.tp-late{color:var(--warn);font-weight:600}
+.tp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tp-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line-2);border-radius:99px;background:var(--card);font-size:12.5px;font-weight:550;color:var(--ink-2)}
+button.tp-chip:hover{background:var(--hover)}
+.tp-chip button{border:0;background:none;padding:0 0 0 2px;color:var(--muted);font-size:11px}
+.tp-chip button:hover{color:var(--bad)}
+.tp-chip.static{border-radius:9px;background:var(--card-2);margin:0 6px 6px 0}
+.tp-chip.static b{color:var(--accent-text)}
+.tp-chip.static em{font-style:normal;color:var(--muted);font-size:11.5px}
+.tp-groups{display:flex;flex-wrap:wrap;gap:6px;min-height:32px;align-items:center}
+
+/* a student's e-books in the drawer */
+.tp-bk{padding:12px 0;border-bottom:1px solid var(--line)}
+.tp-bk:last-child{border-bottom:0;padding-bottom:0}.tp-bk:first-of-type{padding-top:0}
+.tp-bk-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;margin-bottom:6px}
+.tp-units{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:4px}
+.tp-units li{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 8px;border-radius:8px;background:var(--card-2)}
+.tp-u-dot{width:18px;height:18px;flex:none;border-radius:50%;border:2px solid var(--line-2);display:grid;place-items:center}
+.tp-u-dot svg{width:11px;height:11px}
+.tp-units li.started .tp-u-dot{border-color:var(--warn);background:var(--warn-bg)}
+.tp-units li.done .tp-u-dot{border-color:var(--ok);background:var(--ok);color:#fff}
+.tp-u-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* books progress */
+.tp-book-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.tp-cover{width:58px;height:76px;flex:none;border-radius:8px;overflow:hidden;display:grid;place-items:center;color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)}
+.tp-cover img{width:100%;height:100%;object-fit:cover}
+.tp-cover svg{width:24px;height:24px}
+.tp-book-main{flex:1;min-width:220px;display:grid;gap:6px}
+.tp-book-stats{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12.5px;color:var(--muted)}
+.tp-book-stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+.tp-unitlist{display:flex;flex-wrap:wrap}.tp-unitlist>div{flex-basis:100%}
+
+/* add students */
+.tp-add{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.tp-add .card{margin:0}
+.tp-add .tp-code-card{grid-column:1/-1}
+.tp-pw{display:flex;gap:6px}.tp-pw .field{flex:1}
+.tp-created{margin-top:16px;padding:14px;border:1px solid var(--ok);border-radius:12px;background:var(--ok-bg);font-size:13px}
+.tp-created pre{margin:10px 0;padding:10px 12px;border-radius:9px;background:var(--card);border:1px solid var(--line);white-space:pre-wrap;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink)}
+.tp-created .btn svg{width:14px;height:14px}
+.tp-inv{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.tp-inv:last-child{border-bottom:0}
+.tp-inv>span:first-child{flex:1;min-width:0;display:flex;align-items:center;gap:7px;overflow:hidden}
+.tp-inv>span:first-child b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.tp-inv svg{width:15px;height:15px;color:var(--muted);flex:none}
+.tp-code{font:800 34px/1.1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--accent-text);margin:2px 0 12px}
+.tp-link{display:flex;gap:8px;flex-wrap:wrap}.tp-link .field{flex:1 1 280px}
+
+/* Admin → Teachers */
+.at-list{display:grid;gap:14px}
+.at-row{display:grid;grid-template-columns:auto minmax(0,1.3fr) repeat(4,minmax(0,1fr)) auto;align-items:center;gap:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);transition:border-color .15s,box-shadow .15s}
+.at-row:hover{border-color:var(--line-2);box-shadow:var(--shadow-md)}
+.at-rank{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;background:var(--chip);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.at-rank.r1{background:linear-gradient(135deg,#fde68a,#f59e0b);color:#7c2d12}.at-rank.r2{background:linear-gradient(135deg,#e5e7eb,#9ca3af);color:#1f2937}.at-rank.r3{background:linear-gradient(135deg,#fed7aa,#c2410c);color:#fff}
+.at-name strong{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.at-m small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:650;margin-bottom:3px}
+.at-m b{font-size:17px;font-variant-numeric:tabular-nums}.at-m b small{display:inline;font-size:12px;text-transform:none;letter-spacing:0;color:var(--muted)}
+.at-m .tp-bar{margin-top:6px}
+.at-score{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:conic-gradient(var(--k) calc(var(--p) * 1%),var(--chip) 0);position:relative}
+.at-score::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--card)}
+.at-score b{position:relative;z-index:1;font-size:15px;font-variant-numeric:tabular-nums}
+.at-actions{display:flex;flex-direction:column;gap:6px}
+.at-search{position:relative}
+.at-results{margin-top:8px;display:grid;gap:6px}
+.at-results button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);text-align:left}
+.at-results button:hover{border-color:var(--accent-line);background:var(--accent-soft)}
+.at-results .avatar{width:30px;height:30px;font-size:12px}
+@media(max-width:1200px){.at-row{grid-template-columns:auto minmax(0,1fr) repeat(2,minmax(0,1fr)) auto}.at-row .at-m.hide-md{display:none}}
+@media(max-width:1200px){.tp-add{grid-template-columns:1fr}}
+@media(max-width:720px){.at-row{grid-template-columns:auto minmax(0,1fr) auto}.at-row .at-m{display:none}.at-row .at-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
