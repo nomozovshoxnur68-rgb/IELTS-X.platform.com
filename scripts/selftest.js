@@ -2058,6 +2058,112 @@ server.listen(0, async () => {
       ok('Reading: paragraph letters on their own line, the line under the title set apart, flow-chart boxes split at the arrows');
     }
 
+    // --- teachers (teachers.js) and e-books (ebooks.js)
+    {
+      for (const f of ['/teachers.js', '/ebooks.js', '/ebooks-sample.js']) assert.ok([403, 404].includes((await call('GET', f)).status), f + ' is a server module');
+      for (const f of ['/teacher.js', '/teacher.css', '/admin-teachers.js', '/admin-ebooks.js', '/assets/js/ebooks-page.js', '/assets/js/join-page.js', '/assets/css/ebooks.css']) assert.equal((await call('GET', f)).status, 200, f);
+      const me = (await call('GET', '/api/auth/me', { jar: user })).json.user; assert.ok(me && me.email === 'alice@example.com', 'alice is still signed in');
+      let r = await call('GET', '/api/teacher/me', { jar: user }); assert.equal(r.status, 200); assert.equal(r.json.teacher, null, 'not a teacher yet');
+      assert.equal((await call('GET', '/api/teacher/overview', { jar: user })).status, 403);
+      assert.equal((await call('GET', '/api/teacher/overview')).status, 401);
+      let pg = await call('GET', '/teacher'); assert.equal(pg.status, 302); assert.ok(/^\/login/.test(pg.headers.get('location')), 'the teacher page: sign in first');
+      pg = await call('GET', '/teacher', { jar: user }); assert.equal(pg.status, 200); assert.equal(pg.headers.get('x-frame-options'), 'DENY'); assert.ok(/noindex/.test(pg.headers.get('x-robots-tag')));
+      assert.equal((await call('GET', '/join')).status, 200);
+      // the admin makes alice a teacher
+      assert.equal((await call('POST', '/api/admin/teachers', { jar: user, body: { email: 'alice@example.com' } })).status, 403, 'only admins make teachers');
+      assert.equal((await call('POST', '/api/admin/teachers', { jar: boss, body: { email: 'nobody-here@example.com' } })).status, 404);
+      r = await call('POST', '/api/admin/teachers', { jar: boss, body: { email: 'alice@example.com', title: 'Evening <b>group</b>', maxStudents: 3 } });
+      assert.equal(r.status, 201); assert.equal(r.json.teacher.title, 'Evening b group /b', 'the class name is cleaned (no < >)'); assert.ok(/^[A-Z2-9]{6}$/.test(r.json.teacher.code));
+      const tid = me.id, code = r.json.teacher.code;
+      assert.equal((await call('GET', '/api/sidebar', { jar: user })).json.teacher, true, 'the menu shows "Teacher panel"');
+      assert.equal((await call('GET', '/api/sidebar', { jar: boss })).json.teacher, false);
+      // a teacher makes student accounts (no e-mail sent, the teacher gives the password)
+      const mk = (name, email, group) => call('POST', '/api/teacher/students', { jar: user, body: { mode: 'create', name, email, password: 'Kid-pass-2026x', group } });
+      assert.equal((await mk('Kid', 'alice@example.com')).status, 409, 'an existing e-mail is invited, not made again');
+      assert.equal((await call('POST', '/api/teacher/students', { jar: user, body: { mode: 'create', name: 'Kid', email: 'kidx@example.com', password: 'password123' } })).status, 400, 'the password rules apply');
+      r = await mk('Kid One', 'kid1@example.com', 'Morning'); assert.equal(r.status, 201); const k1id = r.json.student.id;
+      r = await mk('Kid Two', 'kid2@example.com'); assert.equal(r.status, 201); const k2id = r.json.student.id;
+      const k1 = jar(), k2 = jar();
+      assert.equal((await call('POST', '/api/auth/login', { jar: k1, body: { email: 'kid1@example.com', password: 'Kid-pass-2026x' } })).status, 200);
+      assert.equal((await call('POST', '/api/auth/login', { jar: k2, body: { email: 'kid2@example.com', password: 'Kid-pass-2026x' } })).status, 200);
+      r = await call('GET', '/api/class', { jar: k1 }); assert.equal(r.json.teacher.id, tid); assert.equal(r.json.teacher.group, 'Morning');
+      assert.equal((await call('GET', '/api/teacher/overview', { jar: k1 })).status, 403, 'a student is not a teacher');
+      // out of the class, an invitation, accepted; out again, the class code
+      assert.equal((await call('DELETE', '/api/teacher/students/' + k2id, { jar: user })).status, 200);
+      assert.equal((await call('GET', '/api/class', { jar: k2 })).json.teacher, null);
+      r = await call('POST', '/api/teacher/students', { jar: user, body: { mode: 'invite', email: 'kid2@example.com, bad-mail', group: 'Evening' } }); assert.equal(r.status, 400, 'a bad e-mail is refused');
+      r = await call('POST', '/api/teacher/students', { jar: user, body: { mode: 'invite', email: 'kid2@example.com', group: 'Evening' } }); assert.deepEqual(r.json.invited, ['kid2@example.com']);
+      r = await call('GET', '/api/class', { jar: k2 }); assert.equal(r.json.invites.length, 1); assert.equal(r.json.invites[0].id, tid);
+      assert.equal((await call('POST', '/api/class/join', { jar: k1, body: { teacher: tid } })).status, 404, 'an invitation is for its own e-mail only');
+      r = await call('POST', '/api/class/join', { jar: k2, body: { teacher: tid } }); assert.equal(r.status, 200); assert.equal(r.json.teacher.group, 'Evening'); assert.equal(r.json.invites.length, 0);
+      assert.equal((await call('POST', '/api/class/leave', { jar: k2 })).json.teacher, null);
+      assert.equal((await call('POST', '/api/class/join', { jar: k2, body: { code: 'ZZZZZZ' } })).status, 404);
+      r = await call('POST', '/api/class/join', { jar: k2, body: { code: code.toLowerCase() } }); assert.equal(r.json.teacher.id, tid, 'joined with the class code');
+      assert.equal((await call('POST', '/api/class/join', { jar: user, body: { code } })).status, 400, 'not your own class');
+      assert.equal((await mk('Kid Three', 'kid3@example.com')).status, 201);
+      assert.equal((await mk('Kid Four', 'kid4@example.com')).status, 400, 'the class is full (3 students)');
+      // e-books: the sample book, the units without answers, checked on the server, the progress kept
+      assert.equal((await call('POST', '/api/admin/ebooks/sample', { jar: user })).status, 403);
+      r = await call('POST', '/api/admin/ebooks/sample', { jar: boss }); assert.equal(r.status, 201); const bid = r.json.book.id;
+      r = await call('GET', '/api/ebooks'); const sb = r.json.items.find((b) => b.id === bid); assert.equal(sb.units, 5); assert.equal(sb.progress, undefined, 'a guest has no progress');
+      r = await call('GET', '/api/ebooks/' + bid, { jar: k1 }); assert.equal(r.json.units.length, 5); assert.equal(r.json.progress.percent, 0);
+      const U = r.json.units;
+      r = await call('GET', '/api/ebooks/' + bid + '/' + U[1].id, { jar: k1 }); assert.equal(r.status, 200);
+      assert.ok(!/"answer/.test(r.text) && !r.text.includes('explain'), 'a unit reaches the page without its answers');
+      const ex = r.json.unit.exercises; assert.equal(ex[0].type, 'tfng'); assert.deepEqual(ex[0].options, ['True', 'False', 'Not Given']);
+      const right = ['True', 'False', 'True', 'False', 'Not Given', 'True'];
+      const answers = {}; ex.forEach((x, i) => { answers[x.id] = i < 3 ? right[i] : 'Not Given'; });
+      assert.equal((await call('POST', '/api/ebooks/' + bid + '/' + U[1].id + '/check', { body: { answers } })).status, 401, 'a guest cannot save progress');
+      r = await call('POST', '/api/ebooks/' + bid + '/' + U[1].id + '/check', { jar: k1, body: { answers } });
+      assert.equal(r.json.correct, 4); assert.equal(r.json.total, 6); assert.equal(r.json.passed, true); assert.equal(r.json.progress.done, 1); assert.equal(r.json.results[3].answer, 'False');
+      answers[ex[0].id] = 't'; ex.slice(3).forEach((x, i) => { answers[x.id] = right[i + 3]; });
+      r = await call('POST', '/api/ebooks/' + bid + '/' + U[1].id + '/check', { jar: k1, body: { answers } }); assert.equal(r.json.correct, 6, '"t" counts as True'); assert.equal(r.json.best, 6);
+      r = await call('POST', '/api/ebooks/' + bid + '/' + U[0].id + '/check', { jar: k1, body: { answers: {} } }); assert.equal(r.json.passed, false); assert.equal(r.json.progress.done, 1, 'a failed unit is not learned');
+      r = await call('GET', '/api/ebooks/' + bid + '/' + U[0].id, { jar: k1 }); const gap = r.json.unit.exercises.find((x) => x.type === 'gap');
+      r = await call('POST', '/api/ebooks/' + bid + '/' + U[0].id + '/check', { jar: k1, body: { answers: { [gap.id]: '  browne. ' } } });
+      assert.ok(r.json.results.find((x) => x.id === gap.id).ok, 'a gap: case, spaces and a full stop do not matter');
+      assert.equal((await call('POST', '/api/ebooks/' + bid + '/' + U[4].id + '/check', { jar: k1, body: { answers: {} } })).status, 400, 'a unit with only text has no check');
+      r = await call('POST', '/api/ebooks/' + bid + '/' + U[4].id + '/read', { jar: k1 }); assert.equal(r.json.progress.done, 2); assert.equal(r.json.progress.percent, 40);
+      r = await call('GET', '/api/ebooks', { jar: k1 }); assert.equal(r.json.items.find((b) => b.id === bid).progress.percent, 40);
+      // what the teacher sees
+      await call('POST', '/api/results', { jar: k1, body: { testKey: '/pessages/test-1', section: 'Reading', pageLabel: 'Passage 1', scoreCorrect: 10, scoreTotal: 13 } });
+      r = await call('GET', '/api/teacher/overview', { jar: user }); assert.equal(r.status, 200);
+      const s1 = r.json.students.find((s) => s.id === k1id); assert.equal(s1.group, 'Morning'); assert.equal(s1.tests, 1); assert.equal(s1.books.unitsDone, 2); assert.equal(s1.books.avgPercent, 40);
+      assert.equal(r.json.kpis.students, 3); assert.ok(r.json.kpis.score >= 0 && r.json.kpis.score <= 100); assert.equal(r.json.chart.days.length, 14);
+      assert.ok(!r.text.includes('passwordHash') && !r.text.includes('passwordSalt'), 'no password data reaches the teacher');
+      r = await call('GET', '/api/teacher/students/' + k1id, { jar: user }); assert.equal(r.json.results.length, 1); assert.equal(r.json.student.books.list[0].units.filter((u) => u.done).length, 2);
+      assert.equal((await call('GET', '/api/teacher/students/' + aliceId.replace(/./, (c) => (c === 'a' ? 'b' : 'a')), { jar: user })).status, 404, 'only students of the class');
+      r = await call('GET', '/api/teacher/books', { jar: user }); const tb = r.json.books.find((b) => b.id === bid); assert.equal(tb.started, 1); assert.equal(tb.units.length, 5);
+      r = await call('POST', '/api/teacher/students/' + k1id, { jar: user, body: { group: 'Group B' } }); assert.ok(r.json.groups.includes('Group B'));
+      r = await call('POST', '/api/teacher/code', { jar: user }); assert.notEqual(r.json.teacher.code, code, 'a new class code');
+      // the admin: every teacher with the numbers of the class, a teacher's panel, the user drawer
+      r = await call('GET', '/api/admin/teachers', { jar: boss }); const at = r.json.teachers.find((t) => t.userId === tid); assert.equal(at.students, 3); assert.equal(at.kpis.ebookAvg != null, true);
+      assert.equal((await call('GET', '/api/teacher/overview?as=' + tid, { jar: boss })).json.students.length, 3, 'an admin opens a teacher\'s panel');
+      assert.equal((await call('GET', '/api/teacher/overview?as=' + k1id, { jar: boss })).status, 404);
+      assert.equal((await call('GET', '/api/teacher/overview?as=' + tid, { jar: k1 })).status, 403, '?as= is for admins only');
+      r = await call('GET', '/api/admin/teachers/of/' + k1id, { jar: boss }); assert.equal(r.json.classOf.id, tid);
+      r = await call('POST', '/api/admin/teachers/' + tid, { jar: boss, body: { maxStudents: 10 } }); assert.equal(r.json.teacher.maxStudents, 10);
+      // a locked book: no units for a student without the plan
+      const pb = (await call('GET', '/api/admin/panels/books', { jar: boss })).json.items.find((b) => b.id === bid);
+      await call('POST', '/api/admin/panels/books', { jar: boss, body: { item: { ...pb, plan: 'max' } } });
+      r = await call('GET', '/api/ebooks/' + bid, { jar: k1 }); assert.equal(r.status, 403); assert.equal(r.json.units, undefined); assert.ok(r.json.price.startsWith('/Price'));
+      assert.equal((await call('GET', '/api/ebooks/' + bid + '/' + U[1].id, { jar: k1 })).status, 403);
+      // the admin's unit editor
+      r = await call('POST', '/api/admin/ebooks/' + bid + '/units', { jar: boss, body: { unit: { title: 'Bad', exercises: [{ type: 'choice', q: 'Q?', options: ['a', 'b'], answer: 'c' }] } } }); assert.equal(r.status, 400, 'the right option must be one of the options');
+      r = await call('POST', '/api/admin/ebooks/' + bid + '/units', { jar: boss, body: { unit: { title: 'Bad', test: 'javascript:alert(1)' } } }); assert.equal(r.status, 400);
+      r = await call('POST', '/api/admin/ebooks/' + bid + '/units', { jar: boss, body: { unit: { title: 'Test unit', kind: 'test', test: '/pessages/test-1.html' } } }); assert.equal(r.status, 201); assert.equal(r.json.units.length, 6);
+      await call('POST', '/api/admin/panels/books', { jar: boss, body: { item: { ...pb, plan: 'free' } } });
+      r = await call('GET', '/api/ebooks/' + bid, { jar: k1 }); assert.equal(r.json.progress.done, 3, 'a unit with a test is learned when the test was finished');
+      // deleting the book takes its units; deleting an account takes it out of its class
+      assert.equal((await call('DELETE', '/api/admin/panels/books/' + bid, { jar: boss })).status, 200);
+      assert.equal((await call('GET', '/api/admin/ebooks/' + bid, { jar: boss })).status, 404);
+      assert.equal((await call('DELETE', '/api/admin/users/' + k2id, { jar: boss })).status, 200);
+      assert.equal((await call('GET', '/api/teacher/overview', { jar: user })).json.students.length, 2);
+      assert.equal((await call('DELETE', '/api/admin/teachers/' + tid, { jar: boss })).status, 200);
+      assert.equal((await call('GET', '/api/teacher/me', { jar: user })).json.teacher, null, 'no longer a teacher');
+      ok('teachers: classes (accounts, invitations, class code), the teacher panel API, e-books checked on the server, progress for students and teachers');
+    }
+
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');

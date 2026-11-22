@@ -178,7 +178,10 @@ async function route(req, res, p, method, ctx) {
   ctx.rateLimit('sidebar:' + ctx.clientIp(req), 240, 60000);
   const u = await ctx.currentUser(req).catch(() => null);
   const data = await load(ctx);
-  return send(res, 200, forViewer(data, { signedIn: !!u, admin: ctx.isAdmin(u), level: ctx.userLevel(u) }), { 'Cache-Control': 'no-store, private' });
+  const out = forViewer(data, { signedIn: !!u, admin: ctx.isAdmin(u), level: ctx.userLevel(u) });
+  // a teacher gets "Teacher panel" in the menu (assets/js/sidebar-links.js adds it; teachers.js keeps the role)
+  if (u && ctx.isTeacher) out.teacher = !!(await ctx.isTeacher(u).catch(() => false));
+  return send(res, 200, out, { 'Cache-Control': 'no-store, private' });
 }
 
 /* GET  /api/admin/sidebar          the whole menu (every item, also the hidden ones) + the lists of icons and options

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/assets/js/loading.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS X — Join your teacher's class</title>
+    <meta name="robots" content="noindex">
+    <script src="assets/js/theme-init.js"></script>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="assets/css/login.css">
+<link rel="stylesheet" href="assets/css/ix-unified.css">
+    <style>
+        .jn-teacher{display:flex;align-items:center;gap:12px;padding:14px;margin:4px 0 16px;border:1px solid var(--border, #e5e7eb);border-radius:14px}
+        .jn-avatar{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed)}
+        .jn-teacher b{display:block}.jn-teacher span{font-size:13px;opacity:.75}
+        .jn-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+        .jn-actions .btn-primary,.jn-actions .btn-ghost{flex:1;justify-content:center;text-align:center}
+        .jn-code{text-transform:uppercase;letter-spacing:.2em;font-weight:700;text-align:center}
+        .jn-links{display:grid;gap:8px;margin-top:14px}
+        .jn-links a{display:block;text-align:center}
+    </style>
+    <script src="/assets/js/branding.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a href="/dashboard" class="brand" aria-label="IELTS X home"><img src="/logo.png" alt="IELTS X"></a>
+        <a href="/dashboard" class="btn-ghost">Dashboard</a>
+    </header>
+
+    <main class="stage">
+        <section class="card" aria-labelledby="title">
+            <h1 id="title">Your class</h1>
+            <p class="sub" id="subtitle">Join your teacher's class: they see your tests and your progress in the e-books, and help you prepare.</p>
+            <div id="box"><p class="sub">Loading…</p></div>
+            <p id="error" class="error" role="alert" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <footer class="legal">Your teacher sees your test results and your e-book progress — never your password or payments. You can leave the class at any time.</footer>
+    <script src="assets/js/join-page.js" defer></script>
+</body>
+</html>

@@ -206,6 +206,17 @@ const store = {
     const db = loadDb(); const u = db.users.find((x) => x.id === id);
     if (!u) return null; Object.assign(u, patch); saveDb(db); return u;
   },
+  /* several accounts at once (a teacher's class, teachers.js); ids that are not UUIDs never reach the database */
+  async findUsersByIds(ids) {
+    ids = [...new Set((ids || []).map(String))];
+    if (!ids.length) return [];
+    if (USE_SUPABASE) {
+      const ok = ids.filter(isUuid); const out = [];
+      for (let i = 0; i < ok.length; i += 80) out.push(...((await sb(`ieltsx_users?id=in.(${ok.slice(i, i + 80).map(eq).join(',')})&limit=80`)) || []));
+      return out;
+    }
+    const set = new Set(ids); return loadDb().users.filter((u) => set.has(u.id));
+  },
   async deleteUser(id) {
     memoClear('user:' + id);
     if (USE_SUPABASE) { if (!isUuid(id)) return false; await sb(`ieltsx_users?id=eq.${eq(id)}`, { method: 'DELETE' }); return true; }
@@ -252,6 +263,17 @@ const store = {
   async deleteResultsByUser(userId) {
     if (USE_SUPABASE) { if (isUuid(userId)) await sb(`ieltsx_results?userId=eq.${eq(userId)}`, { method: 'DELETE' }); return true; }
     const db = loadDb(); db.results = db.results.filter((r) => r.userId !== userId); saveDb(db); return true;
+  },
+  /* the results of several students (a teacher's class), newest first */
+  async listResultsFor(userIds, limit = 5000) {
+    const ids = [...new Set((userIds || []).map(String))];
+    if (!ids.length) return [];
+    if (USE_SUPABASE) {
+      const ok = ids.filter(isUuid); const out = [];
+      for (let i = 0; i < ok.length; i += 80) out.push(...((await sb(`ieltsx_results?userId=in.(${ok.slice(i, i + 80).map(eq).join(',')})&order=createdAt.desc&limit=${limit}`)) || []));
+      return out.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, limit);
+    }
+    const set = new Set(ids); return loadDb().results.filter((r) => set.has(r.userId)).slice(0, limit);
   },
   async listResults(userId, limit = 500) {
     if (USE_SUPABASE) return isUuid(userId) ? (await sb(`ieltsx_results?userId=eq.${eq(userId)}&order=createdAt.desc&limit=${limit}`)) || [] : [];
@@ -819,7 +841,15 @@ const mockCtx = (extra) => Object.assign(mockCtxInst || (mockCtxInst = { store, 
 let gameCtxInst = null;
 const gameCtx = (extra) => ({ ...(gameCtxInst || (gameCtxInst = { store, currentUser, isAdmin, send, readJson, rateLimit, HttpError, purposeToken, readPurposeToken, audit, cleanUrl, clientIp, USE_SUPABASE })), ...(extra || {}) });
 /* Predictions (predictions.js): the collections of the Predictions page and of the admin panel */
-const predCtx = (extra) => ({ store, currentUser, isAdmin, userLevel, send, readJson, rateLimit, HttpError, audit, clientIp, ...(extra || {}) });
+const predCtx = (extra) => ({ store, currentUser, isAdmin, isTeacher: isTeacherUser, userLevel, send, readJson, rateLimit, HttpError, audit, clientIp, ...(extra || {}) });
+/* teachers and their classes (teachers.js), e-books (ebooks.js). "Is this account a teacher?" is kept a few seconds per
+   account (the sidebar asks it on every page); a change in teachers.js clears it at once on this server */
+const teachers = () => require('./teachers');
+const ebooks = () => require('./ebooks');
+const isTeacherUser = (u) => (u ? memoGet('tch:' + u.id, () => teachers().isTeacher(teachCtx(), u).catch(() => false), 10000) : Promise.resolve(false));
+const planLabel = (u) => publicUser(u).plan;
+const teachCtx = (extra) => ({ store, currentUser, isAdmin, isPremium, planOf: planLabel, userLevel, send, readJson, rateLimit, HttpError, audit, clientIp,
+  normEmail, validEmail, cleanName, checkPassword, hashPassword, createUser, ebooks: ebooks(), teacherChanged: (id) => memoClear('tch:' + id), ...(extra || {}) });
 /* the Website check (site-check.js): used by Admin -> Website check and by Site Guard (site-watch.js) */
 async function runSiteCheck(fresh) {
   let dbSize = 0; if (!USE_SUPABASE) { try { dbSize = fs.statSync(DB_FILE).size; } catch (e) { /* no file yet */ } }
@@ -1804,6 +1834,9 @@ async function api(req, res, url) {
   if (p === '/api/sidebar') return require('./sidebar').route(req, res, p, method, predCtx());   // the menu of every page, managed in Admin -> Sidebar
   // Videos, Books, Grammar, Music (panels.js; locked items come without their video / file / text) and the link rules of every page
   if (p === '/api/links' || p.startsWith('/api/panels/')) return require('./panels').route(req, res, p, method, predCtx());
+  if (p === '/api/ebooks' || p.startsWith('/api/ebooks/')) return ebooks().route(req, res, p, method, teachCtx());   // the e-books of the Books page: units, exercises checked here, progress
+  if (p.startsWith('/api/teacher/')) return teachers().teacherRoute(req, res, p, method, url, teachCtx());           // the teacher's panel (/teacher)
+  if (p === '/api/class' || p.startsWith('/api/class/')) return teachers().classRoute(req, res, p, method, teachCtx()); // a student joins a class (/join)
   if (p === '/api/client-errors' && method === 'POST') return require('./site-watch').clientError(req, res, guardCtx(req));   // errors in visitors' browsers (assets/js/loading.js) -> Site Guard
   if (p === '/api/cron/site-watch' && (method === 'GET' || method === 'POST')) return require('./site-watch').cron(req, res, url, guardCtx(req));   // Vercel cron / an outside pinger (CRON_SECRET)
 
@@ -1828,6 +1861,8 @@ async function api(req, res, url) {
     if (p === '/api/admin/predictions' || p.startsWith('/api/admin/predictions/')) return require('./predictions').adminRoute(req, res, p, method, predCtx({ admin }));
     if (p === '/api/admin/sidebar' || p.startsWith('/api/admin/sidebar/')) return require('./sidebar').adminRoute(req, res, p, method, predCtx({ admin }));
     if (p === '/api/admin/links' || p.startsWith('/api/admin/panels/')) return require('./panels').adminRoute(req, res, p, method, predCtx({ admin }));
+    if (p === '/api/admin/ebooks' || p.startsWith('/api/admin/ebooks/')) return ebooks().adminRoute(req, res, p, method, teachCtx({ admin }));
+    if (p === '/api/admin/teachers' || p.startsWith('/api/admin/teachers/')) return teachers().adminRoute(req, res, p, method, url, teachCtx({ admin }));
     if (method === 'GET' && p === '/api/admin/orders') return send(res, 200, { orders: await store.listOrders({ status: url.searchParams.get('status') || '', limit: 300 }) });
     let am = p.match(/^\/api\/admin\/orders\/([^/]+)\/(approve|reject)$/);
     if (am && method === 'POST') {
@@ -2007,6 +2042,7 @@ async function api(req, res, url) {
       if (u.id === admin.id) throw new HttpError(400, 'You cannot delete your own account here.');
       await store.deleteResultsByUser(u.id);
       await aiStore().removeByUser(u.id).catch(() => null);   // the saved AI checks go with the account
+      await teachers().forgetUser(teachCtx(), u.id).catch(() => null);   // out of their class, their own class and e-book progress go
       await store.deleteUser(u.id);
       await audit(admin, 'user.delete', u.email);
       return send(res, 200, { ok: true });
@@ -2135,7 +2171,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', 'design-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers; design-src: sent by /api/design/fx/ to who may use it
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js', 'panels.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js', 'panels.js', 'teachers.js', 'ebooks.js', 'ebooks-sample.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
@@ -2325,6 +2361,12 @@ async function staticFile(req, res, pathname) {
   const tl = target.toLowerCase();
   const isHtml = tl.endsWith('.html');
   const needsAdmin = isHtml && (tl === '/admin.html' || tl.startsWith('/admin/'));
+  // the teacher's panel: signed-in only, sent like the admin page (no cache, no frames, not indexed); the page itself
+  // asks /api/teacher/me, and every number on it comes from the teacher API, which checks the teacher role
+  if (isHtml && tl === '/teacher.html') {
+    if (!(await currentUser(req))) return redirect(res, '/login?next=' + encodeURIComponent('/teacher'));
+    return serveFile(req, res, file, { 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY', 'X-Robots-Tag': 'noindex, nofollow', 'Content-Security-Policy': ADMIN_CSP });
+  }
   const gate = isHtml ? await gateForPath(tl) : null;                // full test pages: free / Standard / Max, set in the admin panel
   const gateLocked = !!(gate && gate.locked);
   const needsPremium = isPremiumPath(tl) || gateLocked;

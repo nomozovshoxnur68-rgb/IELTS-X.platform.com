@@ -50,7 +50,8 @@
 
         // ── account ──
         "pricing": "/Price",
-        "admin-panel": "/admin"
+        "admin-panel": "/admin",
+        "teacher": "/teacher"           // only for teachers: added by addTeacher() below
     };
 
     /* the icons an item can have (Lucide, the set the sidebar already uses); the admin panel shows the same list */
@@ -141,6 +142,34 @@
                 if (label) label.textContent = x[1];
                 after.parentNode.insertBefore(copy, after.nextSibling); after = copy;
             });
+        }
+    }
+
+    /* "Teacher panel" (/teacher) for a teacher: /api/sidebar says teacher: true (teachers.js on the server). It goes on top
+       of the last group of the menu (Pricing …), made from a copy of an item there, and goes away when the role does. */
+    var teacherOn = false;
+    function addTeacher(on) {
+        if (on !== undefined) teacherOn = !!on;
+        var contents = document.querySelectorAll('[data-sidebar="content"]');
+        for (var i = 0; i < contents.length; i++) {
+            var have = contents[i].querySelector('a[data-link="teacher"]');
+            if (!teacherOn) { if (have && have.closest('li')) have.closest('li').remove(); continue; }
+            if (have) continue;
+            var uls = contents[i].querySelectorAll('ul[data-sidebar="menu"]'); if (!uls.length) continue;
+            var ul = uls[uls.length - 1]; var tpl = ul.querySelector('li'); if (!tpl) continue;
+            var li = tpl.cloneNode(true); var a = li.querySelector('a'); if (!a) continue;
+            a.setAttribute('data-link', 'teacher'); a.setAttribute('href', LINKS.teacher);
+            ['id', 'target', 'rel', 'data-ix-locked', 'title', 'aria-current'].forEach(function (k) { a.removeAttribute(k); });
+            var here = /^\/teacher(\.html)?\/?$/i.test(location.pathname);
+            a.setAttribute('data-active', here ? 'true' : 'false'); if (here) a.setAttribute('aria-current', 'page');
+            var svgs = a.querySelectorAll('svg');
+            for (var k = svgs.length - 1; k > 0; k--) svgs[k].remove();
+            var ic = node(svg('graduation-cap', ICONS.graduation));
+            if (svgs[0]) svgs[0].parentNode.replaceChild(ic, svgs[0]); else a.insertBefore(ic, a.firstChild);
+            var badge = a.querySelector('.ix-sb-badge'); if (badge) badge.remove();
+            var label = a.querySelector('span.flex-1') || a.querySelector('span:last-of-type');
+            if (label) label.textContent = 'Teacher panel';
+            ul.insertBefore(li, ul.firstChild);
         }
     }
 
@@ -238,6 +267,7 @@
         for (var i = 0; i < contents.length; i++) { try { buildOne(contents[i], cfg); } catch (e) { /* the menu of the page stays */ } }
         drawn = key;
         api.managed = true;
+        try { addTeacher(); } catch (e) { /* fine */ }
     }
     /* a page that a locked item points at: a visitor without the plan goes to the Price page (or signs in first) */
     function gate(cfg) {
@@ -248,12 +278,13 @@
         }
     }
 
-    var api = { links: LINKS, icons: ICONS, apply: apply, addGame: addGame, addExtras: addExtras, build: build, managed: false };
+    var api = { links: LINKS, icons: ICONS, apply: apply, addGame: addGame, addExtras: addExtras, addTeacher: addTeacher, build: build, managed: false };
     window.IELTSXLinks = api;
 
     var hasSidebar = !!document.querySelector('[data-sidebar="content"]');
     var cached = hasSidebar ? readCache() : null;
     try { if (cached && cached.managed) build(cached); else { addGame(); addExtras(); } } catch (e) { /* the menu still works without it */ }
+    try { if (cached && cached.teacher) addTeacher(true); } catch (e) { /* fine */ }
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () { apply(); });
@@ -271,6 +302,7 @@
                 if (!d || !d.items) return;
                 d.t = Date.now();
                 writeCache(d);
+                try { addTeacher(!!d.teacher); } catch (e) { /* fine */ }
                 if (d.managed || (cached && cached.managed)) { if (!d.managed) location.reload(); else { build(d); gate(d); } }
             })
             .catch(function () { /* offline: the menu of the page stays */ });

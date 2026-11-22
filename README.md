@@ -776,3 +776,59 @@ asked at most once a minute.
   added`) is no longer glued to the box before it when pasted. Older tests that kept a flow-chart as single questions with
   arrows in them ("Tobin found a skull ↓ The ____ were called") are shown as a real flow-chart, one box per step. The admin
   preview shows the same boxes.
+
+## Teachers, the Teacher panel, e-books (November 2026)
+
+**Teachers** (`/admin#teachers`, `admin-teachers.js` + server module `teachers.js`). Find an account (it must have signed
+up) and press **Make teacher**; give the class a name and the most students it may have (200 by default). Every teacher is
+ranked by the **score** of their class: *active students this week* (a test, an e-book unit or a sign-in in the last 7
+days) 40 %, *average band of the last 30 days* 30 %, *e-book progress* 30 %. **Open** a teacher: their students (tests,
+band, e-books, last activity), put students in the class by e-mail, move a student to another teacher, take one out,
+switch the teacher off or remove the role (the students stay, without a class). **Panel ↗** opens the teacher's own panel
+as they see it (`/teacher?as=<id>`, admins only). The user drawer has a **Teacher / class** box: whose student this is,
+move them, make them a teacher. Everything is in the Activity log.
+
+**The Teacher panel** (`/teacher`: `teacher.html`, `teacher.js`, `teacher.css` on top of `admin.css`, so it looks like the
+admin panel, light and dark). A teacher sees **only the students of their own class**:
+* *Dashboard*: students, active this week, tests and average band (with the change), e-book progress, a 14-day chart of
+  tests and learned units, bands by section, who needs attention (inactive 7+ days, no e-book started, band below 5.5,
+  invitations not accepted), top students, latest results.
+* *Students*: search, groups, filters, sorting, CSV export; a student's drawer shows every test, the bands by section and
+  every unit of every e-book (learned / started / not started, best score), the group, "Remove from my class".
+* *Books progress*: every e-book with how many of the class started / finished it and each student's percentage.
+* *Add students*: **create an account** (name, e-mail, a password the teacher gives the student), **invite** existing
+  accounts by e-mail (they accept on `/join`), or share the **class link / code** (`/join?code=ABC123`).
+* *Class settings*: the class name and its groups.
+A teacher gets "Teacher panel" in the site menu (`GET /api/sidebar` says `teacher: true`, `assets/js/sidebar-links.js`).
+
+**Students** join on `/join` (`join.html`, `assets/js/join-page.js`, `GET/POST /api/class…`): with the code, by accepting an
+invitation, and they can leave. A student is in one class at a time; joining another moves them. The teacher sees tests
+and e-book progress — never passwords or payments.
+
+**E-books** (`/admin#ebooks`, `admin-ebooks.js` + server module `ebooks.js`). A book of Admin → Books (title, cover,
+PDF, plan) gets **units** (the **Units** button in Books, or Admin → E-books): title, kind (Lesson, Reading, Listening,
+Vocabulary, Grammar, Writing, Speaking, Test, Review), minutes, a summary, the text (the Grammar formatting), an optional
+recording, an optional **test of this website**, and **exercises**: choice, gap (several right answers: `a|b`),
+True / False / Not Given, Yes / No / Not Given, each with an optional explanation. **Paste many…** turns a numbered list
+into exercises (`= answer`, `[TFNG] = False`, options `a) …` with `*` on the right one, `Why: …`).
+**Add the sample e-book** adds *IELTS Starter Workbook* (5 original units) to try everything. Use only books and texts you
+have the right to publish: the Cambridge books themselves are copyrighted, so type your own units or use the website's
+tests in them.
+
+On the **Books page** (`/books`, `assets/js/ebooks-page.js`, `assets/css/ebooks.css`) a student opens a book, reads the
+units, plays the recording, opens the linked test and does the exercises. **The server checks the answers**
+(`POST /api/ebooks/<book>/<unit>/check`: the answers reach the page only after "Check answers"); the best score is kept.
+A unit is **learned** when its exercises reach 60 %, when its test is finished (a unit with a test and no exercises), or
+after "I have read it" (a unit with only text). The page shows the percentage learned, the units left, the right answers,
+"Continue where you stopped", previous / next unit and "Start again". A locked book (its plan) is sent without its units.
+
+Kept in `ieltsx_settings` (no Supabase change): `teacher:<userId>`, `ebook:<bookId>` (the list of units),
+`ebook-unit:<bookId>:<unitId>` (a unit with its answers), `ebook-progress:<userId>`. Deleting a book deletes its units;
+deleting an account takes it out of its class and deletes its e-book progress. `teachers.js`, `ebooks.js` and
+`ebooks-sample.js` are server only (`BLOCKED_FILES` in `server.js`, `PRIVATE` in `middleware.js`); `/teacher` is sent
+like the admin page (no cache, no frames, not indexed — `vercel.json` too).
+
+**Fix**: on the Predictions, Videos, Books and Grammar pages the card background (`--card`) referred to itself and the
+light grey of bars and chips (`--soft`) pointed at a colour that was not one, so cards were transparent and progress
+tracks invisible; `assets/css/predictions.css` now uses `--pcard` (which also takes the glass colour of the designs,
+`--pdp-card`) and `--soft: hsl(var(--secondary))`.

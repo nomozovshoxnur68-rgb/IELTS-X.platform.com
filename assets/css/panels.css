@@ -33,7 +33,7 @@ html.dark-mode .pnl-m-grammar{background:linear-gradient(135deg,rgba(109,40,217,
 .pnl-player-desc{margin:0;padding:14px 18px 18px;font-size:.875rem;line-height:1.6;color:hsl(var(--muted-foreground));white-space:pre-wrap}
 
 /* a grammar lesson */
-.pnl-lesson{padding:1.4rem 1.5rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);box-shadow:0 1px 2px rgba(15,23,42,.05);font-size:.95rem;line-height:1.7;margin-bottom:1rem;overflow-wrap:anywhere}
+.pnl-lesson{padding:1.4rem 1.5rem;border:1px solid var(--line);border-radius:.75rem;background:var(--pcard);box-shadow:0 1px 2px rgba(15,23,42,.05);font-size:.95rem;line-height:1.7;margin-bottom:1rem;overflow-wrap:anywhere}
 .pnl-lesson>:first-child{margin-top:0}.pnl-lesson>:last-child{margin-bottom:0}
 .pnl-lesson h2{margin:1.4rem 0 .5rem;font-size:1.15rem;font-weight:700}
 .pnl-lesson h3{margin:1.1rem 0 .4rem;font-size:1rem;font-weight:700}
@@ -53,7 +53,7 @@ html.dark-mode .pnl-example{background:rgba(139,92,246,.14)}
 html.dark-mode .pnl-tip{background:rgba(14,165,233,.13)}
 
 /* the exercises of a lesson */
-.pnl-exercises{padding:1.25rem 1.5rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.pnl-exercises{padding:1.25rem 1.5rem;border:1px solid var(--line);border-radius:.75rem;background:var(--pcard);box-shadow:0 1px 2px rgba(15,23,42,.05)}
 .pnl-exercises h2{display:flex;align-items:center;gap:.5rem;margin:0 0 .9rem;font-size:1.1rem}
 .pnl-exercises h2 svg{width:18px;height:18px;color:#8b5cf6}
 .pnl-ex-list{list-style:none;margin:0;padding:0;display:grid;gap:.75rem}

@@ -23,7 +23,7 @@
   };
   const K = {
     videos: { name: 'Videos', one: 'video', page: '/videos', icon: 'video', hero: 'Video lessons on the Videos page', help: 'Paste a YouTube or Vimeo link. Students watch it inside the website. A locked video shows only its title (and your own cover picture, if you add one) until the student has the plan. Note: anybody who has the YouTube link itself can watch it on YouTube, so use “Unlisted” videos for paid lessons.' },
-    books: { name: 'Books', one: 'book', page: '/books', icon: 'book', hero: 'Books and study guides on the Books page', help: 'Upload a PDF (or paste a link to it) and a cover picture. A locked book shows its cover and title only; the file is given to students with the plan.' },
+    books: { name: 'Books', one: 'book', page: '/books', icon: 'book', hero: 'Books and study guides on the Books page', help: 'Upload a PDF (or paste a link to it) and a cover picture. A locked book shows its cover and title only; the file is given to students with the plan. Press “Units” to make it an interactive e-book (texts, recordings, exercises checked for the student, progress for the student and the teacher).' },
     grammar: { name: 'Grammar', one: 'topic', page: '/grammar', icon: 'graduation', hero: 'Grammar lessons on the Grammar page', help: 'Write the explanation with simple formatting and add short exercises; students check their answers on the page. A locked topic shows its title and summary only.' },
     music: { name: 'Music', one: 'track', page: '/settings', icon: 'music', hero: 'Study music in Settings', help: 'Upload music files (MP3, M4A, OGG, WAV) or paste links. Students choose a track on the Settings page; it plays on the ordinary pages of the website and stops by itself in tests and exams. Use only music you have the right to share.' }
   };
@@ -89,6 +89,7 @@
             <button class="btn btn-sm btn-icon" data-pn="up" data-k="${kind}" data-id="${esc(it.id)}" type="button" title="Move up" ${i === 0 || q ? 'disabled' : ''}>↑</button>
             <button class="btn btn-sm btn-icon" data-pn="down" data-k="${kind}" data-id="${esc(it.id)}" type="button" title="Move down" ${i === shown.length - 1 || q ? 'disabled' : ''}>↓</button>
             <button class="btn btn-sm" data-pn="publish" data-k="${kind}" data-id="${esc(it.id)}" type="button">${it.published === false ? 'Publish' : 'Hide'}</button>
+            ${kind === 'books' ? `<a class="btn btn-sm" href="#ebooks?book=${esc(it.id)}" title="The units and exercises of this e-book (Admin → E-books)">Units</a>` : ''}
             <button class="btn btn-sm btn-primary" data-pn="edit" data-k="${kind}" data-id="${esc(it.id)}" type="button">Edit</button>
             <button class="btn btn-sm btn-danger btn-icon" data-pn="delete" data-k="${kind}" data-id="${esc(it.id)}" type="button" title="Delete">✕</button>
           </div></div>`).join('') || `<div class="empty">${s.items.length ? 'Nothing matches.' : 'Nothing here yet. Press “New ' + esc(K[kind].one) + '”.'}</div>`}</div>

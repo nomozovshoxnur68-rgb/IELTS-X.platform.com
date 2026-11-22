@@ -12,6 +12,7 @@
 <meta name="color-scheme" content="light dark">
 <title>IELTSX — Admin Panel</title>
 <link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="teacher.css">
     <script src="/assets/js/branding.js" defer></script>
 <script src="/assets/js/no-context-menu.js"></script>
 </head>
@@ -30,6 +31,7 @@
     <a class="nav-item" href="#guard" data-nav="guard"><span class="ico" data-i="bot"></span><span class="grow">Site Guard (AI)</span><span class="nav-new">NEW</span></a>
     <div class="nav-label">People</div>
     <a class="nav-item" href="#users" data-nav="users"><span class="ico" data-i="users"></span><span class="grow">Users</span></a>
+    <a class="nav-item" href="#teachers" data-nav="teachers"><span class="ico" data-i="graduation"></span><span class="grow">Teachers</span><span class="nav-new">NEW</span></a>
     <a class="nav-item" href="#premium" data-nav="premium"><span class="ico" data-i="crown"></span><span class="grow">Premium</span></a>
     <a class="nav-item" href="#orders" data-nav="orders"><span class="ico" data-i="bag"></span><span class="grow">Orders</span><span id="orders-count" class="pill" hidden>0</span></a>
     <a class="nav-item" href="#activity" data-nav="activity"><span class="ico" data-i="activity"></span><span class="grow">Test activity</span></a>
@@ -57,6 +59,7 @@
     <a class="nav-item" href="#vocab" data-nav="vocab"><span class="ico" data-i="languages"></span><span class="grow">Vocabulary</span></a>
     <a class="nav-item" href="#videos" data-nav="videos"><span class="ico" data-i="video"></span><span class="grow">Videos</span><span class="nav-new">NEW</span></a>
     <a class="nav-item" href="#books" data-nav="books"><span class="ico" data-i="book"></span><span class="grow">Books</span><span class="nav-new">NEW</span></a>
+    <a class="nav-item" href="#ebooks" data-nav="ebooks"><span class="ico" data-i="library"></span><span class="grow">E-books (units)</span><span class="nav-new">NEW</span></a>
     <a class="nav-item" href="#grammar" data-nav="grammar"><span class="ico" data-i="graduation"></span><span class="grow">Grammar</span><span class="nav-new">NEW</span></a>
     <a class="nav-item" href="#music" data-nav="music"><span class="ico" data-i="music"></span><span class="grow">Music (Settings)</span><span class="nav-new">NEW</span></a>
     <div class="nav-label">Settings</div>
@@ -201,6 +204,8 @@
   <section class="view" id="view-grammar"><div id="content-grammar"></div></section>
   <section class="view" id="view-music"><div id="content-music"></div></section>
   <section class="view" id="view-links"><div id="content-links"></div></section>
+  <section class="view" id="view-teachers"><div id="content-teachers"></div></section>
+  <section class="view" id="view-ebooks"><div id="content-ebooks"></div></section>
 
   </div>
 </main>
@@ -245,6 +250,8 @@
 <script src="admin-sidebar.js"></script>
 <script src="admin-guard.js"></script>
 <script src="admin-panels.js"></script>
+<script src="admin-teachers.js"></script>
+<script src="admin-ebooks.js"></script>
 </body>
 </html>
 
