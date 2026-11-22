@@ -828,6 +828,35 @@ deleting an account takes it out of its class and deletes its e-book progress. `
 `ebooks-sample.js` are server only (`BLOCKED_FILES` in `server.js`, `PRIVATE` in `middleware.js`); `/teacher` is sent
 like the admin page (no cache, no frames, not indexed — `vercel.json` too).
 
+**E-books in the design of a book.** Every e-book has a **design** (Admin → E-books → a book → *Design of the book*):
+*Website look*, *Course book* ("Unit 1" in a magenta circle, magenta sections with a blue second word, numbered circles,
+blue "Exam advice" boxes, pink-framed "Questions 1–5" boxes, serif instructions), *Workbook* (the same layout in greys) or
+*Vocabulary book (In Use)* (a dark green unit number on a green bar, lettered sections A B C on a pale green page,
+exercises 1.1, 1.2 …). A unit is a **book page** written in a small format (`ebook-doc.js`, server only), with snippet
+buttons, a help box and a **Preview** (with "Show the answers") in the editor:
+
+```
+# Reading | Section 1                    a section (after | in the second colour) · # [A] Title  a lettered section
+::: advice True / False / Not Given      an "Exam advice" box (also: info, note, passage, panel, words) … :::
+::: task Answer Questions 1–5.           a numbered exercise … :::
+Questions 1–5                            the exam box; the lines right after it are its instructions
+1 A statement. = T                       TRUE / FALSE / NOT GIVEN (Y, N, NG → YES / NO / NOT GIVEN; @labels F, I, N)
+6 A question?  then  A …  B … *  C …     A / B / C (two * = "choose TWO")
+Life is [more expensive] (expensive).    a gap; [a|b] several right answers; [=24] a filled-in example
+They had some {problems*|troubles}.      circle the right word
+1 It effects me. = affects               correct the mistake (a typed answer after the sentence)
+@match + 1 meet = the deadline           matching (or options A–F before the questions and "= B")
+| Name: | Anna [Kowalska] |               form / table completion (the gaps get the numbers of the questions)
+Box: a, b, c · @flow · Why: …            a box of words · a flow-chart · the explanation shown after Check
+```
+
+The page (`assets/js/ebook-render.js` + `assets/css/ebook-book.css`, also used by the admin preview) gets the blocks
+**without the answers**; every exercise has its own **Check** / **Try again**, and **Check all answers** checks the unit.
+The server keeps the best try of every exercise (`tasks` in the progress) and adds them up: 60 % of the unit's points =
+learned. A unit with a mistake in its format is not saved (the error names the line). **Add a sample e-book** now offers
+a course book, a workbook and a vocabulary book in these designs (every text written for IELTSX) besides the starter
+workbook. The designs copy the *layout* of the books, not their texts: type or paste only content you may publish.
+
 **Fix**: on the Predictions, Videos, Books and Grammar pages the card background (`--card`) referred to itself and the
 light grey of bars and chips (`--soft`) pointed at a colour that was not one, so cards were transparent and progress
 tracks invisible; `assets/css/predictions.css` now uses `--pcard` (which also takes the glass colour of the designs,

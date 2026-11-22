@@ -2125,6 +2125,41 @@ server.listen(0, async () => {
       assert.equal((await call('POST', '/api/ebooks/' + bid + '/' + U[4].id + '/check', { jar: k1, body: { answers: {} } })).status, 400, 'a unit with only text has no check');
       r = await call('POST', '/api/ebooks/' + bid + '/' + U[4].id + '/read', { jar: k1 }); assert.equal(r.json.progress.done, 2); assert.equal(r.json.progress.percent, 40);
       r = await call('GET', '/api/ebooks', { jar: k1 }); assert.equal(r.json.items.find((b) => b.id === bid).progress.percent, 40);
+      // e-books in the design of a book (ebook-doc.js): the course-book sample, one exercise checked at a time, no answers sent
+      r = await call('POST', '/api/admin/ebooks/sample', { jar: boss, body: { which: 'course' } }); assert.equal(r.status, 201); const cb = r.json.book.id;
+      r = await call('GET', '/api/ebooks/' + cb, { jar: boss }); assert.equal(r.json.book.style, 'course'); const CU = r.json.units; assert.equal(CU.length, 2); assert.ok(CU[0].exercises > 20, 'every gap and question counts');
+      r = await call('GET', '/api/ebooks/' + cb + '/' + CU[0].id, { jar: boss }); assert.equal(r.json.book.style, 'course');
+      const cpg = r.json.unit.doc; assert.equal(r.json.unit.points, CU[0].exercises);
+      assert.ok(cpg.some((b) => b.t === 'sec') && cpg.some((b) => b.t === 'box' && b.kind === 'advice') && cpg.some((b) => b.t === 'box' && b.kind === 'passage'), 'sections, Exam advice, a passage');
+      assert.ok(!r.text.includes('quicker') && !r.text.includes('hardest') && !/"why"|"k":"(?:gap|pick|choice|label|match)"/.test(r.text), 'the page comes without its answers');
+      const slotIds = (b) => (JSON.stringify(b).match(/data-a=\\"([^\\"]+)\\"|"a":"(t\d+\.\d+)"/g) || []).map((x) => /(t\d+\.\d+)/.exec(x)[1]);
+      const comp = cpg.find((b) => b.t === 'task' && /adjective in brackets/.test(b.instr)); const ci = slotIds(comp); assert.equal(ci.length, 5);
+      const ck = '/api/ebooks/' + cb + '/' + CU[0].id + '/check';
+      r = await call('POST', ck, { jar: boss, body: { task: comp.id, answers: { [ci[0]]: 'More expensive.', [ci[1]]: 'busiest', [ci[2]]: 'quicker', [ci[3]]: 'harder', [ci[4]]: 'worst' } } });
+      assert.equal(r.json.correct, 4); assert.equal(r.json.total, 5); assert.equal(r.json.results.length, 5, 'only this exercise'); assert.equal(r.json.results[3].answer, 'hardest');
+      assert.equal(r.json.best, 4); assert.equal(r.json.unitTotal, CU[0].exercises); assert.equal(r.json.passed, false); assert.equal(r.json.mine.tasks[comp.id], 4);
+      const pick = cpg.find((b) => b.t === 'task' && /^Circle the correct word/.test(b.instr)); const pi = slotIds(pick); assert.equal(pi.length, 4);
+      r = await call('POST', ck, { jar: boss, body: { task: pick.id, answers: { [pi[0]]: 'problems', [pi[1]]: 'trouble', [pi[2]]: 'problem', [pi[3]]: 'troubles' } } });
+      assert.equal(r.json.correct, 3); assert.equal(r.json.best, 7, 'the best of every exercise is added up');
+      r = await call('POST', ck, { jar: boss, body: { task: comp.id, answers: {} } }); assert.equal(r.json.correct, 0); assert.equal(r.json.best, 7, 'a worse try keeps the best');
+      const tf = cpg.find((b) => b.t === 'task' && b.legend === 'tfng'); const ti = slotIds(tf); assert.deepEqual(tf.labels, ['TRUE', 'FALSE', 'NOT GIVEN']);
+      r = await call('POST', ck, { jar: boss, body: { task: tf.id, answers: { [ti[0]]: 'TRUE', [ti[1]]: 'f', [ti[2]]: 'True', [ti[3]]: 'NOT GIVEN', [ti[4]]: 'TRUE' } } });
+      assert.equal(r.json.correct, 4); assert.ok(r.json.results[3].explain, 'the explanation after Check');
+      const mc = cpg.find((b) => b.t === 'task' && b.body.some((x) => x.kind === 'choice')); const mi = mc.body.filter((x) => x.kind === 'choice').map((x) => x.a);
+      r = await call('POST', ck, { jar: boss, body: { task: mc.id, answers: { [mi[0]]: 'B', [mi[1]]: 'A', [mi[2]]: 'A' } } }); assert.equal(r.json.correct, 2);
+      r = await call('POST', ck, { jar: boss, body: { answers: {} } }); assert.equal(r.json.total, CU[0].exercises, 'Check all = the whole unit'); assert.equal(r.json.best, 13);
+      assert.equal((await call('POST', ck, { jar: boss, body: { task: 't99', answers: {} } })).status, 400);
+      // the admin: the design of a book, the preview, a unit with a mistake in its format is not saved
+      assert.equal((await call('POST', '/api/admin/ebooks/' + cb + '/style', { jar: k1, body: { style: 'site' } })).status, 403);
+      assert.equal((await call('POST', '/api/admin/ebooks/' + cb + '/style', { jar: boss, body: { style: 'pink' } })).status, 400);
+      r = await call('POST', '/api/admin/ebooks/' + cb + '/style', { jar: boss, body: { style: 'inuse' } }); assert.equal(r.json.style, 'inuse');
+      r = await call('GET', '/api/ebooks', { jar: boss }); assert.equal(r.json.items.find((b) => b.id === cb).style, 'inuse');
+      r = await call('POST', '/api/admin/ebooks/' + cb + '/preview', { jar: boss, body: { content: '::: task Circle.\n1 {a|b}\n:::' } }); assert.equal(r.json.errors.length, 1); assert.ok(/^Line 2/.test(r.json.errors[0]));
+      r = await call('POST', '/api/admin/ebooks/' + cb + '/preview', { jar: boss, body: { content: '::: task Gaps.\n1 I [am|\'m] here.\n2 It = T\n:::' } }); assert.equal(r.json.points, 2); assert.equal(r.json.errors.length, 0); assert.ok(r.json.key);
+      r = await call('POST', '/api/admin/ebooks/' + cb + '/units', { jar: boss, body: { unit: { title: 'Bad', content: '::: task Circle.\n1 {a|b}\n:::' } } }); assert.equal(r.status, 400); assert.ok(/Line 2/.test(r.json.error));
+      for (const w of ['workbook', 'inuse']) { r = await call('POST', '/api/admin/ebooks/sample', { jar: boss, body: { which: w } }); assert.equal(r.status, 201, w); }
+      assert.ok([403, 404].includes((await call('GET', '/ebook-doc.js')).status), 'ebook-doc.js is a server module');
+      for (const f of ['/assets/js/ebook-render.js', '/assets/css/ebook-book.css']) assert.equal((await call('GET', f)).status, 200, f);
       // what the teacher sees
       await call('POST', '/api/results', { jar: k1, body: { testKey: '/pessages/test-1', section: 'Reading', pageLabel: 'Passage 1', scoreCorrect: 10, scoreTotal: 13 } });
       r = await call('GET', '/api/teacher/overview', { jar: user }); assert.equal(r.status, 200);

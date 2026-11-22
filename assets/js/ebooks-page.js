@@ -5,7 +5,9 @@
  * only after "Check answers"). The progress is kept on the account, so the teacher sees it too.
  *   /books                    every book: the progress of each, "Continue where you stopped"
  *   /books#<book>             one book: how much is learned, what is left, its units
- *   /books#<book>/<unit>      one unit: the text, the recording, the test, the exercises; previous / next unit
+ *   /books#<book>/<unit>      one unit: its book page (assets/js/ebook-render.js) in the design of the book — the website's,
+ *                             a course book, a workbook or a vocabulary book (assets/css/ebook-book.css) — with the recording,
+ *                             the test, the exercises (each checked on its own, or all at once); previous / next unit
  * The look is the Predictions / Grammar pages' (predictions.css, panels.css) plus assets/css/ebooks.css.
  */
 (function () {
@@ -107,7 +109,7 @@
   function cardHtml(it) {
     var chips = [];
     if (it.units) chips.push('<span class="pdp-chip">' + svg(IC.layers) + plural(it.units, 'unit') + '</span>');
-    if (it.exercises) chips.push('<span class="pdp-chip">' + svg(IC.pencil) + plural(it.exercises, 'exercise') + '</span>');
+    if (it.exercises) chips.push('<span class="pdp-chip">' + svg(IC.pencil) + plural(it.exercises, 'question') + '</span>');
     if (it.level) chips.push('<span class="pdp-chip">' + esc(it.level) + '</span>');
     if (it.category) chips.push('<span class="pdp-chip muted">' + esc(it.category) + '</span>');
     if (!it.units && it.pages) chips.push('<span class="pdp-chip muted">' + svg(IC.file) + esc(it.pages) + ' pages</span>');
@@ -168,8 +170,9 @@
       var file = safeHref(b.file);
       var next = p && p.next ? p.next : units[0] && units[0].id;
       var head = '<div class="pdp-dhead eb-dhead"><div class="pdp-dmedia pnl-m-book eb-dcover">' + cover(b, 'eb-big-cover') + '</div><div class="pdp-dmain"><div class="pdp-pills">' + planBadge(b)
+        + (b.style && b.style !== 'site' && window.IXEbook ? '<span class="pdp-pill soft eb-style-pill eb-style-' + esc(b.style) + '"><i></i>' + esc(window.IXEbook.STYLES[b.style] || '') + '</span>' : '')
         + (b.level ? '<span class="pdp-pill soft">' + esc(b.level) + '</span>' : '') + (b.category ? '<span class="pdp-pill soft">' + esc(b.category) + '</span>' : '') + '</div><h1>' + esc(b.title) + '</h1>'
-        + (b.author ? '<div class="pdp-dmeta"><span>' + svg(IC.user) + esc(b.author) + '</span><span>' + svg(IC.layers) + plural(units.length, 'unit') + '</span>' + (b.exercises ? '<span>' + svg(IC.pencil) + plural(b.exercises, 'exercise') + '</span>' : '') + (b.minutes ? '<span>' + svg(IC.clock) + 'about ' + b.minutes + ' min</span>' : '') + '</div>' : '')
+        + (b.author ? '<div class="pdp-dmeta"><span>' + svg(IC.user) + esc(b.author) + '</span><span>' + svg(IC.layers) + plural(units.length, 'unit') + '</span>' + (b.exercises ? '<span>' + svg(IC.pencil) + plural(b.exercises, 'question') + '</span>' : '') + (b.minutes ? '<span>' + svg(IC.clock) + 'about ' + b.minutes + ' min</span>' : '') + '</div>' : '')
         + (b.description ? '<p>' + esc(b.description) + '</p>' : '');
       if (p) {
         head += '<div class="eb-progress"><div class="eb-ring" style="--p:' + p.percent + '"><b>' + p.percent + '%</b><small>learned</small></div><div class="eb-progress-main">'
@@ -183,11 +186,11 @@
       head += (btns ? '<div class="eb-actions">' + btns + '</div>' : '') + '</div></div>';
       var items = units.map(function (u, i) {
         var s = p && p.status ? p.status[u.id] : null; var st = unitState(s);
-        return '<li><a class="pdp-item eb-unit ' + st.cls + '" href="#' + esc(b.id) + '/' + esc(u.id) + '"><span class="eb-num">' + (st.cls === 'done' ? svg(IC.check) : i + 1) + '</span><span class="pdp-item-main"><span class="pdp-item-head">' + kindChip(u.kind)
-          + (u.minutes ? '<span class="pdp-meta-chip">' + svg(IC.clock) + u.minutes + ' min</span>' : '') + (u.exercises ? '<span class="pdp-meta-chip">' + svg(IC.pencil) + plural(u.exercises, 'exercise') + '</span>' : '') + (u.audio ? '<span class="pdp-meta-chip">' + svg(IC.headphones) + 'audio</span>' : '') + (u.test ? '<span class="pdp-meta-chip">' + svg(IC.target) + 'test</span>' : '') + '</span>'
+        return '<li><a class="pdp-item eb-unit ' + st.cls + '" href="#' + esc(b.id) + '/' + esc(u.id) + '"><span class="eb-num">' + (st.cls === 'done' ? svg(IC.check) : (b.style && b.style !== 'site' ? '<small>Unit</small>' : '') + (i + 1)) + '</span><span class="pdp-item-main"><span class="pdp-item-head">' + kindChip(u.kind)
+          + (u.minutes ? '<span class="pdp-meta-chip">' + svg(IC.clock) + u.minutes + ' min</span>' : '') + (u.exercises ? '<span class="pdp-meta-chip">' + svg(IC.pencil) + plural(u.exercises, 'question') + '</span>' : '') + (u.audio ? '<span class="pdp-meta-chip">' + svg(IC.headphones) + 'audio</span>' : '') + (u.test ? '<span class="pdp-meta-chip">' + svg(IC.target) + 'test</span>' : '') + '</span>'
           + '<span class="pdp-item-title">' + esc(u.title) + '</span>' + (u.summary ? '<span class="eb-sum">' + esc(u.summary) + '</span>' : '') + '</span><span class="eb-state ' + st.cls + '">' + esc(st.label) + '</span></a></li>';
       }).join('');
-      root.innerHTML = '<div class="pdp">' + back + head + (units.length ? '<h2 class="pdp-group">Units</h2><ol class="pdp-items eb-units">' + items + '</ol>' : '<div class="pdp-empty"><strong>No units yet</strong>' + (file ? 'Open the PDF meanwhile.' : 'Please check back soon.') + '</div>') + '</div>';
+      root.innerHTML = '<div class="pdp">' + back + head + (units.length ? '<h2 class="pdp-group">Units</h2><ol class="pdp-items eb-units eb-style-' + esc(b.style || 'site') + '">' + items + '</ol>' : '<div class="pdp-empty"><strong>No units yet</strong>' + (file ? 'Open the PDF meanwhile.' : 'Please check back soon.') + '</div>') + '</div>';
       window.scrollTo(0, 0);
     };
     if (bookCache[id]) show(bookCache[id]); else root.innerHTML = '<div class="pdp">' + back + '<div class="pdp-skel"></div></div>';
@@ -203,44 +206,58 @@
       });
   }
 
-  /* ───────── one unit ───────── */
-  var current = null;   // { bookId, unitId, data }
-  function exHtml(x, n) {
-    var q = esc(x.q).replace(/_{2,}/g, '<span class="pnl-gap">_____</span>');
-    var body = x.type === 'gap'
-      ? '<input class="pnl-input" type="text" data-ex="' + esc(x.id) + '" autocomplete="off" spellcheck="false" placeholder="Your answer">'
-      : '<div class="pnl-opts' + (x.type !== 'choice' ? ' eb-tf' : '') + '">' + x.options.map(function (o, k) { return '<label class="pnl-opt"><input type="radio" name="ex-' + esc(x.id) + '" value="' + esc(o) + '"><span class="pnl-opt-l">' + (x.type === 'choice' ? String.fromCharCode(65 + k) : esc(o.split(' ').map(function (w) { return w.charAt(0); }).join(''))) + '</span><span>' + esc(o) + '</span></label>'; }).join('') + '</div>';
-    return '<li class="pnl-ex" data-id="' + esc(x.id) + '"><div class="pnl-ex-q"><span class="pdp-num-tag">' + (n + 1) + '</span><span>' + q + '</span></div>' + body + '<div class="pnl-ex-fb" hidden></div></li>';
-  }
-  function scoreBox(r) {
+  /* ───────── one unit: the book page (assets/js/ebook-render.js), its exercises checked one by one ───────── */
+  var current = null;   // { bookId, unitId, data, page }
+  function unitBox(r) {
     if (!r) return '';
-    var ok = r.passed;
-    return '<div class="eb-score ' + (ok ? 'ok' : 'bad') + '">' + svg(ok ? IC.trophy : IC.target) + '<div><b>' + r.correct + ' / ' + r.total + ' correct · ' + r.percent + '%</b><span>'
-      + (ok ? 'Unit learned. ' + (r.best > r.correct ? 'Your best: ' + r.best + ' / ' + r.total + '.' : '') : 'You need ' + r.pass + '% to learn this unit. Read the text again and try once more.' + (r.best ? ' Your best: ' + r.best + ' / ' + r.total + '.' : ''))
+    var ok = r.passed; var pct = r.unitTotal ? Math.round((r.best / r.unitTotal) * 100) : 0;
+    return '<div class="eb-score ' + (ok ? 'ok' : 'bad') + '">' + svg(ok ? IC.trophy : IC.target) + '<div><b>' + (r.task ? 'This unit so far: ' : '') + r.best + ' / ' + r.unitTotal + ' · ' + pct + '%</b><span>'
+      + (ok ? 'Unit learned.' + (r.task ? ' Keep going with the other exercises.' : '') : 'You need ' + r.pass + '% of the unit to learn it. Every exercise counts with its best try.')
       + '</span></div></div>';
+  }
+  function taskScore(page, taskId, got, total) {
+    var sec = page.querySelector('.ebk-task[data-task="' + taskId + '"]'); if (!sec) return;
+    var s = sec.querySelector('.ebk-tscore'); if (s) { s.textContent = got + ' / ' + total; s.className = 'ebk-tscore ' + (got / total >= 0.6 ? 'ok' : 'bad'); }
+    var c = sec.querySelector('[data-check-task]'); if (c) { c.hidden = true; c.disabled = false; }
+    var a = sec.querySelector('[data-again-task]'); if (a) a.hidden = false;
+  }
+  function showBest(page, tasks) {
+    Object.keys(tasks || {}).forEach(function (t) {
+      var sec = page.querySelector('.ebk-task[data-task="' + t + '"]'); if (!sec) return;
+      var b = sec.querySelector('.ebk-tbest'); if (b) b.textContent = 'Your best: ' + tasks[t] + ' / ' + sec.getAttribute('data-points');
+    });
   }
   function renderUnit(bookId, unitId) {
     var back = '<button class="pdp-back" type="button" data-go="' + esc(bookId) + '">' + svg(IC.back) + 'Back to the book</button>';
     var show = function (d) {
-      current = { bookId: bookId, unitId: unitId, data: d };
-      var u = d.unit, nav = d.nav, mine = d.mine;
-      var st = unitState(mine);
-      var html = back + '<div class="eb-unit-head"><div class="eb-unit-top"><span class="eb-crumb">' + esc(d.book.title) + ' · Unit ' + (nav.index + 1) + ' of ' + d.book.units + '</span><span class="eb-state ' + st.cls + '">' + esc(st.label) + '</span></div>'
-        + '<div class="pdp-item-head">' + kindChip(u.kind) + (u.minutes ? '<span class="pdp-meta-chip">' + svg(IC.clock) + u.minutes + ' min</span>' : '') + '</div><h1>' + esc(u.title) + '</h1>' + (u.summary ? '<p>' + esc(u.summary) + '</p>' : '')
-        + '<div class="eb-steps">' + Array.apply(null, Array(d.book.units)).map(function (_, i) { return '<i class="' + (i < nav.index ? 'past' : i === nav.index ? 'now' : '') + '"></i>'; }).join('') + '</div></div>';
+      var R = window.IXEbook;
+      var u = d.unit, nav = d.nav, mine = d.mine; var st = unitState(mine);
+      var style = (d.book && d.book.style) || 'site';
+      var steps = '<div class="eb-steps">' + Array.apply(null, Array(d.book.units)).map(function (_, i) { return '<i class="' + (i < nav.index ? 'past' : i === nav.index ? 'now' : '') + '"></i>'; }).join('') + '</div>';
+      var html = back;
+      if (style === 'site') {
+        html += '<div class="eb-unit-head"><div class="eb-unit-top"><span class="eb-crumb">' + esc(d.book.title) + ' · Unit ' + (nav.index + 1) + ' of ' + d.book.units + '</span><span class="eb-state ' + st.cls + '">' + esc(st.label) + '</span></div>'
+          + '<div class="pdp-item-head">' + kindChip(u.kind) + (u.minutes ? '<span class="pdp-meta-chip">' + svg(IC.clock) + u.minutes + ' min</span>' : '') + '</div><h1>' + esc(u.title) + '</h1>' + (u.summary ? '<p>' + esc(u.summary) + '</p>' : '') + steps + '</div>';
+      } else {
+        html += '<div class="eb-unit-head eb-unit-bar"><div class="eb-unit-top"><span class="eb-crumb">' + esc(d.book.title) + ' · Unit ' + (nav.index + 1) + ' of ' + d.book.units + (u.minutes ? ' · about ' + u.minutes + ' min' : '') + '</span><span class="eb-state ' + st.cls + '">' + esc(st.label) + '</span></div>' + steps + '</div>';
+      }
       if (u.audio && safeHref(u.audio)) html += '<div class="eb-audio">' + svg(IC.headphones) + '<audio controls preload="metadata" src="' + esc(safeHref(u.audio)) + '"></audio></div>';
-      if (u.test && safeHref(u.test)) html += '<div class="eb-test">' + svg(IC.target) + '<div><b>' + esc(u.testLabel || 'Practise with a test of the website') + '</b><span>' + (u.exercises.length ? 'Do the test, then the exercises below.' : 'Finish the test and this unit counts as learned.') + (mine && mine.done && !u.exercises.length ? ' ✓ Done.' : '') + '</span></div><a class="pdp-btn open" href="' + esc(safeHref(u.test)) + '">' + svg(IC.arrow) + 'Open the test</a></div>';
-      if (u.content) html += '<article class="pnl-lesson">' + markup(u.content) + '</article>';
-      if (u.exercises.length) {
-        html += '<section class="pnl-exercises"><h2>' + svg(IC.pencil) + 'Exercises</h2><ol class="pnl-ex-list">' + u.exercises.map(exHtml).join('') + '</ol>'
-          + '<div class="pnl-ex-actions"><button class="pdp-btn primary" type="button" data-check>' + svg(IC.check) + 'Check answers</button><button class="pdp-btn ghost" type="button" data-again hidden>' + svg(IC.rotate) + 'Try again</button>'
-          + (d.signedIn ? '' : '<span class="eb-signin"><a href="' + esc(signInHref()) + '">Sign in</a> to check your answers and save your progress.</span>') + '</div><div class="eb-result" aria-live="polite"></div></section>';
+      if (u.test && safeHref(u.test)) html += '<div class="eb-test">' + svg(IC.target) + '<div><b>' + esc(u.testLabel || 'Practise with a test of the website') + '</b><span>' + (u.points ? 'Do the test, then the exercises below.' : 'Finish the test and this unit counts as learned.') + (mine && mine.done && !u.points ? ' ✓ Done.' : '') + '</span></div><a class="pdp-btn open" href="' + esc(safeHref(u.test)) + '">' + svg(IC.arrow) + 'Open the test</a></div>';
+      var body = R ? R.page(u.doc || [], { style: style, unit: nav.index + 1 }) : '<p>Reload the page to open this unit.</p>';
+      html += '<div class="ebk ebk-' + esc(style) + '"><div class="ebk-page">' + (R ? R.head(style, nav.index + 1, u.title, u.summary) : '') + body + '</div></div>';
+      if (u.points) {
+        html += '<div class="eb-unit-foot"><div class="pnl-ex-actions"><button class="pdp-btn primary" type="button" data-check-all>' + svg(IC.check) + 'Check all answers</button>'
+          + (d.signedIn ? '<span class="eb-signin">Or check each exercise with its own button. Your best try of every exercise is kept.</span>' : '<span class="eb-signin"><a href="' + esc(signInHref()) + '">Sign in</a> to check your answers and save your progress.</span>') + '</div>'
+          + '<div class="eb-result" aria-live="polite">' + (mine && mine.attempts ? unitBox({ best: mine.best, unitTotal: u.points, passed: mine.done, pass: 60, task: 'x' }) : '') + '</div></div>';
       } else if (!u.test) {
         html += '<div class="eb-read">' + (mine && mine.done ? '<span class="eb-state done">' + svg(IC.check) + ' You have read this unit</span>' : d.signedIn ? '<button class="pdp-btn primary" type="button" data-read>' + svg(IC.check) + 'I have read it</button><span class="muted">Marks this unit as learned.</span>' : '<span class="eb-signin"><a href="' + esc(signInHref()) + '">Sign in</a> to save your progress.</span>') + '</div>';
       }
       html += '<div class="eb-nav">' + (nav.prev ? '<a class="pdp-btn ghost eb-big-ghost" href="#' + esc(bookId) + '/' + esc(nav.prev) + '">' + svg(IC.back) + 'Previous unit</a>' : '<span></span>')
         + (nav.next ? '<a class="pdp-btn primary" href="#' + esc(bookId) + '/' + esc(nav.next) + '">Next unit' + svg(IC.arrow) + '</a>' : '<a class="pdp-btn primary" href="#' + esc(bookId) + '">' + svg(IC.check) + 'Back to the book</a>') + '</div>';
-      root.innerHTML = '<div class="pdp eb-reader">' + html + '</div>';
+      root.innerHTML = '<div class="pdp eb-reader' + (style === 'site' ? '' : ' eb-reader-book') + '">' + html + '</div>';
+      var page = root.querySelector('.ebk');
+      current = { bookId: bookId, unitId: unitId, data: d, page: page };
+      if (R && page) { R.bind(page, onTask); if (mine) showBest(page, mine.tasks); }
       var au = root.querySelector('.eb-audio audio');
       if (au) au.addEventListener('play', function () { document.dispatchEvent(new CustomEvent('ix:media-play', { detail: { from: 'ebook' } })); });
       window.scrollTo(0, 0);
@@ -253,50 +270,47 @@
         root.innerHTML = '<div class="pdp">' + back + '<div class="pdp-empty"><strong>Could not open this unit</strong>' + esc(e.message) + '</div></div>';
       });
   }
-  function check() {
-    if (!current) return;
-    var d = current.data;
+  /* Check one exercise (task) or all of them (no task) */
+  function check(taskId, btn) {
+    if (!current || !window.IXEbook) return;
+    var d = current.data, page = current.page, R = window.IXEbook;
     if (!d.signedIn) { location.href = signInHref(); return; }
-    var answers = {}, empty = 0;
-    d.unit.exercises.forEach(function (x) {
-      var li = root.querySelector('.pnl-ex[data-id="' + x.id + '"]'); if (!li) return;
-      var v = x.type === 'gap' ? (li.querySelector('.pnl-input') || {}).value || '' : ((li.querySelector('input:checked') || {}).value || '');
-      if (!String(v).trim()) empty++;
-      answers[x.id] = v;
-    });
-    if (empty && !confirm(empty + ' exercise' + (empty === 1 ? ' is' : 's are') + ' not answered. Check anyway?')) return;
-    var btn = root.querySelector('[data-check]'); if (btn) btn.disabled = true;
-    call('POST', '/api/ebooks/' + encodeURIComponent(current.bookId) + '/' + encodeURIComponent(current.unitId) + '/check', { answers: answers }).then(function (r) {
-      r.results.forEach(function (x) {
-        var li = root.querySelector('.pnl-ex[data-id="' + x.id + '"]'); if (!li) return;
-        li.classList.toggle('ok', x.ok); li.classList.toggle('bad', !x.ok);
-        li.querySelectorAll('input').forEach(function (inp) { inp.disabled = true; });
-        var fb = li.querySelector('.pnl-ex-fb'); fb.hidden = false;
-        fb.innerHTML = (x.ok ? svg(IC.check) + '<b>Correct.</b>' : svg(IC.x) + '<b>Answer:</b> ' + esc(x.answers.join(' / '))) + (x.explain ? ' <span>' + esc(x.explain) + '</span>' : '');
-      });
-      var res = root.querySelector('.eb-result'); if (res) res.innerHTML = scoreBox(r);
-      var again = root.querySelector('[data-again]'); if (again) again.hidden = false;
-      if (btn) btn.hidden = true;
+    var got = R.collect(page, taskId);
+    if (!got.count) return;
+    if (got.empty && !confirm(got.empty + (got.empty === 1 ? ' answer is' : ' answers are') + ' still empty. Check anyway?')) return;
+    if (btn) btn.disabled = true;
+    var all = root.querySelector('[data-check-all]'); if (!taskId && all) all.disabled = true;
+    call('POST', '/api/ebooks/' + encodeURIComponent(current.bookId) + '/' + encodeURIComponent(current.unitId) + '/check', taskId ? { answers: got.answers, task: taskId } : { answers: got.answers }).then(function (r) {
+      R.mark(page, r.results);
+      var per = {};
+      r.results.forEach(function (x) { var t = per[x.task] || (per[x.task] = { got: 0, total: 0 }); t.got += x.got; t.total += x.points; });
+      Object.keys(per).forEach(function (t) { taskScore(page, t, per[t].got, per[t].total); });
+      showBest(page, r.mine && r.mine.tasks);
+      var res = root.querySelector('.eb-result'); if (res) res.innerHTML = unitBox(r);
+      if (all) { all.disabled = false; if (!taskId) all.hidden = true; }
       var st = unitState(r.mine); var pill = root.querySelector('.eb-unit-top .eb-state'); if (pill) { pill.className = 'eb-state ' + st.cls; pill.textContent = st.label; }
       delete bookCache[current.bookId]; list = null;
-      if (res) res.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }).catch(function (e) { alert(e.message); if (btn) btn.disabled = false; });
+      if (!taskId && res) res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }).catch(function (e) { alert(e.message); if (btn) btn.disabled = false; if (all) all.disabled = false; });
   }
-  function again() {
-    root.querySelectorAll('.pnl-ex').forEach(function (li) { li.classList.remove('ok', 'bad'); li.querySelector('.pnl-ex-fb').hidden = true; li.querySelectorAll('input').forEach(function (x) { x.disabled = false; if (x.type === 'radio') x.checked = false; else x.value = ''; }); });
-    var res = root.querySelector('.eb-result'); if (res) res.innerHTML = '';
-    var btn = root.querySelector('[data-check]'); if (btn) { btn.hidden = false; btn.disabled = false; }
-    var a = root.querySelector('[data-again]'); if (a) a.hidden = true;
-    var ex = root.querySelector('.pnl-exercises'); if (ex) window.scrollTo({ top: ex.offsetTop - 80, behavior: 'smooth' });
+  function onTask(action, taskId, btn) {
+    if (action === 'check') return check(taskId, btn);
+    if (!current) return;
+    window.IXEbook.reset(current.page, taskId);
+    var sec = current.page.querySelector('.ebk-task[data-task="' + taskId + '"]'); if (!sec) return;
+    var c = sec.querySelector('[data-check-task]'); if (c) { c.hidden = false; c.disabled = false; }
+    var a = sec.querySelector('[data-again-task]'); if (a) a.hidden = true;
+    var s = sec.querySelector('.ebk-tscore'); if (s) { s.textContent = ''; s.className = 'ebk-tscore'; }
+    var all = root.querySelector('[data-check-all]'); if (all) all.hidden = false;
+    var first = sec.querySelector('input:not([type=radio]):not([type=checkbox]),select,button.ebk-pk,input'); if (first) first.focus({ preventScroll: true });
   }
 
   /* ───────── events, start ───────── */
   root.addEventListener('click', function (e) {
-    var t = e.target.closest && e.target.closest('[data-cat],[data-go],[data-check],[data-again],[data-read],[data-reset]'); if (!t) return;
+    var t = e.target.closest && e.target.closest('[data-cat],[data-go],[data-check-all],[data-read],[data-reset]'); if (!t) return;
     if (t.hasAttribute('data-cat')) { cat = t.getAttribute('data-cat'); renderList(); return; }
     if (t.hasAttribute('data-go')) { var g = t.getAttribute('data-go'); if (g) location.hash = '#' + g; else { history.pushState('', document.title, location.pathname + location.search); route(); } return; }
-    if (t.hasAttribute('data-check')) { check(); return; }
-    if (t.hasAttribute('data-again')) { again(); return; }
+    if (t.hasAttribute('data-check-all')) { check('', t); return; }
     if (t.hasAttribute('data-read') && current) {
       t.disabled = true;
       call('POST', '/api/ebooks/' + encodeURIComponent(current.bookId) + '/' + encodeURIComponent(current.unitId) + '/read').then(function () {
@@ -312,7 +326,6 @@
       call('POST', '/api/ebooks/' + encodeURIComponent(id) + '/reset').then(function () { delete bookCache[id]; list = null; renderBook(id); }).catch(function (err) { alert(err.message); });
     }
   });
-  root.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('pnl-input')) { e.preventDefault(); var all = root.querySelectorAll('.pnl-input:not([disabled])'); var i = Array.prototype.indexOf.call(all, e.target); if (all[i + 1]) all[i + 1].focus(); else check(); } });
   root.addEventListener('input', function (e) {
     if (e.target.id === 'eb-q') { query = e.target.value; var pos = e.target.selectionStart; renderList(); var q = document.getElementById('eb-q'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch (x) { /* fine */ } } }
   });
