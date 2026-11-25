@@ -7,11 +7,14 @@
    The template is pessages/test-19.html; only its data script, its titles and
    its relative paths are replaced. Every question type below is understood by
    reading.js: tfng, ynng, mcq, mcq-multi, notes, matching-info,
-   matching-features, matching-headings.
+   matching-features, matching-headings, diagram (a picture with labels and
+   boxes to type in: assets/js/diagram-core.js, assets/css/diagram.css).
    ==== */
 
 const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const safeUrl = (u) => (/^(\/(uploads|assets)\/[^"'<>\s]*|https:\/\/[^"'<>\s]+)$/i.test(String(u || '')) ? String(u) : '');
+const passageCore = require('./assets/js/passage-core');   // the paragraphs of a passage and their letters (the admin panel uses the same)
+const diagram = require('./assets/js/diagram-core');       // "Label the diagram" with typed answers
+const safeUrl = (u) => (/^(\/(uploads|assets|api\/media)\/[^"'<>\s]*|https:\/\/[^"'<>\s]+)$/i.test(String(u || '')) ? String(u) : '');
 const ROMAN = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
 /* the word limit of a completion block, read from its instruction ("ONE WORD ONLY", "NO MORE THAN TWO WORDS" …) */
 const wordLimitOf = (g) => { const s = String(g || '').toUpperCase(); return /\bONE WORD/.test(s) ? 1 : /\bTWO WORDS/.test(s) ? 2 : /\bTHREE WORDS/.test(s) ? 3 : 0; };
@@ -63,60 +66,19 @@ function inheritGroups(list) {
   return out;
 }
 
-/* Paragraphs of a pasted passage. Text copied from a PDF has a line break at the end of every printed
-   line (and often no blank line between paragraphs): wrapped lines are joined back into one paragraph,
-   and without blank lines a paragraph ends at a clearly short line that ends a sentence. */
-function splitParas(text) {
-  const src = String(text || '').replace(/\r/g, '').replace(/\f/g, '\n').trim();
-  if (!src) return [];
-  const ls = src.split('\n').map((l) => l.trim());
-  // the printed line width: a high percentile, not the maximum (one very long line must not make every line look short)
-  const lens = ls.map((l) => l.length).filter((n) => n > 0).sort((x, y) => x - y);
-  const L = Math.max(40, lens.length ? lens[Math.floor(lens.length * 0.9)] : 40);
-  const END = /[.!?:"\u201d\u2019)]$/;
-  const full = ls.filter(Boolean);
-  // typed in by hand: (almost) every line is a whole paragraph
-  if (full.length && full.filter((l) => END.test(l)).length / full.length > 0.6) return full.map((l) => l.replace(/\s+/g, ' '));
-  // copied from a PDF: wrapped lines. A paragraph ends at a blank line or a clearly short line that ends a
-  // sentence; a blank line in the middle of a sentence is a page break and is ignored.
-  const paras = []; let cur = [];
-  const close = () => { if (cur.length) paras.push(cur); cur = []; };
-  ls.forEach((t) => {
-    if (!t) { if (cur.length && END.test(cur[cur.length - 1])) close(); return; }
-    if (!cur.length && t.length < 0.6 * L && !END.test(t)) { paras.push([t]); return; }          // a title / sub-heading line
-    if (cur.length && /^[A-Z][.)]?\s+[A-Z\u201c"\u2018']/.test(t) && END.test(cur[cur.length - 1])) close();
-    cur.push(t);
-    if (t.length < 0.75 * L && END.test(t)) close();
-  });
-  close();
-  // join wrapped lines with a space; keep a real line break only after a short line (lists, addresses)
-  return paras.map((lines) => lines.filter(Boolean).reduce((acc, l, i, arr) => acc + (i ? (arr[i - 1].length < 0.6 * L ? '\n' : ' ') : '') + l, '').trim()).filter(Boolean);
-}
-
 function passageHtml(d, title) {
   const imgs = (d.images || []).map((i) => safeUrl(i.url)).filter(Boolean)
     .map((u) => `<p><img class='pass-img' alt='' src='${esc(u)}'></p>`).join('');
-  const list = splitParas(d.passage).filter((p, i) => !(i === 0 && p.toLowerCase() === String(title || '').trim().toLowerCase()));
-  // Paragraph letters: "A. text", "A) text" or, as printed in PDFs, "A Text". A bare "A " only counts as a
-  // letter where a run A, B, C … really starts (so "A newborn baby…" is not taken for paragraph A).
-  const LET = /^([A-Z])(?:[.)]\s+|\s+(?=[A-Z0-9\u201c"\u2018'(]))([\s\S]*)$/;
-  const lettered = new Set();
-  // a section may have more than one paragraph ("A …", two plain paragraphs, "B …"): look a few paragraphs ahead for the "B"
-  const nextLetter = (i) => { for (let j = i + 1; j < list.length && j <= i + 4; j++) { const m = LET.exec(list[j]); if (m) return m[1]; } return ''; };
-  let start = list.findIndex((p, i) => { const a = LET.exec(p); return a && a[1] === 'A' && nextLetter(i) === 'B'; });
-  if (start < 0) start = list.findIndex((p) => /^A[.)]\s+/.test(p));
-  if (start >= 0) { let want = 65; for (let i = start; i < list.length; i++) { const m = LET.exec(list[i]); if (m && m[1].charCodeAt(0) === want) { lettered.add(i); want++; } } }
-  const paras = list.map((p, i) => {
-    const m = lettered.has(i) ? LET.exec(p) : null;
+  const rows = passageCore.split(d.passage).filter((r, i) => !(i === 0 && !r.l && r.k === 'p' && r.t.toLowerCase() === String(title || '').trim().toLowerCase()));
+  const start = rows.findIndex((r) => r.l);
+  const paras = rows.map((r, i) => {
     // the letter stands on its own line above its paragraph (reading.css: .para-letter), as in the computer test
-    if (m) return `<p class="para-lettered"><strong class="para-letter">${m[1]}</strong> ${esc(m[2]).replace(/\n/g, '<br>')}</p>`;
-    const sub = /^##\s+(.+)$/.exec(p);   // "## Coasting through history": a bold sub-heading inside the passage
-    if (sub) return `<p class="pass-sub"><strong>${esc(sub[1])}</strong></p>`;
-    const foot = /^\*\s+(.+)$/.exec(p);   // "* state housing: …": a small footnote under the passage
-    if (foot) return `<p class="pass-foot"><small>* ${esc(foot[1])}</small></p>`;
+    if (r.l) return `<p class="para-lettered"><strong class="para-letter">${esc(r.l)}</strong> ${esc(r.t).replace(/\n/g, '<br>')}</p>`;
+    if (r.k === 'sub') return `<p class="pass-sub"><strong>${esc(r.t)}</strong></p>`;              // "## Coasting through history": a bold sub-heading
+    if (r.k === 'foot') return `<p class="pass-foot"><small>* ${esc(r.t)}</small></p>`;            // "* state housing: …": a small footnote
     // the short line under the title ("Could the vast towers … of the future?"), set apart from the passage (.pass-lead):
     // the first paragraph when it is short and does not end like a sentence, or any short paragraph before paragraph A
-    const lead = i === 0 && p.length < 200 && !/[.!]$/.test(p) || (start > 0 && i < start && p.length < 260);
+    const p = r.t; const lead = i === 0 && p.length < 200 && !/[.!]$/.test(p) || (start > 0 && i < start && p.length < 260);
     return lead ? `<p class="pass-lead"><em>${esc(p)}</em></p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
   }).join('');
   return `<div>${imgs}${paras}</div>`;
@@ -170,7 +132,7 @@ function buildSections(questions, startN) {
   questions = legacyFlowcharts(inheritGroups(questions));
   const sections = []; let n = startN || 1; let cur = null; let key = ''; const built = new Set();
   const headings = []; const slots = [];
-  const defaultTitle = { notes: 'Note Completion', summary: 'Summary Completion', wordbank: 'Summary Completion', sentence: 'Sentence Completion', short: 'Short Answer', flowchart: 'Flow-chart Completion', 'sentence-endings': 'Sentence Endings', table: 'Table Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
+  const defaultTitle = { notes: 'Note Completion', summary: 'Summary Completion', wordbank: 'Summary Completion', sentence: 'Sentence Completion', short: 'Short Answer', flowchart: 'Flow-chart Completion', diagram: 'Diagram Labelling', 'sentence-endings': 'Sentence Endings', table: 'Table Completion', tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple Choice', 'matching-info': 'Matching Information', 'matching-features': 'Matching', 'matching-headings': 'Matching Headings' };
   const defaultInstr = {
     notes: 'Complete the answers below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
     table: 'Complete the table below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
@@ -179,6 +141,7 @@ function buildSections(questions, startN) {
     sentence: 'Complete the sentences below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
     short: 'Answer the questions below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
     flowchart: 'Complete the flow-chart below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
+    diagram: 'Label the diagram below. Write <b>NO MORE THAN THREE WORDS</b> from the passage for each answer.',
     'sentence-endings': 'Complete each sentence with the correct ending below.',
     tfng: 'Do the following statements agree with the information given in the passage? Choose <b>TRUE</b>, <b>FALSE</b> or <b>NOT GIVEN</b>.',
     ynng: 'Do the following statements agree with the views of the writer? Choose <b>YES</b>, <b>NO</b> or <b>NOT GIVEN</b>.',
@@ -213,6 +176,16 @@ function buildSections(questions, startN) {
         const bt = String(q.blockTitle || '').trim(); if (bt) sec.tableTitle = esc(bt);   // printed in the first row of the table
       }
       sec.items.push({ id: n, answer: String(q.answer || ''), label: '' }); n += 1;
+      continue;
+    }
+    if (t === 'diagram' && diagram.read(q.diagram)) {   // a picture with its labels: the boxes are numbered label by label
+      const sec = open('diagram', q);
+      if (!sec.dg) {
+        sec.wordLimit = wordLimitOf(q.group) || 3;
+        const bt = String(q.blockTitle || '').trim(); if (bt) sec.noteTitle = esc(bt);
+        sec.dg = diagram.html(q.diagram, n, (no) => '{{' + no + '}}');
+      }
+      sec.items.push({ id: n, answer: String(q.answer || ''), label: esc(q.prompt || '') }); n += 1;
       continue;
     }
     if (TEXT_SEC[t]) {   // the text of the block, its gaps numbered from here
@@ -402,6 +375,7 @@ function buildExamHtml(material, templates) {
       .split('Dark Chocolate&rsquo;s Health-giving Benefits').join(title).split('Dark Chocolate\u2019s Health-giving Benefits').join(title);
   }
   html = html.replace(/(href|src)="(?:\.\.\/)+/g, '$1="/');
+  if (Object.values(b.SECTIONS).some((list) => list.some((sec) => sec.dg))) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/css/diagram.css">\n</head>');
   return html;
 }
 

@@ -76,8 +76,8 @@
   function imagesHtml() { return (item.data.images || []).map((im) => `<figure class="tp-fig"><img src="${esc(im.url)}" alt="${esc(im.caption || 'Picture for the questions')}" loading="lazy">${im.caption ? `<figcaption>${esc(im.caption)}</figcaption>` : ''}</figure>`).join(''); }
   function passageHtml() {
     return String(item.data.passage || '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean).map((p) => {
-      const m = /^([A-H])[.)]\s+([\s\S]*)$/.exec(p);
-      return m ? `<p><span class="tp-pl">${m[1]}</span>${esc(m[2]).replace(/\n/g, '<br>')}</p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
+      const m = /^(?:\[([A-Z]{1,2})\]\s*|([A-H])[.)]\s+)([\s\S]*)$/.exec(p);   // "[A] …" (the letters set in the admin panel) or "A. …"
+      return m ? `<p><span class="tp-pl">${m[1] || m[2]}</span>${esc(m[3]).replace(/\n/g, '<br>')}</p>` : `<p>${esc(p).replace(/\n/g, '<br>')}</p>`;
     }).join('');
   }
   function renderExam() {

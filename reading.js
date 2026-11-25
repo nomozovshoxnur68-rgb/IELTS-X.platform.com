@@ -2246,7 +2246,7 @@ const RENDERERS = {
   'sentence-endings':  (sec) => renderSentenceEndings(sec),
   'matching-headings': (sec, n) => renderMatchingHeadings(sec, n),
   map:      (sec) => renderMap(sec),
-  diagram:  (sec) => renderMap(sec),
+  diagram:  (sec) => sec.dg ? renderDiagram(sec) : renderMap(sec),
   table:    (sec) => renderTable(sec),
   flowchart:(sec) => renderFlowchart(sec)
 };
@@ -2438,6 +2438,14 @@ function renderMap(sec) {
     ? refBox((sec.bank || []).map(b => ({ l: b.l || b.id, name: b.word || b.text || '' })))
     : '';
   return `<div class="q-card">${bankBox}${stage}</div>`;
+}
+
+// ── Diagram labelling, as on the computer test ────────────────────────
+// sec.dg: the picture with its labels and arrows (drawn on the server by
+// assets/js/diagram-core.js), {{id}} = the box of a question.
+function renderDiagram(sec) {
+  const limit = sec.wordLimit || 0;
+  return `<div class="q-card dg-card">${noteTitleHTML(sec)}${fillTokens(sec.dg, id => gapInput(id, limit))}</div>`;
 }
 
 // ── Table completion ──────────────────────────────────────────────────
@@ -3863,7 +3871,7 @@ function renderResults() {
     'matching-features':'Matching Features', 'sentence-endings':'Sentence Endings',
     'notes':'Notes Completion', 'summary':'Summary Completion',
     'table':'Table Completion', 'short-answer':'Short Answer', 'short':'Short Answer',
-    'sentence':'Sentence Completion', 'flowchart':'Flow-chart Completion', 'wordbank':'Summary Completion'
+    'sentence':'Sentence Completion', 'flowchart':'Flow-chart Completion', 'diagram':'Diagram Labelling', 'wordbank':'Summary Completion'
   };
   const typeLabel = t => TYPE_LABELS[t] || String(t || 'Other')
     .replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());

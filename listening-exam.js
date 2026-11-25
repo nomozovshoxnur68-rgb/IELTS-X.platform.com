@@ -6,10 +6,11 @@
 const fs = require('fs')
 const path = require('path')
 const { inheritGroups } = require('./reading-exam')
+const diagram = require('./assets/js/diagram-core')   // "Label the diagram" with typed answers
 
-const KINDS = ['gap', 'table', 'mcq', 'multi', 'matching', 'map', 'box']
+const KINDS = ['gap', 'table', 'mcq', 'multi', 'matching', 'map', 'box', 'diagram']
 const TEXT_KINDS = ['notes', 'sentence', 'summary', 'flowchart']   // the block's text is typed once, ____ = a gap
-const KIND_FROM_TYPE = { gap: 'gap', table: 'table', notes: 'text', sentence: 'text', summary: 'text', flowchart: 'text', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box' }
+const KIND_FROM_TYPE = { gap: 'gap', table: 'table', notes: 'text', sentence: 'text', summary: 'text', flowchart: 'text', short: 'gap', completion: 'gap', tfng: 'gap', ynng: 'gap', mcq: 'mcq', 'mcq-multi': 'multi', multi: 'multi', matching: 'matching', map: 'map', box: 'box', diagram: 'diagram' }
 const DEFAULT_INSTR = {
   gap: 'Complete the notes below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
   table: 'Complete the table below. Write **ONE WORD AND/OR A NUMBER** for each answer.',
@@ -17,6 +18,7 @@ const DEFAULT_INSTR = {
   sentence: 'Complete the sentences below. Write **ONE WORD ONLY** for each answer.',
   summary: 'Complete the summary below. Write **ONE WORD ONLY** for each answer.',
   flowchart: 'Complete the flow-chart below. Write **ONE WORD ONLY** for each answer.',
+  diagram: 'Label the diagram below. Write **NO MORE THAN TWO WORDS AND/OR A NUMBER** for each answer.',
   textbox: 'Complete the notes below. Choose the correct answer and move it into the gap.',
   mcq: 'Choose the correct letter, **A**, **B** or **C**.',
   multi: 'Choose the correct letters.',
@@ -65,7 +67,7 @@ function buildBlocks(material) {
   // the map pictures of a full paper belong to the part chosen for them (when none was chosen, every map shows them all)
   const picsByPart = full && (d.images || []).some((im) => Number(im.passage || 1) !== 1)
   qs.forEach((q) => {
-    const kind = q.type === 'box' && String(q.text || '').trim() ? 'textbox' : (KIND_FROM_TYPE[q.type] || 'gap')
+    const kind = q.type === 'box' && String(q.text || '').trim() ? 'textbox' : q.type === 'diagram' && !diagram.read(q.diagram) ? 'gap' : (KIND_FROM_TYPE[q.type] || 'gap')
     const opts = parseOptions(q.options)
     const gi = (q.gi === undefined || q.gi === null || q.gi === '') ? null : String(q.gi)
     const qPart = full ? partOfQ(q) : part
@@ -79,6 +81,7 @@ function buildBlocks(material) {
       if (newPart) cur.partHead = 'Part ' + qPart
       lastPart = qPart
       if (kind === 'table') cur.table = String(q.table || '')
+      if (kind === 'diagram') cur.html = diagram.html(q.diagram, n, (no) => '{{' + no + '}}')   // the boxes: {{11}}, {{12}} … (listening-render.js draws them)
       if (kind === 'text' || kind === 'textbox') { cur.text = String(q.text || ''); cur.style = q.type }
       if (kind === 'map') cur.images = (d.images || []).filter((im) => !picsByPart || Number(im.passage || 1) === qPart).map((im) => ({ url: im.url, caption: im.caption || '' }))
       blocks.push(cur)
@@ -97,7 +100,7 @@ function buildBlocks(material) {
     const id = n++
     if (Number(q.at) > 0) times[id] = Number(q.at)
     if (kind === 'textbox') { const a = String(q.answer || '').trim(); const o = /^[A-Za-z]$/.test(a) && opts.find((x) => x.l === a.toUpperCase()); answers[id] = o ? o.t : a }   // the word itself
-    else if (kind === 'gap' || kind === 'box' || kind === 'table' || kind === 'text') answers[id] = String(q.answer || '').trim()
+    else if (kind === 'gap' || kind === 'box' || kind === 'table' || kind === 'text' || kind === 'diagram') answers[id] = String(q.answer || '').trim()
     else answers[id] = (letters(q.answer)[0] || '')
     cur.items.push({ id, prompt: q.prompt || '', options: kind === 'mcq' ? opts : undefined, title: kind === 'gap' || kind === 'box' ? String(q.title || '') : undefined })
     cur.to = id
@@ -163,7 +166,7 @@ function renderPage(material) {
   const script = 'window.LISTENING_DATA = ' + jsonForScript(data) + ';\n' +
     'window.PART_PRACTICE = ' + jsonForScript(cfg).slice(0, -1) +
     ',"build":null};\nwindow.PART_PRACTICE.build = function (h) { return window.IXListeningRender(window.LISTENING_DATA, ' + part + ')(h); };'
-  return tpl
+  return (data.blocks.some((b) => b.kind === 'diagram') ? tpl.replace('</head>', '<link rel="stylesheet" href="/assets/css/diagram.css">\n</head>') : tpl)
     .replace(/\{\{TITLE\}\}/g, () => esc(material.title || 'Listening'))
     .replace(/\{\{PARTNO\}\}/g, isFull(material) ? '1–4' : String(part))
     .replace(/\{\{MINUTES\}\}/g, String(cfg.minutes))

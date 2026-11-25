@@ -1,0 +1,51 @@
+/* IELTSX — "Label the diagram" with typed answers (assets/js/diagram-core.js): Reading (reading.js), Listening
+   (listening/js/listening-render.js) and the admin panel's editor. The diagram is a sheet of paper: white with black text
+   in every theme, so the picture always looks as it was drawn. Wide: every label at its place, its arrow to the picture.
+   Narrow (a phone, a narrow question pane): the picture with the numbers on it, the labels as a list under it. */
+.ix-dg{container:ixdg/inline-size;position:relative;width:100%;max-width:900px;margin:10px 0 14px}
+.ix-dg-in{position:relative}
+.ix-dg-stage{position:relative;width:100%;aspect-ratio:var(--dg-w)/var(--dg-h);overflow:hidden;border-radius:6px;background:#fff}
+.ix-dg-img{position:absolute;display:block;max-width:none!important;max-height:none!important;margin:0;border:0;border-radius:0;object-fit:fill;user-select:none;-webkit-user-drag:none}
+.ix-dg-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.ix-dg-lines line{stroke:#111;stroke-width:1.4px;vector-effect:non-scaling-stroke}
+.ix-dg-lines polygon{fill:#111}
+.ix-dg-labels{position:absolute;inset:0;pointer-events:none}
+.ix-dg-label{position:absolute;pointer-events:auto;color:#111;font:400 clamp(11px,2.05cqw,16px)/1.36 Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:clamp(11px,2.05cqw,16px)!important;line-height:1.36!important;text-align:left;overflow-wrap:anywhere}
+.ix-dg-no{display:none}
+.ix-dg-pin{display:none}
+
+/* the box of an answer: thin blue frame, rounded, as on the computer test */
+.ix-dg .gap-field,.ix-dg .prose-gap{display:inline-block;margin:0;white-space:nowrap;vertical-align:baseline}
+.ix-dg .gap-input,.ix-dg .prose-gap .gap-input,.ix-dg .gap-field .gap-input{box-sizing:border-box;width:clamp(62px,15cqw,120px);min-width:clamp(62px,15cqw,120px);max-width:100%;height:1.6em;min-height:0;padding:0 .4em;margin:1px 2px;border:1.4px solid #2f62c9;border-radius:4px;background:#fff;color:#111;font:inherit;font-size:1em!important;line-height:1.2;vertical-align:baseline}
+.ix-dg .gap-input::placeholder{color:#111;opacity:1;font-weight:700;text-align:center}
+.ix-dg .gap-input:focus,.ix-dg .gap-input.is-current,.ix-dg .gap-input.active{border-color:#1d4ed8;box-shadow:0 0 0 1.5px rgba(37,99,235,.45);outline:none}
+.ix-dg .gap-input:not(:placeholder-shown){border-color:#1d4ed8}
+.ix-dg .gap-input.correct,.ix-dg .prose-gap .gap-input.correct{border-color:#15803d;color:#15803d;background:#f0fdf4}
+.ix-dg .gap-input.incorrect,.ix-dg .prose-gap .gap-input.incorrect{border-color:#b91c1c;color:#b91c1c;background:#fef2f2}
+.ix-dg .feedback-pill:empty{display:none}
+.ix-dg .feedback-pill{white-space:normal;max-width:100%}
+/* the sheet stays white in the dark and sepia exam themes */
+body.dark-mode .ix-dg .gap-input,body.dark-mode .ix-dg .prose-gap .gap-input,body.theme-sepia .ix-dg .gap-input{background:#fff;color:#111;border-color:#2f62c9}
+body.dark-mode .ix-dg .gap-input::placeholder,body.theme-sepia .ix-dg .gap-input::placeholder{color:#111}
+body.dark-mode .ix-dg .prose-gap,body.dark-mode .ix-dg .gap-field,body.dark-mode .ix-dg-label{color:#111}
+body.dark-mode .ix-dg .gap-input.correct,body.theme-sepia .ix-dg .gap-input.correct{border-color:#15803d;color:#15803d;background:#f0fdf4}
+body.dark-mode .ix-dg .gap-input.incorrect,body.theme-sepia .ix-dg .gap-input.incorrect{border-color:#b91c1c;color:#b91c1c;background:#fef2f2}
+
+/* the hand-made passage pages (pessages/test-1): their own inputs and text classes */
+.ix-dg-label .text-base{font-size:inherit!important;line-height:inherit!important}
+.ix-dg-label .text-gray-900,.ix-dg-label .text-primary,.ix-dg-label .select-text{color:#111!important}
+.ix-dg-label .mx-2{margin-left:2px!important;margin-right:2px!important}
+.ix-dg-label .inline-grid{width:clamp(62px,15cqw,120px);min-width:0!important}
+.ix-dg-label input[id^="question-"]{box-sizing:border-box;height:1.7em!important;padding:0 .4em;border:1.4px solid #2f62c9!important;border-radius:4px;background:#fff!important;color:#111!important;font-size:1em!important;line-height:1.2}
+.ix-dg-label input[id^="question-"]:disabled+span{display:none}
+.ix-dg-label input[id^="question-"]:focus{box-shadow:0 0 0 1.5px rgba(37,99,235,.45)}
+
+/* narrow: the numbers on the picture, the labels in a list */
+@container ixdg (max-width:459px){
+  .ix-dg-pin{position:absolute;z-index:2;display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 5px;border:1.4px solid #2f62c9;border-radius:99px;background:#fff;color:#111;font:700 11px/1 Arial,sans-serif;transform:translateX(2px)}
+  .ix-dg-labels{position:static;display:grid;gap:8px;margin-top:8px;padding:10px 12px;border-radius:6px;background:#fff;pointer-events:auto}
+  .ix-dg-label{position:static;width:auto!important;display:flex;gap:8px;font-size:15px!important;line-height:1.55!important}
+  .ix-dg-no{display:inline-flex;flex:none;align-items:center;justify-content:center;min-width:24px;height:22px;margin-top:1px;padding:0 5px;border:1.4px solid #2f62c9;border-radius:99px;background:#fff;color:#111;font:700 11px/1 Arial,sans-serif}
+  .ix-dg-t{flex:1;min-width:0}.ix-dg-t br{display:none}
+  .ix-dg .gap-input,.ix-dg .prose-gap .gap-input,.ix-dg .gap-field .gap-input{width:120px;min-width:120px;height:26px}
+}

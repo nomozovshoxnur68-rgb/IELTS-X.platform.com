@@ -8,10 +8,10 @@
   const Q_LABEL = { tfng: 'True / False / Not Given', ynng: 'Yes / No / Not Given', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice (choose TWO / THREE)',
     'matching-headings': 'Matching headings (list of headings i, ii, iii …)', 'matching-info': 'Matching information (which paragraph, A–H)', 'matching-features': 'Matching features (list of people / options, A–E)', 'matching-endings': 'Matching sentence endings (A–G)',
     notes: 'Note completion', summary: 'Summary completion (words from the passage)', 'summary-words': 'Summary completion (list of words moved into the gaps)', sentence: 'Sentence completion', table: 'Table completion', flowchart: 'Flow-chart completion',
-    short: 'Short-answer questions', map: 'Diagram / map labelling (choose a letter)' };
+    short: 'Short-answer questions', diagram: 'Diagram labelling: boxes on the picture (typed)', map: 'Diagram / map labelling (choose a letter)' };
   /* Listening has its own question types: they are the types of the listening engine (listening/js/listening.js) */
   const LQ_LABEL = { notes: 'Note / form completion (typed)', sentence: 'Sentence completion (typed)', summary: 'Summary completion (typed)', table: 'Table completion (typed)', flowchart: 'Flow-chart completion (typed)',
-    box: 'Notes / summary with a box of words (moved into the gaps)', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice, choose TWO / THREE letters', matching: 'Matching: move the lettered option into the gap', map: 'Map / plan / diagram labelling (tick one letter)' };
+    box: 'Notes / summary with a box of words (moved into the gaps)', mcq: 'Multiple choice (one answer)', 'mcq-multi': 'Multiple choice, choose TWO / THREE letters', matching: 'Matching: move the lettered option into the gap', diagram: 'Diagram / plan labelling: boxes on the picture (typed)', map: 'Map / plan / diagram labelling (tick one letter)' };
   /* the types of older tests: opened, they are turned into the types above (upgradeGroup) */
   const OLD_LABEL = { completion: 'Completion (old type)', matching: 'Matching (old type)', gap: 'Completion, typed (old type)' };
   const qLabels = () => (draft && draft.type === 'listening' ? LQ_LABEL : Q_LABEL);
@@ -418,9 +418,8 @@
   }
   function passagesBlock() {
     const ps = draft.data.passages || [];
-    return [0, 1, 2].map((k) => `<div class="cb-block"><div class="cb-head"><div><strong>Passage ${k + 1}${k === 0 ? ' *' : ''}</strong><div class="muted sm">${k === 0 ? 'Required.' : 'Leave empty if the test has fewer passages.'} Empty line between paragraphs. Start a line with A. / B. / C. to label paragraphs.</div></div></div>
-      <input class="field" placeholder="Passage ${k + 1} title (optional)" data-p="data.passages.${k}.title" value="${esc((ps[k] || {}).title)}" maxlength="200">
-      <textarea class="field cb-passage" rows="12" data-p="data.passages.${k}.passage" placeholder="Paste passage ${k + 1} here">${esc((ps[k] || {}).passage)}</textarea></div>`).join('');
+    return [0, 1, 2].map((k) => window.IXPassageEditor.block(`data.passages.${k}.passage`, { label: `Passage ${k + 1}${k === 0 ? ' *' : ' (leave empty if the test has fewer passages)'}`, rows: 12, ph: `Paste passage ${k + 1} here`,
+      head: `<input class="field" placeholder="Passage ${k + 1} title (optional)" data-p="data.passages.${k}.title" value="${esc((ps[k] || {}).title)}" maxlength="200">` })).join('');
   }
   /* which passage (full reading, 1-3) or which part (full listening, 1-4) a group / picture belongs to */
   const passSelect = (path, cur) => { const L = draft.type === 'listening'; return `<select class="field" style="width:auto" data-p="${path}" data-num="1" data-rerender="1" title="${L ? 'Which part?' : 'Which passage?'}">${(L ? [1, 2, 3, 4] : [1, 2, 3]).map((n) => `<option value="${n}" ${Number(cur || 1) === n ? 'selected' : ''}>${L ? 'Part' : 'Passage'} ${n}</option>`).join('')}</select>`; };
@@ -439,7 +438,7 @@
   const ROMANS = /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/i;
   const optToken = (o, i) => { const m = /^\s*([A-Za-z0-9]{1,5})\s*[.):]\s+([\s\S]*)$/.exec(String(o || '')); return m ? { l: m[1], t: m[2] } : { l: /^[A-Za-z]$/.test(String(o || '').trim()) ? String(o).trim() : String.fromCharCode(65 + i), t: String(o || '').trim() }; };
   const newItem = () => ({ prompt: '', answer: '', explanation: '', evidence: '', title: '', options: [] });
-  const newGroup = (type, passage) => ({ type, passage: passage || 1, group: '', blockTitle: '', table: '', text: '', options: [], items: type === 'table' || TEXT_TYPES.includes(type) ? [] : [newItem()] });
+  const newGroup = (type, passage) => ({ type, passage: passage || 1, group: '', blockTitle: '', table: '', text: '', options: [], items: type === 'table' || type === 'diagram' || TEXT_TYPES.includes(type) ? [] : [newItem()] });
   const normType = (t) => (draft && draft.type === 'listening' ? (LQ_LABEL[t] || t === 'gap' ? t : 'notes') : (Q_LABEL[t] || t === 'completion' || t === 'matching' ? t : 'short'));
   /* how many numbers of the paper one question uses: a "choose TWO" question uses two. Before its answer is in, the
      width comes from the block it was pasted with (w: "Choose TWO letters" / Questions 21–22). */
@@ -496,7 +495,7 @@
        sentence      one sentence per line            flowchart   one box per line */
   const TEXT_TYPES = ['notes', 'summary', 'summary-words', 'sentence', 'flowchart', 'box'];
   const isTextType = (t) => TEXT_TYPES.includes(t);
-  const hasFixedItems = (t) => t === 'table' || isTextType(t);   // the questions are the gaps of the table / text
+  const hasFixedItems = (t) => t === 'table' || t === 'diagram' || isTextType(t);   // the questions are the gaps of the table / text / labels
   /* "7 ………", "(7) ____", "____ 7": a number glued to dots or underscores is the printed question number */
   const gapsToMarks = (s) => String(s || '').replace(/\(?\b\d{1,2}\b\)?\s*(?:\.{3,}|…+|_{2,})|(?:\.{3,}|…+|_{2,})\s*\(?\b\d{1,2}\b\)?|_{2,}|\.{4,}|…{2,}/g, '____');
   const BULLET = /^\s*[-–•●▪◦·*]\s*/;
@@ -513,7 +512,49 @@
     if (g.items.length > gaps.length) g.items.length = gaps.length;
     g.items.forEach((it, k) => { it.prompt = gaps[k]; it.options = []; });
   }
-  const syncGaps = (g) => (g.type === 'table' ? syncTable(g) : isTextType(g.type) ? syncText(g) : null);
+  /* ═════════ Diagram labelling with typed answers (admin-diagram.js, assets/js/diagram-core.js) ═════════
+     The picture with its labels is edited in place; every box (____) of a label is one question, numbered label by label.
+     An answer stays with its label when labels change places or get another box (label.k = the boxes it had). */
+  const DG = () => window.IXDiagram, DGE = () => window.IXDiagramEditor;
+  const boxesOf = (b) => (String(b.t).match(DG().GAP) || []).length;
+  function syncDiagram(g) {
+    const d = DGE().modelOf(g); const out = []; let at = 0;
+    d.labels.forEach((b) => {
+      const now = boxesOf(b), had = Number.isInteger(b.k) ? b.k : now; const mine = g.items.slice(at, at + had); at += had;
+      while (mine.length < now) mine.push(newItem());
+      mine.length = now; out.push(...mine); b.k = now;
+    });
+    const gaps = DG().gaps(d); g.items = out; g.items.forEach((it, k) => { it.prompt = gaps[k]; it.options = []; });
+    g.diagram = DG().write(d);
+  }
+  /* the answers of one label: where they begin and how many they are */
+  function labelSpan(g, i) { const d = DGE().modelOf(g); let at = 0; for (let k = 0; k < i; k++) at += Number.isInteger(d.labels[k].k) ? d.labels[k].k : boxesOf(d.labels[k]); return [at, Number.isInteger(d.labels[i].k) ? d.labels[i].k : boxesOf(d.labels[i])]; }
+  /* lines of text (pasted, or another type turned into a diagram) -> labels down both sides of the picture */
+  const diagramLines = (text) => String(text || '').replace(/\r/g, '').split('\n').map((l) => l.replace(/^\s*##\s*/, '').replace(BULLET, '').trim()).filter((l) => TABLE_GAP.test(l));
+  function diagramGroupFrom(lines) {   // a pasted "Label the diagram" block: every line with a gap is a label; a line without one goes on with the label it belongs to
+    const g = newGroup('diagram'); let instr = ''; const body = []; const inline = [];
+    lines.forEach((raw) => {
+      const t = String(raw || '').trim(); if (!t) return;
+      if (!body.length && isInstrLine(t)) { instr += (instr ? ' ' : '') + t; return; }
+      let l = gapsToMarks(t);
+      if (l.includes('=>')) { const [txt, an, ex] = l.split('=>'); l = txt.replace(/^\d{1,2}\s*[.)]\s*/, '').trim(); if (!TABLE_GAP.test(l)) l += ' ____'; inline.push({ answer: String(an || '').trim(), explanation: String(ex || '').trim() }); }
+      body.push(l.replace(BULLET, '').trim());
+    });
+    const first = body[0] || '';
+    if (body.length > 1 && !TABLE_GAP.test(first) && first.length < 90 && !/[.;:,]$/.test(first) && !/^[a-z(]/.test(body[1])) { g.blockTitle = first; body.shift(); }
+    const labels = []; let wait = '';
+    body.forEach((l) => {
+      if (TABLE_GAP.test(l)) { if (wait && /^(?:[a-z(]|_{2,})/.test(l)) l = wait + ' ' + l; else if (wait && labels.length) labels[labels.length - 1] += ' ' + wait; labels.push(l); wait = ''; }
+      else if (labels.length && !wait && /^[a-z(]/.test(l)) labels[labels.length - 1] += ' ' + l;
+      else wait = wait ? wait + ' ' + l : l;
+    });
+    if (wait && labels.length) labels[labels.length - 1] += ' ' + wait;
+    g.group = cleanHeadText(instr); g.dg = DG().fromLines(labels); syncDiagram(g);
+    if (inline.length === g.items.length) g.items.forEach((it, k) => { it.answer = inline[k].answer; it.explanation = inline[k].explanation; });
+    return g;
+  }
+  function diagramToNotes(g) { if (g.type === 'diagram') { g.text = DGE().modelOf(g).labels.map((b) => '- ' + String(b.t).replace(/\s*\n\s*/g, ' ')).join('\n'); g.type = 'notes'; delete g.dg; delete g.diagram; syncText(g); } return g; }
+  const syncGaps = (g) => (g.type === 'table' ? syncTable(g) : g.type === 'diagram' ? syncDiagram(g) : isTextType(g.type) ? syncText(g) : null);
   /* a list of words / endings: "A water   B foundations", "A water B foundations C specialists" or one per line */
   function optionPieces(t) {
     let pieces = t.split(/\t+|\s{2,}/).map((x) => x.trim()).filter(Boolean);
@@ -604,6 +645,7 @@
     }
     if (g.text === undefined) g.text = '';
     if (g.type === 'table') gridOf(g);
+    if (g.type === 'diagram') syncDiagram(g);
     return g;
   }
   /* a word typed as the answer of a list-of-words summary is its letter; a letter typed for a word box is its word */
@@ -626,7 +668,7 @@
       const g = String(q.group || '').trim(); const shared = SHARED_OPTS.includes(type); const opts = Array.isArray(q.options) ? q.options : [];
       const pass = Number(q.passage) || 1;
       const same = cur && cur.type === type && pass === cur.passage && (hasGi ? q.gi === cur._gi : (!g || g === cur.group)) && (!shared || !opts.length || !cur.options.length || JSON.stringify(opts) === JSON.stringify(cur.options));
-      if (!same) { cur = { type, passage: pass, group: g, blockTitle: q.blockTitle || '', table: String(q.table || ''), text: String(q.text || ''), options: [], items: [], _gi: hasGi ? q.gi : undefined }; gs.push(cur); }
+      if (!same) { cur = { type, passage: pass, group: g, blockTitle: q.blockTitle || '', table: String(q.table || ''), text: String(q.text || ''), diagram: String(q.diagram || ''), options: [], items: [], _gi: hasGi ? q.gi : undefined }; gs.push(cur); }
       if (shared && !cur.options.length && opts.length) cur.options = opts.slice();
       if (!cur.group && g) cur.group = g; if (!cur.blockTitle && q.blockTitle) cur.blockTitle = q.blockTitle;
       cur.items.push({ prompt: q.prompt || '', answer: q.answer || '', explanation: q.explanation || '', evidence: q.evidence || '', title: q.title || '', options: shared ? [] : opts.slice(), origin: q.origin, at: q.at });
@@ -648,7 +690,7 @@
     const out = []; const idx = (gs || []).map((_, i) => i);
     if (isMultiSection()) idx.sort((a, b) => (gs[a].passage - gs[b].passage) || (a - b));
     idx.forEach((i, n) => { const g = gs[i]; const shared = SHARED_OPTS.includes(g.type);
-      g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), table: g.type === 'table' ? (g.grid ? tableJson(g.grid) : String(g.table || '').trim()) : undefined, text: isTextType(g.type) ? String(g.text || '').trim() : undefined, title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
+      g.items.forEach((it) => out.push({ type: g.type, passage: g.passage || 1, gi: n, group: String(g.group || '').trim(), blockTitle: String(g.blockTitle || '').trim(), table: g.type === 'table' ? (g.grid ? tableJson(g.grid) : String(g.table || '').trim()) : undefined, text: isTextType(g.type) ? String(g.text || '').trim() : undefined, diagram: g.type === 'diagram' ? DG().write(DGE().modelOf(g)) : undefined, title: String(it.title || '').trim(), prompt: String(it.prompt || '').trim(),
         options: (shared ? g.options : it.options || []).map((o) => String(o).trim()).filter(Boolean), answer: finalAnswer(g, it.answer), explanation: String(it.explanation || '').trim(), evidence: String(it.evidence || '').trim(),
         origin: it.origin === 'ai' || it.origin === 'source' ? it.origin : undefined, at: Number(it.at) > 0 ? Number(it.at) : undefined })); });   // where an AI-made question came from, when an answer is heard
     return out;
@@ -671,6 +713,10 @@
     return out;
   }
 
+  /* the passage a group belongs to, and the letters of its paragraphs (assets/js/passage-core.js) */
+  const passageTextOf = (g) => (isFullReading() ? ((draft.data.passages || [])[(g.passage || 1) - 1] || {}).passage : draft.data.passage) || '';
+  const passageLetters = (g) => (draft.type === 'reading' && window.IXPassage ? window.IXPassage.letters(passageTextOf(g)) : []);
+
   /* ───────── checks before saving: every problem listed at once ───────── */
   function validate() {
     const out = []; const gs = draft.groups || []; const num = numbering(); const L = draft.type === 'listening';
@@ -679,10 +725,21 @@
     gs.forEach((g, gi) => {
       const where = 'Group ' + (gi + 1) + ' (' + (qLabels()[g.type] || g.type).split(':')[0] + ')'; const shared = SHARED_OPTS.includes(g.type);
       const filled = g.items.filter((it) => String(it.prompt || '').trim() || String(it.answer || '').trim());
+      if (!filled.length && g.type === 'diagram' && DGE().modelOf(g).img) { err(where + ': no box yet. Press “+ Label” or “+ Box on the picture”, and write ____ where an answer goes.', gi); return; }
       if (!filled.length) { warn(where + ' is empty and will be left out.', gi); return; }
       if (isTextType(g.type)) {
         if (!String(g.text || '').trim()) err(where + ': type the text of the block, with ____ where each answer goes.', gi);
         else if (!textGaps(g.text).length) err(where + ': the text has no gap. Write ____ where each answer goes.', gi);
+      }
+      if (g.type === 'diagram') {
+        const d = DGE().modelOf(g);
+        if (!d.img) err(where + ': upload the picture of the diagram.', gi);
+        if (d.labels.some((b) => !String(b.t).trim())) warn(where + ': a label has no text.', gi);
+      }
+      if (!L && (g.type === 'matching-info' || g.type === 'matching-headings') && String(passageTextOf(g) || '').trim()) {   // these need the letters of the paragraphs
+        const ls = passageLetters(g);
+        if (!ls.length) warn(where + ': the paragraphs of the passage have no letters. Set them in “Paragraphs A, B, C” of the passage.', gi);
+        else if (g.type === 'matching-headings') { const no = g.items.map((it) => (/^(?:paragraph|section)?\s*([A-Z])\b/i.exec(String(it.prompt || '').trim()) || [])[1]).filter((l) => l && !ls.includes(l.toUpperCase())); if (no.length) warn(where + ': the passage has no paragraph ' + no.join(', ') + '.', gi); }
       }
       if (g.type === 'table') {
         const grid = gridOf(g); const rows = grid.rows.filter((r) => r.some((c) => String(c || '').trim()));
@@ -760,7 +817,8 @@
     map: 'List the letters of the map ONCE above (A, B, C…). Each question is the place name and its letter.',
     gap: 'One line of the notes with ____ where the answer goes.',
     box: 'List the words of the box ONCE above. Each question is a line with ____ and the right word.',
-    table: 'Type the table ONCE above (cells split by |, ____ for each gap). Every gap is one question: only its answer is needed.'
+    table: 'Type the table ONCE above (cells split by |, ____ for each gap). Every gap is one question: only its answer is needed.',
+    diagram: 'Put the labels on the picture above, ____ for each box. Every box is one question: only its answer is needed.'
   };
   const PROMPT_PH = { tfng: 'Statement', ynng: 'Statement', mcq: 'Question', 'mcq-multi': 'Question', short: 'The question', 'matching-headings': 'Paragraph, e.g. Paragraph A', 'matching-info': 'The information, e.g. a reference to an early experiment',
     'matching-features': 'The statement', 'matching-endings': 'The beginning of the sentence', matching: 'Item, e.g. Paragraph A', map: 'Place on the map / plan', completion: 'Text with ____ for the gap', gap: 'Text with ____ for the gap' };
@@ -801,10 +859,10 @@
   const qNum = (g, ii, from) => { let n = from; for (let k = 0; k < ii; k++) n += itemWidth(g, g.items[k]); return n; };
   function groupBlock(g, gi, range, total, mode) {
     const L = draft.type === 'listening'; const shared = SHARED_OPTS.includes(g.type); const full = isMultiSection();
-    const qOnly = mode === 'q'; const isTable = g.type === 'table'; const isText = isTextType(g.type); const fixed = isTable || isText;
+    const qOnly = mode === 'q'; const isTable = g.type === 'table'; const isText = isTextType(g.type); const isDg = g.type === 'diagram'; const fixed = isTable || isText || isDg;
     const items = g.items.map((it, ii) => {
       const p = `groups.${gi}.items.${ii}`; const multi = g.type === 'mcq' || g.type === 'mcq-multi';
-      const prompt = fixed ? `<div class="field gi-cell" title="The words around this gap (edit the ${isTable ? 'table' : 'text'} above)">${esc(it.prompt)}</div>`
+      const prompt = fixed ? `<div class="field gi-cell" title="The words around this gap (edit the ${isTable ? 'table' : isDg ? 'label' : 'text'} above)">${esc(it.prompt)}</div>`
         : `<textarea class="field gi-prompt" rows="${multi ? 2 : 1}" data-p="${p}.prompt" placeholder="${esc(PROMPT_PH[g.type] || 'Question')}">${esc(it.prompt)}</textarea>`;
       // made by the AI Test Generator: "AI" = written by the AI, "check" = its proof was not found in the passage / transcript
       const tags = (it.origin === 'ai' ? '<span class="cb-ai-tag" title="Written by the AI">AI</span>' : '') + (it.verified === false ? '<span class="cb-ai-tag warn" title="The AI\'s evidence was not found in the source">check</span>' : '');
@@ -823,12 +881,13 @@
         <div class="btn-row"><button class="btn btn-sm" data-cb="g-up" data-g="${gi}" type="button" title="Move up">↑</button><button class="btn btn-sm" data-cb="g-down" data-g="${gi}" type="button" title="Move down">↓</button><button class="btn btn-sm" data-cb="g-dup" data-g="${gi}" type="button" title="Copy this group">Copy</button><button class="btn btn-sm btn-danger" data-cb="g-del" data-g="${gi}" type="button">Remove group</button></div></div>
       <div class="cb-row"><select class="field" data-p="groups.${gi}.type" data-rerender="1" title="Type of this group">${Object.entries(qLabels()).map(([k, v]) => `<option value="${k}" ${g.type === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>${full ? passSelect(`groups.${gi}.passage`, g.passage) : ''}</div>
       <input class="field" data-p="groups.${gi}.group" value="${esc(g.group)}" placeholder="${L ? 'Instruction of this block, e.g. Complete the notes below. Write ONE WORD for each answer.' : 'Instruction of this group, e.g. Complete the notes. Write NO MORE THAN TWO WORDS. (“Questions 1–5” is added by itself. Empty = the standard instruction)'}">
-      ${L ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="Title above the ${isTable ? 'table' : 'block'} (optional), e.g. Barrington Historical Buildings Tours">`
-        : !['tfng', 'ynng', 'mcq', 'mcq-multi', 'map', 'matching-headings', 'matching-info'].includes(g.type) ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="${g.type === 'matching' || g.type === 'matching-features' ? 'Title of the list (optional), e.g. List of Researchers' : g.type === 'matching-endings' ? 'Title above the sentences (optional)' : isTable ? 'Title above the table (optional), e.g. Specialisation' : 'Title above the notes / summary (optional), e.g. Further advantages of social networks'}">` : ''}
+      ${L ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="Title above the ${isTable ? 'table' : isDg ? 'diagram' : 'block'} (optional), e.g. Barrington Historical Buildings Tours">`
+        : !['tfng', 'ynng', 'mcq', 'mcq-multi', 'map', 'matching-headings', 'matching-info'].includes(g.type) ? `<input class="field" data-p="groups.${gi}.blockTitle" value="${esc(g.blockTitle)}" placeholder="${g.type === 'matching' || g.type === 'matching-features' ? 'Title of the list (optional), e.g. List of Researchers' : g.type === 'matching-endings' ? 'Title above the sentences (optional)' : isTable ? 'Title above the table (optional), e.g. Specialisation' : isDg ? 'Title above the diagram (optional), e.g. How the spinning jenny worked' : 'Title above the notes / summary (optional), e.g. Further advantages of social networks'}">` : ''}
+      ${isDg ? DGE().html(g, gi, range.from) : ''}
       ${isTable ? tableEditor(g, gi) + tablePreview(g, range.from) : ''}
       ${isText ? `<label class="lbl cb-shared">${TEXT_HELP[g.type]}<textarea class="field cb-table" rows="${g.type === 'summary' || g.type === 'summary-words' ? 6 : 8}" data-p="groups.${gi}.text" placeholder="${esc(TEXT_PH[g.type] || '')}">${esc(g.text)}</textarea></label>${textPreview(g, range.from)}` : ''}
       ${shared ? `<label class="lbl cb-shared">${SHARED_LABEL[g.type]}<textarea class="field" rows="${g.type === 'matching' ? 6 : 4}" data-lines="1" data-p="groups.${gi}.options" placeholder="${esc(SHARED_PH[g.type])}">${esc((g.options || []).join('\n'))}</textarea></label>
-        ${(g.type === 'matching' || g.type === 'matching-info') && !L ? `<div class="btn-row"><button class="btn btn-sm" data-cb="g-letters" data-g="${gi}" type="button">Fill paragraph letters A–G</button><button class="btn btn-sm" data-cb="g-letters-9" data-g="${gi}" type="button">A–I</button></div>` : ''}` : ''}
+        ${(g.type === 'matching' || g.type === 'matching-info') && !L ? `<div class="btn-row"><button class="btn btn-sm" data-cb="g-letters" data-g="${gi}" type="button">Fill paragraph letters A–G</button><button class="btn btn-sm" data-cb="g-letters-9" data-g="${gi}" type="button">A–I</button>${passageLetters(g).length ? `<button class="btn btn-sm btn-primary" data-cb="g-letters-p" data-g="${gi}" type="button">Letters of the passage (${esc(passageLetters(g)[0])}–${esc(passageLetters(g).slice(-1)[0])})</button>` : ''}</div>` : ''}${g.type === 'matching-headings' && passageLetters(g).length ? `<div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="g-paras" data-g="${gi}" type="button">A question for every paragraph of the passage (${esc(passageLetters(g)[0])}–${esc(passageLetters(g).slice(-1)[0])})</button></div>` : ''}` : ''}
       <div class="gi-list">${items}</div>
       ${fixed ? '' : `<div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="i-add" data-g="${gi}" type="button">+ Question</button>${qOnly ? '' : `<button class="btn btn-sm" data-cb="g-paste" data-g="${gi}" type="button">Paste many into this group</button>`}</div>`}
       ${fixed || qOnly ? '' : `<div class="cb-bulk" id="gpaste-${gi}" hidden><div class="muted sm"><b>${esc(GROUP_HINT[g.type] || '')}</b><br>One question per line: <code>question =&gt; answer =&gt; explanation</code> (explanation optional). Or blocks: <code>1. text</code> / <code>Answer: …</code> / <code>Explanation: …</code>.${mcqLike ? ' Put the options (<code>A. …</code>) under each question.' : ''}</div>
@@ -990,7 +1049,8 @@
     else if (has(/complete the table/i)) t = 'table';
     else if (has(/flow-?\s?chart/i)) t = 'flowchart';
     else if (has(/complete the summary/i)) t = 'summary';
-    else if (has(/complete the (?:notes|form|diagram)|label the diagram/i)) t = 'notes';
+    else if (has(/(?:label|complete) the (?:diagram|drawing|illustration|picture)/i)) t = has(/correct letter|\bletters\b/i) ? 'map' : 'diagram';
+    else if (has(/complete the (?:notes|form)/i)) t = 'notes';
     else if (has(/complete the sentences?|complete each sentence/i)) t = 'sentence';
     else if (has(/answer the questions?/i)) t = 'short';
     else if (has(/choose the correct (?:letter|answer)/i) || filled.some((l) => /^[A-D][.)]\s+\S/.test(l))) t = 'mcq';
@@ -1040,6 +1100,7 @@
       if (!lines.some((l) => l.trim())) return;
       const type = forced && forced !== 'auto' ? forced : guessType(lines);
       if (type === 'table') { const g = tableGroupFrom(lines); if (g.items.length) groups.push(g); return; }
+      if (type === 'diagram') { const g = diagramGroupFrom(lines); if (g.items.length) groups.push(g); else skipped.push('no ____ gap in the diagram block'); return; }
       if (isTextType(type)) { const g = textGroupFrom(lines, type); if (g.items.length) groups.push(g); else skipped.push('no ____ gap in the ' + typeShort(type).toLowerCase() + ' block'); return; }
       const r = itemsGroupsFrom(lines.join('\n'), type); groups.push(...r.groups); skipped = skipped.concat(r.skipped);
     });
@@ -1130,6 +1191,7 @@
     const bulkOpen = !!$('#bulk-box') && !$('#bulk-box').hidden; const bt = ($('#bulk-text') || {}).value || '';
     const st = $('#builder-body').scrollTop; w.innerHTML = questionsInner(); $('#builder-body').scrollTop = st;
     if (bulkOpen) { $('#bulk-box').hidden = false; $('#bulk-text').value = bt; }
+    DGE().mount();
   }
 
   /* ───────── "Paste many": text -> groups ───────── */
@@ -1323,8 +1385,8 @@
     chunks.forEach((lines) => {
       const head = lines.find((l) => P_HEAD.test(l.trim()));
       const type = head ? (forced && forced !== 'auto' ? forced : guessType(lines)) : '';
-      if (!head || !(type === 'table' || isTextType(type))) { rest.push(...lines); return; }
-      const g = type === 'table' ? tableGroupFrom(lines) : textGroupFrom(lines, type);
+      if (!head || !(type === 'table' || type === 'diagram' || isTextType(type))) { rest.push(...lines); return; }
+      const g = type === 'table' ? tableGroupFrom(lines) : type === 'diagram' ? diagramGroupFrom(lines) : textGroupFrom(lines, type);
       if (!g.items.length) { rest.push(...lines); return; }
       flush();
       const n0 = Number((/(\d+)/.exec(head) || [])[1]) || 0; const typed = type !== 'summary-words' && type !== 'box';
@@ -1608,6 +1670,7 @@
     if (t === 'writing') (d.tasks || []).forEach((x, i) => out.push(['task:' + i, (x.title || 'Task ' + (i + 1)) + ' picture']));
     if (t === 'speaking') (d.parts || []).forEach((x, i) => out.push(['part:' + i, String(x.title || 'Part ' + (i + 1)).split('·')[0].trim() + ' picture']));
     if (t === 'reading' || t === 'listening') out.push(['images', t === 'listening' ? 'Pictures (map / plan / diagram)' : 'Pictures for the passage']);
+    if (t === 'reading' || t === 'listening') (draft.groups || []).forEach((g, i) => { if (g.type === 'diagram') out.unshift(['dg:' + i, 'Diagram of group ' + (i + 1)]); });
     if (d.mode !== 'full' && (t === 'reading' || t === 'listening' || t === 'writing')) out.push(['cover', 'Card picture']);
     return out;
   }
@@ -1637,6 +1700,7 @@
       const url = await uploadFile(file); const target = ($('#imp-target') || {}).value || 'images'; const d = draft.data;
       if (target === 'images') (d.images = d.images || []).push({ url, caption: '', passage: 1 });
       else if (target === 'cover') d.coverUrl = url;
+      else if (target.startsWith('dg:')) DGE().setPicture(Number(target.slice(3)), url);
       else if (target.startsWith('task:')) d.tasks[Number(target.slice(5))].imageUrl = url;
       else if (target.startsWith('part:')) d.parts[Number(target.slice(5))].imageUrl = url;
       toast('Picture added'); renderBuilder(); autosave();
@@ -1753,7 +1817,7 @@
         <label class="lbl">Who can open it<select class="field" data-p="_access">${ACCESS.map(([v, l]) => `<option value="${v}" ${(draft._access || (draft.premium ? 'standard' : 'free')) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
         ${draft._ai ? '<div class="muted sm">Saved as a <b>Draft</b> (students do not see it) until you press <b>Publish</b>.</div>' : `<div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>`}</div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
-      ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : `<label class="lbl">Passage text *<textarea class="field cb-passage" rows="14" data-p="data.passage" placeholder="Paste the passage. Leave an empty line between paragraphs. Tip: start a line with A. / B. / C. to label paragraphs, ## for a sub-heading, * for a footnote.">${esc(d.passage)}</textarea></label>`) : ''}
+      ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : window.IXPassageEditor.block('data.passage', { label: 'Passage text *', rows: 14, ph: 'Paste the passage. Leave an empty line between paragraphs. Tip: ## for a sub-heading, * for a footnote.' })) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
         <label class="lbl">Audio link (https://… or /uploads/…)<input class="field" data-p="data.audioUrl" value="${esc(d.audioUrl)}" placeholder="https://…/recording.mp3"></label>
         <div class="cb-grid"><label class="lbl">Starts at (seconds, 0 = from the beginning)<input class="field" type="number" min="0" data-p="data.audioStart" data-num="1" value="${esc(d.audioStart || 0)}"></label><label class="lbl">Ends at (seconds, 0 = until the end)<input class="field" type="number" min="0" data-p="data.audioEnd" data-num="1" value="${esc(d.audioEnd || 0)}"></label></div>
@@ -1762,8 +1826,29 @@
       ${t === 'writing' ? tasksBlock() : t === 'speaking' || t === 'pdf' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
       ${t === 'reading' || t === 'listening' ? questionsBlock() : ''}
       ${t === 'listening' ? `<label class="lbl">Transcript (optional, shown only after the student submits). One line per speaker turn, e.g. <code>Tom: Good morning…</code>. The line that contains an answer is highlighted automatically<textarea class="field" rows="8" data-p="data.transcript">${esc(d.transcript)}</textarea></label>` : ''}`;
-    syncSave();
+    syncSave(); DGE().mount();
   }
+  /* only the answers of one block and the numbers: the block itself stays as it is while it is edited */
+  let dgStale = false;
+  function refreshGroupItems(gi) {
+    const el = $('#cb-group-' + gi); if (!el || !draft) return; const gs = draft.groups, num = numbering();
+    const tmp = document.createElement('div'); tmp.innerHTML = groupBlock(gs[gi], gi, num[gi] || { from: 1, to: 1 }, gs.reduce((n, g) => n + g.items.length, 0), draft._step === 'all' ? 'all' : 'q');
+    ['.gi-list', '.cb-grange'].forEach((q) => { const a = el.querySelector(q), b = tmp.querySelector(q); if (a && b) a.innerHTML = b.innerHTML; });
+    refreshNums();
+  }
+  DGE().init({
+    group: (gi) => draft && draft.groups && draft.groups[gi], from: (gi) => (numbering()[gi] || { from: 1 }).from,
+    changed: (gi, text) => { const g = draft && draft.groups[gi]; if (!g) return; if (text) { const n = g.items.length; syncDiagram(g); if (g.items.length !== n) dgStale = true; refreshGroupItems(gi); } else g.diagram = DG().write(DGE().modelOf(g)); autosave(); },
+    swap: (gi, i, j) => { const g = draft.groups[gi], d = DGE().modelOf(g), a = Math.min(i, j), b = Math.max(i, j); const [sa, na] = labelSpan(g, a), [sb, nb] = labelSpan(g, b); const A = g.items.slice(sa, sa + na), M = g.items.slice(sa + na, sb), B = g.items.slice(sb, sb + nb); g.items.splice(sa, na + M.length + nb, ...B, ...M, ...A); [d.labels[a], d.labels[b]] = [d.labels[b], d.labels[a]]; },
+    drop: (gi, i) => { const g = draft.groups[gi], d = DGE().modelOf(g); if (!d.labels[i]) return; const [at, n] = labelSpan(g, i); g.items.splice(at, n); d.labels.splice(i, 1); },
+    upload: async (file) => { uploading++; syncSave(); try { return await uploadFile(file); } finally { uploading--; syncSave(); } },
+    pick: (accept) => new Promise((resolve) => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = accept; inp.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(inp); const done = (v) => { inp.remove(); resolve(v); }; inp.addEventListener('cancel', () => done(null)); inp.onchange = () => done(inp.files && inp.files[0]); inp.click(); }),
+    images: () => (draft && draft.data.images || []).map((x) => x.url), refresh: () => refreshQuestions(), toast
+  });
+  // the numbers of the blocks after it, once the diagram is left (not while it is typed in)
+  document.addEventListener('focusout', (e) => { if (!dgStale || !e.target.closest || !e.target.closest('.dg-ed')) return; setTimeout(() => { const a = document.activeElement; if (dgStale && draft && !(a && a.closest && a.closest('.dg-ed'))) { dgStale = false; refreshQuestions(); } }, 260); });
+  window.IXPassageEditor.init({ draft: () => draft, toast,
+    get: (p) => p.split('.').reduce((o, k) => (o == null ? o : o[k]), draft), set: (p, v) => { setPath(draft, p, v); autosave(); } });
 
   function setPath(obj, path, val) {
     const keys = path.split('.'); let o = obj;
@@ -1816,7 +1901,12 @@
     if (gt && hasFixedItems(draft.groups[Number(gt[1])].type)) {
       const g = draft.groups[Number(gt[1])]; const lines = g.items.filter((it) => String(it.prompt || '').trim()).map((it) => (TABLE_GAP.test(it.prompt) ? it.prompt : it.prompt + ' ____'));
       if (g.type === 'table' && !g.grid && !String(g.table || '').trim() && lines.length) g.grid = { rows: [[g.blockTitle || 'Notes']].concat(lines.map((l) => [l])), head: true, rowHead: false };
+      if (isTextType(g.type) && !String(g.text || '').trim() && g.dg && g.dg.labels.length) g.text = diagramLines(g.dg.labels.map((b) => String(b.t).replace(/\s*\n\s*/g, ' ')).join('\n')).join('\n');   // a diagram turned into notes
       if (isTextType(g.type) && !String(g.text || '').trim() && lines.length) g.text = lines.join('\n');
+      if (g.type === 'diagram' && !(g.dg && (g.dg.img || g.dg.labels.length))) {   // the lines become labels, the answers stay with them
+        const own = diagramLines(g.text); g.dg = DG().fromLines(own.length ? own : lines);
+        const pics = (draft.data.images || []).map((x) => x.url); if (pics.length === 1) setTimeout(() => DGE().setPicture(Number(gt[1]), pics[0]), 0);
+      }
       syncGaps(g);
     }
     const gd = /^groups\.(\d+)\.grid\./.exec(p);
@@ -1988,6 +2078,8 @@
       else if (a === 'i-add') { const g = draft.groups[Number(t.dataset.g)]; g.items.push(newItem()); refreshQuestions(); const rows = document.querySelectorAll('#cb-group-' + t.dataset.g + ' .gi-prompt'); if (rows.length) rows[rows.length - 1].focus(); }
       else if (a === 'i-del') { const g = draft.groups[Number(t.dataset.g)]; g.items.splice(i, 1); if (!g.items.length) g.items.push(newItem()); refreshQuestions(); }
       else if (a === 'g-letters' || a === 'g-letters-9') { const g = draft.groups[Number(t.dataset.g)]; g.options = 'ABCDEFGHI'.slice(0, a === 'g-letters' ? 7 : 9).split(''); refreshQuestions(); }
+      else if (a === 'g-letters-p') { const g = draft.groups[Number(t.dataset.g)]; g.options = passageLetters(g); refreshQuestions(); }
+      else if (a === 'g-paras') { const g = draft.groups[Number(t.dataset.g)]; const have = new Set(g.items.map((it) => (/^(?:paragraph|section)?\s*([A-Z])\b/i.exec(String(it.prompt || '').trim()) || [])[1]).filter(Boolean).map((l) => l.toUpperCase())); g.items = g.items.filter((it) => it.prompt || it.answer).concat(passageLetters(g).filter((l) => !have.has(l)).map((l) => ({ ...newItem(), prompt: 'Paragraph ' + l }))); refreshQuestions(); }
       else if (a === 'g-paste') { const b = $('#gpaste-' + t.dataset.g); b.hidden = !b.hidden; if (!b.hidden) $('#gpaste-text-' + t.dataset.g).focus(); }
       else if (a === 'g-paste-do') {
         const gi = Number(t.dataset.g), g = draft.groups[gi]; const raw = parseRaw($('#gpaste-text-' + gi).value); const qs = raw.blocks.reduce((x, b) => x.concat(b.qs), []);
@@ -2165,8 +2257,8 @@
   function readSource(type, mode, text) {
     const keep = draft; draft = { type, data: { mode } };   // the reader looks at draft.type (listening question types)
     try {
-      if (type === 'reading') { const r = smartReading(text, mode === 'full'); return { passages: r.passages.map((x) => ({ title: x.title, text: x.passage })).filter((x) => x.text), groups: r.groups, skipped: r.skipped, keyCount: r.keyCount }; }
-      const r = smartListening(text, mode === 'full'); return { passages: [], groups: r.groups, transcript: r.transcript, section: r.section, skipped: r.skipped, keyCount: r.keyCount };
+      if (type === 'reading') { const r = smartReading(text, mode === 'full'); r.groups.forEach(diagramToNotes); return { passages: r.passages.map((x) => ({ title: x.title, text: x.passage })).filter((x) => x.text), groups: r.groups, skipped: r.skipped, keyCount: r.keyCount }; }
+      const r = smartListening(text, mode === 'full'); r.groups.forEach(diagramToNotes); return { passages: [], groups: r.groups, transcript: r.transcript, section: r.section, skipped: r.skipped, keyCount: r.keyCount };
     } finally { draft = keep; }
   }
   // the generator's result -> the normal form, as a Draft, with its warnings on top
