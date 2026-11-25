@@ -2056,6 +2056,36 @@ server.listen(0, async () => {
       assert.deepEqual(boxes[1], ['The river flooded', '{{3}} walked along the banks', 'The skull was found', 'it was sent to the {{4}}'], 'typed arrows only separate the boxes');
       assert.ok(!/"boxes": \[[^\]]*[↓→]/.test(html), 'no arrow is left inside a box');
       ok('Reading: paragraph letters on their own line, the line under the title set apart, flow-chart boxes split at the arrows');
+
+      // paragraph letters set by the admin ("[A] …"): exactly these, nothing guessed (assets/js/passage-core.js)
+      const P = require('../assets/js/passage-core');
+      const own = 'How yarn was made\n\n[A] A newborn baby needs wool.\nIt is spun at home.\n\nBig mills came later, and this paragraph has no letter.\n\n[C] Spinners lost their work.\n\n## The end\n* a footnote';
+      assert.deepEqual(P.split(own).map((r) => [r.l, r.k]), [['', 'p'], ['A', 'p'], ['', 'p'], ['C', 'p'], ['', 'sub'], ['', 'foot']]); assert.equal(P.split(own)[1].t, 'A newborn baby needs wool. It is spun at home.');
+      assert.equal(P.join(P.split(P.join(P.split(own)))), P.join(P.split(own)), 'saved and read again: the same'); assert.deepEqual(P.letters(own), ['A', 'C']); assert.deepEqual(P.letters('Plain text.\n\nMore text.'), []);
+      const lettersOf = (passage) => [...buildExamHtml({ ...mat, data: { ...mat.data, passage } }, tpl).matchAll(/para-letter\\">([A-Z]+)/g)].map((m) => m[1]).join('');
+      assert.equal(lettersOf(own), 'AC'); assert.equal(lettersOf('A. One sentence here.\n\nB. Two sentences here.'), 'AB', 'letters printed in the text are still found'); assert.ok(!buildExamHtml({ ...mat, data: { ...mat.data, passage: own } }, tpl).includes('[A]'));
+      // "Label the diagram" with typed answers: checked by the server, drawn in both players (assets/js/diagram-core.js)
+      const D = require('../assets/js/diagram-core');
+      const dg = JSON.stringify({ img: '/assets/img/wedding-cakes.svg', iw: 720, ih: 360, pad: [30, 10, 30, 10], labels: [{ x: 3, y: 4, w: 25, t: 'A ____ (faller) <img src=x onerror=1>', line: [10, 20, 30, 40] }, { x: 60, y: 4, w: 25, t: 'a ____ and a ____' }, { x: 5, y: 80, w: 20, t: 'No box here' }] });
+      assert.equal(D.count(D.read(dg)), 3); assert.deepEqual(D.gaps(D.read(dg))[1], 'a ____ and a'); const drawn = D.html(dg, 14, (n) => '{{' + n + '}}');
+      assert.ok(drawn.includes('{{14}}') && drawn.includes('{{16}}') && !drawn.includes('{{17}}') && !drawn.includes('<img src=x') && drawn.includes('&lt;img'), 'boxes numbered label by label, the text is never HTML');
+      for (const bad of ['javascript:alert(1)', 'http://x.com/a.png', 'data:image/png;base64,AA', '/uploads/../server.js', '//x.com/a.png']) assert.equal(D.read({ img: bad }).img, '', bad);
+      assert.equal(D.read('not json'), null); assert.equal(D.read({ labels: Array(99).fill({ t: '____' }) }).labels.length, 40); assert.equal(D.read({ labels: [{ x: 'a', y: -5, w: 900, line: [1, 2, 3] }] }).labels[0].line, null);
+      const moved = D.setPad(D.read(dg), [0, 60, 0, 60]), a0 = D.area(D.read(dg)), a1 = D.area(moved); const rel = (A, l) => [Math.round((l.x - A.x) / A.w * 50), Math.round((l.line[2] - A.x) / A.w * 50)]; assert.deepEqual(rel(a1, moved.labels[0]), rel(a0, D.read(dg).labels[0]), 'more space: a label stays at its place on the picture');
+      const qs = ['presser', 'cord|string', 'wheel'].map((answer, k) => ({ type: 'diagram', gi: 0, passage: 1, group: 'Label the diagram below. Choose ONE WORD ONLY.', blockTitle: 'The jenny', diagram: dg, prompt: D.gaps(D.read(dg))[k], answer }));
+      r = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Diagram reading', published: true, data: { mode: 'part', passageLabel: 'Passage 2', passage: own, questions: qs.concat([{ type: 'tfng', gi: 1, prompt: 'True.', answer: 'TRUE' }]) } } }); assert.equal(r.status, 201);
+      const rd = r.json.item; assert.equal(rd.data.questions[0].type, 'diagram'); assert.equal(JSON.parse(rd.data.questions[0].diagram).labels.length, 3); assert.equal(rd.data.questions[3].diagram, undefined);
+      assert.ok((await call('GET', '/api/materials?type=reading')).json.items.find((x) => x.id === rd.id).types.includes('Diagram Labelling'), 'the chip of the card');
+      r = await call('GET', '/pessages/test-' + rd.data.no, { jar: boss }); assert.equal(r.status, 200); assert.ok(r.text.includes('/assets/css/diagram.css') && r.text.includes('{{14}}') && r.text.includes('{{16}}') && r.text.includes('ix-dg-label'), 'Passage 2: questions 14–16 are the boxes of the picture'); assert.ok(/"type": "tfng"[\s\S]{0,400}"id": 17/.test(r.text), 'the next block goes on with 17');
+      r = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'Diagram listening', published: true, data: { mode: 'part', sectionLabel: 'Section 2', audioUrl: '/uploads/audio/x.mp3', questions: qs } } }); assert.equal(r.status, 201); const ls = r.json.item;
+      r = await call('GET', '/sections/test-' + ls.data.no, { jar: boss }); assert.equal(r.status, 200); assert.ok(r.text.includes('/assets/css/diagram.css') && r.text.includes('{{11}}') && r.text.includes('{{13}}'), 'Listening: questions 11–13 are the boxes of the picture');
+      const cfg = require('../listening-exam').buildConfig(ls); assert.equal(cfg.data.blocks[0].kind, 'diagram'); assert.equal(cfg.cfg.answers[12], 'cord|string');
+      // a diagram whose picture data is missing is still a typed question (never a broken page); an unsafe picture is dropped
+      r = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Broken diagram', data: { mode: 'part', passage: own, questions: [{ type: 'diagram', prompt: 'the ____ of it', answer: 'end', diagram: '{oops' }, { type: 'diagram', gi: 2, prompt: 'x ____', answer: 'y', diagram: JSON.stringify({ img: 'javascript:1', labels: [{ t: 'x ____' }] }) }] } } }); assert.equal(r.status, 201);
+      assert.equal(r.json.item.data.questions[0].diagram, undefined); assert.equal(JSON.parse(r.json.item.data.questions[1].diagram).img, ''); assert.equal((await call('GET', '/pessages/test-' + r.json.item.data.no, { jar: boss })).status, 200);
+      for (const id of [rd.id, ls.id, r.json.item.id]) await call('DELETE', '/api/admin/materials/' + id, { jar: boss });
+      for (const u of ['/assets/js/diagram-core.js', '/assets/js/passage-core.js', '/assets/css/diagram.css', '/admin-diagram.js', '/admin-passage.js']) assert.equal((await call('GET', u)).status, 200, u);
+      ok('Reading / Listening: paragraph letters set by the admin, diagrams with labels, boxes and arrows (checked, numbered, drawn in both players)');
     }
 
     // --- teachers (teachers.js) and e-books (ebooks.js)

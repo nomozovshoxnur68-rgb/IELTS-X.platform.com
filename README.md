@@ -889,3 +889,24 @@ screen (**Two pages**) and one under the other on a narrow one. A book without a
   the server does not replace the page the student has gone on to; the editor asks "Leave without saving?" only when something
   was changed and no longer loses typed text; the list of e-books shows a book made in Admin → Books at once; the dead picture of
   Reading passage 1, the missing map of `/sections/test-5` and two dead links of PDF materials.
+
+## Diagrams with boxes on the picture; the letters of the paragraphs (November 2026)
+
+**Diagram labelling, typed answers** (Reading and Listening, question type `diagram`): a picture with labels around and on it,
+every label a short text with boxes to type in (`____`) and an arrow to the part it names, as on the computer test. The model is
+one JSON in the questions of the block (`diagram`): picture, its size, the free space around it, the labels with their places
+in %, their arrows. `assets/js/diagram-core.js` reads, checks and draws it for the server (`reading-exam.js`,
+`listening-exam.js`) and for the admin panel, so the admin sees what the student sees; `assets/css/diagram.css` is added to a
+page that has one. On a narrow screen the numbers stand on the picture and the labels are a list under it; the sheet stays
+white in the dark themes. In the admin form (`admin-diagram.js`): upload / paste (Ctrl+V) / drop the picture, or cut it from the
+PDF; **+ Label with an arrow**, **+ Box on the picture**; drag a label, its right edge, the two dots of its arrow; *Space around*
+the picture (labels stay at their place on it); ↑ ↓ change the numbers and the answers go with their labels. A pasted
+"Label the diagram …" block becomes a diagram with its labels down both sides; another type of question can be turned into one.
+`map` (choose a letter) is still there for maps with letters.
+
+**The letters of the paragraphs** (`admin-passage.js`): the passage of a Reading test is edited as *Whole text* or as
+*Paragraphs A, B, C*: every paragraph has its own place for its letter, with "A, B, C … to every paragraph", "↓ABC" from one on,
+split / join / move, sub-headings and footnotes. Saved as `[A] text`: exactly these letters are shown (nothing is guessed).
+Letters printed in pasted text ("A. …", "A Text") are found as before (`assets/js/passage-core.js`, shared by the server and the
+admin panel). Matching information takes "Letters of the passage", matching headings "A question for every paragraph"; the
+checker says when the letters are missing. Pictures kept in the database (`/api/media/…`) now show in Reading passages too.

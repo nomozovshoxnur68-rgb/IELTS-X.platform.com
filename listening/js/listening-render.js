@@ -120,7 +120,11 @@
     var pool = '<div class="opt-box drag-pool ix-pool-below" id="pool-bx' + b.from + '" data-pool="pool-bx' + b.from + '">' + h.poolChips('bx' + b.from, words) + '</div>';
     return '<div class="ix-textblock">' + head(b, b.from, b.to, rich(b.instruction), b.title) + h.kbHelp() + textBody(h, b, true) + pool + '</div>';
   }
-  var BUILD = { gap: gapBlock, table: tableBlock, text: textBlock, textbox: textBoxBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
+  /* "Label the diagram": the picture with its labels (drawn by assets/js/diagram-core.js on the server), {{11}} = the box of question 11 */
+  function diagramBlock(h, b) {
+    return head(b, b.from, b.to, rich(b.instruction), b.title) + '<div class="note-flow ix-dg-flow">' + String(b.html || '').replace(/\{\{\s*(\d+)\s*\}\}/g, function (_, id) { return h.gapInput(+id); }) + '</div>';
+  }
+  var BUILD = { diagram: diagramBlock, gap: gapBlock, table: tableBlock, text: textBlock, textbox: textBoxBlock, mcq: mcqBlock, multi: multiBlock, matching: matchBlock, map: mapBlock, box: boxBlock };
 
   window.IXListeningRender = function (data, part) {
     return function (h) {

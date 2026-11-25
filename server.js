@@ -949,10 +949,12 @@ const MATERIAL_TYPES = ['reading', 'listening', 'writing', 'speaking', 'article'
 const MODE_TYPES = ['reading', 'listening', 'writing', 'speaking'];
 const materialMode = (m) => (m && m.data && m.data.mode === 'full' ? 'full' : 'part');
 const Q_TYPES =['short', 'completion', 'table', 'tfng', 'ynng', 'mcq', 'mcq-multi', 'matching', 'map', 'gap', 'box',
-  'notes', 'summary', 'summary-words', 'sentence', 'flowchart', 'matching-headings', 'matching-info', 'matching-features', 'matching-endings'];
+  'notes', 'summary', 'summary-words', 'sentence', 'flowchart', 'diagram', 'matching-headings', 'matching-info', 'matching-features', 'matching-endings'];
 const OPTION_TYPES = ['mcq', 'mcq-multi', 'matching', 'map', 'box', 'matching-headings', 'matching-info', 'matching-features', 'matching-endings', 'summary-words'];
 const TEXT_Q_TYPES = ['notes', 'summary', 'summary-words', 'sentence', 'flowchart', 'box'];   // the block's text (with its gaps) is typed once
 const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
+/* the picture with its labels and arrows of a "Label the diagram" block (assets/js/diagram-core.js), checked: safe picture, numbers, texts */
+const cleanDiagram = (v) => { const D = require('./assets/js/diagram-core'); if (String(v || '').length > 40000) return undefined; const d = D.read(v); return d && (d.img || d.labels.length) ? D.write({ ...d, img: cleanUrl(d.img) }) : undefined; };
 const cleanTitle = (v) => String(v || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
 const cleanList = (v, max, len) => (Array.isArray(v) ? v : String(v || '').split(',')).map((x) => cleanName(x).slice(0, len)).filter(Boolean).slice(0, max);
 // a line graph drawn by the writing exam page (years along the bottom, one line per series)
@@ -1049,7 +1051,7 @@ function cleanMaterialData(type, d) {
   if (type === 'reading' || type === 'listening') {
     out.questions = (Array.isArray(d.questions) ? d.questions : []).slice(0, 120).map((q, i) => {
       q = q || {}; const t = Q_TYPES.includes(q.type) ? q.type : (type === 'listening' ? 'gap' : 'short');
-      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000), table: t === 'table' ? (cut(q.table, 12000) || undefined) : undefined, text: TEXT_Q_TYPES.includes(t) ? (cut(q.text, 8000) || undefined) : undefined,
+      return { id: 'q' + (i + 1), type: t, title: type === 'listening' ? cut(q.title, 200) : undefined, blockTitle: cut(q.blockTitle, 200).trim() || undefined, passage: sections.includes(Number(q.passage)) ? Number(q.passage) : 1, gi: (q.gi === undefined || q.gi === null || q.gi === '' || !Number.isFinite(Number(q.gi))) ? undefined : Math.max(0, Math.min(999, Math.floor(Number(q.gi)))), group: cut(q.group, 300), prompt: cut(q.prompt, 1000), table: t === 'table' ? (cut(q.table, 12000) || undefined) : undefined, text: TEXT_Q_TYPES.includes(t) ? (cut(q.text, 8000) || undefined) : undefined, diagram: t === 'diagram' ? cleanDiagram(q.diagram) : undefined,
         options: OPTION_TYPES.includes(t) ? (Array.isArray(q.options) ? q.options : []).slice(0, 20).map((o) => cut(o, 300)).filter(Boolean) : [],
         answer: cut(q.answer, 300), explanation: cut(q.explanation, 1500), evidence: type === 'reading' ? (cut(q.evidence, 600) || undefined) : undefined,
         // where the question came from (printed in the source / written by the AI Test Generator) and, for listening, the second the answer is heard
@@ -1166,7 +1168,7 @@ function checkPreTest(type, pack, data) {
 /* the question-type chips of a card: what the admin typed, or taken from the questions */
 function cardTypesOf(d) {
   if (Array.isArray(d.cardTypes) && d.cardTypes.length) return d.cardTypes;
-  const L = { short: 'Short Answer', completion: 'Completion', table: 'Table Completion', notes: 'Note Completion', summary: 'Summary Completion', 'summary-words': 'Summary Completion', sentence: 'Sentence Completion', flowchart: 'Flow-chart Completion', 'matching-headings': 'Matching Headings', 'matching-info': 'Matching Information', 'matching-features': 'Matching Features', 'matching-endings': 'Sentence Endings', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
+  const L = { short: 'Short Answer', completion: 'Completion', table: 'Table Completion', notes: 'Note Completion', summary: 'Summary Completion', 'summary-words': 'Summary Completion', sentence: 'Sentence Completion', flowchart: 'Flow-chart Completion', diagram: 'Diagram Labelling', 'matching-headings': 'Matching Headings', 'matching-info': 'Matching Information', 'matching-features': 'Matching Features', 'matching-endings': 'Sentence Endings', tfng: 'True False Not Given', ynng: 'Yes No Not Given', mcq: 'Multiple Choice', 'mcq-multi': 'Multiple Choice', map: 'Map Labelling', gap: 'Completion', box: 'Word Box Completion' };
   const out = [];
   for (const q of require('./reading-exam').inheritGroups(d.questions)) {
     let t = L[q.type];
