@@ -111,9 +111,9 @@ function cleanCollection(b, old, HttpError) {
   };
 }
 
-async function load(ctx) {
+async function load(ctx, strict) {   // strict = a change is coming: a failed read stops it (an empty list would be saved over the real one)
   let v = null;
-  try { v = await ctx.store.getSetting(KEY); } catch (e) { v = null; }
+  try { v = await ctx.store.getSetting(KEY, strict ? { fresh: true } : undefined); } catch (e) { if (strict) throw e; v = null; }
   if (!v || typeof v !== 'object' || !Array.isArray(v.collections)) return defaults();
   return { collections: v.collections.filter((c) => c && idOk(c.id) && SKILLS.includes(c.skill)), updatedAt: v.updatedAt || null };
 }
@@ -172,7 +172,7 @@ async function route(req, res, p, method, ctx) {
    DELETE /api/admin/predictions/<id> */
 async function adminRoute(req, res, p, method, ctx) {
   const { send, readJson, HttpError, admin, audit } = ctx;
-  const data = await load(ctx);
+  const data = await load(ctx, method !== 'GET');
   const out = () => send(res, 200, { collections: data.collections.map((c) => ({ ...c, ...counts(c) })), updatedAt: data.updatedAt }, { 'Cache-Control': 'no-store' });
   if (p === '/api/admin/predictions' && method === 'GET') return out();
   if (p === '/api/admin/predictions' && method === 'POST') {

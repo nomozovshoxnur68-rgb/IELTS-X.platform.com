@@ -46,7 +46,7 @@ function normTeacher(v, userId) {
 }
 async function loadTeacher(ctx, userId, fresh) {
   if (!ID_RE.test(String(userId || ''))) return null;
-  let v = null; try { v = await ctx.store.getSetting(KEY(userId), fresh ? { fresh: true } : undefined); } catch (e) { v = null; }
+  let v = null; try { v = await ctx.store.getSetting(KEY(userId), fresh ? { fresh: true } : undefined); } catch (e) { if (fresh) throw e; v = null; }   // fresh = a change is coming: never over a class that could not be read
   return v ? normTeacher(v, userId) : null;
 }
 async function saveTeacher(ctx, t) { t.updatedAt = now(); await ctx.store.setSetting(KEY(t.userId), t); if (ctx.teacherChanged) ctx.teacherChanged(t.userId); return t; }

@@ -11,15 +11,25 @@
  *   **bold** · *italic* · __underlined__ · ==marked==
  *   ::: advice Form completion       an "Exam advice" box, closed by a line ":::"   (also: info = "Exam information",
  *                                    note <title>, passage <title> (a reading text), panel <title>, words = a box of words)
+ *   ::: mistakes · tip · help · you  the small boxes of a vocabulary book: "Common mistakes", "Tip", "Language help", "Your turn"
+ *   ::: email <subject> · letter <heading> · ad <title> · news <headline> · web <title>      a text as it looks in real life
+ *   ::: chat                         a conversation, one "Name: what they say" on every line
+ *   ::: footnotes                    the meanings under a text: "1 a meaning" lines, for the words marked with ^1^ in it
  *   ::: task [1] Match the two parts of these collocations.      a numbered exercise, closed by ":::"
  *       Questions 1-5                the exam box: the lines right after it are its (italic) instructions
  *       Box: rain, wisdom, hair      a box of words
- *       @match · @flow · @tfng · @yng · @labels F, I, N
+ *       @match · @flow · @tfng · @yng · @labels F, I, N · @chat (a conversation with gaps) · @cols (short questions in two columns)
  *       A first heading …            the options of the whole task (headings, endings, features), before the questions
  *       6 What did she …?            a question; under it: A … B … C … (the right one with *), or " = answer" at the end
- *       [answer|other answer]        a gap the student types in; [=example] a gap filled in as an example
+ *       [answer|other answer]        a gap the student types in; [=example] a gap filled in as an example; w[age] = the first
+ *                                    letters are given ("wage" is right as well)
  *       {problem|trouble*}           circle the right word
  *       Why: …                       the explanation of the question above (shown after Check)
+ *
+ *   ^1^ a small raised number (a footnote)
+ *
+ * textOf(blocks) / termsOf(blocks): the text and the bold collocations of the page (never of its exercises) — for the search
+ * and the A–Z index of the book. unitsFromText(text): many units in one text ("=== Title" starts a unit), for the import.
  *
  * Every gap, circled word, question with options, label or match is one point (a question with TWO right options: two).
  */
@@ -27,7 +37,11 @@
 const MAX_TASKS = 120, MAX_SLOTS = 600;
 const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN'], YNNG = ['YES', 'NO', 'NOT GIVEN'];
 const ALIAS = { t: 'TRUE', true: 'TRUE', f: 'FALSE', false: 'FALSE', ng: 'NOT GIVEN', 'not given': 'NOT GIVEN', notgiven: 'NOT GIVEN', y: 'YES', yes: 'YES', n: 'NO', no: 'NO' };
-const BOXES = { advice: 'advice', info: 'info', information: 'info', note: 'note', passage: 'passage', text: 'passage', panel: 'panel', words: 'words', box: 'words' };
+const BOXES = { advice: 'advice', info: 'info', information: 'info', note: 'note', passage: 'passage', text: 'passage', panel: 'panel', words: 'words', box: 'words',
+  mistakes: 'mistakes', mistake: 'mistakes', tip: 'tip', help: 'help', you: 'you', followup: 'you',
+  email: 'email', mail: 'email', letter: 'letter', ad: 'ad', advert: 'ad', news: 'news', web: 'web', blog: 'web',
+  chat: 'chat', dialogue: 'chat', footnotes: 'footnotes', footnote: 'footnotes' };
+const SPEAKER = /^([A-Z][A-Za-z.'’ -]{0,22}):\s+(\S.*)$/;
 
 const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 /* how answers are compared: case, curly quotes, a full stop at the end and double spaces do not matter */
@@ -42,7 +56,8 @@ function fmt(s) {
     .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?![\w*])/g, '$1<i>$2</i>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/==([^=]+)==/g, '<mark>$1</mark>')
-    .replace(/~~([^~]+)~~/g, '<s>$1</s>');
+    .replace(/~~([^~]+)~~/g, '<s>$1</s>')
+    .replace(/\^([0-9a-z]{1,3})\^/gi, '<sup>$1</sup>');
 }
 const plain = (s) => fmt(String(s).replace(/\\([[\]{}])/g, '$1'));
 /* the cells of a table row: a | inside [a|b] or {a|b} does not end a cell */
@@ -72,19 +87,23 @@ function parse(src, opts) {
     s = String(s);
     if (!T) return plain(s);
     let out = ''; let last = 0; let m;
+    const held = [];           // what must not be formatted (a gap …): kept apart while the whole sentence is formatted, so **bold [gap]** works
+    const hold = (html) => { held.push(html); return '\ue000' + (held.length - 1) + '\ue001'; };
+    s = s.replace(/[\ue000\ue001]/g, '');
     const re = /\\([[\]{}])|\[(=?)([^[\]]*)\]|\{([^{}|]*(?:\|[^{}|]*)+)\}/g;
     while ((m = re.exec(s))) {
-      out += fmt(s.slice(last, m.index)); last = re.lastIndex;
-      if (m[1]) { out += esc(m[1]); continue; }
+      out += s.slice(last, m.index); last = re.lastIndex;
+      if (m[1]) { out += hold(esc(m[1])); continue; }
       if (m[0][0] === '[') {
         const body = m[3].trim();
-        if (m[2]) { out += '<span class="ebk-eg">' + esc(body) + '</span>'; continue; }
+        if (m[2]) { out += hold('<span class="ebk-eg">' + esc(body) + '</span>'); continue; }
         const answers = body.split('|').map((a) => a.trim()).filter(Boolean);
         if (!answers.length) { err(n, 'an empty gap [ ]: write its answer inside, e.g. [most important].'); continue; }
-        const id = slot(T, { k: 'gap', a: answers.slice(0, 10) }, n);
+        const pre = (/([A-Za-z]+)$/.exec(s.slice(0, m.index)) || [])[1] || '';   // w[age]: the first letters are given
+        const id = slot(T, pre ? { k: 'gap', a: answers.slice(0, 5).concat(answers.slice(0, 5).map((a) => pre + a)), s: answers.slice(0, 5).map((a) => pre + a) } : { k: 'gap', a: answers.slice(0, 10) }, n);
         if (!id) continue;
         const num = inItem ? 0 : T.qn++;
-        out += '<span class="ebk-slot" data-k="gap" data-a="' + id + '"' + (num ? ' data-n="' + num + '"' : '') + '></span>';
+        out += hold('<span class="ebk-slot" data-k="gap" data-a="' + id + '"' + (num ? ' data-n="' + num + '"' : '') + '></span>');
       } else {
         const raw = m[4].split('|').map((o) => o.trim());
         const right = raw.filter((o) => /^\*|\*$/.test(o));
@@ -92,10 +111,22 @@ function parse(src, opts) {
         if (options.length < 2) { err(n, 'circle the right word: give at least two words, e.g. {problem|trouble*}.'); continue; }
         if (right.length !== 1) { err(n, 'circle the right word: mark exactly one word with *, e.g. {problem*|trouble}.'); continue; }
         const id = slot(T, { k: 'pick', a: right[0].replace(/^\*\s*|\s*\*$/g, '').trim(), o: options }, n);
-        if (id) out += '<span class="ebk-slot" data-k="pick" data-a="' + id + '" data-o="' + esc(options.join('|')) + '"></span>';
+        if (id) out += hold('<span class="ebk-slot" data-k="pick" data-a="' + id + '" data-o="' + esc(options.join('|')) + '"></span>');
       }
     }
-    return out + fmt(s.slice(last));
+    return fmt(out + s.slice(last)).replace(/\ue000(\d+)\ue001/g, (_, k) => held[+k]);
+  }
+  /* "Name: what they say" lines; a line without a name goes on with the one above */
+  function chatRows(list, T) {
+    const rows = [];
+    for (const { s: raw, n } of list) {
+      const t = raw.trim(); if (!t) continue;
+      const m = SPEAKER.exec(t);
+      if (m) rows.push({ who: plain(m[1]), html: inline(m[2], T, n, false) });
+      else if (rows.length) rows[rows.length - 1].html += ' ' + inline(t, T, n, false);
+      else rows.push({ who: '', html: inline(t, T, n, false) });
+    }
+    return rows;
   }
   function slot(T, entry, n) {
     if (slotCount >= MAX_SLOTS) { err(n, `keep at most ${MAX_SLOTS} questions in one unit.`); return null; }
@@ -162,7 +193,7 @@ function parse(src, opts) {
     taskCount++;
     if (taskCount > MAX_TASKS) { err(n0, `keep at most ${MAX_TASKS} exercises in one unit.`); return null; }
     const T = { id: 't' + taskCount, slots: 0, points: 0, qn: 1 };
-    const out = { t: 'task', id: T.id, num: '', instr: '', qtitle: '', rubric: [], words: [], options: [], mopts: [], labels: null, legend: '', layout: '', body: [], points: 0 };
+    const out = { t: 'task', id: T.id, num: '', instr: '', qtitle: '', rubric: [], words: [], options: [], mopts: [], labels: null, legend: '', layout: '', cols: 0, body: [], points: 0 };
     let h = head.trim(); const nm = /^(\d{1,2}(?:\.\d{1,2})?)(?:\s+|$)(.*)$/.exec(h); if (nm) { out.num = nm[1]; h = nm[2]; }
     const instr = h ? [h] : [];
     let mode = ''; let custom = null; const extras = [];
@@ -177,9 +208,11 @@ function parse(src, opts) {
       const t = raw.trim(); let m;
       if (!t) { blank = true; endItem(); if (stage !== 'body' && stage !== 'head') stage = 'body'; if (text) text.push({ s: '', n }); continue; }
       const wasBlank = blank; blank = false;
-      if ((m = /^@\s*(match|flow|tfng|yng|labels?)\b\s*(.*)$/i.exec(t))) {
+      if ((m = /^@\s*(match|flow|tfng|yng|labels?|chat|dialogue|cols|columns)\b\s*(.*)$/i.exec(t))) {
         const k = m[1].toLowerCase();
         if (k === 'flow') out.layout = 'flow';
+        else if (k === 'chat' || k === 'dialogue') { out.layout = 'chat'; stage = 'body'; }
+        else if (k === 'cols' || k === 'columns') out.cols = Math.min(3, Math.max(2, parseInt(m[2], 10) || 2));
         else if (k === 'match') mode = 'match';
         else if (k === 'tfng' || k === 'yng') mode = k;
         else { custom = m[2].split(/[,/;]|\s{2,}/).map((x) => x.trim()).filter(Boolean).slice(0, 8); mode = 'labels'; if (custom.length < 2) err(n, '@labels needs two or more labels, e.g. @labels F, I, N.'); }
@@ -249,6 +282,7 @@ function parse(src, opts) {
       if (p.k === 'qtitle') { T.qn = p.start; out.body.push({ t: 'qtitle', html: p.html, rubric: p.rubric || [] }); continue; }
       if (p.k === 'text') {
         if (out.layout === 'flow') p.lines.filter((x) => x.s.trim()).forEach((x) => out.body.push(...textBlocks([x], T, false)));   // a flow-chart: every line is a box
+        else if (out.layout === 'chat') out.body.push({ t: 'chat', rows: chatRows(p.lines, T) });
         else out.body.push(...textBlocks(p.lines, T, false));
         continue;
       }
@@ -312,17 +346,115 @@ function parse(src, opts) {
     if (!closed) err(start, `close "::: ${kind}" with a line ":::".`);
     if (kind === 'task' || kind === 'exercise') { const b = task(rest, body, start); if (b) blocks.push(b); continue; }
     const box = BOXES[kind];
-    if (!box) { err(start, `"::: ${kind}" is not known: use task, advice, info, note, passage, panel or words.`); continue; }
+    if (!box) { err(start, `"::: ${kind}" is not known: use task, advice, info, note, passage, panel, words, mistakes, tip, help, you, email, letter, ad, news, web, chat or footnotes.`); continue; }
     if (box === 'words') { blocks.push({ t: 'box', kind: 'words', title: plain(rest), words: body.map((x) => x.s).join(',').split(/\s*[,;]\s*/).map((w) => w.trim()).filter(Boolean).slice(0, 80) }); continue; }
+    if (box === 'chat') { const rows = chatRows(body, null); if (!rows.length) err(start, 'an empty conversation: write "Name: what they say" lines.'); blocks.push({ t: 'box', kind: 'chat', title: plain(rest), rows }); continue; }
+    if (box === 'footnotes') {
+      const rows = [];
+      for (const { s: raw, n } of body) {
+        const x = raw.trim(); if (!x) continue;
+        const fm = /^(\d{1,2}|[a-z])[.)]?\s+(\S.*)$/.exec(x);
+        if (fm) rows.push({ n: fm[1], html: inline(fm[2], null, n) }); else if (rows.length) rows[rows.length - 1].html += ' ' + inline(x, null, n); else rows.push({ n: '', html: inline(x, null, n) });
+      }
+      blocks.push({ t: 'box', kind: 'footnotes', title: plain(rest), rows }); continue;
+    }
+    const meta = [];
+    while (box === 'email' && body.length) {
+      const hm = /^(From|To|Cc|Date|Subject|Sent)\s*:\s*(.+)$/i.exec(body[0].s.trim());
+      if (!hm) break;
+      meta.push([hm[1].charAt(0).toUpperCase() + hm[1].slice(1).toLowerCase(), plain(hm[2])]); body.shift();
+    }
     let source = '';
-    if (box === 'passage') {
+    if (box === 'passage' || box === 'news') {
       let k = body.length - 1; while (k >= 0 && !body[k].s.trim()) k--;
       if (k >= 0 && /^(?:source\s*:|adapted from\b|from\b)/i.test(body[k].s.trim())) { source = plain(body[k].s.trim().replace(/^source\s*:\s*/i, '')); body.splice(k, 1); }
     }
-    blocks.push({ t: 'box', kind: box, title: plain(rest), source, blocks: textBlocks(body, null, false) });
+    blocks.push({ t: 'box', kind: box, title: plain(rest), source, meta, blocks: textBlocks(body, null, false) });
   }
   flush();
   return { blocks, key, points, tasks: taskCount, errors };
+}
+
+/* ───────── the text and the collocations of a page (its exercises are never read: their answers stay on the server) ───────── */
+const strip = (html) => String(html == null ? '' : html).replace(/<sup>.*?<\/sup>/g, '').replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+function htmlOf(blocks) {
+  const out = [];
+  for (const b of blocks || []) {
+    if (b.t === 'task') continue;
+    if (b.t === 'sec') { out.push(b.html + (b.sub ? ' ' + b.sub : '')); continue; }
+    if (b.t === 'box') {
+      if (b.title) out.push(b.title);
+      if (b.words) out.push(b.words.map(esc).join(', '));
+      (b.rows || []).forEach((r) => out.push((r.who ? r.who + ': ' : '') + r.html));
+      out.push(...htmlOf(b.blocks));
+      continue;
+    }
+    if (b.items) out.push(...b.items);
+    else if (b.rows) b.rows.forEach((r) => out.push(...r));
+    else if (b.html) out.push(b.html);
+  }
+  return out;
+}
+const textOf = (blocks) => htmlOf(blocks).map(strip).filter(Boolean);
+/* the collocations of a page: what is bold in it, with its sentence */
+function termsOf(blocks) {
+  const seen = new Map();
+  for (const html of htmlOf(blocks)) {
+    const re = /<b>(.*?)<\/b>/g; let m;
+    while ((m = re.exec(html))) {
+      const w = strip(m[1]).replace(/^[\s,.;:]+|[\s,.;:]+$/g, ''); const k = norm(w);
+      if (/:\s*$/.test(m[1]) || /[A-Za-z]$/.test(html.slice(0, m.index)) || /^[A-Za-z]/.test(html.slice(re.lastIndex))) continue;   // the name of a speaker, a part of a word (thir**teen**)
+      if (!w || w.length < 3 || w.length > 60 || /^(?:not|and|or|but|the)$/i.test(w) || seen.has(k)) continue;
+      const all = strip(html.slice(0, m.index) + '\ue000' + m[0] + '\ue001' + html.slice(re.lastIndex));
+      const a = all.indexOf('\ue000'); let from = Math.max(all.lastIndexOf('. ', a), all.lastIndexOf('? ', a), all.lastIndexOf('! ', a)); from = from < 0 ? 0 : from + 2;
+      const z = all.slice(a).search(/[.?!](?:\s|$)/); const to = z < 0 ? all.length : a + z + 1;
+      seen.set(k, { w, s: all.slice(from, to).replace(/[\ue000\ue001]/g, '').trim().slice(0, 240) });
+    }
+  }
+  return [...seen.values()];
+}
+
+/* ───────── many units in one text (Admin → E-books → Import) ─────────
+     == The name of a part of the book            (optional: the units under it belong to it)
+     === The title of the unit                    (or: === The title | its part)
+     kind: vocabulary                             (optional lines: kind, minutes, part, summary, audio, test, hidden: yes)
+     ---
+     # [A] …                                      the book page of the unit                                              */
+const META = /^(kind|minutes|group|part|summary|audio|test|hidden)\s*:\s*(.*)$/i;
+function unitsFromText(src) {
+  const lines = String(src == null ? '' : src).replace(/^\ufeff/, '').replace(/\r/g, '').split('\n');
+  const out = []; let cur = null; let group = '';
+  lines.forEach((l, n) => {
+    const g = /^==\s+([^=].*?)\s*(?:==)?$/.exec(l);
+    if (g) { group = g[1].trim(); cur = null; return; }
+    const m = /^={3,}\s*([^=].*?)\s*=*$/.exec(l);
+    if (m) {
+      const parts = m[1].split(/\s+\|\s+/);
+      cur = { title: parts[0].replace(/^(?:unit\s+)?\d{1,3}[.:)]\s+/i, '').trim(), group: (parts[1] || group).trim(), kind: 'lesson', minutes: 0, summary: '', audio: '', test: '', published: true, content: '', line: n + 1, body: [], head: true };
+      out.push(cur); return;
+    }
+    if (!cur) return;
+    if (cur.head) {
+      const k = META.exec(l.trim());
+      if (k) {
+        const name = k[1].toLowerCase(), v = k[2].trim();
+        if (name === 'hidden') cur.published = !/^(?:yes|true|1)$/i.test(v);
+        else if (name === 'part') cur.group = v;
+        else if (name === 'minutes') cur.minutes = parseInt(v, 10) || 0;
+        else cur[name] = v;
+        return;
+      }
+      if (!l.trim()) return;
+      cur.head = false;
+      if (/^-{3,}$/.test(l.trim())) return;
+    }
+    cur.body.push(l);
+  });
+  return out.map((u) => { const { body, head, ...x } = u; x.content = body.join('\n').trim(); return x; });
+}
+function unitsToText(units) {
+  return (units || []).map((u) => ['=== ' + u.title + (u.group ? ' | ' + u.group : ''), 'kind: ' + (u.kind || 'lesson'), u.minutes ? 'minutes: ' + u.minutes : '', u.summary ? 'summary: ' + String(u.summary).replace(/\s+/g, ' ') : '',
+    u.audio ? 'audio: ' + u.audio : '', u.test ? 'test: ' + u.test : '', u.published === false ? 'hidden: yes' : '', '---', u.content || ''].filter(Boolean).join('\n')).join('\n\n') + '\n';
 }
 
 /* the simple exercises of a unit (Admin → E-books → Exercises) as one task at the end, with the same key */
@@ -372,9 +504,9 @@ function isRight(k, given) {
 }
 /* the answer to show after Check */
 function shown(k) {
-  if (k.k === 'gap') return k.a.join(' / ');
+  if (k.k === 'gap') return (k.s || k.a).join(' / ');
   if (k.k === 'choice') return k.a.join(', ');
   return String(k.a);
 }
 
-module.exports = { parse, legacyTask, isRight, shown, norm, TFNG, YNNG };
+module.exports = { parse, legacyTask, isRight, shown, norm, textOf, termsOf, unitsFromText, unitsToText, TFNG, YNNG };
