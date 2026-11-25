@@ -303,17 +303,30 @@ const isFull = (material) => !!(material && material.data && material.data.mode 
 /* a Part test in the "Pre-test" pack has up to 49 questions, numbered from 1, whatever the passage tag says */
 const isPreTest = (material) => !isFull(material) && /^pre[\s_-]*test$/i.test(String((material && material.pack) || '').trim());
 
+/* The words of the Vocabulary tab (the modern answer review), one per line as typed in the admin panel:
+     word (part of speech) | definition | translation | example        (or columns copied from a table)
+   Two columns are the word and its translation: "venerable | hurmatli". */
+function vocabularyOf(text) {
+  const seen = new Set();
+  return String(text || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 80).map((l) => {
+    const c = l.split(l.includes('\t') ? '\t' : '|').map((x) => x.trim());
+    const m = /^(.*?)\s*\(([^)]{1,24})\)\s*$/.exec(c[0]) || [null, c[0], ''];
+    const word = String(m[1] || '').replace(/^\d+[.)]\s*/, '').trim(); if (!word) return null;
+    const two = c.length === 2;
+    return { word, pos: m[2] || '', def: two ? '' : c[1] || '', uz: two ? c[1] : c[2] || '', model: c[3] || '' };
+  }).filter((w) => { const k = w && w.word.toLowerCase(); if (!k || seen.has(k)) return false; seen.add(k); return true; });
+}
 /* The passages of a test: one for a "part" test, three for a "full" test. Pictures and questions
    carry the number of the passage they belong to (default 1). */
 function passagesOf(material) {
   const d = material.data || {};
   const imgs = Array.isArray(d.images) ? d.images : [];
-  if (!isFull(material)) return [{ no: isPreTest(material) ? 1 : partSlot(d), title: material.title, text: d.passage, images: imgs }];
+  if (!isFull(material)) return [{ no: isPreTest(material) ? 1 : partSlot(d), title: material.title, text: d.passage, vocab: d.vocabText, images: imgs }];
   const ps = Array.isArray(d.passages) ? d.passages : [];
   return [1, 2, 3].map((i) => {
     const p = ps[i - 1] || {};
     return { no: i, title: String(p.title || '').trim() || (String(p.passage || '').trim() ? material.title + ' \u2014 Passage ' + i : ''),
-      text: p.passage, images: imgs.filter((im) => (Number(im && im.passage) || 1) === i) };
+      text: p.passage, vocab: p.vocabText, images: imgs.filter((im) => (Number(im && im.passage) || 1) === i) };
   });
 }
 
@@ -334,7 +347,7 @@ function buildData(material) {
     const passage = { title: esc(ps.title || material.title), content: passageHtml({ images: ps.images, passage: ps.text }, ps.title || material.title) };
     if (b.headings.length) { passage.headings = b.headings; passage.headingSlots = b.slots; }
     PASSAGES[ps.no] = passage;
-    VOCAB[ps.no] = { passageTitle: passage.title, words: [] };
+    VOCAB[ps.no] = { passageTitle: passage.title, words: vocabularyOf(ps.vocab) };
   });
   // explanation per question number (numbers follow passage order, exactly as the sections above)
   const expl = {}; let n = first;
@@ -375,8 +388,11 @@ function buildExamHtml(material, templates) {
       .split('Dark Chocolate&rsquo;s Health-giving Benefits').join(title).split('Dark Chocolate\u2019s Health-giving Benefits').join(title);
   }
   html = html.replace(/(href|src)="(?:\.\.\/)+/g, '$1="/');
+  // the look chosen for this test in the admin panel (assets/js/reading-ui.js reads it; none = the default of the website)
+  const look = String((material.data && material.data.ui) || '');
+  if (look === 'classic' || look === 'modern') html = html.replace(/<html\b/i, '<html data-rui-test="' + look + '"');
   if (Object.values(b.SECTIONS).some((list) => list.some((sec) => sec.dg))) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/css/diagram.css">\n</head>');
   return html;
 }
 
-module.exports = { buildExamHtml, buildData, isFull, isPreTest, inheritGroups };
+module.exports = { buildExamHtml, buildData, isFull, isPreTest, inheritGroups, vocabularyOf };

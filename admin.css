@@ -948,3 +948,19 @@ input.cb-inline{display:inline-block;width:72px;padding:2px 6px;margin:0 2px}
 .dg-row textarea.field{min-height:44px}
 .dg-act{display:flex;flex-wrap:wrap;gap:4px;max-width:150px}.dg-act .btn{min-width:30px;padding:5px 7px}.dg-act .is-on{border-color:#2563eb;color:#2563eb;background:rgba(37,99,235,.08)}
 @media (max-width:760px){.ps-row{grid-template-columns:54px minmax(0,1fr)}.ps-act{grid-column:1/-1;grid-template-columns:130px 1fr;align-items:center}.dg-row{grid-template-columns:44px minmax(0,1fr)}.dg-act{grid-column:1/-1;max-width:none}}
+
+/* ───────── Reading interface: the two looks of a Reading test (admin-reading-ui.js, the form in admin-content.js) ───────── */
+.rui-looks{display:grid;grid-template-columns:repeat(2,minmax(0,360px));gap:14px;margin:6px 0 14px}
+.rui-look{display:flex;flex-direction:column;gap:8px;padding:10px 10px 14px;border:1.5px solid var(--line);border-radius:14px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.rui-look img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:9px;background:#fff}
+.rui-look strong,.rui-look>.muted{padding:0 4px}
+.rui-look:hover,.rui-pick:hover{border-color:var(--accent)}
+.rui-look.on,.rui-pick.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.rui-picks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.rui-pick{display:flex;align-items:center;gap:12px;padding:9px;border:1.5px solid var(--line);border-radius:11px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;min-width:0}
+.rui-pick img,.rui-pick-auto{width:96px;height:60px;flex:none;border:1px solid var(--line);border-radius:7px;background:#fff;object-fit:cover}
+.rui-pick-auto{display:grid;place-items:center;font-weight:600;color:#64748b}
+.rui-pick>span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rui-group td{background:color-mix(in srgb,currentColor 4%,transparent)}
+.pc-look{width:auto;max-width:100%;padding:3px 8px;font-size:12px;border-radius:99px}
+@media (max-width:860px){.rui-looks,.rui-picks{grid-template-columns:minmax(0,1fr)}}

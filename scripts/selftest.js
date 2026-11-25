@@ -251,6 +251,39 @@ server.listen(0, async () => {
     await call('POST', '/api/admin/branding', { jar: boss, body: { logoUrl: '', iconUrl: '' } });
     assert.equal((await call('GET', '/api/branding')).json.logoUrl, ''); ok('site logo: admin only, links checked, public read');
 
+    // --- the look of the Reading tests (assets/js/reading-ui.js): the default, a student's choice, the look and the words of a test
+    {
+      r = await call('GET', '/api/reading-ui'); assert.deepEqual([r.json.default, r.json.choice, r.json.pref, r.json.signedIn], ['classic', true, '', false], 'classic until the admin changes it');
+      assert.equal((await call('POST', '/api/account/reading-ui', { body: { ui: 'modern' } })).status, 401);
+      assert.equal((await call('POST', '/api/account/reading-ui', { jar: user, body: { ui: 'modern' } })).json.pref, 'modern');
+      assert.equal((await call('GET', '/api/reading-ui', { jar: user })).json.pref, 'modern'); assert.equal((await call('GET', '/api/reading-ui', { jar: boss })).json.pref, '', 'each account has its own');
+      assert.equal((await call('POST', '/api/account/reading-ui', { jar: user, body: { ui: '"><script>' } })).json.pref, '', 'an unknown look is no choice');
+      assert.equal((await call('POST', '/api/admin/reading-ui', { jar: user, body: { default: 'modern' } })).status, 403); assert.equal((await call('GET', '/api/admin/reading-ui', { jar: user })).status, 403);
+      r = await call('POST', '/api/admin/reading-ui', { jar: boss, body: { default: 'modern', choice: false, pages: { '/full-tests/reading/test-1.html': 'classic', '/pessages/test-19': 'modern', '/full-tests/reading/test-2': 'x', '/admin': 'modern' } } });
+      assert.equal(r.status, 200); assert.deepEqual(r.json.config.pages, { '/full-tests/reading/test-1': 'classic', '/pessages/test-19': 'modern' }, 'only reading pages and known looks are kept');
+      r = await call('GET', '/api/reading-ui', { jar: user }); assert.deepEqual([r.json.default, r.json.choice], ['modern', false]);
+      assert.equal((await call('POST', '/api/account/reading-ui', { jar: user, body: { ui: 'classic' } })).status, 403, 'no choice while the admin keeps it');
+      await call('POST', '/api/admin/reading-ui', { jar: boss, body: {} });
+      assert.deepEqual((await call('GET', '/api/reading-ui')).json.default, 'classic');
+      r = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'reading', title: 'Look test', published: true, data: { mode: 'part', passage: 'Resin is a sticky substance.', ui: 'modern', vocabText: 'resin (n) | a sticky substance | smola | The resin hardens.\nsticky | yopishqoq\nresin | again', questions: [{ type: 'tfng', prompt: 'Resin is sticky.', answer: 'TRUE' }] } } });
+      const look = r.json.item; assert.equal(look.data.ui, 'modern');
+      const lookPage = async () => (await call('GET', '/exam/reading/' + look.id)).text;
+      let lp = await lookPage(); assert.ok(lp.includes('<html data-rui-test="modern"') && lp.includes('/assets/js/reading-ui.js') && lp.includes('/assets/css/reading-modern.css'));
+      const words = require('../reading-exam').buildData(look).VOCAB[1].words;
+      assert.deepEqual(words.map((w) => [w.word, w.pos, w.def, w.uz, w.model]), [['resin', 'n', 'a sticky substance', 'smola', 'The resin hardens.'], ['sticky', '', '', 'yopishqoq', '']]);
+      assert.equal((await call('PATCH', '/api/admin/materials/' + look.id, { jar: user, body: { ui: 'classic' } })).status, 403);
+      r = await call('PATCH', '/api/admin/materials/' + look.id, { jar: boss, body: { ui: 'classic' } }); assert.equal(r.json.item.data.ui, 'classic'); assert.equal(r.json.item.data.questions.length, 1, 'only the look changes'); assert.equal(r.json.item.data.no, look.data.no);
+      assert.ok((await lookPage()).includes('<html data-rui-test="classic"'));
+      await call('PATCH', '/api/admin/materials/' + look.id, { jar: boss, body: { ui: 'nonsense' } }); assert.ok(!(await lookPage()).includes('data-rui-test'), 'no look of its own: the default');
+      await call('DELETE', '/api/admin/materials/' + look.id, { jar: boss });
+      // every page of the shared engine loads the two files, after reading.css
+      const pagesDir = path.join(__dirname, '..');
+      for (const f of ['pessages/test-19.html', 'full-tests/reading/test-1.html', 'full-tests/reading/test-2.html', 'full-tests/reading/test-v9-7.html']) {
+        const t = fs.readFileSync(path.join(pagesDir, f), 'utf8'); assert.ok(t.indexOf('reading.css') < t.indexOf('/assets/css/reading-modern.css') && t.includes('<script src="/assets/js/reading-ui.js"></script>'), f);
+      }
+      ok('reading interface: default, choice of a student, look and words of a test, admin only');
+    }
+
     // --- site design (Admin -> Design, the Settings page, assets/js/site-design.js)
     r = await call('GET', '/api/design');
     assert.equal(r.status, 200); assert.equal(r.json.default, 'classic'); assert.equal(r.json.defaultEffect, ''); assert.deepEqual(r.json.themes, []);
