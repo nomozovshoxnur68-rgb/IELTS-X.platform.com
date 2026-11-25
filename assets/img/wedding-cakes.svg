@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" role="img" aria-label="Three wedding cakes: a tall decorated cake, a cake whose parts stand apart, and a tower of cakes one on top of another">
+  <rect width="720" height="360" fill="#ffffff"/>
+  <g stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <!-- a decorated cake -->
+    <g fill="#fdf2f8">
+      <rect x="40" y="244" width="170" height="64" rx="4"/><rect x="62" y="184" width="126" height="60" rx="4"/><rect x="84" y="128" width="82" height="56" rx="4"/>
+      <path d="M40 258c10 14 18 14 28 0 10 14 18 14 28 0 10 14 18 14 28 0 10 14 18 14 28 0 10 14 18 14 28 0 10 14 18 14 30 0" fill="none"/>
+      <path d="M62 198c9 12 16 12 25 0 9 12 16 12 25 0 9 12 16 12 25 0 9 12 16 12 25 0 9 12 16 12 26 0" fill="none"/>
+      <path d="M84 142c8 11 14 11 21 0 7 11 13 11 20 0 7 11 13 11 20 0 7 11 13 11 21 0" fill="none"/>
+      <g fill="#f9a8d4"><circle cx="125" cy="118" r="8"/><circle cx="109" cy="121" r="6"/><circle cx="141" cy="121" r="6"/><circle cx="76" cy="180" r="5"/><circle cx="174" cy="180" r="5"/><circle cx="54" cy="240" r="5"/><circle cx="196" cy="240" r="5"/></g>
+      <path d="M125 110v-14m0 0c-10-10 6-16 0-4 6-12 18-2 0 4z" fill="#fff"/>
+    </g>
+    <path d="M24 308h202" stroke-width="4"/>
+    <!-- a cake whose parts stand apart -->
+    <g fill="#fefce8">
+      <rect x="276" y="264" width="170" height="44" rx="4"/><rect x="300" y="180" width="122" height="42" rx="4"/><rect x="324" y="100" width="74" height="40" rx="4"/>
+      <g fill="#ffffff"><path d="M312 222h14v42h-14zM354 222h14v42h-14zM396 222h14v42h-14zM334 140h12v40h-12zM376 140h12v40h-12z"/><path d="M308 222h22M350 222h22M392 222h22M308 264h22M350 264h22M392 264h22M330 140h20M372 140h20M330 180h20M372 180h20" fill="none" stroke-width="4"/></g>
+      <path d="M361 100c-18-18 10-30 0-8 10-22 34-8 0 8z" fill="#fecaca"/>
+    </g>
+    <path d="M260 308h202" stroke-width="4"/>
+    <!-- a tower -->
+    <g fill="#f0f9ff">
+      <rect x="512" y="262" width="168" height="46" rx="3"/><rect x="530" y="216" width="132" height="46" rx="3"/><rect x="548" y="170" width="96" height="46" rx="3"/><rect x="566" y="124" width="60" height="46" rx="3"/>
+      <path d="M512 274h168M530 228h132M548 182h96M566 136h60" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+      <path d="M512 262h168M530 216h132M548 170h96" fill="none" stroke="#0ea5e9" stroke-width="5"/>
+      <path d="M596 124V92m0 0c12-4 12 12 0 10" fill="none"/>
+    </g>
+    <path d="M496 308h202" stroke-width="4"/>
+  </g>
+</svg>

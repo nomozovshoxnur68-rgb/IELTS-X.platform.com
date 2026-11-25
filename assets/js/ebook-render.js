@@ -2,8 +2,11 @@
  * IELTSX — draws the book page of an e-book unit (the blocks of ebook-doc.js, sent by /api/ebooks) in the look of its
  * book: the website's own, a course book (magenta), a workbook (grey) or a vocabulary book "In Use" (green) — the styles
  * are in assets/css/ebook-book.css. Used by the Books page (assets/js/ebooks-page.js) and by the preview of Admin → E-books.
- *   IXEbook.head(style, n, title)    the "Unit 1  Title" header of the book
- *   IXEbook.page(blocks, opts)       the HTML of the page: sections, boxes, passages, exercises with their inputs
+ *   IXEbook.sheet(blocks, opts)      the whole page of a unit: its header, its text and its exercises. opts: { style, unit (its
+ *                                    number), title, summary, book (the name of the book) }. A vocabulary book ("In Use") is a
+ *                                    spread: the green page (header, A, B, C) and the white page (Exercises 1.1, 1.2 …), side by
+ *                                    side on a wide screen (.is-two on a parent), one under the other on a narrow one
+ *   IXEbook.head / IXEbook.page      its two parts (the header · the sections, boxes, passages and exercises)
  *   IXEbook.bind(root, onCheck)      makes the inputs work (circle a word, two options at most …), once per root
  *   IXEbook.collect(root, task)      { answers: { <id>: value }, empty, count } of one exercise (or of the whole page)
  *   IXEbook.mark(root, results)      shows what was right, the right answers and the explanations after Check
@@ -35,6 +38,7 @@
   }
   function textBlock(b) {
     switch (b.t) {
+      case 'chat': return chat(b.rows);
       case 'h2': return '<h3 class="ebk-h2">' + slots(b.html) + '</h3>';
       case 'h3': return '<h4 class="ebk-h3">' + slots(b.html) + '</h4>';
       case 'p': return '<p>' + slots(b.html) + '</p>';
@@ -47,7 +51,26 @@
       default: return '';
     }
   }
+  function chat(rows) {
+    return '<div class="ebk-chat">' + (rows || []).map(function (r) { return '<div class="ebk-say"><b class="ebk-who">' + (r.who ? r.who + ':' : '') + '</b><span>' + slots(r.html) + '</span></div>'; }).join('') + '</div>';
+  }
+  /* the small boxes of a vocabulary book: the words of the tab (the last one in colour) */
+  var TABS = { mistakes: ['Common', 'mistakes'], tip: ['Tip', ''], help: ['Language', 'help'], you: ['Your', 'turn'] };
+  var DOTS = '<span class="ebk-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
   function box(b) {
+    if (b.kind === 'chat') return (b.title ? '<h4 class="ebk-h3">' + b.title + '</h4>' : '') + '<div class="ebk-talk">' + chat(b.rows) + '</div>';
+    if (b.kind === 'footnotes') return '<div class="ebk-notes">' + (b.title ? '<b class="ebk-notes-t">' + b.title + '</b>' : '') + (b.rows || []).map(function (r) { return '<p>' + (r.n ? '<sup>' + esc(r.n) + '</sup> ' : '') + r.html + '</p>'; }).join('') + '</div>';
+    if (TABS[b.kind]) {
+      var t = TABS[b.kind];
+      return '<aside class="ebk-tab ebk-tab-' + b.kind + '"><div class="ebk-tab-h">' + t[0] + (t[1] ? ' <em>' + t[1] + '</em>' : '') + '</div><div class="ebk-tab-b">' + (b.title ? '<p class="ebk-tab-t">' + b.title + '</p>' : '') + (b.blocks || []).map(textBlock).join('') + '</div></aside>';
+    }
+    if (b.kind === 'email') {
+      return '<div class="ebk-mail"><div class="ebk-mail-h">' + DOTS + '<span class="ebk-mail-a" aria-hidden="true"><u>Reply</u><u>Forward</u></span></div>'
+        + (b.title || (b.meta && b.meta.length) ? '<div class="ebk-mail-m">' + (b.meta || []).map(function (m) { return '<div><b>' + esc(m[0]) + ':</b> ' + m[1] + '</div>'; }).join('') + (b.title ? '<div><b>Subject:</b> ' + b.title + '</div>' : '') + '</div>' : '')
+        + '<div class="ebk-mail-b">' + (b.blocks || []).map(textBlock).join('') + '</div></div>';
+    }
+    if (b.kind === 'web') return '<div class="ebk-web"><div class="ebk-web-h">' + DOTS + '<span>' + (b.title || '') + '</span></div><div class="ebk-web-b">' + (b.blocks || []).map(textBlock).join('') + '</div></div>';
+    if (b.kind === 'letter' || b.kind === 'ad' || b.kind === 'news') return '<div class="ebk-' + b.kind + '">' + (b.title ? '<div class="ebk-' + b.kind + '-h">' + b.title + '</div>' : '') + '<div class="ebk-' + b.kind + '-b">' + (b.blocks || []).map(textBlock).join('') + '</div>' + (b.source ? '<p class="ebk-src">' + b.source + '</p>' : '') + '</div>';
     if (b.kind === 'words') return '<div class="ebk-words">' + (b.title ? '<b class="ebk-words-t">' + b.title + '</b>' : '') + b.words.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('') + '</div>';
     var inner = (b.blocks || []).map(textBlock).join('');
     if (b.kind === 'advice' || b.kind === 'info') return '<aside class="ebk-adv"><div class="ebk-adv-h"><span class="ebk-adv-tag">' + (b.kind === 'info' ? 'Exam information' : 'Exam advice') + '</span>' + (b.title ? '<span class="ebk-adv-t">' + b.title + '</span>' : '') + '</div>' + inner + '</aside>';
@@ -78,6 +101,7 @@
   }
   function task(b, label, style) {
     var body = b.body.map(function (x) { return x.t === 'item' ? item(x, b) : textBlock(x); }).join('');
+    if (b.cols) body = '<div class="ebk-cols">' + body + '</div>';
     if (b.layout === 'flow') body = '<div class="ebk-flow">' + b.body.map(function (x) { return '<div class="ebk-step">' + (x.t === 'item' ? item(x, b) : textBlock(x)) + '</div>'; }).join('') + '</div>';
     var legend = b.legend ? '<dl class="ebk-legend">' + LEGEND[b.legend].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>' : '';
     var options = b.options && b.options.length ? '<div class="ebk-olist">' + b.options.map(function (o) { return '<div><b>' + o.l + '</b><span>' + o.html + '</span></div>'; }).join('') + '</div>' : '';
@@ -88,30 +112,45 @@
       ? '<header class="ebk-th"><span class="ebk-tn">' + esc(label) + '</span><div class="ebk-instr">' + (style === 'inuse' ? 'More practice' : 'Exercises') + '</div></header>'
       : (b.instr || label ? '<header class="ebk-th"><span class="ebk-tn">' + esc(label) + '</span><div class="ebk-instr">' + (b.instr || '') + '</div></header>' : '');
     var foot = b.points ? '<div class="ebk-tf"><button class="ebk-btn ebk-check" type="button" data-check-task="' + esc(b.id) + '">' + CHECK + 'Check</button><button class="ebk-btn ghost ebk-again" type="button" data-again-task="' + esc(b.id) + '" hidden>' + AGAIN + 'Try again</button><span class="ebk-tscore" aria-live="polite"></span><span class="ebk-tbest"></span></div>' : '';
-    return '<section class="ebk-task' + (b.points ? '' : ' no-check') + '" data-task="' + esc(b.id) + '" data-points="' + (b.points || 0) + '">' + head
+    return '<section class="ebk-task' + (b.points ? '' : ' no-check') + (b.cols ? ' cols-' + b.cols : '') + '" data-task="' + esc(b.id) + '" data-points="' + (b.points || 0) + '">' + head
       + (b.qtitle ? '<div class="ebk-qbox"><div class="ebk-qtitle">' + b.qtitle + '</div>' + inner + '</div>' : '<div class="ebk-tbody">' + inner + '</div>') + foot + '</section>';
   }
-  /* the page: blocks grouped into the sections of the unit; exercises numbered like the book (per section, or 1.1, 1.2 …) */
-  function page(blocks, opts) {
+  /* the blocks grouped into the sections of the unit; exercises numbered like the book (per section, or 1.1, 1.2 …).
+     right = a part of the exercises page of a vocabulary book: exercises, and no letter */
+  function parts(blocks, opts) {
     opts = opts || {}; var style = opts.style || 'site'; var unitNo = opts.unit || 1;
-    var out = []; var open = false; var seq = 0; var useq = 0; var cur = [];
-    var close = function () { if (!open && !cur.length) return; var hasTask = cur.some(function (h) { return h.indexOf('class="ebk-task') > -1; }); var onlyTask = hasTask && cur.every(function (h) { return h.indexOf('class="ebk-task') > -1 || h.indexOf('class="ebk-sec') > -1; }); out.push('<div class="ebk-part' + (hasTask ? ' has-task' : '') + (onlyTask ? ' only-task' : '') + '">' + cur.join('') + '</div>'); cur = []; open = false; };
+    var out = []; var seq = 0; var useq = 0; var cur = null;
+    var part = function () { if (!cur) { cur = { html: [], tasks: 0, other: 0, letter: '' }; out.push(cur); } return cur; };
     (blocks || []).forEach(function (b) {
       if (b.t === 'sec') {
-        close(); open = true; seq = 0;
-        cur.push('<h2 class="ebk-sec' + (b.letter ? ' has-letter' : '') + '">' + (b.letter ? '<span class="ebk-let">' + esc(b.letter) + '</span>' : '') + '<span class="ebk-sec-t">' + b.html + (b.sub ? ' <em>' + b.sub + '</em>' : '') + '</span></h2>');
+        cur = null; seq = 0; part().letter = b.letter || ''; cur.head = true;
+        cur.html.push('<h2 class="ebk-sec' + (b.letter ? ' has-letter' : '') + '">' + (b.letter ? '<span class="ebk-let">' + esc(b.letter) + '</span>' : '') + '<span class="ebk-sec-t">' + b.html + (b.sub ? ' <em>' + b.sub + '</em>' : '') + '</span></h2>');
         return;
       }
       if (b.t === 'task') {
         seq++; useq++;
-        var label = b.num || (style === 'inuse' ? unitNo + '.' + useq : String(seq));
-        cur.push(task(b, label, style)); return;
+        if (style === 'inuse' && cur && !cur.letter && !cur.tasks && cur.other && !cur.head) cur = null;   // the text before the first exercise belongs to the green page
+        part().tasks++; cur.html.push(task(b, b.num || (style === 'inuse' ? unitNo + '.' + useq : String(seq)), style)); return;
       }
-      if (b.t === 'box') { cur.push(box(b)); return; }
-      cur.push(textBlock(b));
+      part().other++; cur.html.push(b.t === 'box' ? box(b) : textBlock(b));
     });
-    close();
-    return out.join('');
+    return out.map(function (p) {
+      var only = p.tasks && !p.other;
+      return { right: !!p.tasks && !p.letter, html: '<div class="ebk-part' + (p.tasks ? ' has-task' : '') + (only ? ' only-task' : '') + '">' + p.html.join('') + '</div>' };
+    });
+  }
+  function page(blocks, opts) { return parts(blocks, opts).map(function (p) { return p.html; }).join(''); }
+  /* the whole page of a unit */
+  function sheet(blocks, opts) {
+    opts = opts || {}; var style = opts.style || 'site'; var n = opts.unit || 1;
+    if (style !== 'inuse') return '<div class="ebk-page">' + head(style, n, opts.title, opts.summary) + page(blocks, opts) + '</div>';
+    var ps = parts(blocks, opts); var k = ps.length;
+    for (var i = 0; i < ps.length; i++) if (ps[i].right) { k = i; break; }
+    var join = function (l) { return l.map(function (p) { return p.html; }).join(''); };
+    var foot = function (no, side) { var t = '<i>' + esc(opts.book || '') + '</i>'; return '<footer class="ebk-foot ' + side + '">' + (side === 'l' ? '<b>' + no + '</b>' + t : t + '<b>' + no + '</b>') + '</footer>'; };
+    var right = join(ps.slice(k));
+    return '<div class="ebk-page ebk-spread' + (right ? '' : ' one') + '"><section class="ebk-left">' + head(style, n, opts.title, opts.summary) + '<div class="ebk-left-b">' + join(ps.slice(0, k)) + '</div>' + foot(2 * n + 4, 'l') + '</section>'
+      + (right ? '<section class="ebk-right">' + right + foot(2 * n + 5, 'r') + '</section>' : '') + '</div>';
   }
   function head(style, n, title, summary) {
     if (style === 'site') return '';
@@ -197,6 +236,20 @@
     s.querySelectorAll('input,select,button.ebk-pk').forEach(function (x) { x.disabled = false; if (x.type === 'radio' || x.type === 'checkbox') x.checked = false; else if (x.tagName === 'INPUT') { x.value = ''; x.style.width = ''; } else if (x.tagName === 'SELECT') x.value = ''; });
     s.querySelectorAll('.ebk-key,.ebk-fb').forEach(function (x) { x.hidden = true; x.textContent = ''; });
   }
+  /* the answers of an unfinished page back into its inputs ({ <id>: value } as collect() gives them) */
+  function restore(root, answers) {
+    var n = 0;
+    Object.keys(answers || {}).forEach(function (id) {
+      var v = answers[id]; var el = find(root, id); if (!el || v == null || v === '') return;
+      if (el.disabled || (el.closest('.done') && el.closest('.ebk-task'))) return;
+      n++;
+      if (el.classList.contains('ebk-gap')) { el.value = v; el.style.width = Math.min(24, Math.max(7, el.value.length + 2)) + 'ch'; }
+      else if (el.classList.contains('ebk-sel')) el.value = v;
+      else if (el.classList.contains('ebk-pick')) el.querySelectorAll('.ebk-pk').forEach(function (b) { var on = b.getAttribute('data-v') === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      else { var l = String(v).split(','); el.querySelectorAll('input').forEach(function (i) { i.checked = l.indexOf(i.value) > -1; }); }
+    });
+    return n;
+  }
   /* the admin's preview: the answers written in */
   function fill(root, key) {
     Object.keys(key || {}).forEach(function (id) {
@@ -208,5 +261,5 @@
       else if (k.k === 'match') el.value = k.a;
     });
   }
-  window.IXEbook = { STYLES: STYLES, head: head, page: page, bind: bind, collect: collect, mark: mark, reset: reset, fill: fill };
+  window.IXEbook = { STYLES: STYLES, sheet: sheet, head: head, page: page, bind: bind, collect: collect, mark: mark, reset: reset, restore: restore, fill: fill };
 })();

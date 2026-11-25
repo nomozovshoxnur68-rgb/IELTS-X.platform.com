@@ -3,8 +3,9 @@
    .ebk-course    a course book: "Unit 1" in a magenta circle, magenta sections with a blue second word, numbered circles,
                   pale blue "Exam advice" boxes, pink-framed "Questions 1–5" boxes, serif instructions
    .ebk-workbook  the same layout in the greys of a workbook
-   .ebk-inuse     a vocabulary book: a dark green unit number and green title bar, lettered sections A B C on a pale green
-                  page, white "Exercises" with 1.1, 1.2 … in green
+   .ebk-inuse     a vocabulary book, as a spread: the pale green page (a dark green unit number and a green title bar that run
+                  to the edge of the page, lettered sections A B C with their tabs in the margin) and the white page of
+                  "Exercises" with 1.1, 1.2 … in green; "Common mistakes" and "Tip" boxes, e-mails, letters, notes 1 2 3
    Its own tokens (--e-…), so it works on the Books page (.pdp, html.dark-mode) and in the admin (html[data-theme=dark]). */
 .ebk{--e-paper:#fff;--e-ink:#1d2433;--e-muted:#5f6b7d;--e-line:#e3e6ec;--e-soft:#f3f4f7;
   --e-sans:var(--ix-font,var(--font,"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif));
@@ -23,14 +24,15 @@
   --pass-bg:#fffaf0;--pass-line:#eedfbf;--th-bg:#f3d9ea;--th-ink:#5b0f43;--q-font:var(--e-serif);--halo:rgba(140,205,170,.32)}
 .ebk-workbook{--a:#45474d;--b:#6b6f78;--a-soft:rgba(69,71,77,.06);--adv-bg:#eceef1;--adv-tag:#d3d6dc;--adv-ink:#2f3237;--q-line:#c9ccd2;--q-bg:#fafafa;
   --pass-bg:#f7f7f7;--pass-line:#dedede;--th-bg:#e6e7ea;--th-ink:#2f3237;--q-font:var(--e-serif);--halo:rgba(0,0,0,.06)}
-.ebk-inuse{--a:#0b5a33;--a2:#4f7e5b;--b:#0b5a33;--a-soft:rgba(11,90,51,.06);--adv-bg:#e7efe4;--adv-tag:#c6dbc0;--adv-ink:#0b4a2a;--q-line:#bcd3bf;--q-bg:#fff;
-  --pass-bg:#f4f8f2;--pass-line:#d3e2cf;--tint:#e2ebdf;--th-bg:#0b5a33;--th-ink:#fff}
+.ebk-inuse{--a:#05552f;--a2:#3b825e;--b:#05552f;--a-soft:rgba(5,85,47,.06);--adv-bg:#eef5f1;--adv-tag:#c9ddd2;--adv-ink:#0b4a2a;--q-line:#b9d2c5;--q-bg:#fff;
+  --pass-bg:#fff;--pass-line:#cfe0d7;--tint:#ddebe4;--th-bg:#05552f;--th-ink:#fff;--sheet:#fff;--tab:#43454b;--mar:4.6rem;
+  --e-sans:"Source Sans 3","Source Sans Pro","Segoe UI","Noto Sans",system-ui,-apple-system,Roboto,Arial,sans-serif}
 html.dark-mode .ebk,html[data-theme="dark"] .ebk{--e-ok:#4ade80;--e-ok-bg:rgba(74,222,128,.12);--e-bad:#fb923c;--e-bad-bg:rgba(251,146,60,.13);
   --a:#60a5fa;--b:#22d3ee;--a-soft:rgba(96,165,250,.1);--adv-bg:rgba(34,211,238,.09);--adv-tag:rgba(34,211,238,.22);--adv-ink:#a5f3fc;--q-line:rgba(96,165,250,.32);--q-bg:rgba(96,165,250,.04);
   --pass-bg:rgba(255,255,255,.03);--pass-line:rgba(255,255,255,.09);--th-bg:rgba(255,255,255,.06);--th-ink:var(--e-ink)}
 html.dark-mode .ebk-course,html[data-theme="dark"] .ebk-course{--a:#f075c5;--b:#6cb4f5;--a-soft:rgba(240,117,197,.09);--q-line:rgba(240,117,197,.35);--q-bg:rgba(240,117,197,.04);--th-bg:rgba(240,117,197,.16);--th-ink:#fbd3ec;--halo:rgba(110,200,150,.16)}
 html.dark-mode .ebk-workbook,html[data-theme="dark"] .ebk-workbook{--a:#d4d6db;--b:#a8acb5;--a-soft:rgba(255,255,255,.05);--adv-bg:rgba(255,255,255,.05);--adv-tag:rgba(255,255,255,.12);--adv-ink:#e4e6ea;--q-line:rgba(255,255,255,.18);--q-bg:transparent;--th-bg:rgba(255,255,255,.08);--th-ink:#eceef1;--halo:rgba(255,255,255,.05)}
-html.dark-mode .ebk-inuse,html[data-theme="dark"] .ebk-inuse{--a:#5fcf8e;--a2:#2f6b45;--b:#5fcf8e;--a-soft:rgba(95,207,142,.08);--adv-bg:rgba(95,207,142,.08);--adv-tag:rgba(95,207,142,.2);--adv-ink:#bbf7d0;--q-line:rgba(95,207,142,.3);--q-bg:transparent;--pass-bg:rgba(95,207,142,.05);--pass-line:rgba(95,207,142,.18);--tint:rgba(95,207,142,.07);--th-bg:#1d5a39;--th-ink:#eafff1}
+html.dark-mode .ebk-inuse,html[data-theme="dark"] .ebk-inuse{--a:#6fd39a;--a2:#2b6548;--b:#6fd39a;--a-soft:rgba(111,211,154,.09);--adv-bg:rgba(111,211,154,.08);--adv-tag:rgba(111,211,154,.2);--adv-ink:#bbf7d0;--q-line:rgba(111,211,154,.3);--q-bg:transparent;--pass-bg:rgba(255,255,255,.04);--pass-line:rgba(111,211,154,.2);--tint:#16261e;--th-bg:#1d5a39;--th-ink:#eafff1;--sheet:rgba(255,255,255,.05);--tab:#4b5563}
 html.dark-mode .ebk-workbook .ebk-tn,html[data-theme="dark"] .ebk-workbook .ebk-tn{color:#16181d}
 
 /* the page — a sheet of the book inside the website's card */
@@ -45,15 +47,12 @@ html.dark-mode .ebk-workbook .ebk-tn,html[data-theme="dark"] .ebk-workbook .ebk-
 
 /* "Unit 1  Title" */
 .ebk-uh{display:flex;align-items:center;gap:1.4rem;margin:0 0 1.5rem}
-.ebk-uc{flex:none;display:grid;place-items:center;width:6.6rem;height:6.6rem;border-radius:50%;background:var(--a);color:#fff;font:800 1.9rem/1 var(--e-sans);letter-spacing:-.01em;text-align:center;box-shadow:0 8px 22px -12px var(--a)}
+.ebk-uc{flex:none;display:grid;place-items:center;align-content:center;gap:.5rem;width:6.6rem;height:6.6rem;border-radius:50%;background:var(--a);color:#fff;font:800 1.9rem/1 var(--e-sans);letter-spacing:-.01em;text-align:center;box-shadow:0 8px 22px -12px var(--a)}
 .ebk-uc small{display:block;font-size:.62em;font-weight:800;margin-bottom:-.35rem}
 .ebk-uh h1{margin:0;font:800 clamp(1.45rem,3.4vw,2.25rem)/1.15 var(--e-sans);letter-spacing:-.015em;color:var(--e-ink)}
 .ebk-sum{margin:-.6rem 0 1.25rem;color:var(--e-muted);font-size:.95rem}
 .ebk-workbook .ebk-uc{background:radial-gradient(circle at 35% 30%,#8a8d94,#45474d 70%);box-shadow:0 0 0 .7rem var(--halo)}
 html.dark-mode .ebk-workbook .ebk-uc,html[data-theme="dark"] .ebk-workbook .ebk-uc{background:radial-gradient(circle at 35% 30%,#6b6f78,#2f3237 70%);color:#fff}
-.ebk-inuse .ebk-uh{gap:0;align-items:stretch;border-radius:.65rem;overflow:hidden;background:var(--a2);margin:-.25rem 0 1.5rem}
-.ebk-inuse .ebk-uc{width:auto;min-width:5rem;height:auto;padding:.7rem 1.2rem;border-radius:0;background:var(--a);font-size:2.4rem;box-shadow:none}
-.ebk-inuse .ebk-uh h1{padding:.85rem 1.2rem;color:#fff;align-self:center;font-size:clamp(1.3rem,3vw,2rem)}
 .ebk-site .ebk-uh{display:none}
 
 /* sections */
@@ -67,11 +66,6 @@ html.dark-mode .ebk-workbook .ebk-uc,html[data-theme="dark"] .ebk-workbook .ebk-
 .ebk-h2{margin:1.1rem 0 .45rem;font:700 1.15rem/1.3 var(--e-sans);color:var(--b)}
 .ebk-course .ebk-h2,.ebk-workbook .ebk-h2{font-weight:600}
 .ebk-h3{margin:1rem 0 .4rem;font:800 .95rem/1.3 var(--e-sans);color:var(--a);letter-spacing:.02em}
-.ebk-inuse .ebk-part:not(.only-task){margin-left:-2rem;margin-right:-2rem;padding:.4rem 2rem 1rem;background:var(--tint)}
-.ebk-inuse .ebk-part:not(.only-task)+.ebk-part:not(.only-task){margin-top:-1.4rem;padding-top:.2rem}
-.ebk-inuse .ebk-sec{font-size:1.25rem}
-.ebk-inuse .ebk-part.only-task>.ebk-sec{font-size:1.75rem}
-.ebk-inuse .ebk-h2{color:var(--a)}
 
 /* example, tip, tables */
 .ebk-egl{margin:.7rem 0;padding:.6rem .95rem;border-left:3px solid var(--a);border-radius:0 .5rem .5rem 0;background:var(--a-soft);font-style:italic}
@@ -81,7 +75,6 @@ html.dark-mode .ebk-workbook .ebk-uc,html[data-theme="dark"] .ebk-workbook .ebk-
 .ebk-table{width:100%;border-collapse:collapse;font-size:.92rem;line-height:1.45}
 .ebk-table th,.ebk-table td{padding:.5rem .7rem;border:1px solid var(--q-line);text-align:left;vertical-align:top}
 .ebk-table th{background:var(--th-bg);color:var(--th-ink);font-weight:700}
-.ebk-inuse .ebk-table th,.ebk-inuse .ebk-table td{border-color:var(--a)}
 .ebk-table.nohead td:first-child{font-weight:700;color:var(--b);white-space:nowrap}
 .ebk-course .ebk-table.nohead td:first-child{color:#2b7bc0}
 .ebk-table.nohead{border:0;width:auto;min-width:min(100%,26rem)}
@@ -94,7 +87,6 @@ html.dark-mode .ebk-workbook .ebk-uc,html[data-theme="dark"] .ebk-workbook .ebk-
 .ebk-adv-t{color:var(--adv-ink);font:italic 400 1.12rem/1.5 var(--e-serif)}
 .ebk-adv ul{padding-left:1.2rem}.ebk-adv li{margin:.3rem 0}
 .ebk-site .ebk-adv{border-radius:.6rem;border:1px solid rgba(14,165,233,.3)}.ebk-site .ebk-adv-tag{border-radius:.6rem 0 99px 0}
-.ebk-inuse .ebk-adv{border-radius:.5rem}
 .ebk-note{margin:1rem 0;padding:.85rem 1rem;border:1px solid var(--e-line);border-radius:.6rem;background:var(--e-soft);font-size:.95rem}
 .ebk-note-t{font-weight:700;color:var(--a);margin-bottom:.25rem}
 .ebk-panel{margin:1rem 0;padding:1rem 1.2rem;border-radius:.6rem;background:var(--a-soft)}
@@ -115,10 +107,6 @@ html.dark-mode .ebk-workbook .ebk-pass-t,html[data-theme="dark"] .ebk-workbook .
 .ebk-th{display:flex;align-items:flex-start;gap:.55rem;margin-bottom:.5rem}
 .ebk-tn{flex:none;display:inline-grid;place-items:center;min-width:1.6rem;height:1.6rem;margin-top:.05rem;padding:0 .35rem;border-radius:99px;background:var(--a);color:#fff;font:800 .85rem/1 var(--e-sans)}
 .ebk-instr{font:700 1rem/1.45 var(--q-font)}
-.ebk-inuse .ebk-th{gap:1rem}
-.ebk-inuse .ebk-tn{min-width:2.8rem;height:auto;padding:0;background:none;color:var(--a);font-size:1.2rem;justify-items:start;margin-top:-.05rem}
-.ebk-inuse .ebk-task{margin:1rem 0 1.25rem}
-.ebk-inuse .ebk-tbody,.ebk-inuse .ebk-qbox,.ebk-inuse .ebk-tf{margin-left:3.8rem}
 .ebk-tbody{padding-left:2.15rem;font-family:var(--q-font)}
 .ebk-qbox{margin:.65rem 0 0;padding:1rem 1.2rem 1.1rem;border:2px solid var(--q-line);border-radius:.8rem;background:var(--q-bg);font-family:var(--q-font)}
 .ebk-qtitle{font-weight:700;margin-bottom:.15rem}
@@ -172,7 +160,7 @@ html.dark-mode .ebk-workbook .ebk-pass-t,html[data-theme="dark"] .ebk-workbook .
 /* a gap: a dotted line with its number, like the book */
 .ebk-gapw{display:inline-flex;align-items:baseline;gap:.25rem;margin:0 .1rem;vertical-align:baseline;flex-wrap:wrap}
 .ebk-gn{font:800 .92em var(--e-sans);color:var(--a)}
-.ebk-gap{width:7ch;min-width:7ch;max-width:100%;height:1.7rem;padding:0 .25rem;border:0;border-bottom:2px dotted color-mix(in srgb,var(--e-ink) 50%,transparent);border-radius:.2rem .2rem 0 0;background:color-mix(in srgb,var(--a) 4%,transparent);color:var(--b);font:600 .98em var(--e-sans);transition:background .15s,border-color .15s}
+.ebk-gap{width:7ch;min-width:7ch;max-width:100%;height:1.45rem;padding:0 .25rem;border:0;border-bottom:2px dotted color-mix(in srgb,var(--e-ink) 62%,transparent);border-radius:.2rem .2rem 0 0;background:color-mix(in srgb,var(--a) 4%,transparent);color:var(--b);font:600 .98em var(--e-sans);transition:background .15s,border-color .15s}
 .ebk-gap:focus{outline:0;border-bottom:2px solid var(--a);background:var(--a-soft)}
 .ebk-gap.ok{border-bottom:2px solid var(--e-ok);color:var(--e-ok);background:var(--e-ok-bg)}
 .ebk-gap.bad{border-bottom:2px solid var(--e-bad);color:var(--e-bad);background:var(--e-bad-bg);text-decoration:line-through;text-decoration-thickness:1.5px}
@@ -210,14 +198,137 @@ html.dark-mode .ebk-workbook .ebk-btn:not(.ghost),html[data-theme="dark"] .ebk-w
   .ebk-page{padding:1.15rem 1rem 1.3rem;border-radius:.75rem}
   .ebk-course .ebk-page{background:radial-gradient(circle at 2.9rem 2.9rem,var(--halo) 0,var(--halo) 4.9rem,transparent 4.95rem),var(--e-paper)}
   .ebk-uh{gap:.9rem}.ebk-uc{width:4.4rem;height:4.4rem;font-size:1.3rem}
-  .ebk-inuse .ebk-uh{margin:-.15rem 0 1.1rem}.ebk-inuse .ebk-uc{min-width:3.4rem;font-size:1.7rem;padding:.5rem .8rem}
   .ebk-sec{font-size:1.25rem}
   .ebk-let{margin-left:-1rem}
-  .ebk-inuse .ebk-part:not(.only-task){margin-left:-1rem;margin-right:-1rem;padding-left:1rem;padding-right:1rem}
   .ebk-tbody,.ebk-tf,.ebk-task.no-check .ebk-tbody{padding-left:0;margin-left:0}
-  .ebk-inuse .ebk-tbody,.ebk-inuse .ebk-qbox,.ebk-inuse .ebk-tf{margin-left:0}
   .ebk-qbox{padding:.85rem .8rem}
   .ebk-legend{grid-template-columns:1fr;gap:0}.ebk-legend dd{margin-bottom:.3rem}
   .ebk-item{gap:.5rem}
   .ebk-table{font-size:.85rem}
+}
+
+/* ───────── texts as they look in real life, conversations, notes, the small boxes (every design) ───────── */
+.ebk sup{font-size:.68em;line-height:0;font-weight:700;color:var(--a);padding-left:.05em}
+.ebk-chat{display:grid;gap:.3rem;margin:.5rem 0}
+.ebk-say{display:grid;grid-template-columns:minmax(3.4rem,max-content) 1fr;gap:.7rem;align-items:baseline}
+.ebk-who{text-align:right;font-weight:600;white-space:nowrap}
+.ebk-talk{margin:.8rem 0;padding:.75rem 1rem;border-radius:.6rem;border:1px solid var(--pass-line);background:var(--pass-bg)}
+.ebk-notes{columns:2;column-gap:2rem;margin:.55rem 0 .9rem;font-size:.86rem;line-height:1.4}
+.ebk-notes p{margin:0 0 .25rem;break-inside:avoid;padding-left:.75rem;text-indent:-.75rem}
+.ebk-notes-t{display:block;column-span:all;margin-bottom:.2rem;color:var(--a)}
+.ebk-mail,.ebk-web,.ebk-letter,.ebk-ad,.ebk-news{margin:.85rem 0;color:#20242c;font-size:.93rem;line-height:1.5}
+.ebk-mail .ebk-h2,.ebk-web .ebk-h2,.ebk-letter .ebk-h2,.ebk-ad .ebk-h2,.ebk-news .ebk-h2{color:#20242c}
+.ebk-mail{border:1px solid #aebfc7;background:#fff;font-family:Arial,"Segoe UI",sans-serif;box-shadow:2px 3px 5px rgba(20,40,40,.12)}
+.ebk-mail-h{display:flex;align-items:center;justify-content:space-between;padding:.34rem .6rem;background:#bfd0d7}
+.ebk-dots{display:inline-flex;gap:.28rem}.ebk-dots i{width:.5rem;height:.5rem;border-radius:50%;background:#e24b3b}.ebk-dots i:nth-child(2){background:#f0b429}.ebk-dots i:nth-child(3){background:#54b948}
+.ebk-mail-a{display:inline-flex;gap:1rem;font-size:.74rem;color:#33424a}
+.ebk-mail-m{padding:.5rem .8rem;border-bottom:1px solid #d9e2e6;font-size:.86rem;color:#3c474d}
+.ebk-mail-b{padding:.35rem .8rem .6rem}
+.ebk-web{border:1px solid #c5cad3;border-radius:.5rem;overflow:hidden;background:#fff}
+.ebk-web-h{display:flex;align-items:center;gap:.8rem;padding:.4rem .7rem;background:#e8ebf0;font-size:.78rem;color:#4a5363}
+.ebk-web-h>span:last-child{flex:1;min-width:0;padding:.12rem .7rem;border-radius:99px;background:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ebk-web-b{padding:.5rem 1rem .8rem}
+.ebk-letter{padding:1rem 1.2rem;background:#fff;border:1px solid #d7dbd9;box-shadow:3px 4px 6px rgba(20,40,40,.18)}
+.ebk-letter-h{margin-bottom:.5rem;text-align:center;color:#d9662b;font:600 1.1rem/1.3 "Trajan Pro","Cinzel",Georgia,serif;letter-spacing:.04em;text-transform:uppercase;text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+.ebk-ad{background:#d6cbe2;font-family:Georgia,"Times New Roman",serif}
+.ebk-ad-h{padding:.5rem .8rem;background:#43454b;color:#fff;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.ebk-ad-b{padding:.4rem .9rem .75rem}
+.ebk-news{padding:.9rem 1.1rem;background:#fffdf6;border:1px solid #e2dcc9;font-family:Georgia,"Times New Roman",serif}
+.ebk-news-h{font-weight:700;font-size:1.3rem;line-height:1.2;padding-bottom:.4rem;margin-bottom:.4rem;border-bottom:2px solid #20242c}
+.ebk-news .ebk-src{color:#6b6657}
+.ebk-tab{margin:1.1rem 0;max-width:34rem}
+.ebk-tab-h{display:inline-block;padding:.28rem .8rem .3rem;border-radius:.15rem .15rem 0 0;background:var(--tab,#43454b);color:#fff;font:700 .95rem/1.2 "Cascadia Mono",Consolas,"Courier New",monospace}
+.ebk-tab-h em{font-style:normal;color:#f7b92b}
+.ebk-tab-b{--bc:#f7b92b;padding:.5rem .9rem .55rem;border:3px solid var(--bc);border-radius:0 0 .8rem 0;background:var(--sheet,var(--e-paper));font-size:.93rem;line-height:1.5}
+.ebk-tab-b p{margin:.2rem 0}.ebk-tab-b ul,.ebk-tab-b ol{margin:.25rem 0}
+.ebk-tab-t{font-weight:700}
+.ebk-tab-tip .ebk-tab-b{--bc:#d9492a}.ebk-tab-help .ebk-tab-b{--bc:#2f80c2}.ebk-tab-help .ebk-tab-h em{color:#8cc8f5}.ebk-tab-you .ebk-tab-b{--bc:#3b825e}.ebk-tab-you .ebk-tab-h em{color:#8ddcb0}
+.ebk-cols{column-gap:2rem;columns:2}.ebk-task.cols-3 .ebk-cols{columns:3}
+.ebk .ebk-cols .ebk-item{break-inside:avoid;margin:0 0 .5rem}
+.ebk-item.k-match{align-items:baseline}
+
+/* ───────── the vocabulary book ("In Use"): a spread of two pages ───────── */
+.ebk-inuse .ebk-page{padding:0;border-color:color-mix(in srgb,var(--a) 22%,var(--e-line))}
+.ebk-left,.ebk-right{position:relative;display:flex;flex-direction:column;min-width:0}
+.ebk-left{background:var(--tint)}
+.ebk-left-b{padding:1.1rem 2rem 1rem var(--mar);flex:1}
+.ebk-right{background:var(--e-paper);padding:1.6rem 2rem 0 1.6rem}
+.ebk-inuse .ebk-uh{display:grid;grid-template-columns:calc(var(--mar) - .75rem) 1fr;align-items:stretch;gap:0;min-height:4.3rem;margin:0 .75rem 0 0;border-radius:0 0 .5rem 0;overflow:hidden;background:var(--a2)}
+.ebk-inuse .ebk-uc{display:flex;align-items:flex-end;justify-content:flex-end;width:auto;height:auto;padding:.5rem .5rem .45rem .3rem;border-radius:0 0 .5rem 0;background:#05552f;box-shadow:none;font:800 2.35rem/1 var(--e-sans)}
+.ebk-inuse .ebk-uh h1{align-self:end;padding:.7rem 1rem .55rem .75rem;color:#fff;font:700 clamp(1.35rem,2.6vw,1.85rem)/1.15 var(--e-sans);letter-spacing:0}
+html.dark-mode .ebk-inuse .ebk-uc,html[data-theme="dark"] .ebk-inuse .ebk-uc{background:#0f4a2c}
+.ebk-inuse .ebk-sum{margin:.9rem 2rem -.3rem var(--mar);color:color-mix(in srgb,var(--e-ink) 72%,transparent);font-size:.95rem;font-style:italic}
+.ebk-inuse .ebk-part{margin:0 0 1.15rem}
+.ebk-inuse .ebk-sec{position:relative;margin:.2rem 0 .3rem;font:700 1.18rem/1.3 var(--e-sans);letter-spacing:0;color:var(--a)}
+.ebk-inuse .ebk-let{position:absolute;left:calc(var(--mar) * -1);top:.12rem;width:calc(var(--mar) - .85rem);min-width:0;height:1.3rem;margin:0;padding:0 .5rem 0 0;border-radius:0 .3rem .3rem 0;background:#05552f;color:#fff;font-size:.92rem;line-height:1.3rem}
+html.dark-mode .ebk-inuse .ebk-let,html[data-theme="dark"] .ebk-inuse .ebk-let{background:#1d6a42}
+.ebk-right .ebk-part:first-child>.ebk-sec:first-child{margin:0 0 1rem;padding-left:3.6rem;font-size:1.55rem}
+.ebk-right .ebk-sec{padding-left:3.6rem}
+.ebk-inuse .ebk-h2{color:var(--a);font-size:1.05rem}
+.ebk-inuse p,.ebk-inuse li{line-height:1.5}
+.ebk-inuse .ebk-table{background:var(--sheet)}
+.ebk-inuse .ebk-table th,.ebk-inuse .ebk-table td{border:1.5px solid color-mix(in srgb,var(--a) 75%,transparent)}
+.ebk-inuse .ebk-table th{border-color:var(--th-bg);border-right-color:rgba(255,255,255,.8)}.ebk-inuse .ebk-table th:last-child{border-right-color:var(--th-bg)}
+.ebk-inuse .ebk-egl{border-left-color:var(--a2);background:color-mix(in srgb,var(--sheet) 60%,transparent)}
+.ebk-inuse .ebk-adv{border-radius:.4rem}
+.ebk-inuse .ebk-tip{border-left:4px solid #d9492a;background:var(--sheet);color:var(--e-ink)}
+.ebk-inuse .ebk-note{background:var(--sheet);border-color:var(--pass-line)}
+.ebk-inuse .ebk-task{margin:0 0 1.35rem}
+.ebk-inuse .ebk-th{gap:0;margin-bottom:.35rem}
+.ebk-inuse .ebk-tn{display:block;width:3.6rem;min-width:3.6rem;height:auto;margin:0;padding:0;border-radius:0;background:none;color:var(--a);font:700 1.18rem/1.45 var(--e-sans);text-align:left}
+.ebk-inuse .ebk-instr{flex:1;font:700 1rem/1.45 var(--e-sans)}
+.ebk-inuse .ebk-tbody,.ebk-inuse .ebk-task.no-check .ebk-tbody{padding-left:0;margin-left:3.6rem}
+.ebk-inuse .ebk-qbox,.ebk-inuse .ebk-tf{margin-left:3.6rem}
+.ebk-inuse .ebk-item{gap:.6rem;margin:.28rem 0}
+.ebk-inuse .ebk-in{min-width:1rem;text-align:left;font-weight:600}
+.ebk-inuse .ebk-labs{margin:.2rem 0 .1rem}
+.ebk-inuse .ebk-right>.ebk-part>.ebk-tab{margin-left:3.6rem}
+.ebk-left .ebk-task .ebk-th{margin-left:-3.6rem}.ebk-left .ebk-tbody,.ebk-left .ebk-qbox,.ebk-left .ebk-tf,.ebk-left .ebk-task.no-check .ebk-tbody{margin-left:0}
+.ebk-foot{display:flex;align-items:baseline;gap:1rem;margin-top:auto;padding:.9rem 2rem 1rem 1.6rem;font-size:.82rem;color:color-mix(in srgb,var(--e-ink) 70%,transparent)}
+.ebk-left .ebk-foot i{padding-left:calc(var(--mar) - 3.6rem)}
+.ebk-foot b{color:var(--e-ink);min-width:1.6rem}
+.ebk-foot.r{justify-content:flex-end;padding-right:0}.ebk-foot.r b{text-align:right}
+/* two pages side by side (the reader's "Two pages" button, on a wide screen) */
+.is-two .ebk-spread:not(.one){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.is-two .ebk-spread{font-size:.94rem}
+.is-two .ebk-right{box-shadow:inset 14px 0 18px -16px rgba(0,0,0,.35)}
+.is-two .ebk-left{border-right:1px solid color-mix(in srgb,var(--a) 14%,transparent)}
+.is-two .ebk-spread{--mar:3.9rem}
+.is-two .ebk-left-b{padding-right:1.4rem}.is-two .ebk-right{padding-right:1.4rem;padding-left:1.2rem}
+.is-two .ebk-right .ebk-tn{width:3rem;min-width:3rem}
+.is-two .ebk-inuse .ebk-right .ebk-tbody,.is-two .ebk-inuse .ebk-right .ebk-qbox,.is-two .ebk-inuse .ebk-right .ebk-tf,.is-two .ebk-inuse .ebk-right>.ebk-part>.ebk-tab{margin-left:3rem}
+.is-two .ebk-right .ebk-sec,.is-two .ebk-right .ebk-part:first-child>.ebk-sec:first-child{padding-left:3rem}
+
+.is-two .ebk-sel{max-width:10rem;font-size:.84rem;height:1.85rem;padding:0 .3rem}
+html.dark-mode .ebk-inuse .ebk-btn:not(.ghost),html[data-theme="dark"] .ebk-inuse .ebk-btn:not(.ghost),html.dark-mode .ebk-inuse .ebk-lab input:checked+span,html[data-theme="dark"] .ebk-inuse .ebk-lab input:checked+span,html.dark-mode .ebk-inuse .ebk-opt:has(input:checked) b,html[data-theme="dark"] .ebk-inuse .ebk-opt:has(input:checked) b{color:#06281a}
+
+/* a collocation the student can keep (the reader: .ebk-live) */
+.ebk-live .ebk-left b,.ebk-live .ebk-part:not(.has-task)>:not(.ebk-sec) b{cursor:pointer;border-radius:.2rem;transition:background .15s}
+.ebk-live .ebk-left b:hover,.ebk-live .ebk-part:not(.has-task)>:not(.ebk-sec) b:hover{background:color-mix(in srgb,var(--a) 16%,transparent)}
+.ebk-live b.is-kept{background:color-mix(in srgb,#f7b92b 34%,transparent)}
+.ebk-live .ebk-foot b,.ebk-live .ebk-who,.ebk-live .ebk-opt b{cursor:inherit;background:none!important}
+.ebk-live .ebk-foot b{cursor:default}
+
+@media (max-width:640px){
+  .ebk-inuse{--mar:1.1rem}
+  .ebk-left-b{padding:.9rem 1.1rem .6rem}
+  .ebk-right{padding:1.2rem 1.1rem 0}
+  .ebk-inuse .ebk-uh{grid-template-columns:3.4rem 1fr;min-height:3.6rem;margin-right:.5rem}.ebk-inuse .ebk-uc{font-size:1.85rem}
+  .ebk-inuse .ebk-let{position:static;flex:none;width:2.3rem;margin-left:-1.1rem}
+  .ebk-inuse .ebk-sec{align-items:flex-start;gap:.6rem}
+  .ebk-inuse .ebk-sum{margin:.8rem 1.1rem -.2rem}
+  .ebk-right .ebk-sec,.ebk-right .ebk-part:first-child>.ebk-sec:first-child{padding-left:0}
+  .ebk-inuse .ebk-tn{width:2.6rem;min-width:2.6rem;font-size:1.05rem}
+  .ebk-inuse .ebk-tbody,.ebk-inuse .ebk-task.no-check .ebk-tbody,.ebk-inuse .ebk-qbox,.ebk-inuse .ebk-tf,.ebk-inuse .ebk-right>.ebk-part>.ebk-tab{margin-left:0}
+  .ebk-left .ebk-task .ebk-th{margin-left:0}
+  .ebk-foot{padding:.7rem 1.1rem .8rem}.ebk-left .ebk-foot i{padding-left:0}
+  .ebk-notes{columns:1}.ebk-cols,.ebk-task.cols-3 .ebk-cols{columns:1}
+  .ebk-say{grid-template-columns:1fr;gap:0}.ebk-who{text-align:left}
+  .ebk-letter{padding:.8rem .9rem}
+}
+@media print{
+  .ebk-page{box-shadow:none!important;border:0!important}
+  .ebk-tf,.ebk-tbest,.ebk-tscore{display:none!important}
+  .ebk-left,.ebk-right{break-after:page}.ebk-left,.ebk-uh,.ebk-let,.ebk-table th,.ebk-tab-h,.ebk-ad,.ebk-ad-h,.ebk-mail-h{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ebk-sel{border:0;border-bottom:1px dotted #555;appearance:none;background:none}
 }

@@ -104,8 +104,9 @@ const CLEAN = {
 };
 
 /* ───────── storage ───────── */
-async function load(ctx, kind) {
-  let v = null; try { v = await ctx.store.getSetting(KINDS[kind].key); } catch (e) { v = null; }
+/* strict = a change is coming: read the database itself, and a failed read stops the change (an empty list would be saved over the real one) */
+async function load(ctx, kind, strict) {
+  let v = null; try { v = await ctx.store.getSetting(KINDS[kind].key, strict ? { fresh: true } : undefined); } catch (e) { if (strict) throw e; v = null; }
   return { items: v && Array.isArray(v.items) ? v.items.filter((x) => x && ID_RE.test(String(x.id))) : [], updatedAt: (v && v.updatedAt) || null };
 }
 async function save(ctx, kind, data) {
@@ -157,7 +158,7 @@ function view(kind, it, level, full) {
 }
 const planName = (p) => p.charAt(0).toUpperCase() + p.slice(1);
 const pageOf = { videos: '/videos', books: '/books', grammar: '/grammar', music: '/settings' };
-const priceLink = (kind, it) => '/Price?premium=required&plan=' + encodeURIComponent(it.plan) + '&next=' + encodeURIComponent(pageOf[kind] + (kind === 'grammar' ? '#' + it.id : ''));
+const priceLink = (kind, it) => '/Price?premium=required&plan=' + encodeURIComponent(it.plan) + '&next=' + encodeURIComponent(pageOf[kind] + (kind === 'grammar' || kind === 'books' ? '#' + it.id : ''));
 
 /* GET /api/panels/<kind>          the published items (grammar: without the text)
    GET /api/panels/grammar/<id>    one grammar topic with its text and exercises, when the plan allows it
@@ -207,7 +208,7 @@ async function adminRoute(req, res, p, method, ctx) {
   const m = /^\/api\/admin\/panels\/(videos|books|grammar|music)(?:\/(order|[a-z]-[a-f0-9]{8}))?$/.exec(p);
   if (!m) throw new HttpError(404, 'API endpoint not found.');
   const kind = m[1]; const K = KINDS[kind];
-  const data = await load(ctx, kind);
+  const data = await load(ctx, kind, method !== 'GET');
   const out = (status, extra) => send(res, status || 200, { kind, items: data.items, updatedAt: data.updatedAt, ...(extra || {}) }, nc);
   if (!m[2] && method === 'GET') return out();
   if (!m[2] && method === 'POST') {
@@ -239,4 +240,7 @@ async function adminRoute(req, res, p, method, ctx) {
   throw new HttpError(405, 'Method not allowed.');
 }
 
-module.exports = { route, adminRoute, parseVideo, videoUrl, cleanLinks, KINDS, LINKS_KEY };
+/* a book, checked (ebooks.js makes and changes books too) */
+const cleanBook = (b, old, HttpError) => CLEAN.books(b, old, HttpError);
+
+module.exports = { route, adminRoute, parseVideo, videoUrl, cleanLinks, cleanBook, KINDS, LINKS_KEY };

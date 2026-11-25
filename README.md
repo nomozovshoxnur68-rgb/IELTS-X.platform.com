@@ -845,9 +845,13 @@ Questions 1–5                            the exam box; the lines right after i
 Life is [more expensive] (expensive).    a gap; [a|b] several right answers; [=24] a filled-in example
 They had some {problems*|troubles}.      circle the right word
 1 It effects me. = affects               correct the mistake (a typed answer after the sentence)
+w[age]                                   the first letters of the answer are given ("wage" is right too)
 @match + 1 meet = the deadline           matching (or options A–F before the questions and "= B")
 | Name: | Anna [Kowalska] |               form / table completion (the gaps get the numbers of the questions)
 Box: a, b, c · @flow · Why: …            a box of words · a flow-chart · the explanation shown after Check
+@chat · @cols                            a conversation with gaps ("Ann: I [met] him.") · short questions in two columns
+::: mistakes · tip · help · you          "Common mistakes", "Tip", "Language help", "Your turn" boxes
+::: email · letter · ad · news · web     a text as it looks in real life · ::: chat a conversation · ::: footnotes (^1^ in the text)
 ```
 
 The page (`assets/js/ebook-render.js` + `assets/css/ebook-book.css`, also used by the admin preview) gets the blocks
@@ -861,3 +865,27 @@ workbook. The designs copy the *layout* of the books, not their texts: type or p
 light grey of bars and chips (`--soft`) pointed at a colour that was not one, so cards were transparent and progress
 tracks invisible; `assets/css/predictions.css` now uses `--pcard` (which also takes the glass colour of the designs,
 `--pdp-card`) and `--soft: hsl(var(--secondary))`.
+
+**E-books, second part (November 2026).** *Vocabulary book (In Use)* is now a spread: the pale green page (unit number on a green
+bar, A B C with their tabs in the margin, boxes, e-mails, notes 1 2 3) and the white page of exercises, side by side on a wide
+screen (**Two pages**) and one under the other on a narrow one. A book without a picture gets a cover in the colours of its design.
+
+* **The reader** (`assets/js/ebooks-page.js`): contents of the book, previous / next unit (also ← →), text size, full screen, print,
+  search in the book, the **A–Z index** (what is bold outside the exercises, with its units), and a **notebook**: press a
+  collocation to hear or keep it; `/books#notebook` revises what is kept as cards (known → back in 1, 3, 7, 16, 35 days).
+  Answers that are not checked yet are kept in the browser. API: `GET /api/ebooks/<book>/index`, `…/search?q=`,
+  `GET/POST /api/ebooks/notebook` (kept in `ebook-progress:<userId>`). The index and the search never read the exercises.
+* **Advanced Collocations for IELTS** (`ebooks-collocations.js`, server only): 24 units, about 600 questions, written for IELTSX. It
+  is put on the Books page once (`ebook-builtin`; `EBOOK_BUILTIN=off` in the environment stops that). Deleted, it does not come
+  back by itself; *+ Add a ready one* in Admin → E-books adds it again.
+* **Admin → E-books**: make an e-book (details, cover by drag and drop, PDF, design, units) on one page; **Import** many units from
+  a text or a JSON file (checked first: every mistake is named with its unit); **Export** (JSON or text), **Copy**, **Hide**, **Delete**;
+  units in **parts** of the book, dragged to their place, hidden or copied. The unit editor draws the page while you write, names
+  the lines with mistakes (a press goes to the line), keeps an unsaved unit in the browser (Ctrl+S saves) and joins the broken
+  lines of text pasted from a PDF. The import format: `== part`, `=== unit title`, then `kind: … minutes: … summary: …`, `---`, the page.
+* A **hidden unit** is not shown to students, not counted in their progress and not seen by teachers.
+* **Fixes**: a failed read of the database can no longer save an empty list over the books, units, videos, predictions, classes or a
+  student's progress (the change is refused instead); two exercises checked at the same moment are both kept; a late answer of
+  the server does not replace the page the student has gone on to; the editor asks "Leave without saving?" only when something
+  was changed and no longer loses typed text; the list of e-books shows a book made in Admin → Books at once; the dead picture of
+  Reading passage 1, the missing map of `/sections/test-5` and two dead links of PDF materials.

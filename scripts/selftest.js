@@ -2199,6 +2199,85 @@ server.listen(0, async () => {
       ok('teachers: classes (accounts, invitations, class code), the teacher panel API, e-books checked on the server, progress for students and teachers');
     }
 
+    // --- e-books: the ready book, the format of a vocabulary book, make / import / hide / copy / export, the index, the search, the notebook
+    {
+      const lib = require('../ebooks-collocations'), edoc = require('../ebook-doc'); const RB = '/api/ebooks/' + lib.id;
+      assert.ok([403, 404].includes((await call('GET', '/ebooks-collocations.js')).status), 'the ready book is server only (it holds the answers)');
+      assert.equal(lib.units.length, 24);
+      for (const u of lib.units) {
+        const p = edoc.parse(u.content); assert.deepEqual(p.errors, [], u.title); assert.ok(p.points >= 15 && p.tasks >= 4, u.title); assert.ok(u.group && u.summary && u.minutes, u.title);
+        for (const k of Object.values(p.key)) { if (k.k === 'pick') assert.ok(k.o.includes(k.a), u.title); if (k.k === 'label') assert.ok(k.a, u.title); assert.ok(edoc.isRight(k, k.k === 'choice' ? k.a.join(',') : Array.isArray(k.a) ? k.a[0] : k.a), u.title + ': the key is right by its own rule'); }
+      }
+      let r = await call('GET', '/api/ebooks'); const rb = r.json.items.find((b) => b.id === lib.id);
+      assert.ok(rb && rb.units === 24 && rb.style === 'inuse' && rb.exercises > 500, 'the ready book is on the Books page'); assert.equal(r.json.notebook, undefined, 'a guest has no notebook');
+      assert.equal((await call('POST', '/api/admin/ebooks/sample', { jar: boss, body: { which: 'collocations' } })).status, 409, 'not twice');
+      // the page of a unit: no answers; the index and the search: the explanations only
+      r = await call('GET', RB + '/' + lib.unitId(1)); assert.equal(r.status, 200); assert.equal(r.json.unit.group, 'Getting started'); assert.equal(r.json.contents.length, 24); assert.ok(!('key' in r.json) && !/"a":\[/.test(r.text), 'no key in the page'); assert.ok(!(await call('GET', RB + '/' + lib.unitId(0))).text.includes('doing'), 'an answer ("doing") is not in the page');
+      r = await call('GET', RB + '/index'); assert.ok(r.json.terms.length > 600); const gc = r.json.terms.find((t) => t.w === 'a glass ceiling'); assert.equal(gc.units[0].n, 10);
+      r = await call('GET', RB + '/search?q=' + encodeURIComponent('Glass ceiling')); assert.equal(r.json.results[0].n, 10); assert.ok(r.json.results[0].hits.length);
+      assert.equal((await call('GET', RB + '/search?q=' + encodeURIComponent('nasty comment'))).json.results.length, 0, 'the exercises are not searched'); assert.equal((await call('GET', RB + '/search?q=a')).json.results.length, 0);
+      assert.equal((await call('POST', RB + '/index')).status, 405);
+      // the format: boxes, conversations, footnotes, gaps inside bold text, first letters
+      let d = edoc.parse('Text^1^ with **a collocation**.\n::: chat\nAnn: Hi **there you are**\n:::\n::: footnotes\n1 a note\n:::\n::: email Hello\nFrom: Ann\nHi!\n:::\n::: mistakes\nNOT ~~this~~.\n:::\n::: task Gaps.\n@chat\nAnn: I **really [like]** it, w[age] earners [=do].\n:::');
+      assert.deepEqual(d.errors, []); assert.equal(d.blocks.filter((b) => b.t === 'box').map((b) => b.kind).join(), 'chat,footnotes,email,mistakes'); assert.equal(d.points, 2);
+      const row = d.blocks.find((b) => b.t === 'task').body[0].rows[0]; assert.equal(row.who, 'Ann'); assert.ok(/<b>really <span class="ebk-slot"/.test(row.html), 'a gap inside bold text');
+      assert.ok(edoc.isRight(d.key['t1.1'], 'age') && edoc.isRight(d.key['t1.1'], 'wage') && !edoc.isRight(d.key['t1.1'], 'w')); assert.equal(edoc.shown(d.key['t1.1']), 'wage');
+      assert.deepEqual(edoc.termsOf(d.blocks).map((t) => t.w), ['a collocation', 'there you are'], 'the collocations of the page, not of its exercises');
+      assert.ok(!/<script|<img/.test(JSON.stringify(edoc.parse('::: news <script>x</script>\n<img src=x onerror=1>\n:::').blocks)), 'no HTML of the admin\'s text');
+      // make one, with its units; a mistake is named and nothing is made
+      const text = '== Part one\n=== 1. Alpha\nkind: vocabulary\nminutes: 10\nsummary: s\n---\n# [A] T\nWe **take notes**.\n::: task Gaps.\n1 I [take] notes.\n:::\n\n=== Beta\n---\nText.';
+      assert.equal((await call('POST', '/api/admin/ebooks', { jar: user, body: { book: { title: 'X' } } })).status, 403); assert.equal((await call('POST', '/api/admin/ebooks', { body: { book: { title: 'X' } } })).status, 401);
+      assert.equal((await call('POST', '/api/admin/ebooks', { jar: boss, body: { book: {} } })).status, 400);
+      const before = (await call('GET', '/api/admin/ebooks', { jar: boss })).json.books.length;
+      r = await call('POST', '/api/admin/ebooks', { jar: boss, body: { book: { title: 'Bad book' }, text: text + '\n=== Gamma\n---\n::: task C.\n1 {a|b}\n:::' } }); assert.equal(r.status, 400); assert.equal(r.json.problems[0].title, 'Gamma'); assert.equal((await call('GET', '/api/admin/ebooks', { jar: boss })).json.books.length, before);
+      assert.equal((await call('POST', '/api/admin/ebooks', { jar: boss, body: { book: { title: 'X', cover: 'javascript:1', file: 'http://x/y.pdf' } } })).status, 400, 'safe links only');
+      r = await call('POST', '/api/admin/ebooks', { jar: boss, body: { book: { title: 'My book', author: 'Me', plan: 'free' }, style: 'inuse', text } }); assert.equal(r.status, 201); const nb = r.json.book.id; const A = '/api/admin/ebooks/' + nb;
+      r = await call('GET', '/api/ebooks/' + nb); assert.equal(r.json.units.map((u) => u.title).join(), 'Alpha,Beta'); assert.equal(r.json.units[1].group, 'Part one'); assert.equal(r.json.book.style, 'inuse'); const U1 = r.json.units[0].id, U2 = r.json.units[1].id;
+      r = await call('POST', A + '/info', { jar: boss, body: { book: { description: 'New', level: 'b2' } } }); assert.equal(r.json.book.description, 'New'); assert.equal(r.json.book.level, 'B2'); assert.equal(r.json.book.author, 'Me', 'the rest stays');
+      // import: checked first, the good ones can be added, all can be replaced
+      r = await call('POST', A + '/import', { jar: boss, body: { text: '=== Ok\n---\nText\n=== Bad\n---\n::: what\n:::', dry: true } }); assert.equal(r.json.found, 2); assert.equal(r.json.problems.length, 1); assert.equal((await call('GET', '/api/ebooks/' + nb)).json.units.length, 2);
+      assert.equal((await call('POST', A + '/import', { jar: boss, body: { text: '=== Ok\n---\nText\n=== Bad\n---\n::: what\n:::' } })).status, 400);
+      r = await call('POST', A + '/import', { jar: boss, body: { text: '=== Ok\n---\nText\n=== Bad\n---\n::: what\n:::', skip: true } }); assert.equal(r.json.added, 1); assert.equal(r.json.units.length, 3);
+      assert.equal((await call('POST', A + '/import', { jar: boss, body: { text: 'no units here' } })).status, 400); assert.equal((await call('POST', A + '/import', { jar: boss, body: { text: '{"broken' } })).status, 400);
+      // hidden units, copies, the order with the parts
+      r = await call('POST', A + '/units/' + U2 + '/publish', { jar: boss, body: { published: false } }); assert.equal(r.json.units.find((u) => u.id === U2).published, false);
+      r = await call('GET', '/api/ebooks/' + nb, { jar: user }); assert.equal(r.json.units.length, 2); assert.equal(r.json.progress.total, 2, 'a hidden unit is not counted'); assert.equal((await call('GET', '/api/ebooks/' + nb + '/' + U2, { jar: user })).status, 404); assert.equal((await call('GET', '/api/ebooks/' + nb + '/' + U2, { jar: boss })).status, 200, 'an admin can look at it');
+      r = await call('POST', A + '/units/' + U1 + '/copy', { jar: boss }); assert.equal(r.status, 200); assert.equal(r.json.units.length, 4); assert.equal(r.json.units[1].title, 'Alpha (copy)'); assert.equal(r.json.units[1].published, false);
+      r = await call('POST', A + '/order', { jar: boss, body: { ids: r.json.units.map((u) => u.id).reverse(), groups: { [U1]: 'The end' } } }); assert.equal(r.json.units[3].id, U1); assert.equal(r.json.units[3].group, 'The end');
+      // export → the same book again
+      r = await call('GET', A + '/export', { jar: boss }); assert.equal(r.status, 200); assert.ok(/attachment/.test(r.headers.get('content-disposition'))); const ex = JSON.parse(r.text); assert.equal(ex.units.length, 4);
+      assert.equal((await call('GET', A + '/export', { jar: user })).status, 403);
+      const txt = (await call('GET', A + '/export?format=txt', { jar: boss })).text; assert.equal(edoc.unitsFromText(txt).length, 4); assert.equal(edoc.unitsFromText(txt)[3].content, ex.units[3].content); assert.equal(edoc.unitsFromText(txt)[0].group, ex.units[0].group);
+      r = await call('POST', A + '/import', { jar: boss, body: { text: JSON.stringify(ex), mode: 'replace' } }); assert.equal(r.status, 200); assert.equal(r.json.units.length, 4); assert.ok(!r.json.units.some((u) => u.id === U1), 'the old units are replaced');
+      r = await call('POST', A + '/copy', { jar: boss }); assert.equal(r.status, 201); const cp = r.json.book.id; assert.equal((await call('GET', '/api/ebooks/' + cp, { jar: user })).status, 404, 'a copy starts hidden'); assert.equal((await call('GET', '/api/admin/ebooks/' + cp, { jar: boss })).json.units.length, 4);
+      // the notebook
+      assert.equal((await call('GET', '/api/ebooks/notebook')).status, 401); assert.equal((await call('GET', '/api/ebooks/notebook', { jar: user })).json.items.length, 0);
+      const nbk = (body) => call('POST', '/api/ebooks/notebook', { jar: user, body });
+      r = await nbk({ add: { w: ' take  notes ', s: 'We take notes.', book: nb, unit: U1 } }); assert.equal(r.json.items[0].w, 'take notes'); assert.equal((await nbk({ add: { w: 'Take notes.', s: '', book: nb } })).json.items.length, 1, 'kept once'); await nbk({ add: { w: 'a glass ceiling', s: '', book: lib.id, unit: lib.unitId(9) } });
+      assert.equal((await nbk({ add: { w: 'x y', book: 'b-00000000' } })).status, 404); assert.equal((await nbk({ add: { w: '', book: nb } })).status, 400); assert.equal((await nbk({})).status, 400);
+      r = await nbk({ result: { w: 'take notes', ok: true } }); let it = r.json.items.find((n) => n.w === 'take notes'); assert.equal(it.box, 1); assert.ok(Date.parse(it.due) > Date.now() + 20 * 3600e3); r = await nbk({ result: { w: 'take notes', ok: false } }); it = r.json.items.find((n) => n.w === 'take notes'); assert.equal(it.box, 0); assert.ok(Date.parse(it.due) <= Date.now() + 1000, 'comes back at once');
+      r = await call('GET', '/api/ebooks', { jar: user }); assert.equal(r.json.notebook.total, 2); assert.equal((await nbk({ remove: 'a glass ceiling' })).json.items.length, 1);
+      assert.equal((await call('GET', '/api/ebooks/notebook', { jar: boss })).json.items.length, 0, 'everybody has their own');
+      // two exercises checked at the same moment: both are kept
+      const unit = (await call('GET', RB + '/' + lib.unitId(0), { jar: user })).json.unit; const key = edoc.parse(lib.units[0].content).key;
+      const answers = Object.fromEntries(Object.entries(key).map(([id, k]) => [id, Array.isArray(k.a) ? k.a[0] : k.a])); const ck = (task) => call('POST', RB + '/' + lib.unitId(0) + '/check', { jar: user, body: { answers, task } });
+      const both = await Promise.all(['t1', 't2', 't3', 't4', 't5'].map(ck)); assert.ok(both.every((x) => x.status === 200 && x.json.correct === x.json.total));
+      r = await call('GET', RB + '/' + lib.unitId(0), { jar: user }); assert.equal(Object.keys(r.json.mine.tasks).length, 5); assert.equal(r.json.mine.best, unit.points); assert.equal(r.json.mine.done, true);
+      r = await call('POST', RB + '/reset', { jar: user }); assert.equal(r.json.progress.done, 0); assert.equal((await call('GET', '/api/ebooks/notebook', { jar: user })).json.items.length, 1, 'the notebook stays');
+      // a failed read of the database stops a change (an empty list would be saved over the real one)
+      const store = handler.store, real = store.getSetting; const count = (await call('GET', '/api/admin/ebooks', { jar: boss })).json.books.length; const log = console.error; console.error = () => {};
+      store.getSetting = async (k, o) => { if (k === 'panel-books' || k === 'panel-videos' || k === 'predictions' || k.startsWith('ebook:') || k.startsWith('ebook-progress:')) throw new Error('the database does not answer'); return real.call(store, k, o); };
+      const failed = [await call('POST', '/api/admin/ebooks', { jar: boss, body: { book: { title: 'Lost?' } } }), await call('POST', '/api/admin/panels/books', { jar: boss, body: { item: { title: 'Lost?' } } }), await call('POST', '/api/admin/panels/videos', { jar: boss, body: { item: { title: 'V', url: 'https://youtu.be/dQw4w9WgXcQ' } } }), await call('POST', '/api/admin/ebooks/sample', { jar: boss, body: { which: 'starter' } }), await nbk({ add: { w: 'lost words', book: nb } })];
+      store.getSetting = real; console.error = log;
+      assert.ok(failed.every((x) => x.status >= 400), 'refused: ' + failed.map((x) => x.status)); assert.equal((await call('GET', '/api/admin/ebooks', { jar: boss })).json.books.length, count, 'every book is still there'); assert.equal((await call('GET', '/api/ebooks/notebook', { jar: user })).json.items.length, 1);
+      // delete
+      for (const id of [nb, cp]) assert.equal((await call('DELETE', '/api/admin/ebooks/' + id, { jar: boss })).status, 200);
+      assert.equal((await call('GET', '/api/ebooks/' + nb)).status, 404); assert.equal((await call('DELETE', '/api/admin/ebooks/' + nb, { jar: boss })).status, 404);
+      assert.equal((await call('DELETE', '/api/admin/ebooks/' + lib.id, { jar: boss })).status, 200); assert.ok(!(await call('GET', '/api/ebooks')).json.items.some((b) => b.id === lib.id), 'a deleted ready book does not come back');
+      assert.equal((await call('POST', '/api/admin/ebooks/sample', { jar: boss, body: { which: 'collocations' } })).status, 201, 'but can be added again'); assert.equal((await call('GET', RB)).json.units.length, 24);
+      ok('e-books: the ready collocations book, boxes / conversations / first letters, make, import, hide, copy, order, export, index, search, notebook, no change after a failed read');
+    }
+
     // --- rate limit
     let limited = false; for (let i = 0; i < 12; i++) { const x = await call('POST', '/api/auth/login', { body: { email: 'victim@example.com', password: 'x' + i } }); if (x.status === 429) limited = true; }
     assert.ok(limited); ok('login brute force is rate limited');
