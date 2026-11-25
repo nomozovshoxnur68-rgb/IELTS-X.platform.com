@@ -1289,7 +1289,22 @@ function rebuildTestIndex(){
 }
 rebuildTestIndex();
 
-
+// ── THE INTERFACE (assets/js/reading-ui.js) ───────────────────────────
+// The test has two looks: "classic" (reading.css, as it always was) and "modern" (assets/css/reading-modern.css).
+// The engine is the same for both: timer, answers, highlights, notes, settings and marking live here. It only tells the
+// interface what it has just drawn; ui() answers true when the interface took that step over (the modern answer review).
+// Without reading-ui.js on the page (the Full Mock papers) nothing happens and the test looks classic.
+function ui(name, data) {
+  try { return !!(window.ReadingUI && window.ReadingUI.on && window.ReadingUI.on(name, data, UI_ENGINE)); }
+  catch (e) { try { console.error('reading-ui:', e); } catch (x) {} return false; }
+}
+const UI_ENGINE = {
+  sections: SECTIONS, passages: PASSAGES, vocabulary: VOCABULARY_DATA, explanations: READING_EXPLANATIONS, synonyms: SYNONYMS,
+  get state() { return state; },
+  grade: () => gradeReading(), evidence: id => evidenceFor(id), sentence: (id, root) => bestSentenceFor(id, root),
+  range: p => NAV_RANGES[p], passageOf: id => passageOf(id), norm: t => normForMatch(t), text: h => stripTags(h), esc: t => escapeHtml(t),
+  passage: n => switchPassage(n), jump: id => jumpToReading(id), results: () => openResultsModal()
+};
 
 // =====
 // STATE
@@ -1582,9 +1597,10 @@ function fmt(seconds) {
 // the last seconds down, because "0 minutes left" is not an honest reading.
 function fmtMinutesLeft(seconds) {
   if (seconds < 0) seconds = 0;
-  if (seconds < 60) return seconds + (seconds === 1 ? ' second remaining' : ' seconds remaining');
+  const left = document.documentElement.classList.contains('rui-modern') ? ' left' : ' remaining';   // the modern header reads "19 minutes left"
+  if (seconds < 60) return seconds + (seconds === 1 ? ' second' : ' seconds') + left;
   const m = Math.ceil(seconds / 60);
-  return m + (m === 1 ? ' minute remaining' : ' minutes remaining');
+  return m + (m === 1 ? ' minute' : ' minutes') + left;
 }
 
 function startTimer(section, onExpire) {
@@ -2096,9 +2112,11 @@ function switchPassage(n) {
   saveState();
   updateReadingNav();
   attachScrollObserver();
+  ui('passage', n);
 
   if (document.body.classList.contains('review-mode')) {
     setupDictionary(n);
+    if (ui('review', n)) return;   // the modern review draws its own list
     setTimeout(() => {
         applyReviewReveal();
         injectExplanationButtons();
@@ -2745,6 +2763,7 @@ function refreshWordZone(qid) {
   const entry = bankOf(qid).find(w => w.id === wid);
   if (entry) { zone.classList.add('filled'); zone.textContent = entry.word; }
   else { zone.classList.remove('filled'); zone.textContent = ''; }
+  ui('gap', qid);
 }
 function refreshWordBank(anyQid) {
   const sec = sectionOf(anyQid); if (!sec) return;
@@ -2819,6 +2838,7 @@ function updateReadingNav() {
     : `<button id="sub-btn" onclick="ExamApp.backToResults()" title="Back to results" style="font-size:14px;width:auto;max-width:none;flex:0 0 auto;padding:0 16px;">← Results</button>`;
 
   nav.innerHTML = PARTS.map(partHTML).join("") + submitBtn;
+  ui('nav');
 
   updateArrowState();
   markCurrentItem(curQ);
@@ -2900,6 +2920,7 @@ function jumpToReading(qid) {
 function doScrollTo(qid) {
   const pane = document.getElementById('questions-pane');
   if (!pane) return;
+  ui('jump', qid);
 
   let el = document.getElementById('rq-card-' + qid);
   const _sec = sectionOf(qid);
@@ -2945,6 +2966,7 @@ function renderNotesDrawer() {
   const notes = allNotes();
 
   if (badge) { badge.hidden = notes.length === 0; badge.textContent = notes.length; }
+  ui('notes', notes.length);
 
   if (!notes.length) {
     // wording taken verbatim from the official sidebar's empty state
@@ -3939,6 +3961,7 @@ function renderResults() {
 function reviewQuestion(qid) {
   closeResultsModal();
   try { jumpToReading(qid); } catch (e) {}
+  ui('question', qid);
 }
 
 /* ── the reveal ─────────────────────────────────────────────────
@@ -4603,10 +4626,11 @@ function reviewExam(then) {
   // Reveal the correct answer for every question on the currently rendered
   // passage. loadReadingPassage() re-runs this on each passage switch, so the
   // reveal persists as the student navigates P1↔P2↔P3.
-  applyReviewReveal();
-
-  setTimeout(() => injectExplanationButtons(), 100);
-  setTimeout(fpStart, 120);
+  if (!ui('review', state.currentPassage)) {
+    applyReviewReveal();
+    setTimeout(() => injectExplanationButtons(), 100);
+    setTimeout(fpStart, 120);
+  }
   updateReadingNav();
   goToStage('reading', then);
   window.scrollTo(0,0);
@@ -5100,7 +5124,7 @@ function setupDictionary(passageNum) {
 
     let found = null;
     for (let p in VOCABULARY_DATA) {
-      const match = VOCABULARY_DATA[p].words.find(w => w.word === sel || w.word + 's' === sel || w.word === sel + 's');
+      const match = VOCABULARY_DATA[p].words.find(w => { const v = String(w.word || '').toLowerCase(); return v === sel || v + 's' === sel || v === sel + 's'; });
       if (match) { found = match; break; }
     }
 
@@ -5117,8 +5141,8 @@ function setupDictionary(passageNum) {
     popup.classList.add('show');
 
     if (found) {
-      popup.innerHTML = `<div class="dict-word">${found.word} <span class="dict-pos">${found.pos}</span>${found.cefr ? `<span class="dict-cefr">${found.cefr}</span>` : ''}</div>`
-        + `<div class="dict-def">${found.uz}</div>`
+      popup.innerHTML = `<div class="dict-word">${escapeHtml(found.word)} <span class="dict-pos">${escapeHtml(found.pos || '')}</span>${found.cefr ? `<span class="dict-cefr">${escapeHtml(found.cefr)}</span>` : ''}</div>`
+        + `<div class="dict-def">${escapeHtml(found.uz || found.def || '')}</div>`
         + (found.model ? `<div class="dict-example">${escapeHtml(found.model)}</div>` : '');
     } else {
       popup.innerHTML = `<div class="dict-word" style="text-transform:capitalize;">${sel}</div><div class="dict-def" style="color:var(--ink-soft); font-style:italic;">Translating...</div>`;
@@ -5149,6 +5173,7 @@ function setupDictionary(passageNum) {
                 settle('Translation not found in dictionary.', 'dict-miss'); return;
             }
             settle(trans);
+            ui('lookup', { word: sel, uz: trans });   // the modern review keeps the words looked up in its Vocabulary tab
         }).catch(() => {
             clearTimeout(bail);
             settle('Not in the offline glossary, and it could not be looked up — check your connection.', 'dict-miss');

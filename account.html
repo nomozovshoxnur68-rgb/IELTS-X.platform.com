@@ -209,6 +209,7 @@
                             <button type="button" role="tab" class="acc-tab" data-tab="profile">Profile</button>
                             <button type="button" role="tab" class="acc-tab" data-tab="security">Security</button>
                             <button type="button" role="tab" class="acc-tab" data-tab="subscription">Subscription</button>
+                            <button type="button" role="tab" class="acc-tab" data-tab="interface">Interface</button>
                             <button type="button" role="tab" class="acc-tab" data-tab="appearance">Appearance</button>
                         </nav>
 
@@ -282,6 +283,32 @@
                                     <div id="orders-list" class="acc-list"><div class="ix-skel" style="height:52px"></div><div class="ix-skel" style="height:52px"></div></div>
                                 </section>
                             </div>
+                        </div>
+
+                        <!-- INTERFACE: the look of the Reading tests (assets/js/reading-ui.js, /api/account/reading-ui) -->
+                        <div class="acc-panel" data-tab-panel="interface" role="tabpanel" hidden>
+                            <section class="acc-card">
+                                <h2>Reading test interface</h2>
+                                <p class="acc-sub" id="rui-sub">Choose how the Reading tests look for you. It is kept with your account, so it follows you to every device. Your answers, highlights, notes and settings work the same in both.</p>
+                                <div class="acc-uis" role="radiogroup" aria-label="Reading test interface" id="rui-list">
+                                    <button type="button" class="acc-ui" role="radio" data-rui="modern" aria-checked="false">
+                                        <span class="acc-ui-pic"><img src="/assets/reading-ui-modern.svg" alt="" width="320" height="200"></span>
+                                        <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>New interface</span>
+                                        <span class="acc-ui-text">Clock in the middle, headings above the paragraphs, and a review with explanation cards and a Vocabulary tab.</span>
+                                    </button>
+                                    <button type="button" class="acc-ui" role="radio" data-rui="classic" aria-checked="false">
+                                        <span class="acc-ui-pic"><img src="/assets/reading-ui-classic.svg" alt="" width="320" height="200"></span>
+                                        <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>Classic interface</span>
+                                        <span class="acc-ui-text">The interface the tests have always had, with the explanations under the questions.</span>
+                                    </button>
+                                    <button type="button" class="acc-ui" role="radio" data-rui="" aria-checked="true">
+                                        <span class="acc-ui-pic acc-ui-auto"><img src="/assets/reading-ui-modern.svg" alt="" width="320" height="200"><img src="/assets/reading-ui-classic.svg" alt="" width="320" height="200"></span>
+                                        <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>As set by IELTSX</span>
+                                        <span class="acc-ui-text" id="rui-auto">Every test opens in the interface chosen for it.</span>
+                                    </button>
+                                </div>
+                                <p class="acc-sub" id="rui-note">The change starts with the next test you open. Full Mock tests always use the classic interface.</p>
+                            </section>
                         </div>
 
                         <!-- APPEARANCE -->

@@ -142,6 +142,26 @@ a.acc-item:hover { background: hsl(var(--accent)); }
 .acc-theme-prev.dark { background: #1f1f1f; border: 1px solid #333; } .acc-theme-prev.dark i { background: #4b4b4b; }
 .acc-theme-prev.system { background: linear-gradient(90deg, #f8fafc 50%, #1f1f1f 50%); border: 1px solid #94a3b8; } .acc-theme-prev.system i { background: #94a3b8; }
 
+/* the interface of the Reading tests */
+.acc-uis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 14px; }
+.acc-ui { display: flex; flex-direction: column; gap: 10px; padding: 10px 10px 14px; border-radius: 14px; border: 1.5px solid hsl(var(--border)); background: none; color: hsl(var(--foreground));
+  font: 400 13px/1.5 var(--ix-font); text-align: left; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .1s; min-width: 0; }
+.acc-ui:hover:not(:disabled) { border-color: hsl(var(--ring)); }
+.acc-ui:active:not(:disabled) { transform: translateY(1px); }
+.acc-ui:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
+.acc-ui[aria-checked="true"] { border-color: hsl(var(--primary)); box-shadow: 0 0 0 3px hsl(var(--primary) / .15); }
+.acc-ui:disabled { opacity: .6; cursor: default; }
+.acc-ui-pic { position: relative; display: block; overflow: hidden; border: 1px solid hsl(var(--border)); border-radius: 9px; background: #fff; aspect-ratio: 16 / 10; }
+.acc-ui-pic img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+.acc-ui-auto img + img { position: absolute; inset: 0; clip-path: inset(0 0 0 50%); }
+.acc-ui-auto::after { content: ""; position: absolute; top: 0; bottom: 0; left: calc(50% - 1px); width: 2px; background: hsl(var(--primary) / .55); }
+.acc-ui-name { display: flex; align-items: center; gap: 9px; padding: 0 4px; font-size: 14.5px; font-weight: 600; }
+.acc-ui-dot { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid hsl(var(--muted-foreground) / .6); flex: none; box-sizing: border-box; }
+.acc-ui[aria-checked="true"] .acc-ui-dot { border: 5px solid hsl(var(--primary)); }
+.acc-ui-text { padding: 0 4px; color: hsl(var(--muted-foreground)); }
+@media (max-width: 900px) { .acc-uis { grid-template-columns: minmax(0, 1fr); } .acc-ui { display: grid; grid-template-columns: 132px minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 4px 14px; padding: 10px; } .acc-ui-pic { grid-row: 1 / span 2; } .acc-ui-name { align-self: end; } }
+@media (max-width: 480px) { .acc-ui { grid-template-columns: 104px minmax(0, 1fr); } }
+
 /* toast */
 #ix-toast { font-family: var(--ix-font) !important; }
 

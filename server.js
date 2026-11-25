@@ -779,6 +779,23 @@ function cleanDesignPref(b) {
   return { design: DESIGN_IDS.test(id) ? id : '', effect: fx === 'none' || DESIGN_FX.includes(fx) ? fx : '', accent: cleanHex(b.accent), motion: b.motion !== false,
     at: Math.max(0, Math.min(Date.now() + 60000, Math.floor(Number(b.at) || Date.now()))) };
 }
+/* ---- the two looks of a Reading test, "classic" and "modern" (assets/js/reading-ui.js, assets/css/reading-modern.css) ----
+   The setting "reading-ui" keeps the default of the website, whether a student may choose (Account -> Interface) and the look
+   of the built-in test pages by address. A test made in the admin panel carries its own look (data.ui). What a student chose is
+   the setting "reading-ui:<user id>". The student's choice comes first, then the test, then the default. */
+const READING_UIS = ['classic', 'modern'];
+const cleanReadingUi = (v) => (READING_UIS.includes(v) ? v : '');
+const READING_PAGE = /^\/(?:full-tests\/reading\/test-[a-z0-9-]{1,30}|pessages\/test-\d{1,4})$/;
+function cleanReadingUiConfig(b) {
+  b = b && typeof b === 'object' ? b : {};
+  const pages = {};
+  Object.entries(b.pages && typeof b.pages === 'object' ? b.pages : {}).slice(0, 400).forEach(([k, v]) => { const key = hrefPath(k); if (READING_PAGE.test(key) && cleanReadingUi(v)) pages[key] = v; });
+  return { default: cleanReadingUi(b.default) || 'classic', choice: b.choice !== false, pages };
+}
+async function getReadingUi(fresh) {
+  let s = null; try { s = await store.getSetting('reading-ui', { fresh: !!fresh }); } catch (e) { if (fresh) throw e; /* the classic look */ }
+  return { ...cleanReadingUiConfig(s), updatedAt: (s && s.updatedAt) || '' };
+}
 async function getPricing() {
   let s = null; try { s = await store.getSetting('pricing-config'); } catch (e) { /* defaults */ }
   return normalizePricing(s && typeof s === 'object' ? s : null);
@@ -1021,7 +1038,10 @@ function cleanMaterialData(type, d) {
     // Reading comes in two formats: "part" = one passage (like pessages/test-19), "full" = three passages (like full-tests/reading/test-1)
     out.mode = d.mode === 'full' ? 'full' : 'part';
     out.passage = out.mode === 'full' ? '' : cut(d.passage, 60000);
-    if (out.mode === 'full') out.passages = [0, 1, 2].map((i) => { const x = (Array.isArray(d.passages) ? d.passages[i] : null) || {}; return { title: cut(x.title, 200).trim(), passage: cut(x.passage, 60000) }; });
+    // the words of the Vocabulary tab of the review, one per line: word | definition | translation | example (reading-exam.js)
+    out.vocabText = out.mode === 'full' ? '' : cut(d.vocabText, 20000);
+    if (out.mode === 'full') out.passages = [0, 1, 2].map((i) => { const x = (Array.isArray(d.passages) ? d.passages[i] : null) || {}; return { title: cut(x.title, 200).trim(), passage: cut(x.passage, 60000), vocabText: cut(x.vocabText, 20000) }; });
+    out.ui = cleanReadingUi(d.ui);   // the look of this test ("" = the default of the website)
     out.no = Math.max(0, Math.floor(Number(d.no) || 0));
     // the card on the Reading practice page: picture, "Passage 1/2/3" tag, question-type chips (empty = taken from the questions)
     out.coverUrl = cleanUrl(d.coverUrl);
@@ -1656,6 +1676,20 @@ async function api(req, res, url) {
     await store.setSetting('ui:' + u.id, pref, { minimal: true });
     return send(res, 200, { pref });
   }
+  // the look of the Reading tests: asked by every test page, and by Account -> Interface
+  if (method === 'GET' && p === '/api/reading-ui') {
+    const cfg = await getReadingUi(); const u = await currentUser(req); let pref = null;
+    if (u) { try { pref = await store.getSetting('reading-ui:' + u.id); } catch (e) { /* no choice yet */ } }
+    return send(res, 200, { default: cfg.default, choice: cfg.choice, pages: cfg.pages, pref: cleanReadingUi(pref && pref.ui), signedIn: !!u }, { 'Cache-Control': 'private, no-store', Vary: 'Cookie' });
+  }
+  if (p === '/api/account/reading-ui' && method === 'POST') {
+    const u = await requireUser(req);
+    rateLimit('reading-ui:' + u.id, 60, 10 * 60000);
+    const ui = cleanReadingUi(((await readJson(req, 1024)) || {}).ui);
+    if (!(await getReadingUi()).choice) throw new HttpError(403, 'The interface of the tests is set by IELTSX right now.');
+    await store.setSetting('reading-ui:' + u.id, { ui, at: new Date().toISOString() }, { minimal: true });
+    return send(res, 200, { pref: ui });
+  }
   if (method === 'GET' && p === '/api/plans') { const cfg = await getPricing(); return send(res, 200, { currency: cfg.currency, usdRate: cfg.usdRate, months: cfg.months, plans: cfg.plans.filter((x) => x.active), contact: cfg.contact, instructions: cfg.instructions, promo: promoPublic(bannerPromo(cfg)), payme: payme().enabled() }, { 'Cache-Control': 'no-store' }); }
   // a promo code typed on the Price page: is it valid (and for which plans)? Only the code in the promo strip is public.
   if (method === 'POST' && p === '/api/promo/check') {
@@ -1908,6 +1942,13 @@ async function api(req, res, url) {
       await audit(admin, 'design.save', 'design', { default: d.default, effect: d.defaultEffect, themes: d.themes.length, accents: d.accents.length, access: acc });
       return send(res, 200, { design: await getDesign() });
     }
+    if (method === 'GET' && p === '/api/admin/reading-ui') return send(res, 200, { config: await getReadingUi(true) }, { 'Cache-Control': 'no-store' });
+    if (method === 'POST' && p === '/api/admin/reading-ui') {
+      const cfg = cleanReadingUiConfig(await readJson(req, 64 * 1024));
+      await store.setSetting('reading-ui', { ...cfg, updatedAt: new Date().toISOString() });
+      await audit(admin, 'reading-ui.save', cfg.default, { choice: cfg.choice, pages: Object.keys(cfg.pages).length });
+      return send(res, 200, { config: await getReadingUi(true) });
+    }
     if (method === 'GET' && p === '/api/admin/site-check') {   // Website check (site-check.js): read only
       const report = await runSiteCheck(url.searchParams.get('fresh') === '1');
       return send(res, 200, report, { 'Cache-Control': 'no-store' });
@@ -2045,6 +2086,7 @@ async function api(req, res, url) {
       await store.deleteResultsByUser(u.id);
       await aiStore().removeByUser(u.id).catch(() => null);   // the saved AI checks go with the account
       await teachers().forgetUser(teachCtx(), u.id).catch(() => null);   // out of their class, their own class and e-book progress go
+      await store.deleteSetting('reading-ui:' + u.id).catch(() => null);
       await store.deleteUser(u.id);
       await audit(admin, 'user.delete', u.email);
       return send(res, 200, { ok: true });
@@ -2111,6 +2153,7 @@ async function api(req, res, url) {
       if (b.premium !== undefined) { patch.premium = !!b.premium; try { const r0 = { ...(await accessRules(true)) }; if (r0['mat:' + id]) { delete r0['mat:' + id]; await store.setSetting('access-rules', { rules: cleanRules(r0), updatedAt: new Date().toISOString() }); rulesCache = { t: 0, v: {} }; } } catch (e) { /* the flag still applies */ } }
       if (b.published !== undefined) patch.published = !!b.published;
       if (b.data !== undefined) patch.data = await keepReadingNo(cur.type, cleanMaterialData(cur.type, b.data), cur);
+      else if (b.ui !== undefined && cur.type === 'reading') patch.data = { ...(cur.data || {}), ui: cleanReadingUi(b.ui) };   // only the look (the cards of the Reading lists)
       const item = await store.updateMaterial(id, patch); if (!item) throw new HttpError(404, 'Material not found.');
       await audit(admin, 'material.edit', item.title, b.premium !== undefined ? { premium: patch.premium } : undefined);
       return send(res, 200, { item });

@@ -910,3 +910,25 @@ split / join / move, sub-headings and footnotes. Saved as `[A] text`: exactly th
 Letters printed in pasted text ("A. …", "A Text") are found as before (`assets/js/passage-core.js`, shared by the server and the
 admin panel). Matching information takes "Letters of the passage", matching headings "A question for every paragraph"; the
 checker says when the letters are missing. Pictures kept in the database (`/api/media/…`) now show in Reading passages too.
+
+## Two interfaces for the Reading tests: classic and new (November 2026)
+
+A Reading test has two looks on one engine (`reading.js`): **classic** (`reading.css`, unchanged) and **new** ("modern":
+`assets/css/reading-modern.css` + `assets/js/reading-ui.js`). Timer, answers, highlights, notes, settings, submitting, marking and
+the results page are the same code in both; `reading.js` only tells `ReadingUI` what it has drawn (`ui('passage' | 'review' | …)`).
+A page without `reading-ui.js` (the Full Mock papers) is always classic. All rules of the new look start with `html.rui-modern`.
+
+* **Who decides** (the first that is set): `?ui=modern|classic` in the address (one page view, the preview links) → the student's own
+  choice (**Account → Interface**) → the test → the default of the website. The answer of `GET /api/reading-ui` is remembered in the
+  browser (`ix-reading-ui`), so the right look is there from the first paint.
+* **Account → Interface** (`/account#interface`): New, Classic or "As set by IELTSX"; saved with the account
+  (`POST /api/account/reading-ui`, setting `reading-ui:<user id>`).
+* **Admin → Reading interface** (`#readingui`, `admin-reading-ui.js`, setting `reading-ui`): the default, whether students may choose,
+  the look of every built-in test page, preview links. A test made in the panel has **Interface of this test** in its form, a menu on
+  its card and a bulk action (`data.ui`; `PATCH /api/admin/materials/<id>` with `{ ui }` changes only the look).
+* **The new review**: "Questions Review" lists every question with its mark, the given and the right answer and **Explain More**, which
+  opens the explanation as a card (answers, why, the words of the passage, synonyms, o'zbekcha). The passage shows the evidence of
+  every question with its number (Q14 …); a click on it opens the question. **Vocabulary (N)** is the second tab.
+* **Vocabulary**: typed in the form of a Reading test (one field per passage), one word per line:
+  `word (adj) | definition | o'zbekcha | example`. Words the student looks up with a double click are collected in the same tab.
+* The five oldest passages (`pessages/test-1, 2, 7, 17, 18`) are pages of their own without the shared engine: they keep their look.

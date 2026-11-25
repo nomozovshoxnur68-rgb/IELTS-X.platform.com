@@ -84,6 +84,9 @@
     return { img: d.coverUrl, tag: ({ reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', magazine: 'Magazine', other: 'PDF' })[d.category] || 'PDF', sub: (d.fileUrl ? '📄 PDF uploaded' : '⚠ no PDF file') + (d.pages ? ' · ' + d.pages + ' pages' : ''), href: d.fileUrl || '' };
   }
   const ACCESS = [['free', '🔓 Free'], ['standard', '🔒 Standard'], ['max', '🔒 Max'], ['ultra', '🔒 Ultra']];
+  /* the look of a Reading test (assets/js/reading-ui.js): its own, or the default of Admin -> Reading interface */
+  const LOOKS = [['', 'Default interface'], ['modern', 'New interface'], ['classic', 'Classic interface']];
+  const lookSelect = (m) => `<select class="field pc-look" data-ct-look="${esc(m.id)}" title="How this test looks for students (a student's own choice in Account comes first)">${LOOKS.map(([v, l]) => `<option value="${v}" ${String((m.data || {}).ui || '') === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const accessOf = (m) => { const r = matRules[m.id]; if (r) return r.mode && r.mode !== 'default' ? r.mode : r.locked ? r.plan || 'standard' : 'free'; return m.premium ? 'standard' : 'free'; };
   const accessSelect = (m, type) => `<select class="field pc-access" data-ct-access="${esc(m.id)}" data-type="${type}" title="Who can open it (more plans in Access)">${ACCESS.map(([v, l]) => `<option value="${v}" ${accessOf(m) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   function renderCardGrid(type, mode) {
@@ -98,7 +101,7 @@
         <div class="pc-img">${c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy">` : `<div class="pc-noimg">${mode === 'full' ? 'Full test' : 'No picture yet<br><span>Edit → upload card picture</span>'}</div>`}<label class="pc-sel" title="Select for a bulk action"><input type="checkbox" data-ct-sel="${esc(m.id)}" data-type="${type}" ${selected.has(m.id) ? 'checked' : ''}></label><span class="pc-tag">${esc(c.tag)}</span>${n === 0 && items.length > 1 ? '<span class="pc-new">NEW</span>' : ''}${m.published === false ? '<span class="pc-draft">Hidden</span>' : ''}</div>
         <div class="pc-body"><div class="muted sm">${mode === 'full' ? '📦 ' : ''}${esc(m.pack || (mode === 'full' ? 'Practice' : type === 'reading' ? 'Starter Pack' : '—'))} · ${fmt(m.createdAt)}</div><div class="pc-title">${esc(m.title)}</div>
           <div class="muted sm">${esc(c.sub)}</div>
-          <div class="btn-row" style="margin:8px 0">${accessSelect(m, type)}<button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" ${ids} type="button" title="Click to change">${m.published === false ? 'Hidden' : 'Visible'}</button></div>
+          <div class="btn-row" style="margin:8px 0">${accessSelect(m, type)}${type === 'reading' ? lookSelect(m) : ''}<button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" ${ids} type="button" title="Click to change">${m.published === false ? 'Hidden' : 'Visible'}</button></div>
           <div class="btn-row"><button class="btn btn-sm" data-ct="edit" ${ids} type="button">Edit</button><button class="btn btn-sm" data-ct="dup" ${ids} type="button" title="Make a copy (saved as Hidden)">Copy</button>${c.href ? `<a class="btn btn-sm" href="${esc(c.href)}" target="_blank" rel="noopener">Open ↗</a>` : ''}${mode ? `<button class="btn btn-sm" data-ct="move" ${ids} data-to="${other}" type="button" title="Move this test to ${esc(otherName)}">→ ${other === 'full' ? 'Full' : 'Part'}</button>` : ''}<button class="btn btn-sm btn-danger" data-ct="delete" ${ids} data-title="${esc(m.title)}" type="button">Remove</button></div></div></div>`;
     }).join('');
     mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${G.title}</div>
@@ -109,6 +112,7 @@
         <div class="pc-bulk" data-bulk="${view}" hidden><strong data-bulk-count></strong>
           <button class="btn btn-sm" data-bulk-do="show" type="button">Make visible</button><button class="btn btn-sm" data-bulk-do="hide" type="button">Hide</button>
           <select class="field" data-bulk-access style="width:auto"><option value="">Access…</option>${ACCESS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>
+          ${type === 'reading' ? `<select class="field" data-bulk-look style="width:auto"><option value="-">Interface…</option>${LOOKS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>` : ''}
           <button class="btn btn-sm" data-bulk-do="pack" type="button">${mode === 'full' ? 'Move to pack…' : 'Set pack…'}</button>
           ${mode ? `<button class="btn btn-sm" data-bulk-do="move" data-to="${other}" type="button">Move to ${esc(otherName)}</button>` : ''}
           <button class="btn btn-sm btn-danger" data-bulk-do="delete" type="button">Remove</button><button class="btn btn-sm" data-bulk-do="clear" type="button">Clear</button></div>` : ''}
@@ -132,12 +136,13 @@
   async function setAccess(ids, mode) {
     await api('/api/admin/access', { method: 'POST', body: JSON.stringify({ changes: ids.map((id) => ({ key: 'mat:' + id, mode })) }) });
   }
+  const setLook = (id, ui) => api('/api/admin/materials/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ ui }) });
   /* Part <-> Full: the same test, moved to the other list (Reading also moves its passage text) */
   function switchMode(item, to) {
     const d = JSON.parse(JSON.stringify(item.data || {})); d.mode = to;
     if (item.type === 'reading') {
-      if (to === 'full') { const ps = Array.isArray(d.passages) && d.passages.length ? d.passages : [{}, {}, {}]; if (!String((ps[0] || {}).passage || '').trim()) ps[0] = { title: item.title, passage: d.passage || '' }; d.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); if (!d.durationMin || d.durationMin === 20) d.durationMin = 60; }
-      else { if (!String(d.passage || '').trim()) d.passage = ((d.passages || [])[0] || {}).passage || ''; if (d.durationMin === 60) d.durationMin = 20; }
+      if (to === 'full') { const ps = Array.isArray(d.passages) && d.passages.length ? d.passages : [{}, {}, {}]; if (!String((ps[0] || {}).passage || '').trim()) ps[0] = { title: item.title, passage: d.passage || '', vocabText: d.vocabText || '' }; d.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); if (!d.durationMin || d.durationMin === 20) d.durationMin = 60; }
+      else { if (!String(d.passage || '').trim()) { d.passage = ((d.passages || [])[0] || {}).passage || ''; if (!String(d.vocabText || '').trim()) d.vocabText = ((d.passages || [])[0] || {}).vocabText || ''; } if (d.durationMin === 60) d.durationMin = 20; }
     }
     if (item.type === 'listening') { if (to === 'full' && (!d.durationMin || d.durationMin === 10)) d.durationMin = 30; if (to === 'part' && d.durationMin === 30) d.durationMin = 10; }
     return d;
@@ -150,7 +155,11 @@
     if (action === 'delete' && !confirm('Remove ' + ids.length + ' test(s)? Students will no longer see them.')) return;
     let pack = null;
     if (action === 'pack') { pack = prompt('Pack name for the ' + ids.length + ' selected test(s) (an existing pack, or a new name):\n' + packNames(type).join(', '), ''); if (pack === null) return; }
-    if (action === 'access') { await setAccess(ids, value); toast(ids.length + ' test(s): ' + (ACCESS.find((x) => x[0] === value) || ['', value])[1]); }
+    if (action === 'look') {
+      for (const id of ids) await setLook(id, value);
+      toast(ids.length + ' test(s): ' + LOOKS.find((x) => x[0] === value)[1]);
+    }
+    else if (action === 'access') { await setAccess(ids, value); toast(ids.length + ' test(s): ' + (ACCESS.find((x) => x[0] === value) || ['', value])[1]); }
     else {
       let done = 0;
       for (const id of ids) {
@@ -281,7 +290,7 @@
 
   /* ───────── builder ───────── */
   const blankQ = (type, passage) => ({ type: type || (draft && draft.type === 'listening' ? 'gap' : 'short'), passage: passage || 1, group: '', blockTitle: '', title: '', prompt: '', options: [], answer: '', explanation: '' });
-  const blankPassages = () => [{ title: '', passage: '' }, { title: '', passage: '' }, { title: '', passage: '' }];
+  const blankPassages = () => [{ title: '', passage: '', vocabText: '' }, { title: '', passage: '', vocabText: '' }, { title: '', passage: '', vocabText: '' }];
   const blankTask = (n) => ({ title: 'Task ' + n, kind: n === 1 ? 'task1' : 'task2', prompt: '', imageUrl: '', chartText: '', chartUnit: '', minWords: n === 1 ? 150 : 250, minutes: n === 1 ? 20 : 40, sample: '' });
   /* the three speaking parts: title, preparation and speaking time (a Part practice card usually has only one of them) */
   const SPEAK_PARTS = {
@@ -299,7 +308,7 @@
     const full = mode === 'full';
     const data = { durationMin: type === 'writing' ? (full ? 60 : 20) : type === 'listening' ? (full ? 30 : 10) : type === 'reading' ? (full ? 60 : 20) : 60, instructions: '', images: [] };
     if (MODE_TYPES.includes(type)) data.mode = full ? 'full' : 'part';
-    if (type === 'reading') Object.assign(data, { coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()] });
+    if (type === 'reading') Object.assign(data, { coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()], ui: '', vocabText: '' });
     if (type === 'listening') Object.assign(data, { audioUrl: '', audioStart: 0, audioEnd: 0, transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ('gap')] });
     if (type === 'pdf') { Object.assign(data, { fileUrl: '', coverUrl: '', category: 'reading', badge: 'PDF', corner: '', pages: 0, tags: [] }); delete data.instructions; delete data.images; }
     if (type === 'speaking') data.parts = full ? [blankPart(1), blankPart(2), blankPart(3)] : [blankPart(1)];
@@ -419,7 +428,22 @@
   function passagesBlock() {
     const ps = draft.data.passages || [];
     return [0, 1, 2].map((k) => window.IXPassageEditor.block(`data.passages.${k}.passage`, { label: `Passage ${k + 1}${k === 0 ? ' *' : ' (leave empty if the test has fewer passages)'}`, rows: 12, ph: `Paste passage ${k + 1} here`,
-      head: `<input class="field" placeholder="Passage ${k + 1} title (optional)" data-p="data.passages.${k}.title" value="${esc((ps[k] || {}).title)}" maxlength="200">` })).join('');
+      head: `<input class="field" placeholder="Passage ${k + 1} title (optional)" data-p="data.passages.${k}.title" value="${esc((ps[k] || {}).title)}" maxlength="200">` }) + passageWords(`data.passages.${k}.vocabText`, (ps[k] || {}).vocabText, 'Vocabulary of passage ' + (k + 1))).join('');
+  }
+  /* the look of this test for students: the website's default, or one of its own */
+  function lookBlock() {
+    const cur = String(draft.data.ui || '');
+    const pic = { '': '', modern: '/assets/reading-ui-modern.svg', classic: '/assets/reading-ui-classic.svg' };
+    const help = { '': 'As set in <a href="#readingui">Reading interface</a>', modern: 'Explanation cards and a Vocabulary tab in the review', classic: 'The interface the tests have always had' };
+    return `<div class="cb-block"><strong>Interface of this test</strong><div class="muted sm">How the test looks for students. A student who chose an interface in Account sees their own choice.</div>
+      <div class="rui-picks" role="radiogroup" aria-label="Interface of this test">${LOOKS.map(([v, l]) => `<button class="rui-pick${cur === v ? ' on' : ''}" type="button" role="radio" aria-checked="${cur === v}" data-cb="look" data-look="${v}">${pic[v] ? `<img src="${pic[v]}" alt="" width="96" height="60">` : '<span class="rui-pick-auto">Auto</span>'}<span><strong>${l}</strong><span class="muted sm">${help[v]}</span></span></button>`).join('')}</div></div>`;
+  }
+  /* the words of the Vocabulary tab of the answer review, one per line */
+  const vocabLines = (t) => String(t || '').split('\n').map((l) => l.trim()).filter(Boolean).length;
+  function passageWords(path, text, label) {
+    return `<div class="cb-block"><strong>${label}</strong> <span class="muted sm">(optional) · <span data-vocab-count>${vocabLines(text)}</span> word(s)</span>
+      <div class="muted sm">Shown in the <b>Vocabulary</b> tab of the review (new interface). One word per line: <code>word (adj) | definition | o‘zbekcha | example</code>. Two columns are the word and its translation; columns copied from Excel work too.</div>
+      <textarea class="field" rows="6" data-p="${path}" data-vocab placeholder="incinerate (v) | to burn something completely | yoqib yubormoq | The waste is incinerated at high temperature.">${esc(text)}</textarea></div>`;
   }
   /* which passage (full reading, 1-3) or which part (full listening, 1-4) a group / picture belongs to */
   const passSelect = (path, cur) => { const L = draft.type === 'listening'; return `<select class="field" style="width:auto" data-p="${path}" data-num="1" data-rerender="1" title="${L ? 'Which part?' : 'Which passage?'}">${(L ? [1, 2, 3, 4] : [1, 2, 3]).map((n) => `<option value="${n}" ${Number(cur || 1) === n ? 'selected' : ''}>${L ? 'Part' : 'Passage'} ${n}</option>`).join('')}</select>`; };
@@ -1809,7 +1833,7 @@
     if (t === 'article') { $('#builder-body').innerHTML = articleForm(); return syncSave(); }
     $('#builder-body').innerHTML = `
       ${draft._ai ? aiBanner() : ''}
-      ${t === 'reading' ? readingFormatBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
+      ${t === 'reading' ? readingFormatBlock() + lookBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
       ${MODE_TYPES.includes(t) && !draft._ai ? importBlock() : ''}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(d.mode === 'full' ? 'Pack on the Full Tests page — pick one below, or type a new name for a new pack card' : 'Pack line shown on the card (optional, e.g. Starter Pack)', 'pack', draft.pack, 'list="ix-pack-list" placeholder="' + (d.mode === 'full' ? 'e.g. Pack 5 (empty = Practice)' : 'e.g. Starter Pack') + '" autocomplete="off"')}<datalist id="ix-pack-list">${(d.mode === 'full' ? packNames(draft.type) : [PRE_TEST]).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>${packPicks()}
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
@@ -1817,7 +1841,7 @@
         <label class="lbl">Who can open it<select class="field" data-p="_access">${ACCESS.map(([v, l]) => `<option value="${v}" ${(draft._access || (draft.premium ? 'standard' : 'free')) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
         ${draft._ai ? '<div class="muted sm">Saved as a <b>Draft</b> (students do not see it) until you press <b>Publish</b>.</div>' : `<div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>`}</div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
-      ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : window.IXPassageEditor.block('data.passage', { label: 'Passage text *', rows: 14, ph: 'Paste the passage. Leave an empty line between paragraphs. Tip: ## for a sub-heading, * for a footnote.' })) : ''}
+      ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : window.IXPassageEditor.block('data.passage', { label: 'Passage text *', rows: 14, ph: 'Paste the passage. Leave an empty line between paragraphs. Tip: ## for a sub-heading, * for a footnote.' }) + passageWords('data.vocabText', d.vocabText, 'Vocabulary')) : ''}
       ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
         <label class="lbl">Audio link (https://… or /uploads/…)<input class="field" data-p="data.audioUrl" value="${esc(d.audioUrl)}" placeholder="https://…/recording.mp3"></label>
         <div class="cb-grid"><label class="lbl">Starts at (seconds, 0 = from the beginning)<input class="field" type="number" min="0" data-p="data.audioStart" data-num="1" value="${esc(d.audioStart || 0)}"></label><label class="lbl">Ends at (seconds, 0 = until the end)<input class="field" type="number" min="0" data-p="data.audioEnd" data-num="1" value="${esc(d.audioEnd || 0)}"></label></div>
@@ -1867,6 +1891,11 @@
         syncBulk(ds.ctSelall); return true;
       }
       if (ds.ctAccess) { await setAccess([ds.ctAccess], el.value); toast('Access: ' + el.options[el.selectedIndex].text); await loadType(ds.type); return true; }
+      if (ds.ctLook) {
+        await setLook(ds.ctLook, el.value); const it = (lists.reading || []).find((x) => x.id === ds.ctLook); if (it) it.data = { ...(it.data || {}), ui: el.value };
+        toast(el.value ? 'This test opens in the ' + (el.value === 'modern' ? 'new' : 'classic') + ' interface' : 'This test opens in the default interface'); return true;
+      }
+      if (el.matches('[data-bulk-look]')) { const v = el.value; el.value = '-'; if (v !== '-') await bulk(viewOfEl(el), 'look', v); return true; }
       if (el.matches('[data-bulk-access]')) { const v = el.value; el.value = ''; if (v) await bulk(viewOfEl(el), 'access', v); return true; }
     } catch (err) { fail(err); return true; }
     return false;
@@ -1891,6 +1920,7 @@
       if (v === 'full' && (!dd.durationMin || dd.durationMin === 20)) dd.durationMin = 60; if (v === 'part' && dd.durationMin === 60) dd.durationMin = 20;
     }
     setPath(draft, p, v);
+    if (el.dataset.vocab !== undefined) { const n = el.closest('.cb-block').querySelector('[data-vocab-count]'); if (n) n.textContent = vocabLines(v); }
     const gt = /^groups\.(\d+)\.type$/.exec(p);
     if (gt) {   // another type: the option list moves between the group (matching / map / box) and the questions (multiple choice)
       const g = draft.groups[Number(gt[1])]; const shared = SHARED_OPTS.includes(g.type);
@@ -1953,7 +1983,7 @@
     }
     if (!draft.title.trim()) return toast('Please enter a title.', true);
     if (draft.type === 'reading' && d.mode === 'full') {
-      d.passages = (d.passages || blankPassages()).map((x) => ({ title: String((x && x.title) || '').trim(), passage: String((x && x.passage) || '') }));
+      d.passages = (d.passages || blankPassages()).map((x) => ({ title: String((x && x.title) || '').trim(), passage: String((x && x.passage) || ''), vocabText: String((x && x.vocabText) || '') }));
       if (!d.passages[0].passage.trim()) return toast('Please paste the text of Passage 1.', true);
       const used = (d.questions || []).filter((q) => String(q.prompt || '').trim()).map((q) => Number(q.passage) || 1);
       const bad = [1, 2, 3].find((n) => used.includes(n) && !d.passages[n - 1].passage.trim());
@@ -2033,6 +2063,10 @@
       const a = t.dataset.cb, i = Number(t.dataset.i), d = draft.data;
       const scrollToLast = (sel) => { const all = document.querySelectorAll(sel); if (all.length) all[all.length - 1].scrollIntoView({ block: 'center' }); };
       if (a === 'img-add') { const url = await pickAndUpload('image/*', $('#img-status')); if (url) { draft.data.images.push({ url, caption: '' }); renderBuilder(); } }
+      else if (a === 'look') {
+        d.ui = t.dataset.look || '';
+        document.querySelectorAll('#builder-body .rui-pick').forEach((b) => { const on = b.dataset.look === d.ui; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
+      }
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
       else if (a === 'check') showIssues(validate(), true);

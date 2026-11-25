@@ -46,8 +46,8 @@ sidebarBtn?.addEventListener('click', (e) => {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dropdown.classList.add('hidden'); });
 })();
 
-/* tabs (#profile #security #subscription #appearance; old links such as #invites open Profile) */
-const TABS = ['profile', 'security', 'subscription', 'appearance'];
+/* tabs (#profile #security #subscription #interface #appearance; old links such as #invites open Profile) */
+const TABS = ['profile', 'security', 'subscription', 'interface', 'appearance'];
 const tabBtns = $$('.acc-tab');
 const panels = Object.fromEntries(TABS.map((id) => [id, $(`[data-tab-panel="${id}"]`)]));
 function activateTab(id, remember) {
@@ -290,6 +290,42 @@ function set(id, text) { const el = document.getElementById(id); if (el) el.text
         }));
     }
     load();
+})();
+
+/* interface: the look of the Reading tests. Kept with the account; the copy in this browser ("ix-reading-ui", the same one
+   assets/js/reading-ui.js reads) makes the next test open in the right look from its first paint. */
+(async function readingInterface() {
+    const box = $('#rui-list'); if (!box) return;
+    const opts = $$('.acc-ui', box), KEY = 'ix-reading-ui', NAME = { modern: 'the new interface', classic: 'the classic interface' };
+    const show = (ui) => opts.forEach((o) => { const on = o.dataset.rui === ui; o.setAttribute('aria-checked', String(on)); o.tabIndex = on ? 0 : -1; });
+    const keep = (cfg) => { try { localStorage.setItem(KEY, JSON.stringify({ default: cfg.default, choice: cfg.choice, pages: cfg.pages, pref: cfg.pref })); } catch (e) { /* blocked */ } };
+    let cfg;
+    try { cfg = await getJson('/api/reading-ui'); }
+    catch (e) { const n = $('#rui-note'); if (n) n.textContent = 'Could not load your choice. Refresh the page to try again.'; opts.forEach((o) => { o.disabled = true; }); return; }
+    const auto = $('#rui-auto'); if (auto) auto.textContent = 'Every test opens in the interface chosen for it. Most open in ' + (NAME[cfg.default] || NAME.classic) + '.';
+    show(cfg.choice ? cfg.pref : ''); keep(cfg);
+    if (!cfg.choice) {
+        opts.forEach((o) => { o.disabled = true; });
+        const n = $('#rui-note'); if (n) n.textContent = 'IELTSX sets the interface of every test right now, so it cannot be changed here.';
+        return;
+    }
+    async function choose(ui) {
+        if (ui === cfg.pref) return;
+        const before = cfg.pref; cfg.pref = ui; show(ui);
+        try {
+            const r = await fetch('/api/account/reading-ui', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ui }) });
+            if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not save your choice.');
+            keep(cfg);
+            toast(ui ? 'Saved. Your Reading tests open in ' + NAME[ui] + '.' : 'Saved. Every test opens in the interface chosen for it.');
+        } catch (err) { cfg.pref = before; show(before); toast(err.message || 'Could not save your choice.', true); }
+    }
+    opts.forEach((o) => o.addEventListener('click', () => choose(o.dataset.rui)));
+    box.addEventListener('keydown', (e) => {
+        const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]; if (!step) return;
+        e.preventDefault();
+        const i = opts.findIndex((o) => o.getAttribute('aria-checked') === 'true'), next = opts[(i + step + opts.length) % opts.length];
+        next.focus(); choose(next.dataset.rui);
+    });
 })();
 
 /* appearance: light / dark / system (same "theme" key as the rest of the site) */
