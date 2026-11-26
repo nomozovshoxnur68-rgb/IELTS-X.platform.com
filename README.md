@@ -923,7 +923,7 @@ A page without `reading-ui.js` (the Full Mock papers) is always classic. All rul
   browser (`ix-reading-ui`), so the right look is there from the first paint.
 * **Account → Interface** (`/account#interface`): New, Classic or "As set by IELTSX"; saved with the account
   (`POST /api/account/reading-ui`, setting `reading-ui:<user id>`).
-* **Admin → Reading interface** (`#readingui`, `admin-reading-ui.js`, setting `reading-ui`): the default, whether students may choose,
+* **Admin → Reading interface** (`#readingui`, `admin-test-ui.js`, setting `reading-ui`): the default, whether students may choose,
   the look of every built-in test page, preview links. A test made in the panel has **Interface of this test** in its form, a menu on
   its card and a bulk action (`data.ui`; `PATCH /api/admin/materials/<id>` with `{ ui }` changes only the look).
 * **The new review**: "Questions Review" lists every question with its mark, the given and the right answer and **Explain More**, which
@@ -932,3 +932,31 @@ A page without `reading-ui.js` (the Full Mock papers) is always classic. All rul
 * **Vocabulary**: typed in the form of a Reading test (one field per passage), one word per line:
   `word (adj) | definition | o'zbekcha | example`. Words the student looks up with a double click are collected in the same tab.
 * The five oldest passages (`pessages/test-1, 2, 7, 17, 18`) are pages of their own without the shared engine: they keep their look.
+
+## Two interfaces for the Listening tests: classic and new (November 2026)
+
+The Listening tests have the same two looks, on their own engine: **classic** (`listening/css/listening.css`, unchanged) and **new**
+(`assets/css/listening-modern.css` + `assets/js/listening-ui.js`). Audio, clock, answers, highlights, notes, the settings dialog, the
+submission page, marking and the results page are the same code in both: `listening/js/listening.js` (and `listening/js/exam-app.js`
+for `full-tests/listening/test-1`) only tells `ListeningUI` what it has drawn (`ui('sheet' | 'part' | 'nav' | 'review' | …)`). A
+page without `listening-ui.js` (the Full Mock papers) is always classic; inside a mock (`?embed=1`) a test is classic too. All
+rules of the new look start with `html.lui-modern`.
+
+* **Who decides**, as for Reading: `?ui=modern|classic` → the student's own choice (**Account → Interface**, second card;
+  `/api/account/listening-ui`, setting `listening-ui:<user id>`) → the test (`data.ui`, `<html data-lui-test>`) or the built-in page →
+  the default (**Admin → Listening interface**, `#listeningui`, setting `listening-ui`). The browser keeps the last answer in `ix-listening-ui`.
+  Reading and Listening are chosen apart. The admin page of both is `admin-test-ui.js`.
+* **The test**: the logo, the title (`[Pack] Test N - P3: title`; a full paper shows the test taker), the clock in the middle, the volume
+  slider, full screen, the settings and **Submit** (the old submission page: "Click next to continue" → Next). The notes are a list with
+  bullets, a map stands beside its grid of letters with the title in its corner; the pencil (notes) appears once there is a note.
+* **The review**: the part card has a player (play, time, position, mute, speed, ±10 s). Left the transcript, with the words behind every
+  answer marked **Q1, Q2 …** (green: the question you look at); a line with a time plays from there. Right **Questions Review** (the mark,
+  `Answer: …`, **Explain More**: the answers, why, the words of the recording, *Listen from 01:25*) and **Vocabulary (N)** with a search.
+  The words behind an answer: the question's **Transcript words to highlight** (`evidence`), else the words in "quotes" of its
+  explanation, else the sentence with the typed answer, else (letters) the sentence of its line that fits the question best.
+* **The transcript** in the form of a test: `[01:25] Tom: Good morning…` — the time is taken off the line. **⏱ Time of this line**
+  (or Ctrl + Enter) writes the time the recording is at in front of the line with the cursor and goes to the next one.
+* **Vocabulary**: one field for a section, one per part for a full paper (`data.vocabText`, `data.vocabs[0..3]`), one word per line:
+  `word (adj) | definition | o'zbekcha | example`.
+* Every test made in the panel has **Interface of this test** in its form, a menu on its card and a bulk action
+  (`PATCH /api/admin/materials/<id>` with `{ ui }`). `sections/test-5` is a saved page without the shared engine: it keeps its look.

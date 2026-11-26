@@ -285,7 +285,7 @@
                             </div>
                         </div>
 
-                        <!-- INTERFACE: the look of the Reading tests (assets/js/reading-ui.js, /api/account/reading-ui) -->
+                        <!-- INTERFACE: the look of the Reading and of the Listening tests (assets/js/reading-ui.js, listening-ui.js) -->
                         <div class="acc-panel" data-tab-panel="interface" role="tabpanel" hidden>
                             <section class="acc-card">
                                 <h2>Reading test interface</h2>
@@ -304,10 +304,33 @@
                                     <button type="button" class="acc-ui" role="radio" data-rui="" aria-checked="true">
                                         <span class="acc-ui-pic acc-ui-auto"><img src="/assets/reading-ui-modern.svg" alt="" width="320" height="200"><img src="/assets/reading-ui-classic.svg" alt="" width="320" height="200"></span>
                                         <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>As set by IELTSX</span>
-                                        <span class="acc-ui-text" id="rui-auto">Every test opens in the interface chosen for it.</span>
+                                        <span class="acc-ui-text" id="rui-auto" data-ui-auto>Every test opens in the interface chosen for it.</span>
                                     </button>
                                 </div>
-                                <p class="acc-sub" id="rui-note">The change starts with the next test you open. Full Mock tests always use the classic interface.</p>
+                                <p class="acc-sub" id="rui-note" data-ui-note>The change starts with the next test you open. Full Mock tests always use the classic interface.</p>
+                            </section>
+                            <!-- the look of the Listening tests (assets/js/listening-ui.js, /api/account/listening-ui) -->
+                            <section class="acc-card">
+                                <h2>Listening test interface</h2>
+                                <p class="acc-sub">Choose how the Listening tests look for you. Your answers, highlights, notes, the audio and the settings work the same in both.</p>
+                                <div class="acc-uis" role="radiogroup" aria-label="Listening test interface" id="lui-list">
+                                    <button type="button" class="acc-ui" role="radio" data-rui="modern" aria-checked="false">
+                                        <span class="acc-ui-pic"><img src="/assets/listening-ui-modern.svg" alt="" width="320" height="200"></span>
+                                        <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>New interface</span>
+                                        <span class="acc-ui-text">Clock in the middle, volume in the header, and a review with the transcript, explanation cards and a Vocabulary tab.</span>
+                                    </button>
+                                    <button type="button" class="acc-ui" role="radio" data-rui="classic" aria-checked="false">
+                                        <span class="acc-ui-pic"><img src="/assets/listening-ui-classic.svg" alt="" width="320" height="200"></span>
+                                        <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>Classic interface</span>
+                                        <span class="acc-ui-text">The interface the tests have always had, with the transcript beside the answer sheet.</span>
+                                    </button>
+                                    <button type="button" class="acc-ui" role="radio" data-rui="" aria-checked="true">
+                                        <span class="acc-ui-pic acc-ui-auto"><img src="/assets/listening-ui-modern.svg" alt="" width="320" height="200"><img src="/assets/listening-ui-classic.svg" alt="" width="320" height="200"></span>
+                                        <span class="acc-ui-name"><i class="acc-ui-dot" aria-hidden="true"></i>As set by IELTSX</span>
+                                        <span class="acc-ui-text" data-ui-auto>Every test opens in the interface chosen for it.</span>
+                                    </button>
+                                </div>
+                                <p class="acc-sub" data-ui-note>The change starts with the next test you open. Full Mock tests always use the classic interface.</p>
                             </section>
                         </div>
 

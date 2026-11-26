@@ -963,4 +963,7 @@ input.cb-inline{display:inline-block;width:72px;padding:2px 6px;margin:0 2px}
 .rui-pick>span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}
 .rui-group td{background:color-mix(in srgb,currentColor 4%,transparent)}
 .pc-look{width:auto;max-width:100%;padding:3px 8px;font-size:12px;border-radius:99px}
+/* Listening: the bar over the transcript that writes the time of a line (admin-content.js transcriptBlock) */
+.tr-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 8px}
+.tr-bar .muted{flex:1 1 220px}
 @media (max-width:860px){.rui-looks,.rui-picks{grid-template-columns:minmax(0,1fr)}}

@@ -630,6 +630,7 @@ function tidyAnnotations(list) {
 
 // Re-derive the stored annotation list from whatever is currently in the DOM.
 function syncAnnotations() {
+  setTimeout(function(){ui('notes',allNotes().length);},0);
   const root = partRoot();
   if (!root || state.stage !== 'listening') return;
   const p = state.currentSection;
@@ -910,7 +911,7 @@ function startTimer(section,onExpire){pauseTimer();function tick(){state.timers[
 function updateTimerDisplay(section){
   const el=document.getElementById('timer-'+section),box=document.getElementById('hdr-clock');
   const t=Math.max(0,state.timers[section]);
-  if(el)el.textContent=fmt(t);
+  if(el){const m=Math.ceil(t/60);el.textContent=document.documentElement.classList.contains('lui-modern')?m+(m===1?' minute left':' minutes left'):fmt(t);}
   if(box){box.classList.toggle('warn',t<=300&&t>60);box.classList.toggle('crit',t<=60);box.classList.toggle('hidden',!!state.timerHidden&&t>300);}
   if(t<=300)state.timerHidden=false;
 }
@@ -950,12 +951,27 @@ function toast(msg,type,duration){
 
 // RENDER
 const BUILDERS=[null,buildSection1,buildSection2,buildSection3,buildSection4];
+/* ── THE INTERFACE (assets/js/listening-ui.js): the same contract as in listening.js — the engine does the work, the interface
+   is told what has just been drawn. Without listening-ui.js on the page the test looks classic. */
+function ui(name,data){
+  try{return !!(window.ListeningUI&&window.ListeningUI.on&&window.ListeningUI.on(name,data,UI_ENGINE));}
+  catch(e){try{console.error('listening-ui:',e);}catch(x){}return false;}
+}
+const UI_ENGINE={
+  cfg:{},from:1,to:40,label:'Full test',answers:LISTENING_ANSWERS,times:ANSWER_TIMES,transcript:TRANSCRIPT,
+  parts:[1,2,3,4].map(p=>({part:p,from:p*10-9,to:p*10})),paged:true,
+  get state(){return state;},part:()=>state.currentSection||1,
+  sheet:p=>BUILDERS[p](),redraw:()=>{renderListening();},grade:()=>gradeListening(),variants:t=>answerVariants(t),
+  audio:()=>document.getElementById('exam-audio'),audioStart:0,audioLength:a=>(a&&a.duration)||0,play:(t,o)=>jumpToTime(t,o),
+  submitting:()=>isSubmitting(),finish:()=>{window.__cdiIntentionalReload=true;location.href='/full-tests/listening/';}
+};
 function renderListening(){renderSection(state.currentSection||1);}
 function renderSection(n){
   state.currentSection=n;
   const root=document.getElementById('listening-render');
   root.innerHTML=BUILDERS[n]();
   attachHandlers();
+  ui('sheet',root);   // the modern sheet: the same fields, set as a list; before the highlights are put back
   const [a,b]=NAV_RANGES[n];
   for(let i=a;i<=b;i++){if(state.listeningAnswers[i])setInput(i,state.listeningAnswers[i]);if(state.listeningFlags[i])applyFlagToPill(i);}restoreMultiGroups();
   const ranges={1:'1–10',2:'11–20',3:'21–30',4:'31–40'};
@@ -965,7 +981,8 @@ function renderSection(n){
   document.querySelectorAll('#listening-render .gap-input').forEach(gapAutoGrow);
   updateListeningNav();saveState();
   restoreAnnotations(n);   // bring highlights/notes back after the re-render
-  if(document.body.classList.contains('review-mode')){setTimeout(()=>{applyReviewReveal();reviewMultiGroups();addJumpButtons();},50);}
+  ui('part',n);
+  if(document.body.classList.contains('review-mode')&&!ui('review')){setTimeout(()=>{applyReviewReveal();reviewMultiGroups();addJumpButtons();},50);}
 }
 function setInput(qid,ans){const inp=document.getElementById('lq-'+qid);if(inp&&inp.dataset.dm){dmRestore(qid,ans);return;}if(inp&&(inp.tagName==='INPUT'||inp.tagName==='SELECT')){inp.value=ans;return;}const radios=document.getElementsByName('lq-'+qid);if(radios.length)radios.forEach(r=>{if(r.value===ans){r.checked=true;const opt=r.closest('.option');if(opt){opt.parentElement.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));opt.classList.add('selected');}}});}
 function attachHandlers(){
@@ -1094,6 +1111,7 @@ function updateListeningNav(){
   const clk=document.getElementById('hdr-clock');
   if(clk)clk.style.display=document.body.classList.contains('review-mode')?'none':'';
   updateArrowState();
+  ui('nav');
 }
 /* the official previous arrow is #dddddd — DISABLED — at Part 1, and only turns
    #4C4C4C once there is somewhere to go back to. It is never faded. */
@@ -1223,6 +1241,7 @@ function jumpToListening(qid){
   else{doScrollTo(numId);updateListeningNav();}
 }
 function doScrollTo(qid){
+  if(ui('jump',qid))return;   // the modern review has its own list
   const area=document.getElementById('listening-area');if(!area)return;
   const el=document.getElementById('lq-card-'+qid)||document.getElementById('lq-row-'+qid)||
            (document.getElementById('lq-'+qid)&&document.getElementById('lq-'+qid).closest('.q-card,.gap-line'));
@@ -2497,7 +2516,7 @@ function reviewExam(){
   const audioEl=document.getElementById('pbar-audio');
   const hdrRight=document.getElementById('hdr-right');
   const wifiBtn=document.getElementById('wifi-btn');
-  if(audioEl&&hdrRight){hdrRight.insertBefore(audioEl,wifiBtn||null);}
+  if(audioEl&&hdrRight&&!ui('transport')){hdrRight.insertBefore(audioEl,wifiBtn||null);}   // the modern review has its player in the part card
   renderListening(); // renderSection() schedules applyReviewReveal+addJumpButtons after 50ms
   updateListeningNav();
   goToStage('listening');
@@ -2537,6 +2556,7 @@ function reviewExam(){
   }
   _tpIdx=-1;
   syncTranscriptPanel(audio?(audio.currentTime||0):0);
+  ui('review');
 }
 
 /* The recording streams from the CDI server. With no connection it never

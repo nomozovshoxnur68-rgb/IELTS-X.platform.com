@@ -21,6 +21,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/listening/css/listening.css">
+<link rel="stylesheet" href="/assets/css/listening-modern.css">
+<script src="/assets/js/listening-ui.js"></script>
 
 <script src="/assets/js/access-gate.js"></script>
 <script src="/ieltsx-data.js"></script>
@@ -405,6 +407,20 @@ window.PART_PRACTICE = {
     {"sp": "Presenter", "tx": "Finally, and this is the point I found most surprising, the researchers felt that the designers of the space station were paying too much attention to safety rather than considering operating issues: that is, how the station could be run comfortably and smoothly. And the recommendation was to make changes here at quite a fundamental level.", "aw": "safety", "answers": [40]},
     {"sp": "Presenter", "tx": "So those were the main points I covered in the- [recording cuts off]"}
   ],
+
+  /* ── VOCABULARY ── the Vocabulary tab of the review (new interface) ── */
+  vocab: { 4: [
+    {"word":"teething problems","pos":"n","def":"small problems at the start of something new","uz":"dastlabki muammolar","model":"The space station had its teething problems in the early days."},
+    {"word":"confined","pos":"adj","def":"small, with very little room to move","uz":"tor, siqiq","model":"The crew lived in very confined conditions."},
+    {"word":"stale","pos":"adj","def":"not fresh","uz":"dim, aynigan (havo)","model":"They expected the air to smell stale."},
+    {"word":"morale","pos":"n","def":"how confident and happy a group of people feel","uz":"ruhiy holat, kayfiyat","model":"Talking to Earth was a key morale booster."},
+    {"word":"frustration","pos":"n","def":"the feeling of being annoyed when you cannot do what you want","uz":"hafsala pir bo‘lishi, asabiylik","model":"After a few days the frustrations became clearer."},
+    {"word":"rattle","pos":"v","def":"to make short knocking sounds again and again","uz":"taraqlamoq","model":"The air filters used to rattle and buzz all day."},
+    {"word":"fastener","pos":"n","def":"a thing that closes or holds something in place","uz":"mahkamlagich","model":"The Velcro fasteners did not work well."},
+    {"word":"preservative","pos":"n","def":"a substance that stops food or water from going bad","uz":"konservant","model":"The water contained different sorts of preservatives."},
+    {"word":"inordinate","pos":"adj","def":"far more than is usual or reasonable","uz":"haddan tashqari ko‘p","model":"Repairs took up an inordinate amount of time."},
+    {"word":"subsequent","pos":"adj","def":"coming after something else","uz":"keyingi","model":"Conditions could be improved on subsequent missions."}
+  ] },
 
   /* ── QUESTIONS ── */
   build: function (h) {

@@ -21,6 +21,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/listening/css/listening.css">
+<link rel="stylesheet" href="/assets/css/listening-modern.css">
+<script src="/assets/js/listening-ui.js"></script>
 
 <script src="/assets/js/access-gate.js"></script>
 <script src="/ieltsx-data.js"></script>
@@ -419,6 +421,20 @@ window.PART_PRACTICE = {
     {"sp": "Woman", "tx": "Bye."},
     {"sp": "Tom", "tx": "Goodbye."}
   ],
+
+  /* ── VOCABULARY ── the Vocabulary tab of the review (new interface) ── */
+  vocab: { 1: [
+    {"word":"demolish","pos":"v","def":"to knock down a building completely","uz":"buzib tashlamoq","model":"The old factory by the river has been demolished."},
+    {"word":"premises","pos":"n","def":"the buildings and land that a business or an organisation uses","uz":"bino, idora joylashgan joy","model":"The Town Hall moved to new premises in the 1950s."},
+    {"word":"staircase","pos":"n","def":"a set of stairs inside a building","uz":"zinapoya","model":"The library still has its grand staircase."},
+    {"word":"extend","pos":"v","def":"to make a building bigger by adding to it","uz":"kengaytirmoq","model":"The old school has been considerably extended."},
+    {"word":"pillar","pos":"n","def":"a tall column that holds up part of a building","uz":"ustun","model":"Cornell House has pillars in front."},
+    {"word":"permission","pos":"n","def":"the right to do something, given by the person in charge","uz":"ruxsat","model":"We have special permission to show you the upper floors."},
+    {"word":"candlelight","pos":"n","def":"the light of candles","uz":"sham yorug‘i","model":"The Saturday dinner is held by candlelight."},
+    {"word":"costume","pos":"n","def":"clothes worn to look like people of another time or place","uz":"libos, kostyum","model":"The staff all wear historical costumes."},
+    {"word":"booked up","pos":"adj","def":"with no rooms or places left","uz":"joy qolmagan, band qilingan","model":"Some places in town are already booked up."},
+    {"word":"celebration","pos":"n","def":"a special event held because something is important","uz":"bayram, nishonlash","model":"The week is a celebration of the history of the town."}
+  ] },
 
   /* ── QUESTIONS ── */
   build: function (h) {

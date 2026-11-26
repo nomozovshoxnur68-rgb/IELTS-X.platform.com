@@ -21,6 +21,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/listening/css/listening.css">
+<link rel="stylesheet" href="/assets/css/listening-modern.css">
+<script src="/assets/js/listening-ui.js"></script>
 
 <script src="/assets/js/access-gate.js"></script>
 <script src="/ieltsx-data.js"></script>
@@ -401,6 +403,20 @@ window.PART_PRACTICE = {
     {"sp": "Presenter", "tx": "Now, is there anything I've forgotten? Ah yes, the children's play area, very important for the little ones, and very near the villas. Walk from the villas towards the picnic area, and you'll come across this area where you can sit under the fig tree and watch the kids play.", "answers": [20]},
     {"sp": "Presenter", "tx": "So I hope that gives you a much better idea of where everything is located. Now, I'm sure you've all got plenty to think about and discuss, so I'll close here and let you- [recording cuts off]"}
   ],
+
+  /* ── VOCABULARY ── the Vocabulary tab of the review (new interface) ── */
+  vocab: { 2: [
+    {"word":"investment","pos":"n","def":"money spent on something to get more money or an advantage later","uz":"sarmoya, investitsiya","model":"A villa here is a wonderful investment opportunity."},
+    {"word":"establish","pos":"v","def":"to start a business or an organisation","uz":"tashkil etmoq, asos solmoq","model":"The family established a hotel here in 1911."},
+    {"word":"renowned","pos":"adj","def":"famous, known by many people","uz":"mashhur, taniqli","model":"The park is renowned for its bird life."},
+    {"word":"diverse","pos":"adj","def":"of many different kinds","uz":"xilma-xil","model":"There is a diverse range of birds in the park."},
+    {"word":"species","pos":"n","def":"a group of animals or plants of the same kind","uz":"tur (hayvon, o‘simlik turi)","model":"There are over 160 species of birds here."},
+    {"word":"boast of","pos":"phr v","def":"to have something good that others admire","uz":"bilan faxrlanmoq","model":"Other parks can boast of high waterfalls."},
+    {"word":"energy efficient","pos":"adj","def":"using little energy to work well","uz":"energiyani tejaydigan","model":"The villas are energy efficient: they have solar panels."},
+    {"word":"unique","pos":"adj","def":"the only one of its kind; very special","uz":"yagona, betakror","model":"Only a few villas will be built, which makes them unique."},
+    {"word":"nestle","pos":"v","def":"to be in a sheltered place, with hills or trees around","uz":"qo‘ynida joylashmoq","model":"The villas are nestled in the mountains."},
+    {"word":"rental","pos":"n","def":"an arrangement in which people pay to use something for a time","uz":"ijara","model":"We can organise short-term holiday rentals for your villa."}
+  ] },
 
   /* ── QUESTIONS ── */
   build: function (h) {
