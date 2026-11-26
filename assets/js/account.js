@@ -292,31 +292,33 @@ function set(id, text) { const el = document.getElementById(id); if (el) el.text
     load();
 })();
 
-/* interface: the look of the Reading tests. Kept with the account; the copy in this browser ("ix-reading-ui", the same one
-   assets/js/reading-ui.js reads) makes the next test open in the right look from its first paint. */
-(async function readingInterface() {
-    const box = $('#rui-list'); if (!box) return;
-    const opts = $$('.acc-ui', box), KEY = 'ix-reading-ui', NAME = { modern: 'the new interface', classic: 'the classic interface' };
+/* interface: the look of the Reading and of the Listening tests. Kept with the account; the copy in this browser ("ix-reading-ui",
+   "ix-listening-ui", the same ones assets/js/reading-ui.js and listening-ui.js read) makes the next test open in the right look
+   from its first paint. */
+['reading', 'listening'].forEach((kind) => (async function testInterface() {
+    const box = $(kind === 'reading' ? '#rui-list' : '#lui-list'); if (!box) return;
+    const card = box.closest('.acc-card'), Kind = kind === 'reading' ? 'Reading' : 'Listening';
+    const opts = $$('.acc-ui', box), KEY = 'ix-' + kind + '-ui', NAME = { modern: 'the new interface', classic: 'the classic interface' };
     const show = (ui) => opts.forEach((o) => { const on = o.dataset.rui === ui; o.setAttribute('aria-checked', String(on)); o.tabIndex = on ? 0 : -1; });
     const keep = (cfg) => { try { localStorage.setItem(KEY, JSON.stringify({ default: cfg.default, choice: cfg.choice, pages: cfg.pages, pref: cfg.pref })); } catch (e) { /* blocked */ } };
     let cfg;
-    try { cfg = await getJson('/api/reading-ui'); }
-    catch (e) { const n = $('#rui-note'); if (n) n.textContent = 'Could not load your choice. Refresh the page to try again.'; opts.forEach((o) => { o.disabled = true; }); return; }
-    const auto = $('#rui-auto'); if (auto) auto.textContent = 'Every test opens in the interface chosen for it. Most open in ' + (NAME[cfg.default] || NAME.classic) + '.';
+    try { cfg = await getJson('/api/' + kind + '-ui'); }
+    catch (e) { const n = $('[data-ui-note]', card); if (n) n.textContent = 'Could not load your choice. Refresh the page to try again.'; opts.forEach((o) => { o.disabled = true; }); return; }
+    const auto = $('[data-ui-auto]', card); if (auto) auto.textContent = 'Every test opens in the interface chosen for it. Most open in ' + (NAME[cfg.default] || NAME.classic) + '.';
     show(cfg.choice ? cfg.pref : ''); keep(cfg);
     if (!cfg.choice) {
         opts.forEach((o) => { o.disabled = true; });
-        const n = $('#rui-note'); if (n) n.textContent = 'IELTSX sets the interface of every test right now, so it cannot be changed here.';
+        const n = $('[data-ui-note]', card); if (n) n.textContent = 'IELTSX sets the interface of every test right now, so it cannot be changed here.';
         return;
     }
     async function choose(ui) {
         if (ui === cfg.pref) return;
         const before = cfg.pref; cfg.pref = ui; show(ui);
         try {
-            const r = await fetch('/api/account/reading-ui', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ui }) });
+            const r = await fetch('/api/account/' + kind + '-ui', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ui }) });
             if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not save your choice.');
             keep(cfg);
-            toast(ui ? 'Saved. Your Reading tests open in ' + NAME[ui] + '.' : 'Saved. Every test opens in the interface chosen for it.');
+            toast(ui ? 'Saved. Your ' + Kind + ' tests open in ' + NAME[ui] + '.' : 'Saved. Every test opens in the interface chosen for it.');
         } catch (err) { cfg.pref = before; show(before); toast(err.message || 'Could not save your choice.', true); }
     }
     opts.forEach((o) => o.addEventListener('click', () => choose(o.dataset.rui)));
@@ -326,7 +328,7 @@ function set(id, text) { const el = document.getElementById(id); if (el) el.text
         const i = opts.findIndex((o) => o.getAttribute('aria-checked') === 'true'), next = opts[(i + step + opts.length) % opts.length];
         next.focus(); choose(next.dataset.rui);
     });
-})();
+})());
 
 /* appearance: light / dark / system (same "theme" key as the rest of the site) */
 const themeOpts = $$('.theme-opt');

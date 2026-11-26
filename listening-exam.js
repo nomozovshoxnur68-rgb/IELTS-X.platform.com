@@ -5,7 +5,7 @@
    map (letter matrix over a picture), box (drag words into the text). */
 const fs = require('fs')
 const path = require('path')
-const { inheritGroups } = require('./reading-exam')
+const { inheritGroups, vocabularyOf, evidenceOf } = require('./reading-exam')
 const diagram = require('./assets/js/diagram-core')   // "Label the diagram" with typed answers
 
 const KINDS = ['gap', 'table', 'mcq', 'multi', 'matching', 'map', 'box', 'diagram']
@@ -59,6 +59,11 @@ function buildBlocks(material) {
   const from = n
   const answers = {}
   const times = {}   // the second of the recording where an answer is heard (set by the AI Test Generator)
+  const explanations = {}   // question number -> why it is the answer, and the words of the transcript (the modern review)
+  const explain = (id, q) => {
+    const why = String(q.explanation || '').trim(), ev = why || q.evidence ? evidenceOf(q, d.transcript) : []
+    if (why || ev.length) explanations[id] = { en: esc(why).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\r?\n/g, '<br>'), evidence: ev }
+  }
   const blocks = []
   let cur = null
   let lastPart = 0
@@ -91,7 +96,7 @@ function buildBlocks(material) {
       const cnt = Math.max(2, want.length)
       const ids = []
       for (let i = 0; i < cnt; i++) ids.push(n + i)
-      ids.forEach((id, i) => { answers[id] = want[i] || ''; if (Number(q.at) > 0) times[id] = Number(q.at) })
+      ids.forEach((id, i) => { answers[id] = want[i] || ''; if (Number(q.at) > 0) times[id] = Number(q.at); explain(id, q) })
       cur.items.push({ ids, prompt: q.prompt || '', options: opts, id: ids[0] })
       cur.to = n + cnt - 1
       n += cnt
@@ -99,25 +104,39 @@ function buildBlocks(material) {
     }
     const id = n++
     if (Number(q.at) > 0) times[id] = Number(q.at)
+    explain(id, q)
     if (kind === 'textbox') { const a = String(q.answer || '').trim(); const o = /^[A-Za-z]$/.test(a) && opts.find((x) => x.l === a.toUpperCase()); answers[id] = o ? o.t : a }   // the word itself
     else if (kind === 'gap' || kind === 'box' || kind === 'table' || kind === 'text' || kind === 'diagram') answers[id] = String(q.answer || '').trim()
     else answers[id] = (letters(q.answer)[0] || '')
     cur.items.push({ id, prompt: q.prompt || '', options: kind === 'mcq' ? opts : undefined, title: kind === 'gap' || kind === 'box' ? String(q.title || '') : undefined })
     cur.to = id
   })
-  return { part, from, to: n - 1, blocks, answers, times }
+  return { part, from, to: n - 1, blocks, answers, times, explanations }
+}
+
+/* the time a line of the transcript is said, typed in front of it: "[01:25] Eleanor: Hello" or "01:25 Eleanor: Hello" */
+const LINE_TIME = /^([[(]?)(?:(\d{1,2}):)?(\d{1,3}):([0-5]\d)(?:[.,]\d{1,3})?([\])]?)\s*(?:[-\u2013\u2014]\s*)?(?=\S)/
+function timeOf(line, sure) {
+  const m = LINE_TIME.exec(line); if (!m) return null
+  // a time without brackets is a time only when the transcript has several of them, or when a speaker follows it
+  if (!(m[1] && m[5]) && !sure && !/^[^:]{1,24}:\s+\S/.test(line.slice(m[0].length))) return null
+  return { t: (Number(m[2]) || 0) * 3600 + Number(m[3]) * 60 + Number(m[4]), rest: line.slice(m[0].length) }
 }
 
 /** "Speaker: text" lines -> transcript; marks the line that contains each typed answer */
 function buildTranscript(text, part, from, to, answers, full) {
   const out = full ? [] : [{ type: 'break', label: 'Part ' + part + ' \u00b7 Questions ' + from + '\u2013' + to }]
   const lines = String(text || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
+  const timed = lines.filter((l) => LINE_TIME.test(l)).length >= 3
   lines.forEach((l) => {
     // a full paper: a line "PART 2" (or "Section 2") opens that part's tab of the transcript
     const pm = full && /^(?:part|section)\s*([1-4])\s*[:.\-\u2013\u2014]?\s*$/i.exec(l)
     if (pm) { out.push({ type: 'break', label: 'Part ' + pm[1] }); return }
+    const at = timeOf(l, timed); if (at) l = at.rest
     const m = /^([^:]{1,24}):\s+(.+)$/.exec(l)
-    out.push(m ? { sp: m[1].trim(), tx: m[2].trim() } : { sp: '', tx: l })
+    const line = m ? { sp: m[1].trim(), tx: m[2].trim() } : { sp: '', tx: l }
+    if (at) line.t = at.t
+    out.push(line)
   })
   let cursor = full ? 0 : 1
   Object.keys(answers).map(Number).sort((a, b) => a - b).forEach((id) => {
@@ -133,8 +152,12 @@ function buildTranscript(text, part, from, to, answers, full) {
 
 function buildConfig(material) {
   const d = material.data || {}
-  const { part, from, to, blocks, answers, times } = buildBlocks(material)
+  const { part, from, to, blocks, answers, times, explanations } = buildBlocks(material)
   const full = isFull(material)
+  // the words of the Vocabulary tab of the review: one list for a section, one per part for a full paper
+  const vocab = {}
+  if (full) [1, 2, 3, 4].forEach((p) => { const w = vocabularyOf((Array.isArray(d.vocabs) ? d.vocabs : [])[p - 1]); if (w.length) vocab[p] = w })
+  else { const w = vocabularyOf(d.vocabText); if (w.length) vocab[part] = w }
   const rows = []
   for (let i = from; i <= to; i++) rows.push([i])
   const cfg = {
@@ -145,9 +168,10 @@ function buildConfig(material) {
 
     minutes: Math.min(60, Math.max(1, parseInt(d.durationMin, 10) || (full || isPreTest(material) ? 30 : 10))),
     name: String(material.title || 'Listening'),
+    title: String(material.title || 'Listening'), pack: String(material.pack || '').trim(), no: Number(d.no) || 0,   // the header of the modern look
     audioStart: Math.max(0, +d.audioStart || 0),
     audioEnd: Math.max(0, +d.audioEnd || 0),
-    navGroups: rows, answers, answerTimes: times,
+    navGroups: rows, answers, answerTimes: times, explanations, vocab,
     transcript: buildTranscript(d.transcript, part, from, to, answers, full)
   }
   // a full paper is shown part by part, as in the computer test (listening.js reads cfg.parts)
@@ -166,7 +190,10 @@ function renderPage(material) {
   const script = 'window.LISTENING_DATA = ' + jsonForScript(data) + ';\n' +
     'window.PART_PRACTICE = ' + jsonForScript(cfg).slice(0, -1) +
     ',"build":null};\nwindow.PART_PRACTICE.build = function (h) { return window.IXListeningRender(window.LISTENING_DATA, ' + part + ')(h); };'
+  // the look chosen for this test in the admin panel (assets/js/listening-ui.js reads it; none = the default of the website)
+  const look = d.ui === 'classic' || d.ui === 'modern' ? d.ui : ''
   return (data.blocks.some((b) => b.kind === 'diagram') ? tpl.replace('</head>', '<link rel="stylesheet" href="/assets/css/diagram.css">\n</head>') : tpl)
+    .replace(/<html\b/i, (m) => (look ? m + ' data-lui-test="' + look + '"' : m))
     .replace(/\{\{TITLE\}\}/g, () => esc(material.title || 'Listening'))
     .replace(/\{\{PARTNO\}\}/g, isFull(material) ? '1–4' : String(part))
     .replace(/\{\{MINUTES\}\}/g, String(cfg.minutes))
@@ -174,4 +201,4 @@ function renderPage(material) {
     .replace('{{DATA_SCRIPT}}', () => script)
 }
 
-module.exports = { renderPage, buildConfig, buildBlocks, parseOptions, isFull, isPreTest, KINDS, KIND_FROM_TYPE, DEFAULT_INSTR }
+module.exports = { renderPage, buildConfig, buildBlocks, buildTranscript, parseOptions, isFull, isPreTest, KINDS, KIND_FROM_TYPE, DEFAULT_INSTR }

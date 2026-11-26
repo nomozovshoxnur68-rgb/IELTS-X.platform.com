@@ -284,6 +284,43 @@ server.listen(0, async () => {
       ok('reading interface: default, choice of a student, look and words of a test, admin only');
     }
 
+    // --- the look of the Listening tests (assets/js/listening-ui.js): the same rules, its own setting; the transcript, words and explanations of a test
+    {
+      r = await call('GET', '/api/listening-ui'); assert.deepEqual([r.json.default, r.json.choice, r.json.pref], ['classic', true, '']);
+      assert.equal((await call('POST', '/api/account/listening-ui', { body: { ui: 'modern' } })).status, 401);
+      assert.equal((await call('POST', '/api/account/listening-ui', { jar: user, body: { ui: 'modern' } })).json.pref, 'modern');
+      assert.equal((await call('GET', '/api/listening-ui', { jar: user })).json.pref, 'modern'); assert.equal((await call('GET', '/api/reading-ui', { jar: user })).json.pref, '', 'Reading keeps its own choice');
+      assert.equal((await call('POST', '/api/admin/listening-ui', { jar: user, body: { default: 'modern' } })).status, 403); assert.equal((await call('GET', '/api/admin/listening-ui', { jar: user })).status, 403);
+      r = await call('POST', '/api/admin/listening-ui', { jar: boss, body: { default: 'modern', choice: false, pages: { '/sections/test-1.html': 'classic', '/full-tests/listening/test-1': 'modern', '/pessages/test-19': 'modern', '/sections/test-2': 'x' } } });
+      assert.deepEqual(r.json.config.pages, { '/sections/test-1': 'classic', '/full-tests/listening/test-1': 'modern' }, 'only listening pages and known looks are kept');
+      assert.equal((await call('GET', '/api/reading-ui')).json.default, 'classic', 'the Reading default is apart');
+      assert.equal((await call('POST', '/api/account/listening-ui', { jar: user, body: { ui: 'classic' } })).status, 403, 'no choice while the admin keeps it');
+      await call('POST', '/api/admin/listening-ui', { jar: boss, body: {} });
+      r = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'Look test', published: true, data: { mode: 'part', sectionLabel: 'Section 1', audioUrl: 'https://example.com/a.mp3', ui: 'modern',
+        vocabText: 'deposit (n) | money paid first | garov | You pay a deposit.\nrack | tokcha',
+        transcript: '[00:05] Tom: Good morning.\n[01:25] Tom: The deposit is two hundred pounds, that is 200 in all.\nAnn: 10:30 suits me.',
+        questions: [{ type: 'gap', prompt: 'Deposit: £ ____', answer: '200', explanation: 'He says "that is 200 in all".' }, { type: 'mcq', prompt: 'When?', options: ['A 9:30', 'B 10:30'], answer: 'B', evidence: '10:30 suits me' }] } } });
+      const lt = r.json.item; assert.equal(lt.data.ui, 'modern'); assert.equal(lt.data.questions[1].evidence, '10:30 suits me', 'a listening question keeps its words of the transcript');
+      let page = (await call('GET', '/exam/listening/' + lt.id)).text;
+      assert.ok(page.includes('<html data-lui-test="modern"') && page.includes('/assets/js/listening-ui.js') && page.includes('/assets/css/listening-modern.css'));
+      const cfg = require('../listening-exam').buildConfig(lt).cfg;
+      assert.deepEqual(cfg.transcript.filter((x) => x.tx).map((x) => [x.t, x.sp, x.tx.slice(0, 12)]), [[5, 'Tom', 'Good morning'], [85, 'Tom', 'The deposit '], [undefined, 'Ann', '10:30 suits ']], 'a time in front of a line, never inside one');
+      assert.deepEqual(cfg.vocab[1].map((w) => [w.word, w.uz]), [['deposit', 'garov'], ['rack', 'tokcha']]);
+      assert.deepEqual(cfg.explanations[1].evidence, ['that is 200 in all']); assert.deepEqual(cfg.explanations[2].evidence, ['10:30 suits me']);
+      assert.ok(cfg.explanations[1].en.includes('&quot;that is 200 in all&quot;'), 'an explanation is text, never markup');
+      r = await call('PATCH', '/api/admin/materials/' + lt.id, { jar: boss, body: { ui: 'classic' } }); assert.equal(r.json.item.data.ui, 'classic'); assert.equal(r.json.item.data.questions.length, 2, 'only the look changes');
+      assert.ok((await call('GET', '/exam/listening/' + lt.id)).text.includes('<html data-lui-test="classic"'));
+      await call('PATCH', '/api/admin/materials/' + lt.id, { jar: boss, body: { ui: '' } }); assert.ok(!(await call('GET', '/exam/listening/' + lt.id)).text.includes('data-lui-test'), 'no look of its own: the default');
+      r = await call('POST', '/api/admin/materials', { jar: boss, body: { type: 'listening', title: 'Full look', published: true, data: { mode: 'full', audioUrl: 'https://example.com/a.mp3', vocabs: ['', 'tide (n) | suv ko‘tarilishi', '', ''], questions: [{ type: 'gap', passage: 2, prompt: 'x ____', answer: 'y' }] } } });
+      assert.deepEqual(Object.keys(require('../listening-exam').buildConfig(r.json.item).cfg.vocab), ['2'], 'a full paper has a word list per part');
+      await call('DELETE', '/api/admin/materials/' + r.json.item.id, { jar: boss }); await call('DELETE', '/api/admin/materials/' + lt.id, { jar: boss });
+      // every page of the shared engine loads the two files, after its own style sheet
+      for (const f of ['sections/test-1.html', 'sections/test-4.html', 'listening/exam-template.html', 'full-tests/listening/test-1.html']) {
+        const t = fs.readFileSync(path.join(__dirname, '..', f), 'utf8'); assert.ok(/listening\/css\/(listening|style)\.css">\s*<link rel="stylesheet" href="\/assets\/css\/listening-modern\.css">\s*<script src="\/assets\/js\/listening-ui\.js"><\/script>/.test(t), f);
+      }
+      ok('listening interface: default, choice of a student, look, transcript times, words and explanations of a test');
+    }
+
     // --- site design (Admin -> Design, the Settings page, assets/js/site-design.js)
     r = await call('GET', '/api/design');
     assert.equal(r.status, 200); assert.equal(r.json.default, 'classic'); assert.equal(r.json.defaultEffect, ''); assert.deepEqual(r.json.themes, []);

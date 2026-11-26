@@ -21,6 +21,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/listening/css/listening.css">
+<link rel="stylesheet" href="/assets/css/listening-modern.css">
+<script src="/assets/js/listening-ui.js"></script>
 
 <script src="/assets/js/access-gate.js"></script>
 <script src="/ieltsx-data.js"></script>
@@ -429,6 +431,20 @@ window.PART_PRACTICE = {
     {"sp": "Student 2", "tx": "It's more that scientists actually view oil seeps as being useful because they give us an insight into how marine life can adapt, you know, through years of living in an area where there is constant exposure to oil.", "answers": [30]},
     {"sp": "Student 1", "tx": "Even though researchers obviously get a lot out of their work in this field, I think more money needs to be spent on helping them investigate natural oil seeps."}
   ],
+
+  /* ── VOCABULARY ── the Vocabulary tab of the review (new interface) ── */
+  vocab: { 3: [
+    {"word":"autonomous","pos":"adj","def":"able to work on its own, with no person controlling it","uz":"avtonom, mustaqil ishlaydigan","model":"Autonomous underwater vehicles have no drivers."},
+    {"word":"uneven","pos":"adj","def":"not flat or smooth","uz":"notekis","model":"The sea floor is often really uneven."},
+    {"word":"retractable","pos":"adj","def":"able to be pulled back in when it is not needed","uz":"ichkariga yig‘iladigan","model":"The S83 will have retractable wheels."},
+    {"word":"rechargeable","pos":"adj","def":"able to be filled with power again","uz":"qayta zaryadlanadigan","model":"It uses rechargeable power from the sun."},
+    {"word":"streamlined","pos":"adj","def":"with a smooth shape that moves easily through water or air","uz":"oqimga moslashgan, silliq shaklli","model":"The Wave Rider is smooth and streamlined."},
+    {"word":"glide","pos":"v","def":"to move smoothly and easily","uz":"sirpanib suzmoq","model":"Its shape helps it to glide through the water."},
+    {"word":"obstruction","pos":"n","def":"something that blocks the way","uz":"to‘siq","model":"The T602 can locate obstructions such as shipwrecks."},
+    {"word":"hazard","pos":"n","def":"something that could be dangerous","uz":"xavf","model":"Some obstructions might cause a hazard."},
+    {"word":"allocate","pos":"v","def":"to give an amount of money or time for a purpose","uz":"ajratmoq (mablag‘)","model":"It depends on how much money is allocated to the project."},
+    {"word":"scenario","pos":"n","def":"a situation, real or imagined","uz":"vaziyat, holat","model":"Find a scenario where an underwater vehicle has been used."}
+  ] },
 
   /* ── QUESTIONS ── */
   build: function (h) {

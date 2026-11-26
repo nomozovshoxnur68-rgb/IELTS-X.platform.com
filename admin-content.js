@@ -84,9 +84,10 @@
     return { img: d.coverUrl, tag: ({ reading: 'Reading', listening: 'Listening', writing: 'Writing', speaking: 'Speaking', magazine: 'Magazine', other: 'PDF' })[d.category] || 'PDF', sub: (d.fileUrl ? '📄 PDF uploaded' : '⚠ no PDF file') + (d.pages ? ' · ' + d.pages + ' pages' : ''), href: d.fileUrl || '' };
   }
   const ACCESS = [['free', '🔓 Free'], ['standard', '🔒 Standard'], ['max', '🔒 Max'], ['ultra', '🔒 Ultra']];
-  /* the look of a Reading test (assets/js/reading-ui.js): its own, or the default of Admin -> Reading interface */
+  /* the look of a Reading / Listening test (assets/js/reading-ui.js, listening-ui.js): its own, or the default of Admin -> Reading / Listening interface */
+  const LOOK_TYPES = ['reading', 'listening'];
   const LOOKS = [['', 'Default interface'], ['modern', 'New interface'], ['classic', 'Classic interface']];
-  const lookSelect = (m) => `<select class="field pc-look" data-ct-look="${esc(m.id)}" title="How this test looks for students (a student's own choice in Account comes first)">${LOOKS.map(([v, l]) => `<option value="${v}" ${String((m.data || {}).ui || '') === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const lookSelect = (m) => `<select class="field pc-look" data-ct-look="${esc(m.id)}" data-type="${esc(m.type)}" title="How this test looks for students (a student's own choice in Account comes first)">${LOOKS.map(([v, l]) => `<option value="${v}" ${String((m.data || {}).ui || '') === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const accessOf = (m) => { const r = matRules[m.id]; if (r) return r.mode && r.mode !== 'default' ? r.mode : r.locked ? r.plan || 'standard' : 'free'; return m.premium ? 'standard' : 'free'; };
   const accessSelect = (m, type) => `<select class="field pc-access" data-ct-access="${esc(m.id)}" data-type="${type}" title="Who can open it (more plans in Access)">${ACCESS.map(([v, l]) => `<option value="${v}" ${accessOf(m) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   function renderCardGrid(type, mode) {
@@ -101,7 +102,7 @@
         <div class="pc-img">${c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy">` : `<div class="pc-noimg">${mode === 'full' ? 'Full test' : 'No picture yet<br><span>Edit → upload card picture</span>'}</div>`}<label class="pc-sel" title="Select for a bulk action"><input type="checkbox" data-ct-sel="${esc(m.id)}" data-type="${type}" ${selected.has(m.id) ? 'checked' : ''}></label><span class="pc-tag">${esc(c.tag)}</span>${n === 0 && items.length > 1 ? '<span class="pc-new">NEW</span>' : ''}${m.published === false ? '<span class="pc-draft">Hidden</span>' : ''}</div>
         <div class="pc-body"><div class="muted sm">${mode === 'full' ? '📦 ' : ''}${esc(m.pack || (mode === 'full' ? 'Practice' : type === 'reading' ? 'Starter Pack' : '—'))} · ${fmt(m.createdAt)}</div><div class="pc-title">${esc(m.title)}</div>
           <div class="muted sm">${esc(c.sub)}</div>
-          <div class="btn-row" style="margin:8px 0">${accessSelect(m, type)}${type === 'reading' ? lookSelect(m) : ''}<button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" ${ids} type="button" title="Click to change">${m.published === false ? 'Hidden' : 'Visible'}</button></div>
+          <div class="btn-row" style="margin:8px 0">${accessSelect(m, type)}${LOOK_TYPES.includes(type) ? lookSelect(m) : ''}<button class="chip ${m.published === false ? '' : 'chip-ok'}" data-ct="publish" ${ids} type="button" title="Click to change">${m.published === false ? 'Hidden' : 'Visible'}</button></div>
           <div class="btn-row"><button class="btn btn-sm" data-ct="edit" ${ids} type="button">Edit</button><button class="btn btn-sm" data-ct="dup" ${ids} type="button" title="Make a copy (saved as Hidden)">Copy</button>${c.href ? `<a class="btn btn-sm" href="${esc(c.href)}" target="_blank" rel="noopener">Open ↗</a>` : ''}${mode ? `<button class="btn btn-sm" data-ct="move" ${ids} data-to="${other}" type="button" title="Move this test to ${esc(otherName)}">→ ${other === 'full' ? 'Full' : 'Part'}</button>` : ''}<button class="btn btn-sm btn-danger" data-ct="delete" ${ids} data-title="${esc(m.title)}" type="button">Remove</button></div></div></div>`;
     }).join('');
     mount.innerHTML = `<div class="card"><div class="section-head"><div><div class="section-title">${G.title}</div>
@@ -112,7 +113,7 @@
         <div class="pc-bulk" data-bulk="${view}" hidden><strong data-bulk-count></strong>
           <button class="btn btn-sm" data-bulk-do="show" type="button">Make visible</button><button class="btn btn-sm" data-bulk-do="hide" type="button">Hide</button>
           <select class="field" data-bulk-access style="width:auto"><option value="">Access…</option>${ACCESS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>
-          ${type === 'reading' ? `<select class="field" data-bulk-look style="width:auto"><option value="-">Interface…</option>${LOOKS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>` : ''}
+          ${LOOK_TYPES.includes(type) ? `<select class="field" data-bulk-look style="width:auto"><option value="-">Interface…</option>${LOOKS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>` : ''}
           <button class="btn btn-sm" data-bulk-do="pack" type="button">${mode === 'full' ? 'Move to pack…' : 'Set pack…'}</button>
           ${mode ? `<button class="btn btn-sm" data-bulk-do="move" data-to="${other}" type="button">Move to ${esc(otherName)}</button>` : ''}
           <button class="btn btn-sm btn-danger" data-bulk-do="delete" type="button">Remove</button><button class="btn btn-sm" data-bulk-do="clear" type="button">Clear</button></div>` : ''}
@@ -143,6 +144,10 @@
     if (item.type === 'reading') {
       if (to === 'full') { const ps = Array.isArray(d.passages) && d.passages.length ? d.passages : [{}, {}, {}]; if (!String((ps[0] || {}).passage || '').trim()) ps[0] = { title: item.title, passage: d.passage || '', vocabText: d.vocabText || '' }; d.passages = [0, 1, 2].map((k) => ps[k] || { title: '', passage: '' }); if (!d.durationMin || d.durationMin === 20) d.durationMin = 60; }
       else { if (!String(d.passage || '').trim()) { d.passage = ((d.passages || [])[0] || {}).passage || ''; if (!String(d.vocabText || '').trim()) d.vocabText = ((d.passages || [])[0] || {}).vocabText || ''; } if (d.durationMin === 60) d.durationMin = 20; }
+    }
+    if (item.type === 'listening') {
+      const p = Math.max(0, (parseInt(String(d.sectionLabel || '').replace(/\D+/g, ''), 10) || 1) - 1), vs = [0, 1, 2, 3].map((k) => String((d.vocabs || [])[k] || ''));
+      if (to === 'full') { if (String(d.vocabText || '').trim() && !vs[p].trim()) vs[p] = d.vocabText; d.vocabs = vs; } else if (!String(d.vocabText || '').trim()) d.vocabText = vs[p] || vs.find((x) => x.trim()) || '';
     }
     if (item.type === 'listening') { if (to === 'full' && (!d.durationMin || d.durationMin === 10)) d.durationMin = 30; if (to === 'part' && d.durationMin === 30) d.durationMin = 10; }
     return d;
@@ -309,7 +314,7 @@
     const data = { durationMin: type === 'writing' ? (full ? 60 : 20) : type === 'listening' ? (full ? 30 : 10) : type === 'reading' ? (full ? 60 : 20) : 60, instructions: '', images: [] };
     if (MODE_TYPES.includes(type)) data.mode = full ? 'full' : 'part';
     if (type === 'reading') Object.assign(data, { coverUrl: '', passageLabel: 'Passage 1', cardTypes: [], passage: '', passages: blankPassages(), questions: [blankQ()], ui: '', vocabText: '' });
-    if (type === 'listening') Object.assign(data, { audioUrl: '', audioStart: 0, audioEnd: 0, transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ('gap')] });
+    if (type === 'listening') Object.assign(data, { audioUrl: '', audioStart: 0, audioEnd: 0, transcript: '', coverUrl: '', sectionLabel: 'Section 1', cardTypes: [], questions: [blankQ('gap')], ui: '', vocabText: '', vocabs: ['', '', '', ''] });
     if (type === 'pdf') { Object.assign(data, { fileUrl: '', coverUrl: '', category: 'reading', badge: 'PDF', corner: '', pages: 0, tags: [] }); delete data.instructions; delete data.images; }
     if (type === 'speaking') data.parts = full ? [blankPart(1), blankPart(2), blankPart(3)] : [blankPart(1)];
     if (type === 'writing') Object.assign(data, { coverUrl: '', tier: 'Tier 1', cardTypes: [], tasks: full ? [blankTask(1), blankTask(2)] : [blankTask(1)] });
@@ -432,9 +437,9 @@
   }
   /* the look of this test for students: the website's default, or one of its own */
   function lookBlock() {
-    const cur = String(draft.data.ui || '');
-    const pic = { '': '', modern: '/assets/reading-ui-modern.svg', classic: '/assets/reading-ui-classic.svg' };
-    const help = { '': 'As set in <a href="#readingui">Reading interface</a>', modern: 'Explanation cards and a Vocabulary tab in the review', classic: 'The interface the tests have always had' };
+    const cur = String(draft.data.ui || ''), L = draft.type === 'listening', kind = L ? 'listening' : 'reading';
+    const pic = { '': '', modern: `/assets/${kind}-ui-modern.svg`, classic: `/assets/${kind}-ui-classic.svg` };
+    const help = { '': `As set in <a href="#${kind}ui">${L ? 'Listening' : 'Reading'} interface</a>`, modern: L ? 'Transcript, explanation cards and a Vocabulary tab in the review' : 'Explanation cards and a Vocabulary tab in the review', classic: 'The interface the tests have always had' };
     return `<div class="cb-block"><strong>Interface of this test</strong><div class="muted sm">How the test looks for students. A student who chose an interface in Account sees their own choice.</div>
       <div class="rui-picks" role="radiogroup" aria-label="Interface of this test">${LOOKS.map(([v, l]) => `<button class="rui-pick${cur === v ? ' on' : ''}" type="button" role="radio" aria-checked="${cur === v}" data-cb="look" data-look="${v}">${pic[v] ? `<img src="${pic[v]}" alt="" width="96" height="60">` : '<span class="rui-pick-auto">Auto</span>'}<span><strong>${l}</strong><span class="muted sm">${help[v]}</span></span></button>`).join('')}</div></div>`;
   }
@@ -444,6 +449,37 @@
     return `<div class="cb-block"><strong>${label}</strong> <span class="muted sm">(optional) · <span data-vocab-count>${vocabLines(text)}</span> word(s)</span>
       <div class="muted sm">Shown in the <b>Vocabulary</b> tab of the review (new interface). One word per line: <code>word (adj) | definition | o‘zbekcha | example</code>. Two columns are the word and its translation; columns copied from Excel work too.</div>
       <textarea class="field" rows="6" data-p="${path}" data-vocab placeholder="incinerate (v) | to burn something completely | yoqib yubormoq | The waste is incinerated at high temperature.">${esc(text)}</textarea></div>`;
+  }
+  function listeningWords(d) {
+    if (d.mode !== 'full') return passageWords('data.vocabText', d.vocabText, 'Vocabulary');
+    if (!Array.isArray(d.vocabs)) d.vocabs = ['', '', '', ''];
+    return [0, 1, 2, 3].map((k) => passageWords(`data.vocabs.${k}`, d.vocabs[k], 'Vocabulary of Part ' + (k + 1))).join('');
+  }
+  /* the transcript: what is marked in it, and a button that writes the time of the recording in front of a line */
+  const TIME_LINE = /^[[(]?(?:\d{1,2}:)?\d{1,3}:[0-5]\d[\])]?\s*/;
+  function transcriptBlock(d) {
+    const lines = String(d.transcript || '').split('\n').map((l) => l.trim()).filter(Boolean), timed = lines.filter((l) => TIME_LINE.test(l)).length;
+    return `<div class="cb-block"><div class="cb-head"><div><strong>Transcript</strong> <span class="muted sm">(optional) · <span data-tr-count>${lines.length} line(s), ${timed} with a time</span></span>
+      <div class="muted sm">Shown only after the student submits. One line per speaker turn: <code>Tom: Good morning…</code>${d.mode === 'full' ? ', with a line <code>PART 2</code> before each part' : ''}. The words with an answer are marked by themselves; <b>Transcript words to highlight</b> of a question (step 3) sets them exactly.<br>
+      A time in front of a line — <code>[01:25] Tom: Good morning…</code> — lets students listen from that line (new interface).</div></div></div>
+      <div class="tr-bar"><button class="btn btn-sm" data-cb="tr-time" type="button" title="Writes the time the recording is at now in front of the line with the cursor, and goes to the next line">⏱ Time of this line</button><button class="btn btn-sm" data-cb="tr-back" type="button">↺ 5 s</button><button class="btn btn-sm" data-cb="tr-play" type="button">▶ / ❚❚</button><span class="muted sm">Play the recording, put the cursor on the line you hear, press the button (or Ctrl + Enter).</span></div>
+      <textarea class="field" rows="12" id="tr-text" data-tr data-p="data.transcript" placeholder="[00:05] Tom: Good morning, how can I help you?&#10;[00:09] Woman: Hello, I would like to ask about…">${esc(d.transcript)}</textarea></div>`;
+  }
+  const trAudio = () => document.querySelector('#builder-body audio[data-tr-audio]');
+  function stampTime() {
+    const ta = $('#tr-text'), au = trAudio(); if (!ta) return;
+    if (!au || !au.duration) return toast('Add the audio above and play it first.', true);
+    const t = Math.max(0, Math.floor(au.currentTime)), tag = '[' + String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0') + '] ';
+    const v = ta.value, from = v.lastIndexOf('\n', ta.selectionStart - 1) + 1, end = v.indexOf('\n', from) < 0 ? v.length : v.indexOf('\n', from);
+    const line = v.slice(from, end); if (!line.trim()) return toast('Put the cursor on a line of the transcript.', true);
+    const next = tag + line.replace(/^\s+/, '').replace(TIME_LINE, '');
+    ta.value = v.slice(0, from) + next + v.slice(end);
+    const at = Math.min(ta.value.length, from + next.length + 1); ta.focus(); ta.setSelectionRange(at, at);   // the next line
+    setPath(draft, 'data.transcript', ta.value); countTranscript(ta); syncSave();
+  }
+  function countTranscript(ta) {
+    const n = ta.closest('.cb-block').querySelector('[data-tr-count]'), lines = ta.value.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (n) n.textContent = lines.length + ' line(s), ' + lines.filter((l) => TIME_LINE.test(l)).length + ' with a time';
   }
   /* which passage (full reading, 1-3) or which part (full listening, 1-4) a group / picture belongs to */
   const passSelect = (path, cur) => { const L = draft.type === 'listening'; return `<select class="field" style="width:auto" data-p="${path}" data-num="1" data-rerender="1" title="${L ? 'Which part?' : 'Which passage?'}">${(L ? [1, 2, 3, 4] : [1, 2, 3]).map((n) => `<option value="${n}" ${Number(cur || 1) === n ? 'selected' : ''}>${L ? 'Part' : 'Passage'} ${n}</option>`).join('')}</select>`; };
@@ -896,8 +932,8 @@
         <div class="gi-line${qOnly ? ' gi-qonly' : ''}">${prompt}${qOnly ? '' : answerCell(g, gi, it, ii)}</div>
         ${multi ? `<textarea class="field" rows="4" data-lines="1" data-p="${p}.options" placeholder="Options, one per line (A, B, C… in this order)">${esc((it.options || []).join('\n'))}</textarea>` : ''}${width}
         ${L && (g.type === 'gap' || g.type === 'box') ? `<input class="field" data-p="${p}.title" value="${esc(it.title)}" placeholder="Small sub-heading before this line (optional), e.g. Prices">` : ''}
-        ${qOnly ? '' : `<input class="field gi-exp" data-p="${p}.explanation" value="${esc(it.explanation)}" placeholder="Explanation shown after submitting (optional). Words in &quot;quotes&quot; are lit up in the passage">`}
-        ${qOnly || L ? '' : `<input class="field gi-exp gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="Passage words to highlight (optional — copy them exactly; quotes in the explanation are used if empty)">`}</div>
+        ${qOnly ? '' : `<input class="field gi-exp" data-p="${p}.explanation" value="${esc(it.explanation)}" placeholder="Explanation shown after submitting (optional). Words in &quot;quotes&quot; are lit up in the ${L ? 'transcript' : 'passage'}">`}
+        ${qOnly ? '' : `<input class="field gi-exp gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="${L ? 'Transcript' : 'Passage'} words to highlight (optional — copy them exactly; quotes in the explanation are used if empty)">`}</div>
         ${fixed ? '' : `<button class="btn btn-sm btn-danger" data-cb="i-del" data-g="${gi}" data-i="${ii}" type="button" title="Delete this question">✕</button>`}</div>`;
     }).join('');
     const mcqLike = g.type === 'mcq' || g.type === 'mcq-multi';
@@ -1024,9 +1060,9 @@
   function stepExplanations() {
     const list = numberedItems().filter((x) => hasQ(x.g, x.it)); const L = draft.type === 'listening';
     const rows = list.map(({ gi, ii, it, n, w }) => { const p = `groups.${gi}.items.${ii}`;
-      return `<tr><td class="cb-n">${n}${w > 1 ? '–' + (n + w - 1) : ''}</td><td class="cb-qp"><b>${esc(it.answer || '—')}</b><div class="muted sm">${esc(shortText(it.prompt, 70))}</div></td><td><textarea class="field" rows="2" data-p="${p}.explanation" placeholder="Why this is the answer (words in &quot;quotes&quot; are lit up in the passage)">${esc(it.explanation)}</textarea>${L ? '' : `<input class="field gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="Passage words to highlight (optional)">`}</td></tr>`; }).join('');
-    return `<div class="cb-bulk cb-stepbox"><div class="muted sm"><b>Step 3 — the explanations</b> (optional), by question number: <code>1. The passage says “…” — so the answer is …</code>. Lines without a number continue the one above. ${L ? '' : 'An <code>Evidence: …</code> line under it sets the words to light up in the passage; otherwise the words in “quotes” are used.'}</div>
-      <textarea class="field" id="re-text" rows="9" placeholder="1. Her parents hired a governess: “She was educated in her parents' house by a governess”.&#10;2. “she began to keep a diary written in a secret code”.${L ? '' : '&#10;Evidence: keep a diary written in a secret code'}"></textarea>
+      return `<tr><td class="cb-n">${n}${w > 1 ? '–' + (n + w - 1) : ''}</td><td class="cb-qp"><b>${esc(it.answer || '—')}</b><div class="muted sm">${esc(shortText(it.prompt, 70))}</div></td><td><textarea class="field" rows="2" data-p="${p}.explanation" placeholder="Why this is the answer (words in &quot;quotes&quot; are lit up in the ${L ? 'transcript' : 'passage'})">${esc(it.explanation)}</textarea><input class="field gi-ev" data-p="${p}.evidence" value="${esc(it.evidence || '')}" placeholder="${L ? 'Transcript' : 'Passage'} words to highlight (optional)"></td></tr>`; }).join('');
+    return `<div class="cb-bulk cb-stepbox"><div class="muted sm"><b>Step 3 — the explanations</b> (optional), by question number: <code>1. The passage says “…” — so the answer is …</code>. Lines without a number continue the one above. An <code>Evidence: …</code> line under it sets the words to light up in the ${L ? 'transcript' : 'passage'}; otherwise the words in “quotes” are used${L ? ', and without them the sentence with the answer' : ''}.</div>
+      <textarea class="field" id="re-text" rows="9" placeholder="1. Her parents hired a governess: “She was educated in her parents' house by a governess”.&#10;2. “she began to keep a diary written in a secret code”.&#10;Evidence: keep a diary written in a secret code"></textarea>
       <div class="btn-row"><button class="btn btn-sm btn-primary" data-cb="re-add" type="button">Put the explanations in</button></div></div>
       ${list.length ? `<table class="cb-ntable"><thead><tr><th>No.</th><th>Answer</th><th>Explanation</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="muted sm">Add the questions first (step 1).</div>'}`;
   }
@@ -1202,10 +1238,10 @@
     return by;
   }
   function putExplanations(by) {
-    let put = 0; const L = draft.type === 'listening';
+    let put = 0;
     numberedItems().forEach(({ g, it, n, w }) => {
       if (!hasQ(g, it)) return; let e = null; for (let k = n; k < n + Math.max(1, w) && !e; k++) e = by[k];
-      if (!e) return; it.explanation = e.text; if (e.ev && !L) it.evidence = e.ev; put++;
+      if (!e) return; it.explanation = e.text; if (e.ev) it.evidence = e.ev; put++;
     });
     return put;
   }
@@ -1833,7 +1869,7 @@
     if (t === 'article') { $('#builder-body').innerHTML = articleForm(); return syncSave(); }
     $('#builder-body').innerHTML = `
       ${draft._ai ? aiBanner() : ''}
-      ${t === 'reading' ? readingFormatBlock() + lookBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d)}
+      ${t === 'reading' ? readingFormatBlock() + lookBlock() : t === 'speaking' && d.mode === 'full' ? fullBlock('speaking') : cardBlock(t, d) + (t === 'listening' ? lookBlock() : '')}
       ${MODE_TYPES.includes(t) && !draft._ai ? importBlock() : ''}
       <div class="cb-grid">${field('Title *', 'title', draft.title, 'placeholder="e.g. Cambridge 18 · Test 2 · Passage 1" maxlength="200"')}${field(d.mode === 'full' ? 'Pack on the Full Tests page — pick one below, or type a new name for a new pack card' : 'Pack line shown on the card (optional, e.g. Starter Pack)', 'pack', draft.pack, 'list="ix-pack-list" placeholder="' + (d.mode === 'full' ? 'e.g. Pack 5 (empty = Practice)' : 'e.g. Starter Pack') + '" autocomplete="off"')}<datalist id="ix-pack-list">${(d.mode === 'full' ? packNames(draft.type) : [PRE_TEST]).map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>${packPicks()}
       <label class="lbl">Short description (optional)<input class="field" data-p="description" value="${esc(draft.description)}" maxlength="500"></label>
@@ -1842,14 +1878,14 @@
         ${draft._ai ? '<div class="muted sm">Saved as a <b>Draft</b> (students do not see it) until you press <b>Publish</b>.</div>' : `<div class="cb-checks"><label><input type="checkbox" data-p="published" ${draft.published !== false ? 'checked' : ''}> Published (visible to students)</label></div>`}</div>
       ${t === 'reading' || t === 'listening' ? `<label class="lbl">Instructions shown above the questions (optional)<textarea class="field" rows="2" data-p="data.instructions">${esc(d.instructions)}</textarea></label>` : ''}
       ${t === 'reading' ? (d.mode === 'full' ? passagesBlock() : window.IXPassageEditor.block('data.passage', { label: 'Passage text *', rows: 14, ph: 'Paste the passage. Leave an empty line between paragraphs. Tip: ## for a sub-heading, * for a footnote.' }) + passageWords('data.vocabText', d.vocabText, 'Vocabulary')) : ''}
-      ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
+      ${t === 'listening' ? `<div class="cb-block"><div class="cb-head"><div><strong>Audio file *</strong><div class="muted sm">mp3, wav, m4a, ogg (up to 100 MB). Or paste a link to the audio below.</div></div><button class="btn btn-sm btn-primary" data-cb="audio" type="button">⬆ ${d.audioUrl ? 'Replace audio' : 'Upload audio'}</button></div><div class="muted sm" id="audio-status"></div>${d.audioUrl ? `<audio controls preload="none" data-tr-audio src="${esc(d.audioUrl)}" style="width:100%;margin-top:8px"></audio>` : ''}
         <label class="lbl">Audio link (https://… or /uploads/…)<input class="field" data-p="data.audioUrl" value="${esc(d.audioUrl)}" placeholder="https://…/recording.mp3"></label>
         <div class="cb-grid"><label class="lbl">Starts at (seconds, 0 = from the beginning)<input class="field" type="number" min="0" data-p="data.audioStart" data-num="1" value="${esc(d.audioStart || 0)}"></label><label class="lbl">Ends at (seconds, 0 = until the end)<input class="field" type="number" min="0" data-p="data.audioEnd" data-num="1" value="${esc(d.audioEnd || 0)}"></label></div>
         <div class="muted sm">Use these two numbers when one long recording holds all four sections and this test is only one of them.</div></div>` : ''}
       ${t === 'speaking' ? partsBlock() : ''}
       ${t === 'writing' ? tasksBlock() : t === 'speaking' || t === 'pdf' ? '' : imagesBlock(t === 'listening' ? 'Pictures: maps, plans, diagrams' : t === 'article' ? 'More pictures (shown at the end of the article)' : 'Pictures for the passage (optional)', t === 'article' ? 'Optional extra pictures with captions.' : 'Shown to the student next to the questions. Add as many as needed.')}
       ${t === 'reading' || t === 'listening' ? questionsBlock() : ''}
-      ${t === 'listening' ? `<label class="lbl">Transcript (optional, shown only after the student submits). One line per speaker turn, e.g. <code>Tom: Good morning…</code>. The line that contains an answer is highlighted automatically<textarea class="field" rows="8" data-p="data.transcript">${esc(d.transcript)}</textarea></label>` : ''}`;
+      ${t === 'listening' ? transcriptBlock(d) + listeningWords(d) : ''}`;
     syncSave(); DGE().mount();
   }
   /* only the answers of one block and the numbers: the block itself stays as it is while it is edited */
@@ -1892,7 +1928,7 @@
       }
       if (ds.ctAccess) { await setAccess([ds.ctAccess], el.value); toast('Access: ' + el.options[el.selectedIndex].text); await loadType(ds.type); return true; }
       if (ds.ctLook) {
-        await setLook(ds.ctLook, el.value); const it = (lists.reading || []).find((x) => x.id === ds.ctLook); if (it) it.data = { ...(it.data || {}), ui: el.value };
+        await setLook(ds.ctLook, el.value); const it = (lists[ds.type] || []).find((x) => x.id === ds.ctLook); if (it) it.data = { ...(it.data || {}), ui: el.value };
         toast(el.value ? 'This test opens in the ' + (el.value === 'modern' ? 'new' : 'classic') + ' interface' : 'This test opens in the default interface'); return true;
       }
       if (el.matches('[data-bulk-look]')) { const v = el.value; el.value = '-'; if (v !== '-') await bulk(viewOfEl(el), 'look', v); return true; }
@@ -1920,6 +1956,7 @@
       if (v === 'full' && (!dd.durationMin || dd.durationMin === 20)) dd.durationMin = 60; if (v === 'part' && dd.durationMin === 60) dd.durationMin = 20;
     }
     setPath(draft, p, v);
+    if (el.dataset.tr !== undefined) countTranscript(el);
     if (el.dataset.vocab !== undefined) { const n = el.closest('.cb-block').querySelector('[data-vocab-count]'); if (n) n.textContent = vocabLines(v); }
     const gt = /^groups\.(\d+)\.type$/.exec(p);
     if (gt) {   // another type: the option list moves between the group (matching / map / box) and the questions (multiple choice)
@@ -2067,6 +2104,9 @@
         d.ui = t.dataset.look || '';
         document.querySelectorAll('#builder-body .rui-pick').forEach((b) => { const on = b.dataset.look === d.ui; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
       }
+      else if (a === 'tr-time') stampTime();
+      else if (a === 'tr-back') { const au = trAudio(); if (au) { au.currentTime = Math.max(0, au.currentTime - 5); } }
+      else if (a === 'tr-play') { const au = trAudio(); if (!au) toast('Add the audio above first.', true); else if (au.paused) au.play().catch(() => toast('The recording could not be played.', true)); else au.pause(); }
       else if (a === 'img-del') { draft.data.images.splice(i, 1); renderBuilder(); }
       else if (a === 'audio') { const url = await pickAndUpload('audio/*,.mp3,.wav,.m4a,.ogg', $('#audio-status')); if (url) { draft.data.audioUrl = url; renderBuilder(); } }
       else if (a === 'check') showIssues(validate(), true);
@@ -2326,6 +2366,7 @@
     const pub = $('#cb-publish');
     if (pub) pub.addEventListener('click', () => { if (draft && confirm('Publish “' + (draft.title || 'this test') + '”? Students will see it straight away. Have you read every question the AI made?')) save({ publish: true }); });
     document.querySelectorAll('[data-cb-close]').forEach((b) => b.addEventListener('click', closeBuilder));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target && e.target.id === 'tr-text') { e.preventDefault(); stampTime(); } });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#builder').classList.contains('open')) closeBuilder(); });
     window.addEventListener('hashchange', onHash); onHash();
     $('#refresh') && $('#refresh').addEventListener('click', () => { NAMES.forEach((t) => { if (lists[t] !== null) loadType(t); }); if (packList !== null) loadPackList(); });

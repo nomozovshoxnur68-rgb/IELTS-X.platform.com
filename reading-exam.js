@@ -395,4 +395,4 @@ function buildExamHtml(material, templates) {
   return html;
 }
 
-module.exports = { buildExamHtml, buildData, isFull, isPreTest, inheritGroups, vocabularyOf };
+module.exports = { buildExamHtml, buildData, isFull, isPreTest, inheritGroups, vocabularyOf, evidenceOf };

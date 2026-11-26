@@ -61,6 +61,7 @@ function showPaperPart(p){
   document.querySelectorAll('#listening-render [data-ix-part]').forEach(function(el){el.hidden=+el.dataset.ixPart!==p;});
   const pt=document.getElementById('pbar-title');if(pt)pt.textContent='Part '+p;
   const area=document.getElementById('listening-area');if(area)area.scrollTop=0;
+  ui('part',p);
 }
 function paperSteps(){return (NAV_GROUPS[PART_NO]||[]).map(function(g){return g[0];});}
 function stepPaper(dir){
@@ -335,6 +336,7 @@ function tidyAnnotations(list) {
 
 // Re-derive the stored annotation list from whatever is currently in the DOM.
 function syncAnnotations() {
+  setTimeout(function(){ui('notes',allNotes().length);},0);
   const root = partRoot();
   if (!root || state.stage !== 'listening') return;
   const p = state.currentSection;
@@ -533,6 +535,24 @@ function deleteNoteAt(passage, start) {
 const state={student:{name:''},stage:'registration',startedAt:null,finishedAt:null,listeningAnswers:{},listeningFlags:{},annotations:{1:[],2:[],3:[],4:[]},timers:{listening:PART_SECS},currentSection:PART_NO,activeQuestion:null,timerHidden:false,warnings:0};
 let timerInterval=null;
 let _tpIdx=-1;
+/* ── THE INTERFACE (assets/js/listening-ui.js) ──────────────────────────────
+   The test has two looks: "classic" (listening.css, as it always was) and "modern" (assets/css/listening-modern.css). The
+   engine is the same for both: audio, clock, answers, highlights, notes, settings, submitting and marking live here. It only
+   tells the interface what it has just drawn; ui() answers true when the interface took that step over (the modern review).
+   Without listening-ui.js on the page (the Full Mock papers) nothing happens and the test looks classic. */
+function ui(name,data){
+  try{return !!(window.ListeningUI&&window.ListeningUI.on&&window.ListeningUI.on(name,data,UI_ENGINE));}
+  catch(e){try{console.error('listening-ui:',e);}catch(x){}return false;}
+}
+const UI_ENGINE={
+  cfg:CFG,from:Q_FROM,to:Q_TO,label:CFG.label||'',answers:LISTENING_ANSWERS,times:ANSWER_TIMES,transcript:TRANSCRIPT,
+  parts:(PAPER_PARTS||[{part:PART_NO,from:Q_FROM,to:Q_TO}]),paged:!!PAPER_PARTS,
+  get state(){return state;},part:()=>(PAPER_PARTS?(state.viewPart||PAPER_PARTS[0].part):PART_NO),
+  sheet:p=>BUILDERS[PART_NO](),redraw:()=>{renderListening();},grade:()=>gradeListening(),variants:t=>answerVariants(t),
+  audio:()=>document.getElementById('exam-audio'),audioStart:A_START,audioLength:a=>audioWindowLen(a),play:(t,o)=>jumpToTime(t,o),
+  submitting:()=>isSubmitting(),finish:()=>finishAndLeave()
+};
+
 /* Progress is deliberately NOT persisted. A sitting lives in memory only:
    reload and the paper restarts, which is what the Cosmos build already
    implied by removing the resume sheet. Preferences (theme, text size,
@@ -590,7 +610,7 @@ function setupAntiCheat(){
 }
 
 // TIMER
-function minsLeft(s){const m=Math.ceil(Math.max(0,s)/60);return m+(m===1?' minute':' minutes')+' remaining';}
+function minsLeft(s){const m=Math.ceil(Math.max(0,s)/60);return m+(m===1?' minute':' minutes')+(document.documentElement.classList.contains('lui-modern')?' left':' remaining');}   // the modern header reads "7 minutes left"
 function fmt(s){if(s<0)s=0;return Math.floor(s/60).toString().padStart(2,'0')+':'+(s%60).toString().padStart(2,'0');}
 /* The official Listening player has no timer in the DOM at any point (§1.5). This
    is the practice product's own clock, shown in the header in the candidate block's
@@ -647,6 +667,7 @@ function renderSection(n){
   const root=document.getElementById('listening-render');
   root.innerHTML=BUILDERS[n]();
   attachHandlers();
+  ui('sheet',root);   // the modern sheet: the same fields, set as a list; before the highlights are put back
   const [a,b]=NAV_RANGES[n];
   for(let i=a;i<=b;i++){if(state.listeningAnswers[i])setInput(i,state.listeningAnswers[i]);if(state.listeningFlags[i])applyFlagToPill(i);}restoreMultiGroups();
     const pt=document.getElementById('pbar-title'),pd=document.getElementById('pbar-desc');
@@ -656,7 +677,8 @@ function renderSection(n){
   document.querySelectorAll('#listening-render .gap-input').forEach(gapAutoGrow);
   updateListeningNav();saveState();
   restoreAnnotations(n);   // bring highlights/notes back after the re-render
-  if(document.body.classList.contains('review-mode')){setTimeout(()=>{applyReviewReveal();reviewMultiGroups();addJumpButtons();
+  ui('part',PAPER_PARTS?state.viewPart:n);
+  if(document.body.classList.contains('review-mode')&&!ui('review')){setTimeout(()=>{applyReviewReveal();reviewMultiGroups();addJumpButtons();
     try{showTranscriptPart(currentPaperPart());}catch(e){}
   },50);}
 }
@@ -804,6 +826,7 @@ function updateListeningNav(){
   const clk=document.getElementById('hdr-clock');
   if(clk)clk.style.display=document.body.classList.contains('review-mode')?'none':'';
   updateArrowState();
+  ui('nav');
 }
 /* the official previous arrow is #dddddd — DISABLED — at Part 1, and only turns
    #4C4C4C once there is somewhere to go back to. It is never faded. */
@@ -1024,6 +1047,7 @@ function jumpToListening(qid){
   else{doScrollTo(numId);updateListeningNav();}
 }
 function doScrollTo(qid){
+  if(ui('jump',qid))return;   // the modern review has its own list
   const area=document.getElementById('listening-area');if(!area)return;
   const el=document.getElementById('lq-card-'+qid)||document.getElementById('lq-row-'+qid)||
            (document.getElementById('lq-'+qid)&&document.getElementById('lq-'+qid).closest('.q-card,.gap-line'));
@@ -2317,7 +2341,7 @@ function reviewExam(){
   const audioEl=document.getElementById('pbar-audio');
   const hdrRight=document.getElementById('hdr-right');
   const wifiBtn=document.getElementById('wifi-btn');
-  if(audioEl&&hdrRight){hdrRight.insertBefore(audioEl,wifiBtn||null);}
+  if(audioEl&&hdrRight&&!ui('transport')){hdrRight.insertBefore(audioEl,wifiBtn||null);}   // the modern review has its player in the part card
   renderListening(); // renderSection() schedules applyReviewReveal+addJumpButtons after 50ms
   updateListeningNav();
   goToStage('listening');
@@ -2357,6 +2381,7 @@ function reviewExam(){
   }
   _tpIdx=-1;
   try{showTranscriptPart(currentPaperPart());}catch(e){}
+  ui('review');
 }
 
 /* The recording streams from the CDI server. With no connection it never

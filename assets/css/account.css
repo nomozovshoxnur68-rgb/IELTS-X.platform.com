@@ -142,7 +142,8 @@ a.acc-item:hover { background: hsl(var(--accent)); }
 .acc-theme-prev.dark { background: #1f1f1f; border: 1px solid #333; } .acc-theme-prev.dark i { background: #4b4b4b; }
 .acc-theme-prev.system { background: linear-gradient(90deg, #f8fafc 50%, #1f1f1f 50%); border: 1px solid #94a3b8; } .acc-theme-prev.system i { background: #94a3b8; }
 
-/* the interface of the Reading tests */
+/* the interface of the Reading and of the Listening tests */
+.acc-panel > .acc-card + .acc-card { margin-top: 16px; }
 .acc-uis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 14px; }
 .acc-ui { display: flex; flex-direction: column; gap: 10px; padding: 10px 10px 14px; border-radius: 14px; border: 1.5px solid hsl(var(--border)); background: none; color: hsl(var(--foreground));
   font: 400 13px/1.5 var(--ix-font); text-align: left; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .1s; min-width: 0; }
