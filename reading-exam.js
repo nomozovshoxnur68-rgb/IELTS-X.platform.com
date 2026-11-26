@@ -215,7 +215,7 @@ function buildSections(questions, startN) {
       let letters = (q.options || []).map(optTok).map((k) => String(k.l).toUpperCase());
       if (!letters.length) { const hm = /\bA\s*[\u2013\u2014-]\s*([B-L])\b/.exec(String(q.group || '')); letters = 'ABCDEFGHIJKL'.slice(0, hm ? hm[1].charCodeAt(0) - 64 : 7).split(''); }
       const sec = open('matching-info', q, letters.join('')); sec.options = letters;
-      sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: esc(q.prompt) }); n += 1;
+      sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: gapLabel(q.prompt, n) }); n += 1;
       continue;
     }
     if (t === 'matching-features' || t === 'matching-endings') {
@@ -223,7 +223,7 @@ function buildSections(questions, startN) {
       if (t === 'matching-features') {
         const sec = open('matching-features', q, JSON.stringify(toks));
         sec.bankLabel = sec.bankLabel || 'List of options'; sec.people = toks.map((k) => ({ l: String(k.l).toUpperCase(), name: esc(k.t) }));
-        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: esc(q.prompt) });
+        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: gapLabel(q.prompt, n) });
       } else {
         const sec = open('sentence-endings', q, JSON.stringify(toks)); sec.endings = toks.map((k) => ({ l: String(k.l).toUpperCase(), text: esc(k.t) }));
         sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), stem: esc(q.prompt) });
@@ -257,11 +257,11 @@ function buildSections(questions, startN) {
       } else if (toks.length && toks.every((k) => k.t.length <= 1 || k.t === k.l)) {
         const sec = open('matching-info', q, JSON.stringify(toks.map((k) => k.l)));
         sec.options = toks.map((k) => k.l);
-        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: esc(q.prompt) }); n += 1;
+        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: gapLabel(q.prompt, n) }); n += 1;
       } else {
         const sec = open('matching-features', q, JSON.stringify(toks));
         sec.bankLabel = sec.bankLabel || 'List of options'; sec.people = toks.map((k) => ({ l: k.l, name: esc(k.t) }));
-        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: esc(q.prompt) }); n += 1;
+        sec.items.push({ id: n, answer: String(q.answer || '').trim().toUpperCase(), label: gapLabel(q.prompt, n) }); n += 1;
       }
     } else {   // short / completion
       const parts = String(q.prompt || '').split(/_{2,}|\.{4,}|…{2,}/);
@@ -274,6 +274,9 @@ function buildSections(questions, startN) {
 
 /* a table typed in the admin panel: first line = column headings, one row per line, cells split by | (or a tab), ____ = a gap */
 const TABLE_GAP = /_{2,}|\.{4,}|\u2026{2,}/g;
+/* a row of a matching grid with ____ in it (a summary with a list of words typed as matching: "... has changed the ____ the
+   wearers have ...") showed the underscores. The gap is the place of the answer: a box with the number of the question, as on the paper. */
+const gapLabel = (prompt, no) => esc(prompt).replace(TABLE_GAP, () => `<span class="mg-blank">${no}</span>`);
 const tableRowsOf = (t) => String(t || '').replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
   .map((l) => l.replace(/^\|\s*|\s*\|$/g, '').split(/\s*\|\s*|\t+/).map((c) => c.trim()));
 /* the table of an admin test: { rows, head, rowHead } saved as JSON (a cell may have several lines, "- " = a bullet),

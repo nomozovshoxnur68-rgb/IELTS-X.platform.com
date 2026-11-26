@@ -968,3 +968,18 @@ rules of the new look start with `html.lui-modern`.
   `word (adj) | definition | o'zbekcha | example`.
 * Every test made in the panel has **Interface of this test** in its form, a menu on its card and a bulk action
   (`PATCH /api/admin/materials/<id>` with `{ ui }`). `sections/test-5` is a saved page without the shared engine: it keeps its look.
+
+## The admin panel in the website's design, admin Settings, notes sub-headings (November 2026)
+
+* **Admin design** (`admin.css`): the colours are the website's own tokens (`assets/css/ix-unified.css`): white / #212121 pages, a
+  #fafafa / #1c1c1c sidebar, slate text, hairline borders, 6 px controls, 12 px cards and the blue of the site for links, focus and
+  the selected item (the wine-red accent is gone). The sidebar and the header are the website's: section names in small grey letters,
+  the selected page on a grey ground, a fold button left of the title, **Light · Dark · System** in the header (the same `theme`
+  key as the website, "System" = no saved choice), a gear for Settings, the admin's square avatar.
+* **Settings** (`/admin#settings`, `admin-settings.js`): the panel's own settings, kept in this browser (`ix-admin-prefs`):
+  theme, Comfortable / Compact, Default / Large text, show or fold the menu, the NEW labels, less motion, the start page of
+  `/admin` and an automatic refresh of the numbers (off / 1 / 5 / 15 minutes, only while the tab is in front and nothing is open).
+  Links to the website settings kept by the server (access, prices, logo, design, interfaces, menu, links, music), the account,
+  **Reset panel settings** and Sign out. The small script in the `<head>` of `admin.html` applies them before the first paint.
+* **Reading notes**: the sub-headings of the notes (`## Childhood`, `.note-sub`) take the colour of the notes title in every
+  theme; in sepia ("Yellow on black") they had the lighter colour of the bullets, and so did the TRUE / FALSE / NOT GIVEN key.

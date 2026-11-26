@@ -6524,7 +6524,7 @@ function validateStart(){
   }
   beginExam();
 }
-function beginExam(){state.startedAt=new Date().toISOString();saveState();const p=enterFullscreen();const advance=()=>{document.body.classList.add('no-select');goToStage('listening-intro');};if(p&&typeof p.finally==='function')p.finally(advance);else advance();}
+function beginExam(){state.startedAt=new Date().toISOString();saveState();const p=enterFullscreen();const advance=()=>{document.body.classList.add('no-select');goToStage('listening-intro');};/* full-screen may never answer (an in-app browser, a pending prompt): the test starts anyway after 1.5 s, once */let begun=false;const once=()=>{if(begun)return;begun=true;advance();};if(p&&typeof p.finally==='function'){p.finally(once);setTimeout(once,1500);}else once();}
 function beginListening(){
   // Curtain: dim the particle layer and drop the briefing card *before* the
   // stage swap, so the plain white exam never inherits a frame of the shell.

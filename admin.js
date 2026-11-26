@@ -5,7 +5,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   const DAY = 86400000;
-  const VIEWS = { dashboard: 'Dashboard', users: 'Users', teachers: 'Teachers', ebooks: 'E-books', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', mocks: 'Mock tests', games: 'Games · live quiz',listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', videos: 'Videos', books: 'Books', grammar: 'Grammar', music: 'Music (Settings)', links: 'Links', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', design: 'Design', readingui: 'Reading interface', listeningui: 'Listening interface', sitecheck: 'Website check', predictions: 'Predictions', sidebar: 'Sidebar (menu)', guard: 'Site Guard' };
+  const VIEWS = { dashboard: 'Dashboard', users: 'Users', teachers: 'Teachers', ebooks: 'E-books', premium: 'Premium', orders: 'Orders', activity: 'Test activity', audit: 'Activity log', ai: 'AI Test Generator', reading: 'Reading · Part practice', readingfull: 'Reading · Full tests', packs: 'Packs (all Full Tests cards)', mocks: 'Mock tests', games: 'Games · live quiz',listening: 'Listening · Part practice', listeningfull: 'Listening · Full tests', writing: 'Writing · Part practice', writingfull: 'Writing · Full tests', speaking: 'Speaking · Part practice', speakingfull: 'Speaking · Full tests', articles: 'Article cards', pdf: 'PDF materials', vocab: 'Vocabulary', videos: 'Videos', books: 'Books', grammar: 'Grammar', music: 'Music (Settings)', links: 'Links', access: 'Access (lock / plans)', pricing: 'Price control', branding: 'Logo', design: 'Design', readingui: 'Reading interface', listeningui: 'Listening interface', sitecheck: 'Website check', predictions: 'Predictions', sidebar: 'Sidebar (menu)', guard: 'Site Guard', settings: 'Settings' };
 
   /* ───────── icons (one stroke set, drawn with currentColor so they follow light / dark) ───────── */
   const ICONS = {
@@ -53,7 +53,10 @@
     video: '<path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
     graduation: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
     music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
-    link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
+    link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    sidebar: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+    monitor: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+    settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>'
   };
   const icon = (name, cls) => `<svg class="${cls || 'ico-svg'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
   window.IXAdminIcon = icon;
@@ -68,14 +71,30 @@
     const b = $('#theme-toggle'); if (b) { b.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'); b.title = t === 'dark' ? 'Light mode' : 'Dark mode'; }
     clearTimeout(setTheme.t); setTheme.t = setTimeout(() => document.body.classList.remove('theme-anim'), 350);
   }
+  /* Light · Dark · System, as on the website's header and Settings page: "system" = no saved choice (theme-init.js) */
+  const themePref = () => { try { const v = localStorage.getItem('theme'); return v === 'light' || v === 'dark' ? v : 'system'; } catch (e) { return 'system'; } };
+  const systemDark = () => { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { return false; } };
+  function applyThemePref(pref, save) {
+    if (pref !== 'light' && pref !== 'dark') pref = 'system';
+    if (save) { try { if (pref === 'system') localStorage.removeItem('theme'); else localStorage.setItem('theme', pref); } catch (e) { /* blocked */ } }
+    setTheme(pref === 'system' ? (systemDark() ? 'dark' : 'light') : pref, false);
+    $$('[data-theme-pref]').forEach((el) => { const on = el.dataset.themePref === pref; el.classList.toggle('on', on); el.setAttribute('aria-checked', on ? 'true' : 'false'); });
+  }
+  window.IXAdminTheme = { get: themePref, set: (p) => applyThemePref(p, true) };
+  // for admin-settings.js: reload the numbers quietly (auto refresh), the signed-in admin, the names of the pages
+  window.IXAdminReload = () => load();
+  window.IXAdminMe = () => me;
+  window.IXAdminViews = () => Object.assign({}, VIEWS);
   function bindTheme() {
-    const b = $('#theme-toggle'); if (b) b.addEventListener('click', () => setTheme(themeNow() === 'dark' ? 'light' : 'dark', true));
-    setTheme(themeNow(), false);
+    const b = $('#theme-toggle'); if (b) b.addEventListener('click', () => applyThemePref(themeNow() === 'dark' ? 'light' : 'dark', true));
+    document.addEventListener('click', (e) => { const t = e.target.closest && e.target.closest('[data-theme-pref]'); if (t) applyThemePref(t.dataset.themePref, true); });
+    applyThemePref(themePref(), false);
     try {
-      // no choice saved yet: follow the system setting while the panel is open
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => { let s = null; try { s = localStorage.getItem('theme'); } catch (x) { /* blocked */ } if (!s) setTheme(e.matches ? 'dark' : 'light', false); });
+      // "System": follow the device while the panel is open
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (themePref() === 'system') applyThemePref('system', false); });
     } catch (e) { /* old browser */ }
-    window.addEventListener('storage', (e) => { if (e.key === 'theme' && (e.newValue === 'dark' || e.newValue === 'light')) setTheme(e.newValue, false); });
+    // a change made in another tab (the website or a second admin tab), a removed key included (= System)
+    window.addEventListener('storage', (e) => { if (e.key === 'theme' || e.key === null) applyThemePref(themePref(), false); });
   }
   document.addEventListener('DOMContentLoaded', () => { paintIcons(); bindTheme(); });
 
@@ -141,7 +160,9 @@
     closeMenu(); window.scrollTo(0, 0);
     if (name === 'dashboard') requestAnimationFrame(renderActivityChart);   // the chart needs the width of the card
   }
-  const currentView = () => (location.hash || '#dashboard').slice(1).split('?')[0];
+  // no page in the address: the start page chosen in Settings (admin-settings.js keeps it in ix-admin-prefs)
+  const startView = () => { try { const v = (JSON.parse(localStorage.getItem('ix-admin-prefs') || '{}') || {}).start; return v && VIEWS[v] ? v : 'dashboard'; } catch (e) { return 'dashboard'; } };
+  const currentView = () => (location.hash ? location.hash.slice(1).split('?')[0] : startView());
   function openMenu() { $('#sidebar').classList.add('open'); $('#scrim').classList.add('open'); }
   function closeMenu() { $('#sidebar').classList.remove('open'); $('#scrim').classList.remove('open'); }
 
@@ -544,7 +565,15 @@
 
   function bind() {
     document.addEventListener('click', onClick);
-    $('#menu-btn').addEventListener('click', openMenu); $('#scrim').addEventListener('click', closeMenu);
+    $('#menu-btn').addEventListener('click', () => {
+      // narrow screen: the sidebar slides in; wide screen: it folds away and comes back (remembered, Settings → Sidebar)
+      if (window.matchMedia('(max-width: 900px)').matches) return openMenu();
+      const folded = document.documentElement.classList.toggle('ad-side-collapsed');
+      try { const p = JSON.parse(localStorage.getItem('ix-admin-prefs') || '{}') || {}; p.sidebar = folded ? 'collapsed' : 'open'; localStorage.setItem('ix-admin-prefs', JSON.stringify(p)); } catch (e) { /* blocked */ }
+      requestAnimationFrame(() => setTimeout(renderActivityChart, 220));
+      window.dispatchEvent(new CustomEvent('ix-admin-prefs'));
+    });
+    $('#scrim').addEventListener('click', closeMenu);
     $('#refresh').addEventListener('click', () => load().then(() => toast('Updated')));
     window.addEventListener('hashchange', () => showView(currentView()));
     let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(renderActivityChart, 150); });
