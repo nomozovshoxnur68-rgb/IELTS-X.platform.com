@@ -760,6 +760,14 @@ asked at most once a minute.
   uploaded in Admin → Music. The student picks one on the Settings page; a small player at the bottom left keeps it
   playing on the ordinary pages (it continues where it was after a page change; a browser may want one click first) and it
   never loads on a test or exam page. It pauses when a video starts. The choice stays on the device (`ix-music`).
+  * A browser stops all sound when a page is left, so each page picks the music up by itself: the track, its file and its
+    place are kept every second (`ix-music`), the list of tracks too (`ix-music-tracks`), so the next page starts the file
+    at once (the place reached + the seconds the page change took, faded in) and asks `GET /api/panels/music` only in the
+    background (at most once a minute, always on Settings, and when the account changes). A page opened without a click
+    (and iOS Safari on every page) waits for the first click, tap or key press anywhere. Back returns at the latest place;
+    one tab plays at a time. A slow or failed answer never turns the music off (a failed read of the list is a 503, not
+    an empty list); a track that is removed or locked for the visitor stops. Uploads to Supabase Storage are kept a year
+    by the browser and the CDN (`cacheControl` 31536000: every upload has a new name).
 * **Links** (Admin → Links, `assets/js/site-links.js`, loaded by `assets/js/loading.js` on every page): "old link → new
   link". Every `<a href>` of every page that points at the old link gets the new one (the query and `#part` are kept, a
   link whose text is the old address shows the new one), and an old page address of the site (`/old-page`) opens the new

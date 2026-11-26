@@ -104,9 +104,16 @@ const CLEAN = {
 };
 
 /* ───────── storage ───────── */
-/* strict = a change is coming: read the database itself, and a failed read stops the change (an empty list would be saved over the real one) */
-async function load(ctx, kind, strict) {
-  let v = null; try { v = await ctx.store.getSetting(KINDS[kind].key, strict ? { fresh: true } : undefined); } catch (e) { if (strict) throw e; v = null; }
+/* strict = a change is coming: read the database itself, and a failed read stops the change (an empty list would be saved over the real one)
+   tell   = a visitor's list: a failed read answers 503 (an empty list would say "nothing here", and the music player would
+            take its track as removed and turn the music off) */
+async function load(ctx, kind, strict, tell) {
+  let v = null;
+  try { v = await ctx.store.getSetting(KINDS[kind].key, strict ? { fresh: true } : undefined); } catch (e) {
+    if (strict) throw e;
+    if (tell) throw new ctx.HttpError(503, `The ${KINDS[kind].noun}s could not be loaded just now. Try again in a moment.`);
+    v = null;
+  }
   return { items: v && Array.isArray(v.items) ? v.items.filter((x) => x && ID_RE.test(String(x.id))) : [], updatedAt: (v && v.updatedAt) || null };
 }
 async function save(ctx, kind, data) {
@@ -177,7 +184,7 @@ async function route(req, res, p, method, ctx) {
   const kind = m[1];
   const u = await ctx.currentUser(req).catch(() => null);
   const level = ctx.userLevel(u);
-  const items = (await load(ctx, kind)).items.filter((x) => x.published !== false);
+  const items = (await load(ctx, kind, false, true)).items.filter((x) => x.published !== false);
   const headers = { 'Cache-Control': 'no-store, private' };
   if (!m[2]) return send(res, 200, { kind, signedIn: !!u, level, plan: PLANS[Math.min(3, level)], items: items.map((x) => view(kind, x, level, false)) }, headers);
   if (kind !== 'grammar') throw new HttpError(404, 'Not found.');

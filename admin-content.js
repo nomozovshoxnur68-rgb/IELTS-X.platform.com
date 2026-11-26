@@ -204,7 +204,9 @@
     try { meta = await api('/api/admin/upload-url', { method: 'POST', body: JSON.stringify({ filename: file.name, size: file.size }) }); }
     catch (e) { if (isImg(file)) return uploadToServer(file); throw e; }   // storage not ready: pictures still work
     if (meta.local) return uploadToServer(file);
-    const fd = new FormData(); fd.append('cacheControl', '3600'); fd.append('', file);
+    // every upload gets a new name (and is never overwritten): the browser and Supabase's CDN may keep it a year, so music,
+    // recordings and pictures are not downloaded again on the next page or the next day
+    const fd = new FormData(); fd.append('cacheControl', '31536000'); fd.append('', file);
     let r = null, msg = '';
     try { r = await fetch(meta.uploadUrl, { method: 'PUT', body: fd, headers: { 'x-upsert': 'false' } }); if (!r.ok) { const j = await r.json().catch(() => ({})); msg = j.message || j.error || ('HTTP ' + r.status); } }
     catch (e) { msg = 'the browser could not reach Supabase Storage (' + (e.message || 'network') + ')'; }
