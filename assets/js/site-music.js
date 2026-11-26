@@ -3,10 +3,22 @@
  * a test or exam page, so it can never play over a Listening recording).
  *   - the Settings page (#ixs-music): the list of tracks made in the admin panel (admin.html#music, GET /api/panels/music),
  *     a switch, play / pause, next, volume
- *   - every ordinary page: when the music is on, a small player at the bottom left keeps the track going from where it was
- *     (a browser may ask for one click before it plays again on a new page; the player then shows ▶)
- * The choice stays on this device (localStorage "ix-music"). A locked track (a higher plan) arrives without its file and
- * cannot be played. The music pauses by itself while a video of the Videos page or any other sound of the page plays.
+ *   - every ordinary page: when the music is on, a small player at the bottom left keeps the track going
+ *
+ * Every page of the website is a page load of its own, and a browser stops all sound when a page is left. So the next
+ * page picks the music up by itself, at once, where it would be had it kept playing:
+ *   - the track (with its file) and its place are kept on this device every second (localStorage "ix-music"), and the
+ *     list of tracks too ("ix-music-tracks"): the next page starts the file straight away. The list is asked again
+ *     only in the background (that answer can take seconds), at most once a minute, on the Settings page and when the
+ *     account changes;
+ *   - it starts at the place it had reached plus the seconds the page change took (up to 30), and fades in;
+ *   - a browser that wants a click before a page may play sound (a page opened without a click; iOS Safari on every
+ *     page): the music stays on and comes back with the first click, tap or key press anywhere on the page;
+ *   - the Back button (a page the browser kept) comes back at the latest place; a tab opened in the background waits
+ *     until it is looked at; only one tab plays: the tab that starts the music pauses the others.
+ * A slow or failed answer of the server never turns the music off; a track the server no longer lists for this visitor
+ * (removed, hidden, or above the plan: it arrives without its file) stops. The music pauses by itself while a video of
+ * the Videos page or any other sound of the page plays.
  */
 (function () {
   'use strict';
@@ -15,7 +27,9 @@
   if (TEST_PAGE.test(location.pathname)) return;
   var doc = document;
   var KEY = 'ix-music', TRACKS_KEY = 'ix-music-tracks';
+  var REFRESH_MS = 60000, CARRY_S = 30, FADE_MS = 700;
   var onSettings = /^\/settings(\.html)?\/?$/i.test(location.pathname);
+  var TAP = window.matchMedia && matchMedia('(pointer: coarse)').matches ? 'Tap' : 'Click';
   var PLAN = { free: 'Free', standard: 'Standard', max: 'Max', ultra: 'Ultra' };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]; }); };
   var IC = {
@@ -27,72 +41,212 @@
   var svg = function (p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; };
   var safeSrc = function (u) { u = String(u || ''); return /^(https:\/\/|\/(?:uploads|api\/media|assets)\/)/i.test(u) ? u : ''; };
 
-  /* ───────── the saved choice ───────── */
-  function read() { try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); return s && typeof s === 'object' ? s : {}; } catch (e) { return {}; } }
-  var pref = read();
-  if (typeof pref.vol !== 'number' || !(pref.vol >= 0 && pref.vol <= 1)) pref.vol = 0.5;
-  function write() { try { localStorage.setItem(KEY, JSON.stringify(pref)); } catch (e) { /* private mode */ } }
+  /* ───────── what this device keeps ───────── */
+  function readJSON(key) { try { var v = JSON.parse(localStorage.getItem(key) || 'null'); return v && typeof v === 'object' ? v : null; } catch (e) { return null; } }
+  function writeJSON(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* private mode, full */ } }
+  // the choice: { on, playing, id, t (seconds), at (when t was taken), d (length of the track did), vol, track: { id, title, artist, url, cover } }
+  var pref = {};
+  function fix() { if (typeof pref.vol !== 'number' || !(pref.vol >= 0 && pref.vol <= 1)) pref.vol = 0.5; }
+  function read() { pref = readJSON(KEY) || pref; fix(); return pref; }
+  /* another tab may have written in between: only the fields given here change (without storage: in this page only) */
+  function save(patch) { var s = readJSON(KEY) || pref; for (var k in patch) s[k] = patch[k]; pref = s; fix(); writeJSON(KEY, s); }
+  read();
+  var snap = function (t) { return { id: t.id, title: t.title, artist: t.artist || '', url: t.url, cover: t.cover || '' }; };
 
-  /* ───────── the tracks (kept 5 minutes in this tab, so moving between pages does not ask the server each time) ───────── */
-  var tracks = null;
-  function loadTracks(force) {
-    if (!force) { try { var c = JSON.parse(sessionStorage.getItem(TRACKS_KEY) || 'null'); if (c && Array.isArray(c.items) && Date.now() - c.t < 300000) { tracks = c.items; return Promise.resolve(tracks); } } catch (e) { /* none */ } }
-    return fetch('/api/panels/music', { credentials: 'same-origin', cache: 'no-store', headers: { accept: 'application/json' } })
-      .then(function (r) { return r.ok ? r.json() : { items: [] }; })
-      .then(function (d) { tracks = (d && d.items) || []; try { sessionStorage.setItem(TRACKS_KEY, JSON.stringify({ t: Date.now(), items: tracks })); } catch (e) { /* full */ } return tracks; })
-      .catch(function () { tracks = tracks || []; return tracks; });
+  /* ───────── the tracks ───────── */
+  var cache = readJSON(TRACKS_KEY);
+  if (!cache || !Array.isArray(cache.items)) cache = null;
+  try { sessionStorage.removeItem(TRACKS_KEY); } catch (e) { /* the copy of the first version of this file */ }
+  var tracks = cache ? cache.items : null;
+  var answered = false, failed = false, asking = null;
+  // whose list it is: a list made for another account (or plan) is asked again
+  var whoOf = function (u) { return u ? [u.id || '', u.plan || '', u.premiumActive ? 1 : 0].join('|') : 'guest'; };
+  var who = window.IELTSXUser === undefined ? null : whoOf(window.IELTSXUser);
+  function refresh() {
+    if (asking) return asking;
+    var askedFor = who;
+    asking = fetch('/api/panels/music', { credentials: 'same-origin', cache: 'no-store', headers: { accept: 'application/json' } })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (d) {
+        if (!d || !Array.isArray(d.items)) throw new Error('no list');
+        tracks = d.items; answered = true; failed = false;
+        cache = { t: Date.now(), who: askedFor !== null ? askedFor : who, items: tracks, here: true };
+        writeJSON(TRACKS_KEY, { t: cache.t, who: cache.who, items: tracks });
+        settle();
+      })
+      .catch(function () { failed = !tracks; })   // offline or a slow / failed server: the music this device has goes on
+      .then(function () { asking = null; paint(); });
+    return asking;
   }
-  var playable = function () { return (tracks || []).filter(function (t) { return !t.locked && safeSrc(t.url); }); };
+  var playable = function () { return (tracks || (pref.track ? [pref.track] : [])).filter(function (t) { return !t.locked && safeSrc(t.url); }); };
   var byId = function (id) { return (tracks || []).filter(function (t) { return t.id === id; })[0] || null; };
+  /* the track to resume: from the list, or the copy kept with the choice while the list is not known yet */
+  function chosen() { return (pref.id && byId(pref.id)) || (!answered && pref.track && pref.track.id === pref.id ? pref.track : null); }
 
   /* ───────── the sound ───────── */
-  var audio = null, current = null, saveTimer = null, leaving = false;   // leaving: the page is being left, its pause is not the student's
+  var audio = null, current = null, tick = null, fade = null;
+  var startAt = 0;      // the place asked for, until the browser knows the file
+  var quiet = false;    // the next pause is not the student's (another tab took the music, the page is put away)
+  var leaving = false;  // the page is being left
+  var owner = false;    // this tab is the one playing (only its place is kept)
+  var blocked = false, blockedSince = 0;   // the browser wants a click or key press first
   function ensureAudio() {
     if (audio) return audio;
     audio = new Audio(); audio.preload = 'auto'; audio.volume = pref.vol;
     audio.addEventListener('ended', function () { next(true); });
-    audio.addEventListener('play', function () { pref.playing = true; write(); paint(); });
-    audio.addEventListener('pause', function () { if (!audio.ended && !leaving) { pref.playing = false; savePos(); paint(); } });
-    audio.addEventListener('error', function () { if (current) { paint('This track could not be played.'); } });
+    audio.addEventListener('playing', function () { blocked = false; stopWaiting(); claim(); paint(); });
+    audio.addEventListener('pause', function () {
+      if (quiet) { quiet = false; return; }
+      if (audio.ended || leaving) return;
+      savePos(); save({ playing: false }); clearInterval(tick); paint();   // paused by the student (or by the keyboard's media keys)
+    });
+    audio.addEventListener('loadedmetadata', function () {
+      if (startAt > 0 && Math.abs((audio.currentTime || 0) - startAt) > 1) { try { audio.currentTime = startAt; } catch (e) { /* not seekable */ } }
+      if (audio.duration && isFinite(audio.duration) && current) save({ d: Math.round(audio.duration), did: current.id });
+    });
+    audio.addEventListener('error', function () { if (current && audio.getAttribute('src')) paint('This track could not be played.'); });
     return audio;
   }
-  function savePos() { if (audio && current) { pref.id = current.id; pref.t = Math.floor(audio.currentTime || 0); write(); } }
-  function load(t, at) {
-    var a = ensureAudio(); current = t;
-    if (a.getAttribute('data-id') !== t.id) { a.src = safeSrc(t.url); a.setAttribute('data-id', t.id); if (at > 0) { var seek = function () { try { a.currentTime = at; } catch (e) { /* not seekable */ } a.removeEventListener('loadedmetadata', seek); }; a.addEventListener('loadedmetadata', seek); } }
-    pref.id = t.id; write();
+  function pos() { return audio && audio.readyState >= 1 ? audio.currentTime || 0 : startAt; }
+  /* the place is kept by the tab that plays; a page that waited for a click keeps its place when it is left, unless
+     another tab has been playing (and keeping its own place) meanwhile */
+  function savePos(leavingNow) {
+    if (!audio || !current) return;
+    if (!owner) {
+      if (!(leavingNow && blocked)) return;
+      var s = readJSON(KEY); if (s && Number(s.at) > blockedSince) return;
+    }
+    save({ id: current.id, t: Math.round(pos() * 100) / 100, at: Date.now() });
   }
-  function play(t, at) {
+  function load(t, at) {
+    var a = ensureAudio(), src = safeSrc(t.url); current = t; at = Math.max(0, Number(at) || 0);
+    if (a.getAttribute('src') !== src) {
+      a.preload = pref.playing ? 'auto' : 'metadata';
+      a.src = src; startAt = at;
+      if (at > 0) { try { a.currentTime = at; } catch (e) { /* set again when the file is known */ } }
+    } else if (Math.abs(pos() - at) > 1.5) { startAt = at; try { a.currentTime = at; } catch (e) { /* not seekable */ } }
+  }
+  /* auto: started by the page itself (it fades in, and may need a click first) */
+  function play(t, at, auto) {
     if (!t || t.locked || !safeSrc(t.url)) return;
-    load(t, at || 0);
-    pref.on = true; write();
-    var p = audio.play(); if (p && p.catch) p.catch(function () { pref.playing = false; paint(); });   // the browser wants a click first: ▶ shows
-    clearInterval(saveTimer); saveTimer = setInterval(savePos, 3000);
+    load(t, at);
+    save({ on: true, playing: true, id: t.id, track: snap(t) });
+    var a = audio;
+    clearInterval(fade); a.volume = auto ? 0 : pref.vol;
+    var p; try { p = a.play(); } catch (e) { p = null; }
+    if (p && p.then) {
+      p.then(function () { if (auto) fadeIn(); }, function (e) {
+        a.volume = pref.vol;
+        if (e && e.name === 'NotAllowedError' && current === t && pref.playing) { blocked = true; blockedSince = Date.now(); waitForGesture(); paint(); }   // the music stays on
+      });
+    } else if (auto) fadeIn();
+    clearInterval(tick); tick = setInterval(function () { savePos(); }, 1000);
     paint();
   }
-  function pause() { if (audio) audio.pause(); pref.playing = false; savePos(); paint(); }
+  function fadeIn() {
+    clearInterval(fade);
+    var t0 = Date.now();
+    fade = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / FADE_MS); try { audio.volume = pref.vol * k * k; } catch (e) { /* fixed volume (iOS) */ } if (k >= 1) clearInterval(fade); }, 40);
+  }
+  function quietPause() { if (audio && !audio.paused) { quiet = true; audio.pause(); } }
+  function pause() { stopWaiting(); blocked = false; if (audio) { savePos(); audio.pause(); } save({ playing: false }); clearInterval(tick); paint(); }
   function next(auto) {
     var list = playable(); if (!list.length) return;
     var i = current ? list.map(function (t) { return t.id; }).indexOf(current.id) : -1;
-    play(list[(i + 1) % list.length], 0);
-    if (!auto && audio) audio.currentTime = 0;
+    var t = list[(i + 1) % list.length];
+    if (audio && current && t.id === current.id) { startAt = 0; try { audio.currentTime = 0; } catch (e) { /* not seekable */ } }
+    play(t, 0, false);
   }
-  function turnOff() { pause(); pref.on = false; write(); if (audio) { audio.removeAttribute('src'); audio.load(); } current = null; paint(); }
+  /* here only: the music was turned off (in another tab), or the track is gone */
+  function stopHere() { stopWaiting(); blocked = false; clearInterval(tick); clearInterval(fade); owner = false; if (audio) { quietPause(); audio.removeAttribute('src'); audio.load(); } current = null; }
+  function turnOff() { if (audio) quietPause(); stopHere(); save({ on: false, playing: false }); paint(); }
+
+  /* where the music would be now: the place it had reached, plus the seconds the page change took */
+  function resumeAt() {
+    var t = Number(pref.t) || 0, gap = (Date.now() - (Number(pref.at) || 0)) / 1000;
+    if (pref.playing && gap > 0 && gap < CARRY_S) t += gap;
+    return t;
+  }
+  function resume() {
+    if (!pref.on) return;
+    var t = chosen();
+    if (!t || t.locked || !safeSrc(t.url)) { if (answered) save({ on: false, playing: false }); return; }   // removed, or above the plan now
+    var at = resumeAt();
+    if (pref.d && pref.did === t.id && at >= pref.d - 0.5) { current = t; if (pref.playing) return next(true); at = 0; }   // the track ended during the page change
+    if (pref.playing) play(t, at, true); else { load(t, at); paint(); }
+  }
+  /* a tab opened in the background starts when it is looked at (not over the tab in front) */
+  var seenWait = false;
+  function resumeWhenSeen() {
+    if (!doc.hidden) return resume();
+    if (seenWait) return;
+    seenWait = true;
+    var seen = function () { if (doc.hidden) return; doc.removeEventListener('visibilitychange', seen); seenWait = false; read(); resume(); };
+    doc.addEventListener('visibilitychange', seen);
+  }
+  /* the server answered: the track playing may be gone, or locked now */
+  function settle() {
+    if (!pref.on) return;
+    if (!current) return resumeWhenSeen();
+    var t = byId(current.id);
+    if (!t || t.locked || !safeSrc(t.url)) return turnOff();
+    var moved = safeSrc(t.url) !== safeSrc(current.url);
+    current = t; if (pref.id === t.id) save({ track: snap(t) });
+    if (moved) { var was = audio && !audio.paused; load(t, 0); if (was) play(t, 0, false); }   // a new file for the same track
+  }
+
+  /* a browser that wants a click first: the first click, tap or key press anywhere on the page starts the music */
+  var GESTURES = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click'], waiting = false;
+  function waitForGesture() { if (waiting) return; waiting = true; GESTURES.forEach(function (n) { doc.addEventListener(n, onGesture, true); }); }
+  function stopWaiting() { if (!waiting) return; waiting = false; GESTURES.forEach(function (n) { doc.removeEventListener(n, onGesture, true); }); }
+  function onGesture(e) {
+    if (!blocked || !audio || !current || !pref.on || !pref.playing) return stopWaiting();
+    if (e.target && e.target.closest && e.target.closest('.ixm-mini,#ixs-music-card')) return;   // the player's own buttons decide
+    var p; try { p = audio.play(); } catch (x) { p = null; }
+    if (p && p.then) p.then(function () { blocked = false; stopWaiting(); fadeIn(); paint(); }, function () { /* not this one: the next */ });
+  }
+
+  /* one tab plays: the tab that starts the music pauses the others (they keep the music on) */
+  var TAB = Math.random().toString(36).slice(2), chan = null;
+  try { chan = new BroadcastChannel('ix-music'); chan.onmessage = function (e) { if (e.data && e.data.type === 'play' && e.data.tab !== TAB) yieldTab(); }; } catch (e) { chan = null; }
+  function claim() { owner = true; if (chan) { try { chan.postMessage({ type: 'play', tab: TAB }); } catch (e) { /* closed */ } } }
+  function yieldTab() { owner = false; blocked = false; stopWaiting(); clearInterval(tick); quietPause(); paint(); }
+  window.addEventListener('storage', function (e) {
+    if (e.key !== KEY) return;
+    var was = { on: pref.on, vol: pref.vol }; read();
+    if (was.on && !pref.on && current) { stopHere(); paint(); }   // turned off in another tab
+    else if (was.vol !== pref.vol && audio) { clearInterval(fade); audio.volume = pref.vol; if (box && !box.contains(doc.activeElement)) paint(); }
+  });
+
   // another sound of the page (a Videos page player, any <audio>/<video>): the music makes room for it
   doc.addEventListener('ix:media-play', function () { if (audio && !audio.paused) pause(); });
   doc.addEventListener('play', function (e) { if (audio && e.target !== audio && (e.target.tagName === 'VIDEO' || e.target.tagName === 'AUDIO') && !audio.paused) pause(); }, true);
-  window.addEventListener('pagehide', function () { leaving = true; savePos(); });
-  window.addEventListener('pageshow', function (e) { leaving = false; if (e.persisted) paint(); });
+  window.addEventListener('pagehide', function (e) { savePos(true); leaving = true; if (e.persisted) quietPause(); });
+  window.addEventListener('pageshow', function (e) {
+    leaving = false;
+    if (!e.persisted) return;
+    // back from the browser's back / forward cache: the other pages went on meanwhile
+    read(); cache = readJSON(TRACKS_KEY); if (cache && Array.isArray(cache.items)) tracks = cache.items;
+    if (!pref.on) { if (current) stopHere(); paint(); return; }
+    resume();
+  });
   doc.addEventListener('visibilitychange', function () { if (doc.hidden) savePos(); });
+  // signed in, signed out, another account or plan: the list is asked again
+  doc.addEventListener('ieltsx:user', function (e) {
+    var w = whoOf(e.detail && e.detail.user); who = w;
+    if (cache && cache.who === w) return;
+    if (cache && cache.here && cache.who == null) { cache.who = w; writeJSON(TRACKS_KEY, { t: cache.t, who: w, items: cache.items }); return; }   // asked on this page, for this account
+    if (pref.on || onSettings) refresh();
+  });
 
   /* ───────── the little player of the ordinary pages ───────── */
   var mini = null;
   function css() {
-    if (doc.getElementById('ixm-css')) return;
+    if (doc.getElementById('ixm-css') || !doc.head) return;
     var l = doc.createElement('link'); l.id = 'ixm-css'; l.rel = 'stylesheet'; l.href = '/assets/css/site-music.css'; doc.head.appendChild(l);
   }
   function paintMini(msg) {
-    if (onSettings) return;
+    if (onSettings || !doc.body) return;
     if (!pref.on || !current) { if (mini) { mini.remove(); mini = null; } return; }
     css();
     if (!mini) {
@@ -101,12 +255,13 @@
       mini.addEventListener('click', function (e) {
         var b = e.target.closest('[data-m]'); if (!b) return;
         var m = b.getAttribute('data-m');
-        if (m === 'toggle') { if (audio && !audio.paused) pause(); else play(current, audio ? audio.currentTime : pref.t || 0); }
+        if (m === 'toggle') { if (audio && !audio.paused) pause(); else play(current, pos(), false); }
         else if (m === 'next') next(false);
         else if (m === 'off') turnOff();
       });
     }
     var on = audio && !audio.paused;
+    if (!msg && blocked) msg = TAP + ' anywhere to continue';
     mini.innerHTML = '<span class="ixm-mini-ic' + (on ? ' on' : '') + '">' + svg(IC.music) + '</span>'
       + '<a class="ixm-mini-t" href="/settings#ixs-music-card" title="Music settings"><b>' + esc(current.title) + '</b>' + (msg ? '<small>' + esc(msg) + '</small>' : current.artist ? '<small>' + esc(current.artist) + '</small>' : '') + '</a>'
       + '<button type="button" data-m="toggle" aria-label="' + (on ? 'Pause' : 'Play') + '">' + svg(on ? IC.pause : IC.play) + '</button>'
@@ -119,9 +274,10 @@
   function paintSettings(msg) {
     if (!onSettings || !box) return;
     if (sw) sw.checked = !!pref.on;
-    if (!tracks) return;
+    if (!tracks) { if (failed) box.innerHTML = '<p class="ixm-empty">The music could not be loaded. Check the connection and open this page again.</p>'; return; }
     if (!tracks.length) { box.innerHTML = '<p class="ixm-empty">No music yet. New tracks are added by the IELTS X team.</p>'; return; }
     var on = audio && !audio.paused;
+    if (!msg && blocked) msg = TAP + ' anywhere to continue the music.';
     box.innerHTML = '<ul class="ixm-tracks">' + tracks.map(function (t) {
       var cur = current && current.id === t.id;
       var cover = safeSrc(t.cover);
@@ -142,28 +298,28 @@
       var b = e.target.closest('[data-t],[data-mnext]'); if (!b) return;
       if (b.hasAttribute('data-mnext')) return next(false);
       var t = byId(b.getAttribute('data-t'));
-      if (current && t && current.id === t.id && audio && !audio.paused) pause(); else play(t, current && t && current.id === t.id && audio ? audio.currentTime : 0);
+      if (current && t && current.id === t.id && audio && !audio.paused) pause(); else play(t, current && t && current.id === t.id ? pos() : 0, false);
     });
-    box.addEventListener('input', function (e) { if (e.target.id === 'ixm-vol') { pref.vol = Math.max(0, Math.min(1, Number(e.target.value) / 100)); if (audio) audio.volume = pref.vol; write(); } });
+    box.addEventListener('input', function (e) { if (e.target.id === 'ixm-vol') { save({ vol: Math.max(0, Math.min(1, Number(e.target.value) / 100)) }); clearInterval(fade); if (audio) audio.volume = pref.vol; } });
     if (sw) sw.addEventListener('change', function () {
-      if (sw.checked) { var t = (pref.id && byId(pref.id)) || playable()[0]; if (t && !t.locked) play(t, t.id === pref.id ? pref.t || 0 : 0); else { sw.checked = false; paint('Choose a track below.'); } }
+      if (sw.checked) { var t = (pref.id && byId(pref.id)) || playable()[0]; if (t && !t.locked) play(t, t.id === pref.id ? Number(pref.t) || 0 : 0, false); else { sw.checked = false; paint('Choose a track below.'); } }
       else turnOff();
     });
   }
 
   /* ───────── start ───────── */
-  function start() {
-    if (onSettings) settingsStart();
-    var need = onSettings || pref.on;
-    if (!need) return;
-    loadTracks(onSettings).then(function () {
-      var t = pref.id && byId(pref.id);
-      if (pref.on && t && !t.locked && safeSrc(t.url)) {
-        if (pref.playing) play(t, pref.t || 0); else { load(t, pref.t || 0); paint(); }
-      } else if (pref.on && !t) { pref.on = false; write(); }   // the track was removed (or locked since)
-      paint();
-    });
+  // the sound starts at once (it needs neither the page nor the server); the player shows when the page is there
+  function boot() {
+    if (!pref.on && !onSettings) return;
+    if (pref.on) resumeWhenSeen();
+    var stale = !cache || !(Date.now() - (Number(cache.t) || 0) < REFRESH_MS) || (who !== null && cache.who !== who);
+    if (onSettings || stale || (pref.on && !current)) refresh();
   }
-  window.IXMusic = { play: function (id) { play(byId(id), 0); }, pause: pause, next: next, off: turnOff, state: function () { return { on: !!pref.on, playing: !!(audio && !audio.paused), id: current && current.id }; } };
+  function start() { if (onSettings) settingsStart(); paint(); }
+  window.IXMusic = {
+    play: function (id) { play(byId(id), 0, false); }, pause: pause, next: next, off: turnOff,
+    state: function () { return { on: !!pref.on, playing: !!(audio && !audio.paused), id: current && current.id, t: Math.round(pos() * 10) / 10, waitingForClick: blocked }; }
+  };
+  boot();
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start); else start();
 })();

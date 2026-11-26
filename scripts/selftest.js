@@ -2086,6 +2086,13 @@ server.listen(0, async () => {
       r = await call('DELETE', '/api/admin/panels/music/' + m2.id, { jar: boss }); assert.deepEqual(r.json.items.map((x) => x.id), [m1.id]);
       assert.equal((await call('GET', '/api/panels/music')).json.items.length, 1);
       ok('Music: tracks with a file, a locked track has no file, order and delete');
+      // a failed read of the list is a 503, never an empty list (assets/js/site-music.js would take the track as removed and turn the music off)
+      const realGet = handler.store.getSetting;
+      handler.store.getSetting = async (k, o) => { if (k === 'panel-music') throw new Error('database down'); return realGet.call(handler.store, k, o); };
+      try { r = await call('GET', '/api/panels/music', { jar: freeU.j }); assert.equal(r.status, 503); assert.ok(r.json && r.json.error && r.json.items === undefined, 'an error, not an empty list'); }
+      finally { handler.store.getSetting = realGet; }
+      assert.equal((await call('GET', '/api/panels/music')).json.items.length, 1, 'the list again once the database answers');
+      ok('Music: a failed read of the list answers 503, not an empty list');
 
       // links: "old link -> new link" for every page
       const putLinks = (rules) => call('POST', '/api/admin/links', { jar: boss, body: { rules } });
