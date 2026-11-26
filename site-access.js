@@ -107,6 +107,13 @@ function showVerifyBanner(user) {
   x.addEventListener('click', () => { bar.remove(); try { sessionStorage.setItem('ix-verify-dismissed', '1'); } catch (e) { /* ignore */ } });
   bar.append(msg, btn, x);
   document.body.prepend(bar);
+  // Pages without the site's stylesheets (the five oldest Reading passages, some saved test pages) showed it as plain
+  // text over the header: give it the same pill there.
+  if (getComputedStyle(bar).position === 'static') {
+    const dark = document.documentElement.classList.contains('dark') || document.documentElement.classList.contains('dark-mode') || document.body.classList.contains('dark-mode');
+    bar.style.cssText = 'position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:9998;max-width:calc(100vw - 2rem);display:flex;gap:.75rem;align-items:center;justify-content:center;flex-wrap:wrap;padding:.5rem .75rem .5rem 1rem;border-radius:9999px;border:1px solid ' + (dark ? '#6b4f1d' : '#f5c26b') + ';background:' + (dark ? '#2a2112' : '#fff8e6') + ';color:' + (dark ? '#f5d48b' : '#7a4a00') + ';box-shadow:0 10px 30px -8px rgba(0,0,0,.35);font:500 13px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif';
+    [btn, x].forEach((b) => { b.style.cssText = 'border:1px solid currentColor;background:transparent;color:inherit;border-radius:9999px;padding:.2rem .7rem;font:inherit;cursor:pointer'; });
+  }
 }
 
 // finished tests follow the account: progress ("Completed") and the results behind the dashboard

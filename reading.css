@@ -5633,7 +5633,12 @@ body.theme-sepia .tfng-legend{color:var(--sp-ink-2)}
 .note-lines li{line-height:24px;margin:4px 0}
 .sent-lines .sent-line{margin:0 0 14px;line-height:30px}
 .sent-lines .sent-line:last-child{margin-bottom:4px}
+/* the sub-headings of the notes ("## Childhood") take the colour of the notes title in every theme:
+   in sepia / "Yellow on black" they used to fall back to the lighter text colour of the bullets */
+.note-lines .note-sub{color:#000}
 body.dark-mode .note-lines .note-sub{color:var(--ex-ink)}
+body.theme-sepia .note-lines .note-sub,
+body.theme-sepia .tfng-legend th{color:var(--sp-ink)}
 
 /* review: the per-question Explanation button sits under its own question,
    with clear air before the next one (it used to read as the next question's) */
@@ -5701,3 +5706,9 @@ body.dark-mode .flow-box{background:transparent}
    its place and size; it is never shown, so the old logo does not flash before assets/js/branding.js runs. */
 .ex-logo > svg, .ei-logo > svg { background: url(/icon.png) center / contain no-repeat; }
 .ex-logo > svg > *, .ei-logo > svg > * { display: none; }
+
+/* the gap inside a row of a matching grid (a summary with a list of words, reading-exam.js gapLabel): a small box with the
+   number of the question, as on the paper, instead of the underscores the admin typed */
+.mg-label .mg-blank{display:inline-block;min-width:44px;padding:0 6px;margin:0 3px;border:1px solid #767676;border-radius:3px;font-weight:700;font-size:.9em;line-height:1.55;text-align:center;vertical-align:baseline;background:#fff;color:#000}
+body.dark-mode .mg-label .mg-blank{background:var(--ex-panel-2);border-color:var(--ex-line-2);color:var(--ex-ink)}
+body.theme-sepia .mg-label .mg-blank{background:var(--sp-panel-2);border-color:var(--sp-line-2);color:var(--sp-ink)}

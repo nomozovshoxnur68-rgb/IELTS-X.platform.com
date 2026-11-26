@@ -428,3 +428,6 @@ html.rui-modern #stage-registration .ei-shot { aspect-ratio: 16 / 10; }
 @media (prefers-reduced-motion: reduce) {
   html.rui-modern .rm-card, html.rui-modern .rm-word, html.rui-modern mark.is-hit { animation: none !important; }
 }
+
+/* the numbered gap inside a row of a matching grid (reading-exam.js gapLabel) */
+html.rui-modern #questions-pane .mg-label .mg-blank { border-color: var(--rm-field); background: var(--rm-bg) !important; color: var(--rm-ink) !important; font-family: var(--rm-font); border-radius: 4px; }

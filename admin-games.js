@@ -336,12 +336,13 @@
   }
 
   const isMine = () => (location.hash || '').slice(1).split('?')[0] === 'games';
-  function onHash() { if (isMine() && !data && !loading) load(); }
+  // the list may already be here (fetched in the background for the menu count): draw it, or the view stayed on "Loading…"
+  function onHash() { if (!isMine()) return; if (!data && !loading) load(); else if (data && !loading) render(); }
   window.addEventListener('DOMContentLoaded', () => {
     render(); document.addEventListener('click', onClick); document.addEventListener('input', onInput); document.addEventListener('change', onInput);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && report) { report = null; render(); } });
     onHash();
-    if (!isMine()) api('/api/admin/games').then((d) => { if (!data) { data = d; livePill(); } }).catch(() => {});   // the "live" count in the menu
+    if (!isMine()) api('/api/admin/games').then((d) => { if (!data) { data = d; livePill(); render(); } }).catch(() => {});   // the "live" count in the menu
   });
   window.addEventListener('hashchange', onHash);
   window.addEventListener('beforeunload', (e) => { if (edit && edit.questions.some((q) => q.text.trim())) { e.preventDefault(); e.returnValue = ''; } });

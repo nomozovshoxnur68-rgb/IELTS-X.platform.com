@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <script>/* light / dark before the first paint: the same "theme" choice as the website (assets/js/theme-init.js) */
-(function(){try{var s=localStorage.getItem('theme');var d=s==='dark'||(s!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+(function(){try{var s=localStorage.getItem('theme');var d=s==='dark'||(s!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}
+/* the panel's own settings (admin-settings.js): density, text size, folded sidebar, NEW labels, motion */
+try{var p=JSON.parse(localStorage.getItem('ix-admin-prefs')||'{}')||{},c=document.documentElement.classList;if(p.density==='compact')c.add('ad-compact');if(p.text==='large')c.add('ad-text-lg');if(p.sidebar==='collapsed')c.add('ad-side-collapsed');if(p.newBadges===false)c.add('ad-no-new');if(p.motion==='reduced')c.add('ad-reduce-motion');}catch(e){}})();</script>
 <script src="/assets/js/loading.js"></script>
 <meta charset="UTF-8">
 <link rel="icon" href="/favicon.ico">
@@ -22,10 +24,10 @@
 <div class="admin-shell">
 
 <aside class="admin-sidebar" id="sidebar" aria-label="Admin navigation">
-  <div class="admin-brand">
-    <img src="/logo.png" onerror="this.style.display='none'" alt="">
-    <div><strong>IELTSX</strong><small>Admin Panel</small></div>
-  </div>
+  <a class="admin-brand" href="#dashboard" title="Dashboard">
+    <img src="/icon.png" onerror="this.onerror=null;this.src='/logo.png'" alt="">
+    <div><strong>IELTSX</strong><small>Admin panel</small></div>
+  </a>
   <nav class="admin-nav">
     <div class="nav-label">Overview</div>
     <a class="nav-item active" href="#dashboard" data-nav="dashboard"><span class="ico" data-i="dashboard"></span><span class="grow">Dashboard</span></a>
@@ -65,6 +67,7 @@
     <a class="nav-item" href="#grammar" data-nav="grammar"><span class="ico" data-i="graduation"></span><span class="grow">Grammar</span><span class="nav-new">NEW</span></a>
     <a class="nav-item" href="#music" data-nav="music"><span class="ico" data-i="music"></span><span class="grow">Music (Settings)</span><span class="nav-new">NEW</span></a>
     <div class="nav-label">Settings</div>
+    <a class="nav-item" href="#settings" data-nav="settings"><span class="ico" data-i="settings"></span><span class="grow">Settings</span><span class="nav-new">NEW</span></a>
     <a class="nav-item" href="#access" data-nav="access"><span class="ico" data-i="lock"></span><span class="grow">Access (lock / plans)</span></a>
     <a class="nav-item" href="#pricing" data-nav="pricing"><span class="ico" data-i="tag"></span><span class="grow">Price control</span></a>
     <a class="nav-item" href="#branding" data-nav="branding"><span class="ico" data-i="image"></span><span class="grow">Logo</span></a>
@@ -81,11 +84,17 @@
 
 <main class="admin-main">
   <header class="topbar">
-    <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu"><span data-i="menu"></span></button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Show or hide the menu" title="Menu"><span data-i="sidebar"></span></button>
+    <span class="topbar-sep" aria-hidden="true"></span>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
     <button class="btn btn-sm" id="refresh" type="button" title="Reload all data"><span data-i="refresh" class="ico-inline"></span><span class="lbl-txt">Refresh</span></button>
-    <button class="icon-btn theme-toggle" id="theme-toggle" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode"><span class="moon" data-i="moon"></span><span class="sun" data-i="sun"></span></button>
-    <div class="admin-user"><div><strong id="admin-name" style="font-size:13px">Administrator</strong><div id="admin-role" class="muted sm">Full access</div></div><div id="admin-avatar" class="avatar">A</div></div>
+    <div class="theme-seg" role="radiogroup" aria-label="Theme">
+      <button type="button" role="radio" data-theme-pref="light" aria-label="Light" title="Light"><span data-i="sun"></span></button>
+      <button type="button" role="radio" data-theme-pref="dark" aria-label="Dark" title="Dark"><span data-i="moon"></span></button>
+      <button type="button" role="radio" data-theme-pref="system" aria-label="System" title="System"><span data-i="monitor"></span></button>
+    </div>
+    <a class="icon-btn" href="#settings" aria-label="Settings" title="Settings"><span data-i="settings"></span></a>
+    <div class="admin-user"><div><strong id="admin-name" style="font-size:13px">Administrator</strong><div id="admin-role" class="muted sm">Full access</div></div><a href="#settings" title="Settings"><div id="admin-avatar" class="avatar">A</div></a></div>
   </header>
 
   <div class="page">
@@ -212,6 +221,7 @@
   <section class="view" id="view-links"><div id="content-links"></div></section>
   <section class="view" id="view-teachers"><div id="content-teachers"></div></section>
   <section class="view" id="view-ebooks"><div id="content-ebooks"></div></section>
+  <section class="view" id="view-settings"><div id="content-settings"></div></section>
 
   </div>
 </main>
@@ -264,6 +274,7 @@
 <script src="admin-teachers.js"></script>
 <script src="/assets/js/ebook-render.js"></script>
 <script src="admin-ebooks.js"></script>
+<script src="admin-settings.js"></script>
 </body>
 </html>
 

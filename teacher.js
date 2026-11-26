@@ -98,7 +98,9 @@
     paintIcons();
     setTheme(themeNow(), false);
     $('#theme-toggle').addEventListener('click', () => setTheme(themeNow() === 'dark' ? 'light' : 'dark', true));
-    $('#menu-btn').addEventListener('click', openMenu); $('#scrim').addEventListener('click', closeMenu);
+    // narrow screen: the menu slides in; wide screen: it folds away and comes back (the button is shown there too, as in the admin panel)
+    $('#menu-btn').addEventListener('click', () => { if (window.matchMedia('(max-width: 900px)').matches) openMenu(); else document.documentElement.classList.toggle('ad-side-collapsed'); });
+    $('#scrim').addEventListener('click', closeMenu);
     try {
       const d = await api('/api/teacher/me');
       me = d.user; isAdmin = !!d.admin; teacher = d.teacher;

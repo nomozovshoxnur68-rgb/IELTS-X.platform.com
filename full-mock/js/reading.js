@@ -3327,10 +3327,15 @@ function beginExam() {
     beginReading();
   };
   
+  // Full-screen is asked for first, but the test never waits on it: an in-app browser (Telegram, Instagram) or a
+  // pending permission prompt can leave that promise unsettled for ever, and Start then did nothing. 1.5 s at most, once.
+  let begun = false;
+  const once = () => { if (begun) return; begun = true; advance(); };
   if (p && typeof p.finally === 'function') {
-    p.finally(advance);
+    p.finally(once);
+    setTimeout(once, 1500);
   } else {
-    advance();
+    once();
   }
 }
 
