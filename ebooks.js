@@ -238,7 +238,15 @@ async function resultKeys(ctx, userId) {
   try { return new Set((await ctx.store.listResults(userId, 1000)).map((r) => testKeyOf(r.testKey))); } catch (e) { return new Set(); }
 }
 
-/* ───────── the ready e-books: put on the Books page once ───────── */
+/* ───────── the ready e-books: put on the Books page once ─────────
+   Every one is a module { key, id, unitId(n), style, book, units }; a literal require() each, so that the files are
+   bundled with the server on Vercel. In the order of the Books page (the first one on top). */
+const READY = {
+  'bands-course': () => require('./ebooks-course'),
+  'bands-workbook': () => require('./ebooks-workbook'),
+  collocations: () => require('./ebooks-collocations')
+};
+const readyUnits = (lib, HttpError) => lib.units.map((x, n) => ({ ...cleanUnit(x, null, HttpError), id: lib.unitId(n) }));
 let builtinRun = null;
 async function putBook(ctx, book, units, style) {   // the units first: a book without its units is never listed
   await inBatches(units, 6, (u) => ctx.store.setSetting(unitKey(book.id, u.id), u));
@@ -248,11 +256,12 @@ async function putBook(ctx, book, units, style) {   // the units first: a book w
 }
 async function installBuiltin(ctx) {
   const got = await ctx.store.getSetting('ebook-builtin'); const keys = got && Array.isArray(got.keys) ? got.keys : [];
-  const lib = require('./ebooks-collocations');
-  if (keys.includes(lib.key)) return;
+  const libs = Object.values(READY).map((load) => load()).filter((lib) => !keys.includes(lib.key));
+  if (!libs.length) return;
   const items = await loadBooks(ctx, true);
-  if (!items.some((x) => x.id === lib.id)) await putBook(ctx, bookOf(lib.book, lib.id), lib.units.map((x, n) => ({ ...cleanUnit(x, null, ctx.HttpError), id: lib.unitId(n) })), lib.style);
-  await ctx.store.setSetting('ebook-builtin', { keys: keys.concat(lib.key), updatedAt: now() });
+  // a new book goes on top of the Books page: the last one first, so that they stay in the order of READY
+  for (const lib of libs.slice().reverse()) if (!items.some((x) => x.id === lib.id)) await putBook(ctx, bookOf(lib.book, lib.id), readyUnits(lib, ctx.HttpError), lib.style);
+  await ctx.store.setSetting('ebook-builtin', { keys: keys.concat(libs.map((lib) => lib.key)), updatedAt: now() });
 }
 function ensureBuiltin(ctx) {
   if (process.env.EBOOK_BUILTIN === 'off') return Promise.resolve();
@@ -476,7 +485,7 @@ async function route(req, res, p, method, ctx) {
    POST   /api/admin/ebooks/<book>/units/<unit>/copy · /publish { published }
    POST   /api/admin/ebooks/<book>/order         { ids, groups? }   the order (and the parts) of the units
    DELETE /api/admin/ebooks/<book>/units/<unit>
-   POST   /api/admin/ebooks/sample               adds a sample e-book, or the ready one (which: collocations) */
+   POST   /api/admin/ebooks/sample               adds a sample e-book, or a ready one (which: bands-course, bands-workbook, collocations) */
 /* units written as text or as JSON -> { units, problems }: every unit is checked, the problems name their unit */
 function readUnits(body, HttpError) {
   let list = Array.isArray(body.units) ? body.units : null;
@@ -524,13 +533,13 @@ async function adminRoute(req, res, p, method, ctx) {
   if (p === '/api/admin/ebooks/sample' && method === 'POST') {
     const samples = require('./ebooks-sample');
     const which = String(((await readJson(req)) || {}).which || 'starter');
-    const lib = which === 'collocations' ? require('./ebooks-collocations') : null;
+    const lib = Object.prototype.hasOwnProperty.call(READY, which) ? READY[which]() : null;
     const sample = lib || (which !== 'starter' && samples.samples && samples.samples[which] ? samples.samples[which] : samples);
     const items = await loadBooks(ctx, true);
     if (items.length >= panels.KINDS.books.max) throw new HttpError(400, 'Keep at most ' + panels.KINDS.books.max + ' books: delete old ones first.');
     if (lib && items.some((x) => x.id === lib.id)) throw new HttpError(409, '“' + lib.book.title + '” is already on the Books page.');
     const book = bookOf({ ...sample.book, plan: sample.book.plan || 'free' }, lib ? lib.id : '');
-    const units = sample.units.map((x, n) => (lib ? { ...cleanUnit(x, null, HttpError), id: lib.unitId(n) } : cleanUnit(x, null, HttpError)));
+    const units = lib ? readyUnits(lib, HttpError) : sample.units.map((x) => cleanUnit(x, null, HttpError));
     await putBook(ctx, book, units, sample.style);
     await audit(admin, 'ebook.sample', book.title, { units: units.length });
     return send(res, 201, { book: { id: book.id, title: book.title }, units: units.length }, nc);

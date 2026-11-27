@@ -2167,7 +2167,7 @@ server.listen(0, async () => {
 
     // --- teachers (teachers.js) and e-books (ebooks.js)
     {
-      for (const f of ['/teachers.js', '/ebooks.js', '/ebooks-sample.js']) assert.ok([403, 404].includes((await call('GET', f)).status), f + ' is a server module');
+      for (const f of ['/teachers.js', '/ebooks.js', '/ebooks-sample.js', '/ebooks-collocations.js', '/ebooks-course.js', '/ebooks-workbook.js']) assert.ok([403, 404].includes((await call('GET', f)).status), f + ' is a server module');
       for (const f of ['/teacher.js', '/teacher.css', '/admin-teachers.js', '/admin-ebooks.js', '/assets/js/ebooks-page.js', '/assets/js/join-page.js', '/assets/css/ebooks.css']) assert.equal((await call('GET', f)).status, 200, f);
       const me = (await call('GET', '/api/auth/me', { jar: user })).json.user; assert.ok(me && me.email === 'alice@example.com', 'alice is still signed in');
       let r = await call('GET', '/api/teacher/me', { jar: user }); assert.equal(r.status, 200); assert.equal(r.json.teacher, null, 'not a teacher yet');
@@ -2213,6 +2213,9 @@ server.listen(0, async () => {
       assert.equal((await call('POST', '/api/admin/ebooks/sample', { jar: user })).status, 403);
       r = await call('POST', '/api/admin/ebooks/sample', { jar: boss }); assert.equal(r.status, 201); const bid = r.json.book.id;
       r = await call('GET', '/api/ebooks'); const sb = r.json.items.find((b) => b.id === bid); assert.equal(sb.units, 5); assert.equal(sb.progress, undefined, 'a guest has no progress');
+      // the ready e-books (ebooks-course.js, ebooks-workbook.js): on the Books page by themselves, in their designs, no answers sent
+      for (const [id, n, style] of [['b-be5c0001', 10, 'course'], ['b-be5b0001', 12, 'workbook'], ['b-c0110ca7', 24, 'inuse']]) { const rb = r.json.items.find((b) => b.id === id); assert.ok(rb, id + ' is a ready e-book'); assert.equal(rb.units, n, id); assert.equal(rb.style, style, id); assert.ok(rb.exercises > n * 10, id + ': its exercises count'); }
+      r = await call('GET', '/api/ebooks/b-be5c0001/u-be5c0001', { jar: k1 }); assert.equal(r.status, 200); assert.ok(r.json.unit.doc.length > 20); assert.ok(r.json.unit.points >= 40); assert.ok(!r.text.includes('07814302966'), 'the answers of a ready e-book stay on the server');
       r = await call('GET', '/api/ebooks/' + bid, { jar: k1 }); assert.equal(r.json.units.length, 5); assert.equal(r.json.progress.percent, 0);
       const U = r.json.units;
       r = await call('GET', '/api/ebooks/' + bid + '/' + U[1].id, { jar: k1 }); assert.equal(r.status, 200);
