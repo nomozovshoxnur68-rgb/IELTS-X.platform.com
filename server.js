@@ -2229,7 +2229,7 @@ const MIME = {
 const BLOCKED_DIRS = new Set(['node_modules', 'data', 'api', 'scripts', 'reading-src', 'listening-src', 'speaking-src', 'design-src', '.git', '.vscode', '.github']);   // reading-src, listening-src: test sources with their answers; design-src: sent by /api/design/fx/ to who may use it
 const BLOCKED_FILES = new Set(['server.js', 'package.json', 'package-lock.json', 'vercel.json', 'supabase-schema.sql', '.env', '.env.example',
   // server-only modules (required by server.js, never loaded by a page): the AI prompts and routing stay private
-  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js', 'panels.js', 'teachers.js', 'ebooks.js', 'ebooks-sample.js', 'ebooks-collocations.js', 'ebook-doc.js']);
+  'ai-provider.js', 'ai-generator.js', 'ai-examiner.js', 'ai-store.js', 'mock-tests.js', 'reading-router.js', 'listening-router.js', 'reading-exam.js', 'listening-exam.js', 'middleware.js', 'site-check.js', 'quiz-game.js', 'predictions.js', 'sidebar.js', 'site-watch.js', 'payme.js', 'panels.js', 'teachers.js', 'ebooks.js', 'ebooks-sample.js', 'ebooks-collocations.js', 'ebooks-course.js', 'ebooks-workbook.js', 'ebook-doc.js']);
 function isBlocked(rel) {
   const parts = rel.split('/').filter(Boolean).map((s) => s.toLowerCase());
   if (!parts.length) return false;
